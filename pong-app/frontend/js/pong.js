@@ -1,4 +1,5 @@
 document.addEventListener('DOMContentLoaded', function () {
+    // recuperation du canvas
     const canvas = document.getElementById("pongCanvas");
     const ctx = canvas.getContext("2d");
 
@@ -11,7 +12,7 @@ document.addEventListener('DOMContentLoaded', function () {
         ctx.fill();
         ctx.closePath();
     }
-
+//update lemplacement de la balle
     function updateGame() {
         ctx.fillStyle = "#333";
         ctx.fillRect(0, 0, canvas.width, canvas.height);
