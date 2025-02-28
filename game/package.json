@@ -1,0 +1,28 @@
+{
+	"name": "ts",
+	"version": "1.0.0",
+	"main": "index.js",
+	"scripts": {
+	  "test": "echo 'Error: no test specified' && exit 1"
+	},
+	"keywords": [],
+	"author": "",
+	"license": "ISC",
+	"description": "",
+	"devDependencies": {
+	  "http-server": "^14.1.1",
+	  "typescript": "^5.7.3"
+	},
+  
+	"name": "pong-project",
+	"version": "1.0.0",
+	"scripts": {
+	  "start": "lite-server",
+	  "build": "tsc",
+	  "dev": "tsc && lite-server --config bs-config.json"
+	},
+	"devDependencies": {
+	  "typescript": "^4.0.0",
+	  "lite-server": "^2.5.4"
+	}
+}
