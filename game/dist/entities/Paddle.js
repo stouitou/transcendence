@@ -6,7 +6,7 @@ export class Paddle {
         this._height = 120;
         this._color = 'rgb(255, 0, 0)';
         this._speed = 5;
-        this.keys = {};
+        this._keys = {};
         // Creates the paddle object
         this._element = document.createElement('div');
         this._element.classList.add('ball');
@@ -24,27 +24,49 @@ export class Paddle {
         // "Draws" the paddle in the window
         document.body.appendChild(this._element);
         // Arrow function makes this referring to the paddle and not to the document
-        document.addEventListener('keydown', (event) => this.keys[event.key] = true);
-        document.addEventListener('keyup', (event) => this.keys[event.key] = false);
+        document.addEventListener('keydown', (event) => this._keys[event.key] = true);
+        document.addEventListener('keyup', (event) => this._keys[event.key] = false);
         // Launch animation to be able to move the paddle with keyboard
-        this._animate();
+        // this._animate();
     }
-    _animate() {
-        const loop = () => {
-            // Fetch the x value of the top of the paddle, and the keys that are being pressed
-            let currentTop = this._element.offsetTop;
-            const moveUp = (this.keys['ArrowUp'] && this._position === 'right') || (this.keys['s'] && this._position === 'left');
-            const moveDown = (this.keys['ArrowDown'] && this._position === 'right') || (this.keys['x'] && this._position === 'left');
-            // Move subsequently
-            if (moveUp) {
-                this._element.style.top = `${Math.max(0, currentTop - this._speed)}px`;
-            }
-            if (moveDown) {
-                this._element.style.top = `${Math.min(window.innerHeight - this._element.offsetHeight, currentTop + this._speed)}px`;
-            }
-            // Function called when browser refreshes pages
-            requestAnimationFrame(loop);
-        };
-        loop();
+    get element() {
+        return this._element;
+    }
+    ;
+    get keys() {
+        return this._keys;
+    }
+    ;
+    move() {
+        // Fetch the x value of the top of the paddle, and the keys that are being pressed
+        let currentTop = this._element.offsetTop;
+        const moveUp = (this._keys['ArrowUp'] && this._position === 'right') || (this._keys['s'] && this._position === 'left');
+        const moveDown = (this._keys['ArrowDown'] && this._position === 'right') || (this._keys['x'] && this._position === 'left');
+        // Move subsequently
+        if (moveUp) {
+            this._element.style.top = `${Math.max(0, currentTop - this._speed)}px`;
+        }
+        if (moveDown) {
+            this._element.style.top = `${Math.min(window.innerHeight - this._element.offsetHeight, currentTop + this._speed)}px`;
+        }
     }
 }
+// private _animate() {
+// 	const loop = () => {
+// 		// Fetch the x value of the top of the paddle, and the keys that are being pressed
+// 		let currentTop = this._element.offsetTop;
+// 		const moveUp = (this._keys['ArrowUp'] && this._position === 'right') || (this._keys['s'] && this._position === 'left');
+// 		const moveDown = (this._keys['ArrowDown'] && this._position === 'right') || (this._keys['x'] && this._position === 'left');
+// 		// Move subsequently
+// 		if (moveUp) {
+// 			this._element.style.top = `${Math.max(0, currentTop - this._speed)}px`;
+// 		}
+// 		if (moveDown) {
+// 			this._element.style.top = `${Math.min(window.innerHeight - this._element.offsetHeight, currentTop + this._speed)}px`;
+// 		}
+// 		// Function called when browser refreshes pages
+// 		requestAnimationFrame(loop);
+// 	};
+// 	loop();
+// }
+// }

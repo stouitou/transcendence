@@ -4,7 +4,7 @@ export class Ball {
     constructor() {
         this._diameter = 30;
         this._color = 'rgb(0, 0, 0)';
-        this._speed = 4;
+        this._speed = 8;
         // Creates the ball object
         this._element = document.createElement('div');
         this._element.classList.add('ball');
@@ -13,20 +13,37 @@ export class Ball {
         this._element.style.height = `${this._diameter}px`;
         this._element.style.backgroundColor = this._color; // color of the ball
         this._element.style.borderRadius = '50%'; // makes it round
-        this._element.style.top = `calc(50% - ${this._diameter}px)`; // centered vertically (15px is half the size of the ball)
-        this._element.style.left = `calc(50% - ${this._diameter}px)`; // centered horizontally (15px is half the size of the ball)
+        // this._element.style.top = `calc(50% - ${this._diameter}px)`;	// centered vertically (15px is half the size of the ball)
+        this._element.style.left = `calc(50% - ${this._diameter / 2}px)`; // centered horizontally (15px is half the size of the ball)
         this._element.style.position = 'absolute'; // doesn't interact with other objects or text
+        this.spawn();
         // "Draws" the ball in the window
         document.body.appendChild(this._element);
-        if (Math.random() < 0.5)
-            this._moveRight();
-        else
-            this._moveLeft();
+        // this._animate();
     }
-    _moveRight() {
+    spawn() {
+        const pos = (Math.random() * 100) / 2;
+        this._element.style.top = `calc(25% - ${this._diameter / 2}px + ${pos}%)`; // centered vertically (15px is half the size of the ball)
+    }
+    moveRight() {
+        console.log("move right");
         let currentRight = this._element.offsetLeft + this._diameter;
+        console.log("in move right, before, this._element.style.left: ", this._element.style.left);
+        console.log("in move right, current right: ", currentRight);
+        console.log("in move right, speed: ", this._speed);
+        console.log("in move right, diameter: ", this._diameter);
+        this._element.style.left = `${currentRight + this._speed - this._diameter}px`;
+        console.log("in move right, after, this._element.style.left: ", this._element.style.left);
     }
-    _moveLeft() {
+    moveLeft() {
+        console.log("move left");
+        let currentLeft = this._element.offsetLeft;
+        console.log("in move left, before, this._element.style.left: ", this._element.style.left);
+        console.log("in move left, current left: ", currentLeft);
+        console.log("in move left, speed: ", this._speed);
+        console.log("in move left, diameter: ", this._diameter);
+        this._element.style.left = `${currentLeft - this._speed}px`;
+        console.log("in move left, after, this._element.style.left: ", this._element.style.left);
     }
 }
 // const animateRight = (callback: () => void) => {
