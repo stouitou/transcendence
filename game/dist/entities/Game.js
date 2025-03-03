@@ -7,7 +7,6 @@ export class Game {
         this._ball = new Ball;
         this._paddleLeft = new Paddle('left');
         this._paddleRight = new Paddle('right');
-        // this._ball.spawn();
         if (Math.random() < 0.5)
             this._animate('right');
         else
