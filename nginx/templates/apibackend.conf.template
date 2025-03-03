@@ -1,0 +1,6 @@
+# Redirection de <domain> vers https://<domain>
+server {
+    listen 80;
+    server_name ${BACKEND_SERVER_NAME};
+    return 301 https://${BACKEND_SERVER_NAME}:${BACKEND_SERVER_SSH_PORT}$request_uri;
+}

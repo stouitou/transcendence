@@ -1,0 +1,97 @@
+services:
+  nginx:
+    image: nginx
+    container_name: nginx_dev
+    build:
+      context: ./nginx
+      dockerfile: Dockerfile
+    volumes:
+     # - backend_data:/var/www/html
+      - ./nginx/templates:/etc/nginx/templates
+  #  depends_on:
+  #    - backend_services
+    ports:
+      - "4433:443"
+      - "8080:80"
+    networks:
+      - transcendence_network
+    restart: unless-stopped
+    env_file: ./nginx/.env
+
+# auth-service:
+#  auth_services:
+#    build:
+#      context: ./auth-service
+#      dockerfile: ./Dockerfile
+#    container_name: auth_service
+#    environment:
+#      - NODE_ENV=development
+#      - PORT=5000
+#    depends_on:
+#      - sqlite-service
+#    volumes:
+#      - ./auth-service/app:/app
+#      - sqlite_data:/data
+#    networks:
+#      - transcendence_network
+
+ #backend_services:     
+# backend_services:
+#   build:
+#     context: ./backend
+#     dockerfile: ./Dockerfile
+#   container_name: backend_services
+#   environment:
+#     - NODE_ENV=development
+#     - DATABASE_URL=file:/data/users/users.db
+#     - SQLITE_API_URL=http://sqlite-service:1234
+#   depends_on:
+#     - sqlite-service
+#     - auth_services
+#   volumes:
+#     - ./backend/app:/app
+#     - sqlite_data:/data
+#    networks:
+#      - transcendence_network
+
+
+#ajout d'un service de base de données
+ # sqlite-service:
+ #   build:
+ #     context: ./sqlite-service
+ #     dockerfile: ./Dockerfile
+ #   container_name: sqlite-service 
+ #   volumes:
+ #     - ./sqlite-service/app:/app
+ #     - sqlite_data:/data
+ #   environment:
+ #     - NODE_ENV=development
+ #   restart: always
+ #   networks:
+ #     - transcendence_network
+#
+#
+# network and volumes
+networks:
+  transcendence_network:
+    driver: bridge
+
+#volumes:
+#  backend_data:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      device: ./backend/app/build
+#      o: bind
+#  sqlite_data:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      device: ./sqlite/database
+#      o: bind
+#  certs_data:
+#    driver: local
+#    driver_opts:
+#      type: none
+#      device: ./certs
+#      o: bind

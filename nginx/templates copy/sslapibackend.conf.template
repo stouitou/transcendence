@@ -1,0 +1,59 @@
+
+# Redirection de <domain> vers https://www.<domain>
+server {
+    listen 443 ssl;
+    server_name ${BACKEND_SERVER_NAME};
+    return 301 https://www.${BACKEND_SERVER_NAME}:${BACKEND_SERVER_SSH_PORT}$request_uri;
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_certificate /etc/nginx/ssl/transcendence.crt;
+    ssl_certificate_key /etc/nginx/ssl/transcendence.key;
+}
+
+# Configuration pour <domain> avec SSL
+server {
+    listen 443 ssl;
+
+    server_name ${BACKEND_SERVER_NAME_API};
+    server_tokens off;
+
+    #root /var/www/html;
+    #index index.js index.html index.htm;
+
+    #add_header 'X-Content-Type-Options' 'nosniff';
+    #add_header 'X-Frame-Options' 'sameorigin';
+    #add_header 'X-XSS-Protection' '1; mode=block';
+    #add_header 'Strict-Transport-Security' 'max-age=31536000; includeSubDomains; preload';
+    #add_header 'Cache-control' 'no-cache';
+    #add_header 'Content-Security-Policy' "default-src 'self'; font-src 'self'; img-src 'self'; script-src 'self'; style-src 'self'; frame-src 'self'";
+    #add_header 'Permissions-Policy' 'camera=(), geolocation=(), microphone=()';
+    #add_header 'Referrer-Policy' 'same-origin';
+
+    ssl_protocols TLSv1.2 TLSv1.3;
+    ssl_certificate /etc/nginx/ssl/transcendence.crt;
+    ssl_certificate_key /etc/nginx/ssl/transcendence.key;
+
+    location /auth/ {
+        proxy_pass http://auth_services:3000/;        
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+
+    location / {
+        proxy_pass http://backend_services:3000/;        
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    location /databases {
+        proxy_pass http://sqlitebrowser:3000/;        
+        proxy_set_header Host $host;
+        proxy_set_header X-Real-IP $remote_addr;
+        proxy_set_header X-Forwarded-For $proxy_add_x_forwarded_for;
+        proxy_set_header X-Forwarded-Proto $scheme;
+    }
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+}
