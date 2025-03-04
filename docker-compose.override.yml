@@ -6,92 +6,94 @@ services:
       context: ./nginx
       dockerfile: Dockerfile
     volumes:
-     # - backend_data:/var/www/html
       - ./nginx/templates:/etc/nginx/templates
-  #  depends_on:
-  #    - backend_services
+    depends_on:
+      - backend_services
     ports:
-      - "4433:443"
-      - "8080:80"
+      - "${BACKEND_SERVER_SSH_PORT}:443"
+      - "${BACKEND_SERVER_PORT}:80"
     networks:
       - transcendence_network
     restart: unless-stopped
-    env_file: ./nginx/.env
+    env_file: .env
 
 # auth-service:
-#  auth_services:
-#    build:
-#      context: ./auth-service
-#      dockerfile: ./Dockerfile
-#    container_name: auth_service
-#    environment:
-#      - NODE_ENV=development
-#      - PORT=5000
-#    depends_on:
-#      - sqlite-service
-#    volumes:
-#      - ./auth-service/app:/app
-#      - sqlite_data:/data
-#    networks:
-#      - transcendence_network
+  auth_services:
+    build:
+      context: ./auth-service
+      dockerfile: ./Dockerfile
+    container_name: auth_service
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - sqlite-service
+    volumes:
+      - ./auth-service/app:/app
+      - ./auth-service/app/node_modules:/app/node_modules
+    networks:
+      - transcendence_network
 
  #backend_services:     
-# backend_services:
-#   build:
-#     context: ./backend
-#     dockerfile: ./Dockerfile
-#   container_name: backend_services
-#   environment:
-#     - NODE_ENV=development
-#     - DATABASE_URL=file:/data/users/users.db
-#     - SQLITE_API_URL=http://sqlite-service:1234
-#   depends_on:
-#     - sqlite-service
-#     - auth_services
-#   volumes:
-#     - ./backend/app:/app
-#     - sqlite_data:/data
-#    networks:
-#      - transcendence_network
+  backend_services:
+    build:
+      context: ./backend
+      dockerfile: ./Dockerfile
+    container_name: backend_services
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - sqlite-service
+      - auth_services
+    volumes:
+      - ./backend/app:/app
+      - ./backend/app/node_modules:/app/node_modules
+    networks:
+      - transcendence_network
 
 
 #ajout d'un service de base de données
- # sqlite-service:
- #   build:
- #     context: ./sqlite-service
- #     dockerfile: ./Dockerfile
- #   container_name: sqlite-service 
- #   volumes:
- #     - ./sqlite-service/app:/app
- #     - sqlite_data:/data
- #   environment:
- #     - NODE_ENV=development
- #   restart: always
- #   networks:
- #     - transcendence_network
-#
-#
+  sqlite-service:
+    build:
+      context: ./sqlite-service
+      dockerfile: ./Dockerfile
+    container_name: sqlite-service 
+    volumes:
+      - ./sqlite-service/app:/app #app source code
+      - ./sqlite-service/data:/data #database data
+      - ./sqlite-service/app/node_modules:/app/node_modules #node_modules
+    environment:
+      - NODE_ENV=development
+    restart: always
+    networks:
+      - transcendence_network
+
+
 # network and volumes
 networks:
   transcendence_network:
     driver: bridge
-
-#volumes:
-#  backend_data:
-#    driver: local
-#    driver_opts:
-#      type: none
-#      device: ./backend/app/build
-#      o: bind
-#  sqlite_data:
-#    driver: local
-#    driver_opts:
-#      type: none
-#      device: ./sqlite/database
-#      o: bind
-#  certs_data:
-#    driver: local
-#    driver_opts:
-#      type: none
-#      device: ./certs
-#      o: bind
+volumes:
+  backend_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./backend/app/build
+      o: bind
+  databases_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./databases
+      o: bind
+  sqlite_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./sqlite-service/data
+      o: bind
+  certs_data:
+    driver: local
+    driver_opts:
+      type: none
+      device: ./certs
+      o: bind

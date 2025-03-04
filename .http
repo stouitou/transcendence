@@ -1,0 +1,43 @@
+### 
+POST https://localhost:4433/databases/resetmap HTTP/1.1
+Content-Type: application/json
+
+{
+
+}
+### 
+POST https://localhost:4433/api/auth/register HTTP/1.1
+Content-Type: application/json
+
+{
+
+"email": "joe11213d4@mail.com",
+"password": "12345678"
+}
+
+###
+POST https://localhost:4433/databases/usersDB/table/users/rows HTTP/1.1
+Content-Type: application/json
+
+{
+"table": "users",
+"database": "usersDB",
+"data": {
+
+"role": "",
+"name": ""
+}
+}
+
+
+###
+GET https://localhost:4433/databases/list HTTP/1.1
+
+
+### create a new database
+POST https://localhost:4433/databases/usersDB2 HTTP/1.1
+Content-Type: application/json
+
+{
+"database": "usersDB2"
+}
