@@ -1,5 +1,7 @@
-import { Ball } from './Ball';
-import { Paddle } from './Paddle';
+import { Ball } from './Ball.js';
+import { Paddle } from './Paddle.js';
+import { Direction } from './Direction.js';
+import { vector } from "../types/Ball.types";
 
 // export allows to use this class in another file
 export class Game {
@@ -14,14 +16,10 @@ export class Game {
 		this._paddleLeft = new Paddle('left');
 		this._paddleRight = new Paddle('right');
 
-		if (Math.random() < 0.5)
-			this._animate('right');
-		else
-			this._animate('left');
-
+		this._animate();
 	}
 
-	private _animate(direction: 'left' | 'right') {
+	private _animate() {
 		const loop = () => {
 
 			// Move subsequently
@@ -32,12 +30,8 @@ export class Game {
 				this._paddleRight.move();
 			}
 
-			if (direction === 'right')
-				this._ball.moveRight();
-			else
-				this._ball.moveLeft();
-	
-			// Function called when browser refreshes pages
+			this._ball.move();
+
 			requestAnimationFrame(loop);
 		};
 

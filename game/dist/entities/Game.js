@@ -7,12 +7,9 @@ export class Game {
         this._ball = new Ball;
         this._paddleLeft = new Paddle('left');
         this._paddleRight = new Paddle('right');
-        if (Math.random() < 0.5)
-            this._animate('right');
-        else
-            this._animate('left');
+        this._animate();
     }
-    _animate(direction) {
+    _animate() {
         const loop = () => {
             // Move subsequently
             if (this._paddleLeft.keys['s'] || this._paddleLeft.keys['x']) {
@@ -21,11 +18,7 @@ export class Game {
             if (this._paddleLeft.keys['ArrowUp'] || this._paddleLeft.keys['ArrowDown']) {
                 this._paddleRight.move();
             }
-            if (direction === 'right')
-                this._ball.moveRight();
-            else
-                this._ball.moveLeft();
-            // Function called when browser refreshes pages
+            this._ball.move();
             requestAnimationFrame(loop);
         };
         loop();
