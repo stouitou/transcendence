@@ -1,5 +1,6 @@
 import { Ball } from './Ball.js';
 import { Paddle } from './Paddle.js';
+var round = 0;
 // export allows to use this class in another file
 export class Game {
     /* CONSTRUCTOR */
@@ -11,6 +12,8 @@ export class Game {
     }
     _animate() {
         const loop = () => {
+            if (round === 5)
+                return;
             // Move subsequently
             if (this._paddleLeft.keys['s'] || this._paddleLeft.keys['x']) {
                 this._paddleLeft.move();
@@ -19,6 +22,24 @@ export class Game {
                 this._paddleRight.move();
             }
             this._ball.move();
+            if (this._ball.element.offsetTop <= 0 ||
+                this._ball.element.offsetTop + this._ball.diameter >= window.innerHeight) {
+                this._ball.direction.y *= -1;
+            }
+            if (this._ball.element.offsetLeft + this._ball.diameter <= 0 ||
+                this._ball.element.offsetLeft >= window.innerWidth) {
+                this._ball.spawn();
+                round++;
+                // return ;
+            }
+            if ((this._ball.element.offsetLeft <= this._paddleLeft.element.offsetLeft + this._paddleLeft.width &&
+                (this._ball.element.offsetTop - this._ball.diameter >= this._paddleLeft.element.offsetTop &&
+                    this._ball.element.offsetTop <= this._paddleLeft.element.offsetTop + this._paddleLeft.height)) ||
+                (this._ball.element.offsetLeft + this._ball.diameter >= this._paddleRight.element.offsetLeft &&
+                    (this._ball.element.offsetTop - this._ball.diameter >= this._paddleRight.element.offsetTop &&
+                        this._ball.element.offsetTop <= this._paddleRight.element.offsetTop + this._paddleRight.height))) {
+                this._ball.direction.x *= -1;
+            }
             requestAnimationFrame(loop);
         };
         loop();
