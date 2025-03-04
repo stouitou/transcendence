@@ -1,11 +1,11 @@
-// main.ts
 import '../css/input.css';
 import { createHeader } from './header';
 import { createButton } from './button';
 import { startGame } from './pong';
+import { router } from './router';
 
 document.addEventListener('DOMContentLoaded', () => {
-    // Insert the header component at the top of the body.
+    // Insert the header component.
     const headerElement = createHeader({
         title: 'Plastic Pong Game',
         links: [
@@ -14,24 +14,11 @@ document.addEventListener('DOMContentLoaded', () => {
             { href: '#info', text: 'Info' }
         ]
     });
-
     document.body.insertBefore(headerElement, document.body.firstChild);
 
-    const buttonElement = createButton({
-        label: 'Launch Game',
-        onClick: () => {
-            startGame();
-        }
-    });
+    // Initialize routing on first load.
+    router();
 
-
-    const mainElement = document.querySelector('main');
-    if (mainElement) {
-        const wrapper = document.createElement('div');
-        wrapper.className = 'flex justify-center my-6';
-        wrapper.appendChild(buttonElement);
-        mainElement.insertBefore(wrapper, mainElement.firstChild);
-    }
-    // Start the game logic.
-    //startGame();
+    // Listen for hash changes to update the view.
+    window.addEventListener('hashchange', router);
 });

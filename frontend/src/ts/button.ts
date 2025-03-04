@@ -19,7 +19,7 @@ export function createButton(props: ButtonProps): HTMLElement {
       hover:from-green-500 
       hover:to-blue-600 
       text-white 
-      font-bold 
+      font-archivo
       py-2 
       px-4 
       rounded-full 
