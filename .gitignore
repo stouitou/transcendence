@@ -1,0 +1,9 @@
+.vscode/
+
+**/app/node_modules
+
+**/app/build
+
+
+
+
