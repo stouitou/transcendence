@@ -1,0 +1,32 @@
+{
+  "name": "app",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc -p tsconfig.json",
+    "start": "node build/index.js",
+   "dev": "nodemon",
+
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "@fastify/swagger": "^9.4.2",
+    "@fastify/swagger-ui": "^5.2.2",
+    "@fastify/type-provider-typebox": "^5.1.0",
+    "@sinclair/typebox": "^0.34.28",
+    "@types/dotenv": "^8.2.3",
+    "@types/node": "^22.13.9",
+    "dotenv": "^16.4.7",
+    "fastify": "^5.2.1",
+    "typescript": "^5.8.2",
+    "zod": "^3.24.2"
+  },
+  "devDependencies": {
+    "nodemon": "^3.1.9",
+    "tsx": "^4.19.3"
+  }
+}
