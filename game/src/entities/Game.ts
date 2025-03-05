@@ -53,7 +53,6 @@ export class Game {
 				this._ball.direction.x *= -1;
 			}
 
-
 			requestAnimationFrame(loop);
 		};
 		
