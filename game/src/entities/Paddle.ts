@@ -1,3 +1,5 @@
+import { Ball } from "./Ball";
+
 // export allows to use this class in another file
 export class Paddle {
 
@@ -9,6 +11,11 @@ export class Paddle {
 	private _position: string;
 	private readonly _speed: number = 5;
 	private _keys: { [key: string]: boolean } = {};
+	
+	private _top: number;
+	private _bottom: number;
+	private _left: number;
+	private _right: number;
 
 	/* CONSTRUCTOR */
 	public constructor(position: 'left' | 'right') {
@@ -29,6 +36,11 @@ export class Paddle {
 			this._element.style.left = `calc(5% - ${this._width / 2}px)`;
 		else if (position === 'right')
 			this._element.style.right = `calc(5% + ${this._width / 2}px)`;
+
+		this._top = this._element.offsetTop;
+		this._bottom = this._top + this._height;	
+		this._left = this._element.offsetLeft;
+		this._right = this._left + this._width;
 
 		// "Draws" the paddle in the window
 		document.body.appendChild(this._element);
@@ -69,4 +81,59 @@ export class Paddle {
 			this._element.style.top = `${Math.min(window.innerHeight - this._element.offsetHeight, currentTop + this._speed)}px`;
 		}
 	}
+
+	public updatePosition () {
+		this._top = this._element.offsetTop;
+		this._bottom = this._top + this._height;	
+		this._left = this._element.offsetLeft;
+		this._right = this._left + this._width;
+	}
+
+	public checkCollision (ball: Ball) {
+
+		this.updatePosition();
+		ball.updatePosition();
+
+		if (ball.bottom >= this._top &&
+			ball.top <= this._bottom &&
+			ball.left <= this._right &&
+			// ball.left >= this._left &&
+			ball.direction.x < 0) {
+				console.log("1");
+			ball.direction.x *= -1;
+		}
+		
+		if (ball.bottom >= this._top &&
+			ball.top <= this._bottom &&
+			ball.right >= this._left &&
+			// ball.right >= this._right &&
+			ball.direction.x > 0) {
+				console.log("2");
+			ball.direction.x *= -1;
+		}
+		
+		if (ball.right >= this._left &&
+			ball.left <= this._right &&
+			ball.bottom <= this._top &&
+			ball.top >= this._bottom) {
+				console.log("3");
+			ball.direction.y *= -1;
+		}
+	}
 }
+// let paddleBottom: number = this._paddleLeft.element.offsetTop + this._paddleLeft.height;
+// let paddleLeftRightEdge: number = this._paddleLeft.element.offsetLeft + this._paddleLeft.width;
+// let ballCenter: number = this._ball.element.offsetLeft + this._ball.diameter / 2;
+
+// if (this._ball.element.offsetTop + this._ball.diameter >= this._paddleLeft.element.offsetTop &&
+// 	this._ball.element.offsetTop <= paddleBottom &&
+// this._ball.element.offsetLeft <= paddleLeftRightEdge &&
+// 	this._ball.element.offsetLeft >= this._paddleLeft.element.offsetLeft &&
+//  this._ball.direction.x < 0) {
+// 		this._ball.direction.x = -1;
+// }
+// else if ((ballCenter >= this._paddleLeft.element.offsetLeft && ballCenter <= paddleLeftRightEdge) &&
+// (this._ball.element.offsetTop + this._ball.diameter >= this._paddleLeft.element.offsetTop &&
+// this._ball.element.offsetTop <= paddleBottom) && this._ball.direction.x <= 0) {
+// 	this._ball.direction.x= -1;
+// 	this._ball.direction.y *= -1;

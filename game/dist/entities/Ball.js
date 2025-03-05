@@ -4,6 +4,7 @@ export class Ball {
     /* CONSTRUCTOR */
     constructor() {
         this._diameter = 30;
+        this._radius = this._diameter / 2;
         this._color = 'rgb(0, 0, 0)';
         this._speed = 5;
         // Creates the ball object
@@ -19,6 +20,12 @@ export class Ball {
         this._element.style.position = 'absolute'; // doesn't interact with other objects or text
         this._direction = new Direction(0, 0);
         this.spawn();
+        this._top = this._element.offsetTop;
+        this._bottom = this._top + this._diameter;
+        this._left = this._element.offsetLeft;
+        this._right = this._left + this._diameter;
+        this._centerX = this._left + this._radius;
+        this._centerY = this._top + this._radius;
         // "Draws" the ball in the window
         document.body.appendChild(this._element);
     }
@@ -31,10 +38,36 @@ export class Ball {
     get direction() {
         return this._direction;
     }
+    get top() {
+        return this._top;
+    }
+    get bottom() {
+        return this._bottom;
+    }
+    get left() {
+        return this._left;
+    }
+    get right() {
+        return this._right;
+    }
+    get centerX() {
+        return this._centerX;
+    }
+    get centerY() {
+        return this._centerY;
+    }
+    updatePosition() {
+        this._top = this._element.offsetTop;
+        this._bottom = this._top + this._diameter;
+        this._left = this._element.offsetLeft;
+        this._right = this._left + this._diameter;
+        this._centerX = this._left + this._radius;
+        this._centerY = this._top + this._radius;
+    }
     spawn() {
         const pos = (Math.random() * 100) / 3;
-        this._element.style.top = `calc(33% - ${this._diameter / 2}px + ${pos}%)`; // centered vertically (15px is half the size of the ball)
-        this._element.style.left = `calc(50% - ${this._diameter / 2}px)`; // centered horizontally (15px is half the size of the ball)
+        this._element.style.top = `calc(33% - ${this._radius}px + ${pos}%)`; // centered vertically (15px is half the size of the ball)
+        this._element.style.left = `calc(50% - ${this._radius}px)`; // centered horizontally (15px is half the size of the ball)
         const add = Math.random() * 30;
         this._direction.x = Math.sin((45 + add) * Math.PI / 180);
         this._direction.y = Math.cos((45 + add) * Math.PI / 180);
