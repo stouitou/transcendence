@@ -1,5 +1,6 @@
 // export allows to use this class in another file
 import { Direction } from './Direction.js';
+import { Paddle } from './Paddle.js';
 
 export class Ball {
 
@@ -8,15 +9,14 @@ export class Ball {
 	private readonly _diameter: number = 30;
 	private readonly _radius: number = this._diameter / 2;
 	private readonly _color: string = 'rgb(0, 0, 0)';
-	private readonly _speed: number = 5;
+	private readonly _speed: number = 8;
 	private _direction: Direction;
 
+	// Fetch current coordinates
 	private _top: number;
 	private _bottom: number;
 	private _left: number;
 	private _right: number;
-	private _centerX: number;
-	private _centerY: number;
 
 	/* CONSTRUCTOR */
 	public constructor() {
@@ -25,15 +25,14 @@ export class Ball {
 		this._element = document.createElement('div');
 		this._element.classList.add('ball');
 
-		// Gives the ball all its values
+		// Gives the ball basic values
 		this._element.style.width = `${this._diameter}px`;
 		this._element.style.height = `${this._diameter}px`;
 		this._element.style.backgroundColor = this._color;					// color of the ball
 		this._element.style.borderRadius = '50%';							// makes it round
-		// this._element.style.top = `calc(50% - ${this._diameter}px)`;		// centered vertically (15px is half the size of the ball)
-		// this._element.style.left = `calc(50% - ${this._diameter / 2}px)`;	// centered horizontally (15px is half the size of the ball)
 		this._element.style.position = 'absolute';							// doesn't interact with other objects or text
 
+		// Gives the ball a random direction and position
 		this._direction = new Direction(0, 0);
 		this.spawn();
 
@@ -41,13 +40,12 @@ export class Ball {
 		this._bottom = this._top + this._diameter;
 		this._left = this._element.offsetLeft;
 		this._right = this._left + this._diameter;
-		this._centerX = this._left + this._radius;
-		this._centerY = this._top + this._radius;
 		
 		// "Draws" the ball in the window
 		document.body.appendChild(this._element);
 	}
 	
+	/* GETTERS */
 	public get element () {
 		return this._element;
 	}
@@ -75,42 +73,35 @@ export class Ball {
 	public get right () {
 		return this._right;
 	}	
-	
-	public get centerX () {
-		return this._centerX;
-	}	
-	
-	public get centerY () {
-		return this._centerY;
-	}	
-	
+
+	// Update current position
 	public updatePosition() {
 		this._top = this._element.offsetTop;
 		this._bottom = this._top + this._diameter;
 		this._left = this._element.offsetLeft;
 		this._right = this._left + this._diameter;
-		this._centerX = this._left + this._radius;
-		this._centerY = this._top + this._radius;
 	}
 
 	public spawn() {
+		// Randomize position
 		const pos = (Math.random() * 100) / 3;
 
-		this._element.style.top = `calc(33% - ${this._radius}px + ${pos}%)`;	// centered vertically (15px is half the size of the ball)
-		this._element.style.left = `calc(50% - ${this._radius}px)`;	// centered horizontally (15px is half the size of the ball)
+		this._element.style.top = `calc(33% - ${this._radius}px + ${pos}%)`;	// random vertically (from 33% to 66% of the window)
+		this._element.style.left = `calc(50% - ${this._radius}px)`;				// centered horizontally (15px is half the size of the ball)
 
+		// Ramdomize direction
 		const add = Math.random() * 30;
 
-		this._direction.x = Math.sin((45 + add) * Math.PI / 180);
-		this._direction.y = Math.cos((45 + add) * Math.PI / 180);
+		this._direction.x = Math.sin((45 + add) * Math.PI / 180);	// compute x direction depending on an angle between 45 and 75 degrees
+		this._direction.y = Math.cos((45 + add) * Math.PI / 180);	// compute y direction depending on an angle between 45 and 75 degrees
 
-		let base = Math.random();
-		if (base < 0.5)
+		let base = Math.round(Math.random());	// random integer between 0 and 1
+		if (base === 0)
 			this._direction.x *= -1;
-		base = Math.random();
-		if (base < 0.5)
+		base = Math.round(Math.random());
+		if (base === 0)
 			this._direction.y *= -1;
-		// if spawn up and direction down, do we nedd to manage differently ?
+		// if spawn up and direction down, do we need to manage differently ?
 	}
 
 	public move() {
@@ -119,5 +110,21 @@ export class Ball {
 		const currentTop = this._element.offsetTop;
 		this._element.style.left = `${currentLeft + (this._speed * this._direction.x)}px`
 		this._element.style.top = `${currentTop + (this._speed * this._direction.y)}px`
+	}
+
+	public bounce(paddle: Paddle) {
+		this._direction.x *= -1;	
+
+		// Position the ball outside of the paddle to avoid being blocked
+		if (this._left < paddle.right && this._left > paddle.left)
+			this._element.style.left = `${paddle.right}px`;
+		else if (this._right > paddle.left && this._right <paddle.right)
+			this._element.style.left = `calc(${paddle.left - this._diameter} - 1)px`;
+
+		// Formula for the rebound : θrebound ​= θmax ​× (2 × ((yimpact ​− ypaddle) / paddle height)​)
+		const impact: number = 2 * (((this._top + this._radius) - (paddle.top + (paddle.height / 2))) / paddle.height);
+		const angle = ((55 * Math.PI / 180) * impact) + (5 * Math.PI / 180);	// get an angle between 5 and 60 degrees
+		this._direction.x = Math.cos(angle) * Math.sign(this._direction.x);
+		this._direction.y = Math.sin(angle);
 	}
 }

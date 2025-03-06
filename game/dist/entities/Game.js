@@ -1,55 +1,44 @@
 import { Ball } from './Ball.js';
 import { Paddle } from './Paddle.js';
-var round = 0;
+var round = 3;
 // export allows to use this class in another file
 export class Game {
     /* CONSTRUCTOR */
     constructor() {
         this._ball = new Ball;
-        this._paddleLeft = new Paddle('left');
-        this._paddleRight = new Paddle('right');
+        this._paddleRight = new Paddle(1);
+        this._paddleLeft = new Paddle(2);
         this._animate();
     }
     _animate() {
         const loop = () => {
-            if (round === 5)
+            if (round === 0)
                 return;
-            // Move subsequently
-            if (this._paddleLeft.keys['s'] || this._paddleLeft.keys['x']) {
-                this._paddleLeft.move();
-            }
-            if (this._paddleLeft.keys['ArrowUp'] || this._paddleLeft.keys['ArrowDown']) {
-                this._paddleRight.move();
-            }
+            // Launch movement
             this._ball.move();
-            this._paddleLeft.checkCollision(this._ball);
-            this._paddleRight.checkCollision(this._ball);
-            if (this._ball.element.offsetTop <= 0 ||
-                this._ball.element.offsetTop + this._ball.diameter >= window.innerHeight) {
+            this._paddleLeft.move();
+            this._paddleRight.move();
+            this._paddleLeft.updatePosition();
+            this._paddleRight.updatePosition();
+            this._ball.updatePosition();
+            // If touch a paddle...
+            if (this._paddleLeft.collision(this._ball))
+                this._ball.bounce(this._paddleLeft);
+            else if (this._paddleRight.collision(this._ball))
+                this._ball.bounce(this._paddleRight);
+            // ...or touch a wall...
+            else if (this._ball.top <= 0 ||
+                this._ball.bottom >= window.innerHeight) {
                 this._ball.direction.y *= -1;
             }
-            if (this._ball.element.offsetLeft + this._ball.diameter <= 0 ||
-                this._ball.element.offsetLeft >= window.innerWidth) {
+            // ...or get out the field
+            else if (this._ball.right <= 0 ||
+                this._ball.left >= window.innerWidth) {
                 this._ball.spawn();
-                round++;
-                // return ;
+                round--;
             }
-            // if ((this._ball.element.offsetLeft <= this._paddleLeft.element.offsetLeft + this._paddleLeft.width &&
-            // 	(this._ball.element.offsetTop - this._ball.diameter >= this._paddleLeft.element.offsetTop &&
-            // 	this._ball.element.offsetTop <= this._paddleLeft.element.offsetTop + this._paddleLeft.height)) ||
-            // 	(this._ball.element.offsetLeft + this._ball.diameter >= this._paddleRight.element.offsetLeft &&
-            // 	(this._ball.element.offsetTop - this._ball.diameter >= this._paddleRight.element.offsetTop &&
-            // 	this._ball.element.offsetTop <= this._paddleRight.element.offsetTop + this._paddleRight.height))) {
-            // 	this._ball.direction.x *= -1;
-            // }
             requestAnimationFrame(loop);
         };
         loop();
     }
 }
-// θrebond ​= θmax ​× (2 × ((yimpact​−yraquette) / hauteur raquette​)​)
-// θrebond: angle de rebond recherche
-// θmax: angle de rebond maximum autorise (75, comme a l'initialisation de la balle ?)
-// yimpact: position y de la balle au moment du contact
-// yraquette: position y du centre de la raquette
-// hauteur raquette: hauteur totale de la raquette
