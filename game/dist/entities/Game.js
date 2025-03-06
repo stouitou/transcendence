@@ -1,5 +1,6 @@
 import { Ball } from './Ball.js';
 import { Paddle } from './Paddle.js';
+import { Score } from './Score.js';
 var round = 3;
 // export allows to use this class in another file
 export class Game {
@@ -8,6 +9,7 @@ export class Game {
         this._ball = new Ball;
         this._paddleRight = new Paddle(1);
         this._paddleLeft = new Paddle(2);
+        this._score = new Score;
         this._animate();
     }
     _animate() {
@@ -34,6 +36,7 @@ export class Game {
             // ...or get out the field
             else if (this._ball.right <= 0 ||
                 this._ball.left >= window.innerWidth) {
+                this._score.incrScore(this._ball.right);
                 this._ball.spawn();
                 round--;
             }
