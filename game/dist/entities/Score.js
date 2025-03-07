@@ -39,11 +39,11 @@ export class Score {
         this._player1 = newScore;
         this.setMessage();
     }
+    /* METHODS */
     setMessage() {
         this._message = this._player2 + " - " + this._player1;
         this.displayScores();
     }
-    /* METHODS */
     increaseScore(ball) {
         if (ball > window.innerWidth)
             this._player2 += 1;

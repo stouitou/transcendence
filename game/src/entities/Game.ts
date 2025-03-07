@@ -1,19 +1,21 @@
 import { Ball } from './Ball.js';
 import { Paddle } from './Paddle.js';
+import { Player } from './Player.js';
 import { Score } from './Score.js';
 
-var round: number = 3;
 
 // export allows to use this class in another file
 export class Game {
-
+	
 	private readonly _ball: Ball;
 	private readonly _paddleLeft: Paddle;
 	private readonly _paddleRight: Paddle;
 	private readonly _score: Score;
 
+	private _round: number = 3;
+	
 	private _beginning: boolean = true;
-
+	
 	/* CONSTRUCTOR */
 	public constructor() {
 		this._ball = new Ball;
@@ -21,14 +23,14 @@ export class Game {
 		this._paddleLeft = new Paddle(2);
 		this._score = new Score;
 
-		this._animate();
+		// this.launch();
 	}
 
 	/* METHODS */
-	private _animate() {
+	public launch() {
 		const loop = () => {
 
-			if (round === 0)
+			if (this._round === 0)
 				return ;
 
 			// Launch movement
@@ -61,7 +63,7 @@ export class Game {
 				this._score.increaseScore(this._ball.right);
 				this._beginning = true;
 				this._ball.spawn();
-				round--;
+				this._round--;
 			}
 
 			requestAnimationFrame(loop);
