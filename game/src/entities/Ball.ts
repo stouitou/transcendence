@@ -1,7 +1,7 @@
-// export allows to use this class in another file
 import { Direction } from './Direction.js';
-import { Paddle } from './Paddle.js';
+import { Paddle } from "./Paddle.js";
 
+// export allows to use this class in another file
 export class Ball {
 
 	/* PRIVATE ATTRIBUTES */

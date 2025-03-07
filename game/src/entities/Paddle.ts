@@ -1,4 +1,4 @@
-import { Ball } from "./Ball";
+import { Ball } from "./Ball.js";
 
 // export allows to use this class in another file
 export class Paddle {

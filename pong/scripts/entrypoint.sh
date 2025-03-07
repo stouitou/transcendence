@@ -31,20 +31,21 @@ log "$CYAN"  "DEBUG" "************************************"
 log "$CYAN" "INFO" "Copie du dossier node_modules vers le répertoire de l'application..."
 cp -R /node_modules /app
 
+npm install -g typescript
 
   if [ "$NODE_ENV" = "development" ]; then
     # Start the application in watch mode
     log "$CYAN" "INFO" "Démarrage de l'application en mode développement avec nodemon..."
     # Start the application in watch mode
     exec npm run dev
+    exec npm run build
   else
     log "$GREEN" "INFO" "Mode production activé : installation des dépendances de production..."
-	# Install only production dependencies
-	npm install --omit=dev
-  # Install typescript
-  npm install -g typescript
-	# Build the application
-	exec npm run build
+    # Install only production dependencies
+    npm install --omit=dev
+    # Install typescript
+    # Build the application
+    exec npm run build
     log "$GREEN" "INFO" "Démarrage de l'application en mode production..."
     # Start the application  
     exec npm start

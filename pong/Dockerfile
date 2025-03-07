@@ -24,6 +24,5 @@ RUN mkdir /app/node_modules
 RUN chown -R node:node /app/node_modules
 RUN cp -R /node_modules /app/node_modules
 
-
 # Définir l'exécution par défaut
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

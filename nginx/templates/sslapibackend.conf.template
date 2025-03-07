@@ -46,6 +46,8 @@ server {
     }
 
     location /pong/ {
+        root /var/www;
+        autoindex on;
         proxy_pass http://pong:3000;        
         proxy_set_header Host $host;
         proxy_set_header X-Real-IP $remote_addr;

@@ -1,5 +1,5 @@
+import { Direction } from './Direction';
 // export allows to use this class in another file
-import { Direction } from './Direction.js';
 export class Ball {
     /* CONSTRUCTOR */
     constructor() {
