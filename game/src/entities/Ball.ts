@@ -74,6 +74,7 @@ export class Ball {
 		return this._right;
 	}	
 
+	/* METHODS */
 	// Update current position
 	public updatePosition() {
 		this._top = this._element.offsetTop;

@@ -65,6 +65,7 @@ export class Paddle {
         return this._keys;
     }
     ;
+    /* METHODS */
     move() {
         // Fetch the x value of the top of the paddle, and the keys that are being pressed
         const moveUp = (this._keys['ArrowUp'] && this._position === 1) || (this._keys['s'] && this._position === 2);

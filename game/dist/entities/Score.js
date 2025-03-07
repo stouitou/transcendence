@@ -1,54 +1,57 @@
 export class Score {
+    /* CONSTRUCTOR */
     constructor() {
-        this._scoreLeft = 0;
-        this._scoreRigth = 0;
-        this._score = this._scoreLeft.toString() + " - " + this._scoreRigth.toString();
+        this._font = 'Arial';
         this._color = 'rgb(0, 0, 0)';
         this._size = 70;
-        this._msg = document.createElement('div');
-        this._msg.textContent = this._score;
-        this._msg.style.position = "absolute";
-        this._msg.style.color = this._color;
-        this._msg.style.fontSize = `${this._size}px`;
-        this._msg.style.top = "10%";
-        this._msg.style.left = "50%";
-        this._msg.style.transform = "translateX(-50%)";
-        this._msg.style.opacity = "0.3";
-        document.body.appendChild(this._msg);
+        this._opacity = 0.4;
+        this._player2 = 0;
+        this._player1 = 0;
+        this._message = this._player2 + " - " + this._player1;
+        this._score = document.createElement('div');
+        this._score.textContent = this._message;
+        this._score.style.font = `${this._font}`;
+        this._score.style.color = this._color;
+        this._score.style.fontSize = `${this._size}px`;
+        this._score.style.opacity = `${this._opacity}`;
+        this._score.style.top = "10%";
+        this._score.style.left = "50%";
+        this._score.style.position = "absolute";
+        this._score.style.transform = "translateX(-50%)";
+        document.body.appendChild(this._score);
     }
-    /* GETTER / SETTER */
-    get scoreLeft() {
-        return this._scoreLeft;
+    /* GETTERS */
+    get player2() {
+        return this._player2;
     }
-    get scoreRigth() {
-        return this._scoreRigth;
+    get player1() {
+        return this._player1;
     }
-    getScore() {
-        return this._score;
+    get message() {
+        return this._message;
     }
-    set scoreLeft(newScore) {
-        this.scoreLeft = newScore;
-        this.setScore();
+    /* SETTER */
+    set player2(newScore) {
+        this.player2 = newScore;
+        this.setMessage();
     }
-    set scoreRigth(newScore) {
-        this._scoreRigth = newScore;
-        this.setScore();
+    set player1(newScore) {
+        this._player1 = newScore;
+        this.setMessage();
     }
-    setScore() {
-        this._score = this._scoreLeft.toString() + " - " + this._scoreRigth.toString();
+    setMessage() {
+        this._message = this._player2 + " - " + this._player1;
         this.displayScores();
     }
-    /* INCREMENTATION DU SCORE */
-    incrScore(ball) {
-        if (ball > 600)
-            this._scoreLeft += 1;
+    /* METHODS */
+    increaseScore(ball) {
+        if (ball > window.innerWidth)
+            this._player2 += 1;
         else
-            this._scoreRigth += 1;
-        this.setScore();
+            this._player1 += 1;
+        this.setMessage();
     }
     displayScores() {
-        console.log("getScore", this.getScore());
-        this._msg.textContent = this._score;
-        //document.body.appendChild(this.msg);
+        this._score.textContent = this._message;
     }
 }

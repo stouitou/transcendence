@@ -1,4 +1,4 @@
-import { Direction } from './Direction';
+import { Direction } from './Direction.js';
 // export allows to use this class in another file
 export class Ball {
     /* CONSTRUCTOR */
@@ -48,6 +48,7 @@ export class Ball {
     get right() {
         return this._right;
     }
+    /* METHODS */
     // Update current position
     updatePosition() {
         this._top = this._element.offsetTop;

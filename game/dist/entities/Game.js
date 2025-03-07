@@ -12,6 +12,7 @@ export class Game {
         this._score = new Score;
         this._animate();
     }
+    /* METHODS */
     _animate() {
         const loop = () => {
             if (round === 0)
@@ -34,9 +35,8 @@ export class Game {
                 this._ball.direction.y *= -1;
             }
             // ...or get out the field
-            else if (this._ball.right <= 0 ||
-                this._ball.left >= window.innerWidth) {
-                this._score.incrScore(this._ball.right);
+            else if (this._ball.right <= 0 || this._ball.left >= window.innerWidth) {
+                this._score.increaseScore(this._ball.right);
                 this._ball.spawn();
                 round--;
             }

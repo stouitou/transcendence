@@ -1,6 +1,7 @@
 export class Direction {
     /* CONSTRUCTOR */
     constructor(x, y) {
+        /* METHODS */
         this.magnitude = () => Math.sqrt(Math.pow(this._x, 2) + Math.pow(this._y, 2));
         this._x = x;
         this._y = y;

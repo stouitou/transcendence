@@ -1,67 +1,72 @@
 export class Score {
-	private _scoreLeft: number = 0;
-	private _scoreRigth: number = 0;
-	private _score: string = this._scoreLeft.toString() + " - " + this._scoreRigth.toString();
 
+	/* PRIVATE ATTRIBUTES */
+	private readonly _score: HTMLDivElement;
+	private readonly _font: string = 'Arial';
 	private readonly _color: string = 'rgb(0, 0, 0)';
 	private readonly _size: number = 70;
-	private readonly _msg: HTMLDivElement;
+	private readonly _opacity: number = 0.4;
 
+	private _player2: number = 0;
+	private _player1: number = 0;
+	private _message: string = this._player2 + " - " + this._player1;
+
+	/* CONSTRUCTOR */
 	public constructor() {
-		this._msg = document.createElement('div');
+		this._score = document.createElement('div');
 
-		this._msg.textContent = this._score;
-		this._msg.style.position = "absolute";
-		this._msg.style.color = this._color;
-		this._msg.style.fontSize = `${this._size}px`
-		this._msg.style.top = "10%";
-		this._msg.style.left = "50%";
-		this._msg.style.transform = "translateX(-50%)";
-		this._msg.style.opacity = "0.3"
+		this._score.textContent = this._message;
+		this._score.style.font = `${this._font}`;
+		this._score.style.color = this._color;
+		this._score.style.fontSize = `${this._size}px`;
+		this._score.style.opacity = `${this._opacity}`;
+		this._score.style.top = "10%";
+		this._score.style.left = "50%";
+		this._score.style.position = "absolute";
+		this._score.style.transform = "translateX(-50%)";
 
-		document.body.appendChild(this._msg);
+		document.body.appendChild(this._score);
 	}
 
-	/* GETTER / SETTER */
-	public get scoreLeft () {
-		return this._scoreLeft;
+	/* GETTERS */
+	public get player2 () {
+		return this._player2;
 	}
 
-	public get scoreRigth () {
-		return this._scoreRigth;
+	public get player1 () {
+		return this._player1;
 	}
 
-	public getScore () {
-		return this._score;
+	public get message () {
+		return this._message;
 	}
 
-	public set scoreLeft (newScore: number) {
-		this.scoreLeft = newScore;
-		this.setScore();
+	/* SETTER */
+	public set player2 (newScore: number) {
+		this.player2 = newScore;
+		this.setMessage();
 	}
 
-	public set scoreRigth (newScore: number) {
-		this._scoreRigth = newScore;
-		this.setScore();
+	public set player1 (newScore: number) {
+		this._player1 = newScore;
+		this.setMessage();
 	}
 
-	public setScore () {
-		this._score = this._scoreLeft.toString() + " - " + this._scoreRigth.toString();
+	public setMessage () {
+		this._message = this._player2 + " - " + this._player1;
 		this.displayScores();
 	}
 
-	/* INCREMENTATION DU SCORE */
-	public incrScore (ball: number) {
-		if (ball > 600)
-			this._scoreLeft += 1;
+	/* METHODS */
+	public increaseScore (ball: number) {
+		if (ball > window.innerWidth)
+			this._player2 += 1;
 		else
-			this._scoreRigth += 1;
-		this.setScore();
+			this._player1 += 1;
+		this.setMessage();
 	}
 
 	public displayScores () {
-		console.log("getScore", this.getScore());
-		this._msg.textContent = this._score;
-		//document.body.appendChild(this.msg);
+		this._score.textContent = this._message;
 	}
 }

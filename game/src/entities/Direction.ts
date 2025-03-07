@@ -26,7 +26,9 @@ export class Direction {
 		this._y = y;
 	}
 
+	/* METHODS */
 	private magnitude = () => Math.sqrt(Math.pow(this._x, 2) + Math.pow(this._y, 2));
+
 	public normalize() {
 		const magnitude = this.magnitude()
 		this._x = this._x / magnitude;
