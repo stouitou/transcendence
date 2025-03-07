@@ -10,6 +10,7 @@ export class Ball {
 	private readonly _radius: number = this._diameter / 2;
 	private readonly _color: string = 'rgb(0, 0, 0)';
 	private readonly _speed: number = 8;
+	private readonly _startingSpeed: number = 4;
 	private _direction: Direction;
 
 	// Fetch current coordinates
@@ -56,6 +57,14 @@ export class Ball {
 	
 	public get direction () {
 		return this._direction;
+	}	
+
+	public get speed () {
+		return this._speed;
+	}	
+
+	public get startingSpeed () {
+		return this._startingSpeed;
 	}	
 
 	public get top () {
@@ -105,12 +114,12 @@ export class Ball {
 		// if spawn up and direction down, do we need to manage differently ?
 	}
 
-	public move() {
+	public move(speed: number) {
 		this._direction.normalize();
 		const currentLeft = this._element.offsetLeft;
 		const currentTop = this._element.offsetTop;
-		this._element.style.left = `${currentLeft + (this._speed * this._direction.x)}px`
-		this._element.style.top = `${currentTop + (this._speed * this._direction.y)}px`
+		this._element.style.left = `${currentLeft + (speed * this._direction.x)}px`
+		this._element.style.top = `${currentTop + (speed * this._direction.y)}px`
 	}
 
 	public bounce(paddle: Paddle) {

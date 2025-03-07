@@ -1,8 +1,8 @@
 export class Score {
 
 	/* PRIVATE ATTRIBUTES */
-	private readonly _score: HTMLDivElement;
-	private readonly _font: string = 'Arial';
+	private readonly _board: HTMLDivElement;
+	private readonly _font: string = 'system-ui';
 	private readonly _color: string = 'rgb(0, 0, 0)';
 	private readonly _size: number = 70;
 	private readonly _opacity: number = 0.4;
@@ -13,19 +13,19 @@ export class Score {
 
 	/* CONSTRUCTOR */
 	public constructor() {
-		this._score = document.createElement('div');
+		this._board = document.createElement('div');
 
-		this._score.textContent = this._message;
-		this._score.style.font = `${this._font}`;
-		this._score.style.color = this._color;
-		this._score.style.fontSize = `${this._size}px`;
-		this._score.style.opacity = `${this._opacity}`;
-		this._score.style.top = "10%";
-		this._score.style.left = "50%";
-		this._score.style.position = "absolute";
-		this._score.style.transform = "translateX(-50%)";
+		this._board.textContent = this._message;
+		this._board.style.font = `${this._font}`;
+		this._board.style.color = this._color;
+		this._board.style.fontSize = `${this._size}px`;
+		this._board.style.opacity = `${this._opacity}`;
+		this._board.style.top = "10%";
+		this._board.style.left = "50%";
+		this._board.style.position = "absolute";
+		this._board.style.transform = "translateX(-50%)";
 
-		document.body.appendChild(this._score);
+		document.body.appendChild(this._board);
 	}
 
 	/* GETTERS */
@@ -52,12 +52,12 @@ export class Score {
 		this.setMessage();
 	}
 
+	/* METHODS */
 	public setMessage () {
 		this._message = this._player2 + " - " + this._player1;
 		this.displayScores();
 	}
 
-	/* METHODS */
 	public increaseScore (ball: number) {
 		if (ball > window.innerWidth)
 			this._player2 += 1;
@@ -67,6 +67,6 @@ export class Score {
 	}
 
 	public displayScores () {
-		this._score.textContent = this._message;
+		this._board.textContent = this._message;
 	}
 }

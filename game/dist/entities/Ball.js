@@ -7,6 +7,7 @@ export class Ball {
         this._radius = this._diameter / 2;
         this._color = 'rgb(0, 0, 0)';
         this._speed = 8;
+        this._startingSpeed = 4;
         // Creates the ball object
         this._element = document.createElement('div');
         this._element.classList.add('ball');
@@ -35,6 +36,12 @@ export class Ball {
     }
     get direction() {
         return this._direction;
+    }
+    get speed() {
+        return this._speed;
+    }
+    get startingSpeed() {
+        return this._startingSpeed;
     }
     get top() {
         return this._top;
@@ -73,12 +80,12 @@ export class Ball {
             this._direction.y *= -1;
         // if spawn up and direction down, do we need to manage differently ?
     }
-    move() {
+    move(speed) {
         this._direction.normalize();
         const currentLeft = this._element.offsetLeft;
         const currentTop = this._element.offsetTop;
-        this._element.style.left = `${currentLeft + (this._speed * this._direction.x)}px`;
-        this._element.style.top = `${currentTop + (this._speed * this._direction.y)}px`;
+        this._element.style.left = `${currentLeft + (speed * this._direction.x)}px`;
+        this._element.style.top = `${currentTop + (speed * this._direction.y)}px`;
     }
     bounce(paddle) {
         this._direction.x *= -1;

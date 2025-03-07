@@ -12,6 +12,8 @@ export class Game {
 	private readonly _paddleRight: Paddle;
 	private readonly _score: Score;
 
+	private _beginning: boolean = true;
+
 	/* CONSTRUCTOR */
 	public constructor() {
 		this._ball = new Ball;
@@ -30,7 +32,11 @@ export class Game {
 				return ;
 
 			// Launch movement
-			this._ball.move();
+			if (this._beginning)
+				this._ball.move(this._ball.startingSpeed);
+			else
+				this._ball.move(this._ball.speed);
+	
 			this._paddleLeft.move();
 			this._paddleRight.move();
 
@@ -39,18 +45,21 @@ export class Game {
 			this._ball.updatePosition();
 
 			// If touch a paddle...
-			if (this._paddleLeft.collision(this._ball))
+			if (this._paddleLeft.collision(this._ball)) {
+				this._beginning = false;
 				this._ball.bounce(this._paddleLeft);
-			else if (this._paddleRight.collision(this._ball))
-				this._ball.bounce(this._paddleRight);
-			// ...or touch a wall...
-			else if (this._ball.top <= 0 ||
-				this._ball.bottom >= window.innerHeight) {
-					this._ball.direction.y *= -1;
 			}
+			else if (this._paddleRight.collision(this._ball)) {
+				this._beginning = false;
+				this._ball.bounce(this._paddleRight);
+			}
+			// ...or touch a wall...
+			else if (this._ball.top <= 0 || this._ball.bottom >= window.innerHeight)
+				this._ball.direction.y *= -1;
 			// ...or get out the field
 			else if (this._ball.right <= 0 || this._ball.left >= window.innerWidth) {
 				this._score.increaseScore(this._ball.right);
+				this._beginning = true;
 				this._ball.spawn();
 				round--;
 			}
