@@ -67,6 +67,19 @@ services:
     networks:
       - transcendence_network
 
+  database-services:
+    build:
+      context: ./database-service
+      dockerfile: ./Dockerfile
+    container_name: database-services
+    volumes:
+      - ./database-service/app:/app #app source code
+      - ./database-service/app/node_modules:/app/node_modules #node_modules
+    environment:
+      - NODE_ENV=development
+    restart: always
+    networks:
+      - transcendence_network
 
 # network and volumes
 networks:

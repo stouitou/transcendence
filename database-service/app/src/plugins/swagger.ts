@@ -1,18 +1,17 @@
 import { FastifyInstance } from "fastify";
 import swagger from "@fastify/swagger";
 import swaggerUI from "@fastify/swagger-ui";
-import { getEnvVariable } from "../utils/getEnvVariable";
 
-export async function registerSwagger(app: FastifyInstance) {
-  const host:string = getEnvVariable("BACKEND_SERVER_NAME_API");
-  const port:string = getEnvVariable("BACKEND_SERVER_SSH_PORT");
+export async function registerSwagger(app: FastifyInstance) {  
+  const host = app.env.BACKEND_SERVER_NAME_API;
+  const port = app.env.BACKEND_SERVER_SSH_PORT;
   // configuration de Swagger
   await app.register(swagger, {
     openapi: {
       info: {
-        title: "Welcome to Auth Service API Documentation",
+        title: "🚀 Welcome to Database Service API Documentation",
         description,
-        version: "2.0.0",
+        version: "2.0.1",
       },
       components: {
         securitySchemes: {
@@ -34,7 +33,7 @@ export async function registerSwagger(app: FastifyInstance) {
   });
 
   await app.register(swaggerUI, {
-    routePrefix: "/api/auth/docs",
+    routePrefix: "/api/v2/database/docs",
     uiConfig: {
       docExpansion: "list",
       deepLinking: false,
@@ -42,12 +41,12 @@ export async function registerSwagger(app: FastifyInstance) {
   });
 }
 
-const description = "<h2>📚 API Documentation for Auth Service</h2>\
-          <p>Welcome to the comprehensive documentation for our Auth Service API. Here, you'll find all the information you need to interact with our API endpoints effectively.</p>\
+const description = "<h2>📚 API Documentation for Database Service</h2>\
+          <p>Welcome to the comprehensive documentation for our Database Service API. Here, you'll find all the information you need to interact with our API endpoints effectively.</p>\
           <h3>🔐 Authentication</h3>\
           <p>Our API uses <strong>RS256 JWT Tokens</strong> for secure authentication. Ensure you include the token in your requests to access protected resources.</p>\
           <h3>📂 Available Endpoints</h3>\
-          <p>Explore the various endpoints available for managing your authentication and authorization. Each endpoint is documented with detailed information on the required parameters, request bodies, and responses.</p>\
+          <p>Explore the various endpoints available for managing your database entities. Each endpoint is documented with detailed information on the required parameters, request bodies, and responses.</p>\
           <h3>📈 Examples and Use Cases</h3>\
           <p>We provide examples and use cases to help you understand how to use the API effectively. Check out the example requests and responses to get started quickly.</p>\
           <h3>🔧 Support and Feedback</h3>\
@@ -56,6 +55,8 @@ const description = "<h2>📚 API Documentation for Auth Service</h2>\
           <p>Happy coding! 🚀</p>\
           <h4>📝 Note: </h4>\
           <ul>\
-          <li><p>❌ 🚧 ⚠️ 🚨 ...inProgress...</p></li>\
-          <li><p>❌ 🚧 ⚠️ 🚨 ...inProgress...</p></li>\
-          ";
+          <li><p>❌ Autorization is not implemented yet</p></li>\
+          <li><p>❌ Manager's endpoints is not implemented yet</p></li>\
+          <li><p>❌ not fix : put action with relations </p></li>\
+          </ul>\
+        ";
