@@ -27,13 +27,18 @@ export class UserRepository {
 
   static async getAll(): Promise<User[]> {
     const response = await fetch(`${this.BASE_URL}/table/${TABLE}`);
+  //  const response = await fetch(`http://database-services:3000/api/v2/database/myDb/table/user?relations=authProviders`);
+   // console.log("🔐 UserRepository.getAll() response ",response);
     const data = await response.json();
+   // console.log("🔐 UserRepository.getAll() data ",data);
     const users = data.map(User.fromJSON);
+   // console.log("🔐 UserRepository.getAll() users ",users);
     const result = users.map((user:User) => {
      // return {...user.toJSON()};
       //return {...user.toFilteredJSON({name:true,email:true})};
       return {...user.toJson(UserBody)};
     });
+  //  console.log("🔐 UserRepository.getAll() result ",result);
     return result;
   }
 

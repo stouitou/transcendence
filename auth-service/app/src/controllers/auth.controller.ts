@@ -1,9 +1,29 @@
-import { AuthRepository } from "../repository/AuthRepository";
-import { UserRepository } from "../repository/UserRepository";
+import AuthProviderRepository from "@src/repository/AuthProvider.repository";
+import  UserRepository  from "../repository/User.repository";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
+import { BaseController } from "./BaseController";
 
-export class AuthController {
-	  constructor(private app: FastifyInstance) {
+
+/**
+ * Contrôleur d'authentification
+ * rappel: un contrôleur est une classe qui contient des méthodes qui gèrent les requêtes HTTP
+ * -- Il est utilisé pour gérer les requêtes HTTP et les réponses.
+ */
+export class AuthController extends BaseController {
+  //Une classe BaseController qui contient les méthodes communes à tous les contrôleurs??? et qui est étendue par les contrôleurs
+
+  private UserRepository: UserRepository;
+  private AuthProviderRepository: AuthProviderRepository;
+
+  /**
+   * Crée une instance de AuthController.
+   * 
+   * @param app 
+   */
+  constructor(app: FastifyInstance) {
+      super(app);
+      this.UserRepository = new UserRepository();
+      this.AuthProviderRepository = new AuthProviderRepository();
 
 		if (!this.app.authService) {
 			console.error("🔴 authService is not initialized");
@@ -15,39 +35,46 @@ export class AuthController {
 		   this.login = this.login.bind(this);
 		   this.me = this.me.bind(this);
 	  }
-	 
-  // 🟢 Inscription (register)  
+
+  /**
+   *  Inscription (register) by email/password
+   * 
+   * @param req 
+   * @param reply 
+   * @returns 
+   */ 
   async register(req: FastifyRequest, reply: FastifyReply) {
-	console.log("🔗AuthController  start register")
-/* 	if (!this.app.authService) {
-		console.error("🔴 authService is not initialized");
-	  } else {
-		console.log("🟢 authService is initialized");
-	  } */
+	  console.log("🔵 AuthController  start register")
     const { email, password } = req.body as { email: string; password: string };
-    // Vérifier si l'utilisateur existe déjà
-    const existingUser = await this.app.authService.validateUser(email, password);
-	console.log("🔗AuthController   existingUser? ",existingUser)
+    // Vérifier si l'utilisateur existe déjà dan AuthProvider
+    const existingUser = await this.AuthProviderRepository.getByParams({provider_id:email,provider:"local"});
+  	console.log("❓ AuthController   existingUser: ", existingUser)
     if (existingUser) {
       return reply.status(400).send({ error: "User already exists" });
     }
-	console.log("🔗 AuthController  try create User")
+    console.log("🟠 AuthController  try create User")
 
-    // Créer l'utilisateur
-    const newUser = await this.app.authService.createUser(email, password);    
-	console.log("🔗 newUser",newUser)
-  if (!newUser) {
+    // Créer l'utilisateur  
+    const newUser = await this.app.authService.createUser(email, password);
+	  console.log("🟡 newUser",newUser)
+    if (!newUser) {
       return reply.status(400).send({ error: "User already exists" });
     }
     const token = this.app.authService.generateToken(newUser!); // `!` pour forcer le non-null
-console.log("🔗 token",{token})
+    console.log("🔗🟢 token",{token})
     return reply.status(201).send({ token });
   }
 
-  // 🟢 Connexion (login)
+  /**
+   * Connexion (login) by email/password
+   * 
+   * @param req 
+   * @param reply 
+   * @returns 
+   */
   async login(req: FastifyRequest, reply: FastifyReply) {
     const { email, password } = req.body as { email: string; password: string };
-   console.log("🔗 email, password ",email,password)
+    console.log("🔗 email, password ",email,password)
     const user = await this.app.authService.validateUser(email, password);
     console.log("🟢 user ",user)
     if (!user) {
@@ -72,7 +99,9 @@ console.log("🔗 token",{token})
       console.log("🟢 me decoded",decoded)
 
   
-   const result = await  UserRepository.getUserById(decoded.id);
+   //const result = await  UserRepository.getUserById(decoded.id);
+   const result = await  this.UserRepository.getById(decoded.id);
+   console.log("🟢 me result",result)
    if (!result) {
     return reply.status(401).send({ error: "Invalid token" });
   }
@@ -85,7 +114,13 @@ console.log("🔗 token",{token})
     }
   }
 
-  // 🟢 Callback 42
+  /**
+  * Connexion (login) avec 42API OAuth
+  * 
+  * @param req 
+  * @param reply 
+  * @param token 
+  */
   async oauthCallbackApi42(req: FastifyRequest, reply: FastifyReply, token: any) {
     // 1. Récupérer le profil de l'utilisateur depuis l'API 42 en utilisant le token bearer
     try {
@@ -105,63 +140,4 @@ console.log("🔗 token",{token})
       reply.send(error);
     }
   }
-
-/****en  cours */
-    // 🟢 Inscription (register whith oAutht)  
-    async registerWithOauthProvider(profile:any, provider: string) {
-      console.log("registerWithOauthProvider  start register")
-      let provider_id = "";
-      if (provider === "google") {
-        provider_id = `${profile.id}`;
-      } else if (provider === "facebook") {
-        provider_id = profile.id;
-      } else if (provider === "github") {
-        provider_id = `${profile.id}`
-      } else if (provider === "42api") {
-        provider_id = `${profile.id}`;
-      }
-      // on dispose de l'objet profile qui contient les informations de l'utilisateur 
-      // et de provider qui contient le nom du fournisseur d'authentification
-      // on peut donc créer un utilisateur avec ces informations
-      // 1- vérifier si l'utilisateur existe déjà dans la base de données
- const authprovider =  await AuthRepository.getAutProviderByProviderId(profile.id,provider);
-      // 2- si l'utilisateur existe déjà, le retourner
-      if (!authprovider) return null;
-      // 3- si l'utilisateur n'existe pas, le créer
-      // 3.1- créer l'utilisateur dans la base de données
-      const user = await UserRepository.createVoidUser();
-      // 3.2- créer AuthProvider dans la base de données
-      const authProvider = await AuthRepository.createAuthProvider({ provider_id/* : profile.id */, provider, user_id: user.id });
-      // 4- retourner l'utilisateur créé
-      return user;
-
-
-      /**** fin */
-      // et le cas échéant, le mettre à jour avec les informations du fournisseur d'authentification
-    /* 	if (!this.app.authService) {
-        console.error("🔴 authService is not initialized");
-        } else {
-        console.log("🟢 authService is initialized");
-        } */
-/*         const { email, password } = req.body as { email: string; password: string };
-        // Vérifier si l'utilisateur existe déjà
-        const existingUser = await this.app.authService.validateUser(email, password);
-      console.log("registerWithOauthProvider   existingUser? ",existingUser)
-        if (existingUser) {
-          return reply.status(400).send({ error: "User already exists" });
-        }
-      console.log("🔗 registerWithOauthProvider  try create User")
-    
-        // Créer l'utilisateur
-        const newUser = await this.app.authService.createUser(email, password);    
-      console.log("🔗 newUser",newUser)
-      if (!newUser) {
-          return reply.status(400).send({ error: "User already exists" });
-        }
-
-        return newUser; */
-   /*      const token = this.app.authService.generateToken(newUser!); // `!` pour forcer le non-null
-    console.log("🔗 token",{token})
-        return reply.status(201).send({ token }); */
-      }
 }

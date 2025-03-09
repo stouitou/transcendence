@@ -53,6 +53,8 @@ Content-Type: application/json
   ]
 }
 ### create a new User
+GET https://localhost:4433/api/v2/database/myDb/table/user/id/3?relations=authProviders HTTP/1.1
+###
 PUT https://localhost:4433/api/v2/database/myDb/table/user/id/3?relations=authProviders HTTP/1.1
 Content-Type: application/json
 
@@ -73,3 +75,14 @@ DELETE https://localhost:4433/api/v2/database/myDb/table/user/id/2 HTTP/1.1
 ###
 
 GET  https://localhost:4433/api/v2/database/myDb/table/AuthProvider?relations=user&filters={"provider_id":"67890"} HTTP/1.1
+
+###
+
+###
+GET https://localhost:4433/api/v2/database/docs HTTP/1.1
+###
+
+GET  https://localhost:4433/api/v2/database/myDb/table/user?relations=authProviders&filters={"authProviders":{"provider_id":"12345"}} HTTP/1.1
+###
+
+GET  https://localhost:4433/api/v2/database/myDb/table/user?relations=authProviders&filters={"id":"4"} HTTP/1.1

@@ -10,9 +10,12 @@ export class AuthProvider {
   @Column({ type: "text" })
   provider: string;
 
-  @Column({ type: "text" })
+  @Column({ type: "text", unique: true })
   provider_id: string;
 
   @ManyToOne(() => User, (user) => user.authProviders, {onUpdate: 'CASCADE',  onDelete: "CASCADE" })
   user: User;
+
+  @Column({ type: "text", nullable: true })
+  password: string;
 }

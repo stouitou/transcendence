@@ -10,7 +10,8 @@ export type LoginResponse = Static<typeof AuthSchema.login.response[200]>;
 
 
 // 🔹 Définition d'un type User générique (peut être utilisé en dehors du schéma)
-export type User = {
+/* deplacer dans models/User.models.ts
+ export type User = {
   id:        number;
   email?:     string;
   name?:      string;
@@ -21,10 +22,11 @@ export type User = {
   updated_at: Date;
 };
 
+// deplacer dans models/AuthProvider.models.ts
 export type AutProvider = {
   id: number;
   provider: string;
   providerId: string;
   userId: string;
   user: User;
-}
+} */

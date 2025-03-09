@@ -2,13 +2,17 @@ import { FastifyInstance } from "fastify";
 import FastifyPassport from "@fastify/passport";
 import { AuthController } from "../controllers/auth.controller";
 import { AuthSchema } from "../schemas/auth.schema";
+import UserRepository from "@src/repository/User.repository";
+import AuthProviderRepository from "@src/repository/AuthProvider.repository";
+import { User } from "@src/models/User.models";
 async function authRoutes(app: FastifyInstance) {
 
   const authController = new AuthController(app);
   // Routes base Auth
   app.post("/register", { schema: AuthSchema.register }, authController.register);
   app.post("/login", { schema: AuthSchema.login }, authController.login);
-  app.get("/me", { schema: AuthSchema.profileMe }, authController.me);
+  app.get("/me", /* { schema: AuthSchema.profileMe }, */ authController.me);//@DEBUG
+ // app.get("/logout", { schema: AuthSchema.logout }, authController.logout);
   
   // Routes OAuth
   app.get("/google",   { schema: AuthSchema.oauthProvider }, FastifyPassport.authenticate("google", { scope: ["email", "profile"] }));
