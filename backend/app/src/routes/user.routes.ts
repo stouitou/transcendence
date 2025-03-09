@@ -78,11 +78,11 @@ async function userRoutes(app: FastifyInstance) {
 
 
 
-  app.get("/", {/* preHandler: [loggerMiddleware], */schema: UserSchema.getUsers}, userController.getUsers);
-  app.get("/:id", {schema: UserSchema.getUserById}, userController.getUserById);
+  app.get("/", {/* preHandler: [loggerMiddleware], *//* schema: UserSchema.getUsers */}, userController.getUsers);
+  app.get("/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserById);
   app.put("/:id", {schema: UserSchema.updateUser}, userController.updateUser);
-  app.delete("/:id", {schema: UserSchema.deleteUser}, userController.deleteUser);
-  app.post("/query", {schema: UserSchema.requestQuery}, userController.requestQuery);
+  app.delete("/:id",/*  {schema: UserSchema.deleteUser}, */ userController.deleteUser);
+ // app.post("/query", {schema: UserSchema.requestQuery}, userController.requestQuery);
   //pour tester les users
   app.post("/", {schema: UserSchema.createUser }, userController.createUser);
 }

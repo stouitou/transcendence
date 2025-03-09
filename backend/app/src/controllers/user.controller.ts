@@ -1,5 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { UserRepository } from '@src/repository/UserRepository';
+import  UserRepository  from '@src/repository/User.repository';
+import { Param } from '@prisma/client/runtime/library';
 
 
 export type User = {
@@ -29,6 +30,15 @@ interface UpdateUserBody extends User{}
 
 
 export class UserController {
+ private userRepository = new UserRepository();
+  constructor() {
+    this.userRepository = new UserRepository()
+    this.createUser = this.createUser.bind(this);
+    this.getUsers = this.getUsers.bind(this);
+    this.getUserById = this.getUserById.bind(this);
+    this.updateUser = this.updateUser.bind(this);
+    this.deleteUser = this.deleteUser.bind(this);
+  }
   //constructor(private userService: UserService) {}
 
  /*  async  registerUser( request: FastifyRequest<{ Body: CreateUserBody }>, reply: FastifyReply) {
@@ -46,7 +56,8 @@ export class UserController {
 
     async createUser(request: FastifyRequest<{ Body: {name:string,avatar:string} }>, reply: FastifyReply) {  
       const { ...requestBody } = request.body;
-      const users = await UserRepository.create(requestBody);
+      //const users = await UserRepository.create(requestBody);
+      const users = await this.userRepository.create(requestBody);
       if (!users) {
         return reply.status(404).send({ error: 'User not found' });
       }
@@ -54,17 +65,19 @@ export class UserController {
     }
 
   async getUsers(request: FastifyRequest, reply: FastifyReply) {  
-    console.log("UserController getUsers ");
-        const users = await UserRepository.getAll();
+    console.log("--UserController getUsers ");
+       // const users = await UserRepository.getAll();
+    const users = await  this.userRepository.getAll();
         console.log("UserController getUsers ",users);
     return reply.send(users);
   }
 
 
   async getUserById(request:  FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
-    const userId = parseInt(request.params.id);    
+    const userId = Number(request.params.id);    
   //  const user = await this.userService.getUser(userId);
-    const user = await UserRepository.getById(userId);
+    //const user = await UserRepository.getById(userId);
+    const user = await this.userRepository.getById(userId);
         if (!user) {
       return reply.status(404).send({ error: 'User not found' });
     }
@@ -72,12 +85,21 @@ export class UserController {
   }
 
   async updateUser(request: FastifyRequest<{ Params: { id: string }, Body: UpdateUserBody }>, reply: FastifyReply) {
-    const userId = parseInt(request.params.id);
+    const userId = Number(request.params.id);
+    if (!userId) {
+      return reply.status(400).send({ error: 'Invalid user id' });
+    }
+    if (!request.body) {
+      return reply.status(400).send({ error: 'Invalid request body' });
+    }
     const { ...requestBody } = request.body;
-    const { id,email,name,avatar,password,providers} = requestBody;
+    const { id,name,avatar,password,providers} = requestBody;
 
     //check if user exists
-    const user = await UserRepository.update(userId,requestBody);
+   // const user = await UserRepository.update(userId,requestBody);
+    const user = await this.userRepository.update({id:userId,name,avatar,password});//@TODO providers??
+    console.log("UserController updateUser ",user);
+
     if (!user) {
       return reply.status(404).send({ error: 'User not found' });
     }
@@ -87,10 +109,11 @@ export class UserController {
   async deleteUser(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     const userId = parseInt(request.params.id);
     //const user = await this.userService.deleteUser(userId);
-    const user = await UserRepository.delete(userId);
+   // const user = await UserRepository.delete(userId);
+    const user = await this.userRepository.delete(userId);
     return reply.send(user);
   }
-  async requestQuery(request: FastifyRequest<{ Body: {name:string,avatar:string} }>, reply: FastifyReply) {
+ /*  async requestQuery(request: FastifyRequest<{ Body: {name:string,avatar:string} }>, reply: FastifyReply) {
  const date = new Date().toISOString();
     const sql = `INSERT INTO users (name, avatar, created_at, updated_at, role) VALUES (?, ?, ?, ?, ?)`;// VALUES (?, ?, ?, ?, ?)
    
@@ -102,7 +125,7 @@ export class UserController {
     } catch (error) {
       return reply.status(400).send({ error: error.message });
     }
-  }
+  } */
 
 }
 

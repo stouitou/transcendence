@@ -111,10 +111,7 @@ export const UserSchema = {
 		name: Type.String(),
 	}),
 	response: {
-		200: Type.Object({
-			id: Type.Number(),
-			name: Type.String(),
-		}),
+		200: Type.Any(),
 		404: Type.Object({
 			message: Type.String(),
 		}),

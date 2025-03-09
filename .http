@@ -98,3 +98,6 @@ GET  https://localhost:4433/api2/database2/myDb/table/authprovider?relations=use
 ### get seulement dans le conteneur
 GET  http://database-services:3000/api2/database2/myDb/table/authprovider?relations=user HTTP/1.1
 
+### get seulement dans le conteneur
+
+GET  https://localhost:4433/api/v2/database/myDb/table/localhost:4433/api/v2/database/myDb/table/AuthProvider HTTP/1.1
