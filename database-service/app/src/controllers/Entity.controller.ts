@@ -1,10 +1,9 @@
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { EntityRepository } from "../repositories/Entity.repository";
-import { User,UserParams,AuthProvider,AuthProviderParams } from "../types/index.types";
-import { UrlSearchParams } from "@src/types/User.types";
-import { DeepPartial, EntityTarget, ObjectLiteral } from "typeorm";
-import { getEntityByName } from "@src/config/entityMap";
-
+import { UrlSearchParams } from "../types/index.types";
+import { DeepPartial, ObjectLiteral } from "typeorm";
+import { generateErrorResponse, generateSucessResponse } from "@src/utils/responseHandler";
+import { CustomIdNotFoundError } from "@src/config/Databases";
 /*
 options?: {
     limit?: number;
@@ -19,12 +18,14 @@ class buildOptions {
   private offsets: number | undefined;
   private orders: "ASC" | "DESC" | undefined;
   private relations: string[] | undefined;
+  private total: number | undefined
   constructor(private options: UrlSearchParams) {
     //set default values
     this.limits = undefined;
     this.offsets = undefined;
     this.orders = undefined;
     this.relations = undefined;
+    this.total = undefined;
     this.setLimits(options.limit);
     this.setOffsets(options.offset);
     this.setOrders(options.order as "ASC" | "DESC");
@@ -49,7 +50,7 @@ class buildOptions {
     }    
     this.relations = relations;
   }
-  getOptions() : {limit?: number; offset?: number; order?: "ASC" | "DESC"; relations?: string[] }{
+  getOptions() : {limit?: number; offset?: number; order?: "ASC" | "DESC"; relations?: string[], total?: number} {
     return {limit: this.limits, offset: this.offsets, order: this.orders, relations: this.relations};
   }
 }
@@ -78,7 +79,7 @@ export class EntityController {
     this.app = app;
     this.getEntitys = this.getEntitys.bind(this);
     this.getEntityById = this.getEntityById.bind(this);
-    this.getEntitysByParams = this.getEntitysByParams.bind(this);
+   // this.getEntitysByParams = this.getEntitysByParams.bind(this);
     this.createEntity = this.createEntity.bind(this);
     this.updateEntity = this.updateEntity.bind(this);
     this.deleteEntity = this.deleteEntity.bind(this);
@@ -86,70 +87,70 @@ export class EntityController {
 
 // 📌 📢 Route : GET /table/:entity
 getEntitys = async (req: FastifyRequest, reply: FastifyReply) => {
-  
-   const { filters } = req.query as UrlSearchParams;
-  // const { filters, limit, offset, order } = req.query as UrlSearchParams;
-  const { database, entity } = req.params as { database: string, entity: string };
-  //0- Récupérer la base de données par son nom
-  const entityDataSource = (await this.app.DB.getDataBase(database));
-   if (!entityDataSource) {
-    return reply.status(404).send({ error: `Database '${database}' not found` }); // 👈 Error ou message?
+  try{
+    const { filters } = req.query as UrlSearchParams;
+    // const { filters, limit, offset, order } = req.query as UrlSearchParams;
+    const { database, entity } = req.params as { database: string, entity: string };
+    //0- Récupérer la base de données par son nom
+    const entityDataSource = (await this.app.DB.getDataBase(database));
+     //1- Trouver l'entité par son nom
+    const entityClass = entityDataSource.getEntityByName(entity);
+     //2- Créer une instance de EntityRepository
+     const repository =  new EntityRepository(entityDataSource.getDataSource() ,entityClass!);
+    //3- Récupérer les données de l'entité avec les filtres
+    const query = req.query as UrlSearchParams;
+    const options = new buildOptions(query).getOptions();
+    if (filters) {
+      const parsedFilters =(filters as unknown as string[]).map((filter) => {
+        return JSON.parse(decodeURIComponent(filter));
+      });
+//filters          | [ '[{"id":"5"},{"role":"user"}]' ]
+//parsedFilters    | [ { id: '5' }, { role: 'user' } ]
+      const result = await repository.findByParams(parsedFilters,options);
+      return generateSucessResponse(reply,200, result, options);
+    }
+    //4- Récupérer les données de l'entité
+      const result = await repository.findAll(options);
+    //5- Retourner les données
+    return generateSucessResponse(reply,200, result, options);
   }
-   //1- Trouver l'entité par son nom
-  const entityClass = entityDataSource.getEntityByName(entity);
-  if (!entityClass) {
-    return reply.status(404).send({ error: `Entity '${entity}' not found` }); // 👈 Error ou message?
-  }
-  console.log("🚀 ~ file: Entity.controller.ts ~ line 56 ~ EntityController ~ getEntitys= ~ entityClass", entityClass);
-  //2- Créer une instance de EntityRepository
-   const repository =  new EntityRepository(entityDataSource.getDataSource() ,entityClass);
-  //3- Récupérer les données de l'entité avec les filtres
-  console.log("🚀 ~ file: Entity.controller.ts ~ line 61 ~ EntityController ~ getEntitys= ~ filters", filters);
-  const query = req.query as UrlSearchParams;
-  const options = new buildOptions(query).getOptions();
-  if (filters) { 
-   const parsedFilters = JSON.parse(decodeURIComponent(filters));
-  //const result = await repository.findByParams(parsedFilters);
+  catch (error) {
 
-  const result = await repository.findByParams(parsedFilters,options);
-   if (!result) return reply.status(404).send({ error: "User not found" });
-   return reply.send(result);
-  }
-  //4- Récupérer les données de l'entité
-  const result = await repository.findAll(options);
-
-  if (!result) return reply.status(404).send({ error: "User not found" });
-  //5- Retourner les données
-  return reply.send(result);
+  return generateErrorResponse(reply, error);
+}
 };
 
 // 📌 📢 Route : GET /table/:entity/:id
 getEntityById = async (req: FastifyRequest, reply: FastifyReply) => {
-  const { database, entity, id } = req.params as { database: string, entity: string, id: string };
-  //0- Récupérer la base de données par son nom
-  const entityDataSource = (await this.app.DB.getDataBase(database));
-  if (!entityDataSource) {
-    return reply.status(404).send({ error: `Database '${database}' not found` }); // 👈 Error ou message?
+  try {
+    const { database, entity, id } = req.params as { database: string, entity: string, id: string };
+    //0- Récupérer la base de données par son nom
+    const entityDataSource = (await this.app.DB.getDataBase(database));
+
+    //1- Trouver l'entité par son nom
+    const entityClass = entityDataSource.getEntityByName(entity);
+ 
+    //2- Créer une instance de EntityRepository
+     const repository =  new EntityRepository(entityDataSource.getDataSource() ,entityClass!);
+    //3- Récupérer les données de l'entité avec son ID
+    //3- Récupérer les données de l'entité avec les filtres
+    const query = req.query as UrlSearchParams;
+    const options = new buildOptions(query).getOptions();
+    const entityId = Number(id);
+    const result = await repository.findById(entityId, options.relations);
+    //3-a Vérifier si l'entité existe
+    if (!result) throw  new CustomIdNotFoundError(`Entity '${entity}' with ID '${id}' not found`);//return generateErrorResponse(reply, 404, `Entity '${entity}' not found`);
+    //4- Retourner les données
+    options.total = result? 1: 0; // 👈 on a forcement 1 resultat a ce niveau
+    //return reply.status(200).send(generateSucessResponse(200, result, options));
+    return generateSucessResponse(reply,200, result, options);
   }
-  //1- Trouver l'entité par son nom
-  const entityClass = entityDataSource.getEntityByName(entity);
-  console.log(entityClass);
-  //1-a Vérifier si l'entité existe
-  if (!entityClass) {
-    return reply.status(404).send({ error: `Entity '${entity}' not found` }); // 👈 Error ou message?
+  catch (error) {
+    return generateErrorResponse(reply, error);
   }
-  //2- Créer une instance de EntityRepository
-   const repository =  new EntityRepository(entityDataSource.getDataSource() ,entityClass);
-  //3- Récupérer les données de l'entité avec son ID
-  const entityId = Number(id);
-  const result = await repository.findById(entityId);
-  //3-a Vérifier si l'entité existe
-  if (!result) return reply.status(404).send({ error: `Entity '${entity}' not found` });
-  //4- Retourner les données
-  return reply.send(result);
 };
 
-// 📌 📢 Route : GET /table/:entity?filters=filters                                 //ne serai ce pas en double?
+/* // 📌 📢 Route : GET /table/:entity?filters=filters                                 //ne serai ce pas en double?
 getEntitysByParams = async (req: FastifyRequest, reply: FastifyReply) => {
   const { filters } = req.query as UrlSearchParams;
   // const { filters, limit, offset, order } = req.query as UrlSearchParams;
@@ -157,13 +158,13 @@ getEntitysByParams = async (req: FastifyRequest, reply: FastifyReply) => {
   //0- Récupérer la base de données par son nom
   const entityDataSource = (await this.app.DB.getDataBase(database));
   if (!entityDataSource) {
-    return reply.status(404).send({ error: `Database '${database}' not found` }); // 👈 Error ou message?
+    return generateErrorResponse(reply,404, `Database '${database}' not found`, `Database '${database}' not found`);
   }
   //1- Trouver l'entité par son nom
   const entityClass = entityDataSource.getEntityByName(entity);
   console.log(entityClass);
   if (!entityClass) {
-    return reply.status(404).send({ error: `Entity '${entity}' not found` });        // 👈 Error ou message?
+    return generateErrorResponse(reply, 404, `Entity '${entity}' not found`, `Entity '${entity}' not found`);
   }
   //2- Créer une instance de EntityRepository
   const repository =  new EntityRepository(entityDataSource.getDataSource() ,entityClass);
@@ -172,112 +173,116 @@ getEntitysByParams = async (req: FastifyRequest, reply: FastifyReply) => {
    const parsedFilters = filters ? JSON.parse(decodeURIComponent(filters)) : [];
 
   const result = await repository.findByParams(parsedFilters);
-   if (!result) return reply.status(404).send({ error: "User not found" });
-   return reply.send(result);
+   if (!result) return generateErrorResponse(reply, 404, `Entity '${entity}' not found`, `Entity '${entity}' not found`);
+   return generateSucessResponse(reply,200, result);
   }
-}
+} */
 
 // 📌 📢 Route : POST /table/:entity
 createEntity = async (req: FastifyRequest, reply: FastifyReply) => {
-  const { database, entity } = req.params as { database: string, entity: string };
-  //0- Récupérer la base de données par son nom
-  const entityDataSource = (await this.app.DB.getDataBase(database));
-  if (!entityDataSource) {
-    return reply.status(404).send({ error: `Database '${database}' not found` }); // 👈 Error ou message?
-  }
-   //1- Trouver l'entité par son nom
-  const entityClass = entityDataSource.getEntityByName(entity);
-  console.log(entityClass);
-  if (!entityClass) {
-    return reply.status(404).send({ error: `Entity '${entity}' not found` }); // 👈 Error ou message?
-  }
-  //2- Créer une instance de EntityRepository
-   const repository =  new EntityRepository(entityDataSource.getDataSource() ,entityClass);
-   //3- faire une validation des données
-   //  const { valid, entity, errors }= repository.validate(req.body) ou const { valid, entity, errors } = entityValidator(entity, req.body);
+  try {
+    const { database, entity } = req.params as { database: string, entity: string };
+    //0- Récupérer la base de données par son nom
+    const entityDataSource = (await this.app.DB.getDataBase(database));
+    //1- Trouver l'entité par son nom
+    const entityClass = entityDataSource.getEntityByName(entity);
+
+    //2- Créer une instance de EntityRepository
+    const repository =  new EntityRepository(entityDataSource.getDataSource() ,entityClass!);
+    //3- faire une validation des données ou pas
+    //  const { valid, entity, errors }= repository.validate(req.body) ou const { valid, entity, errors } = entityValidator(entity, req.body);
     // if (!valid) return reply.status(400).send({ errors });
-   //
-  //4- recupérer les données de l'entité depuis le body de la requête
-  const { ...data } = req.body as DeepPartial<ObjectLiteral>;
-  //5- Créer une nouvelle entité
-  const result = await repository.create(data);
-  //5-a Vérifier si l'entité a été crée
-  if (!result) return reply.status(404).send({ error: `Entity '${entity}' could not be created` });
-  //6- Retourner les données  
-  return reply.status(201).send(result);
+    //
+    //4- recupérer les données de l'entité depuis le body de la requête
+    const {id, ...data } = req.body as DeepPartial<ObjectLiteral>;
+    //WARNING  id est un champ auto généré
+    //5- Créer une nouvelle entité
+    const result = await repository.create(data);
+    //6- Retourner les données  
+    return generateSucessResponse(reply,201, result);
+  }
+  catch (error) {
+    return generateErrorResponse(reply, error);
+  }
 };
 
 // 📌 📢 Route : PUT /users/:id
 updateEntity = async (req: FastifyRequest, reply: FastifyReply) => {
-  const { database, entity, id} = req.params as { database: string, entity: string, id: string };
-  //0- Récupérer la base de données par son nom
-  const entityDataSource = (await this.app.DB.getDataBase(database));
-  if (!entityDataSource) {
-    return reply.status(404).send({ error: `Database '${database}' not found` }); // 👈 Error ou message?
-  }
-   //1- Trouver l'entité par son nom
-  const entityClass = entityDataSource.getEntityByName(entity);
-  if (!entityClass) {
-    return reply.status(404).send({ error: `Entity '${entity}' not found` }); // 👈 Error ou message?
-  }
+  try {
+    const { database, entity, id} = req.params as { database: string, entity: string, id: string };
+    //0- Récupérer la base de données par son nom
+    const entityDataSource = (await this.app.DB.getDataBase(database));
+     //1- Trouver l'entité par son nom
+    const entityClass = entityDataSource.getEntityByName(entity);
   //2- Créer une instance de EntityRepository
-   const repository =  new EntityRepository(entityDataSource.getDataSource() ,entityClass);
-  
+   const repository =  new EntityRepository(entityDataSource.getDataSource() ,entityClass!);  
   
    //4- recupérer les données de l'entité depuis le body de la requête
   const { ...data } = req.body as DeepPartial<ObjectLiteral>;
   //5- Mettre à jour l'entité
-  const entityId = Number(id);
-  const result = await repository.update(entityId, data);
+    const entityId = Number(id);
+    const result = await repository.update(entityId, data);
   //5-a Vérifier si l'entité a été crée
-  if (!result) return reply.status(404).send({ error: `Entity '${entity}' could not be updated` });
-  //6- Retourner les données
-  return reply.send(result);
+    //if (!result) return generateErrorResponse(reply, 404, `Entity '${entity}' could not be updated`, `Entity '${entity}' could not be updated`);
+    //6- Retourner les données
+    return generateSucessResponse(reply,200, result);
+  }
+  catch (error) {
+    console.log(error);
+    return generateErrorResponse(reply, error);
+  }
 };
 
 // 📌 📢 Route : DELETE /users/:id
 deleteEntity = async (req: FastifyRequest, reply: FastifyReply) => {
-  const { database, entity, id} = req.params as { database: string, entity: string, id: string };
-   //0- Récupérer la base de données par son nom
-   const entityDataSource = (await this.app.DB.getDataBase(database));
-   if (!entityDataSource) {
-     return reply.status(404).send({ error: `Database '${database}' not found` }); // 👈 Error ou message?
-   }
+  try {
+    const { database, entity, id} = req.params as { database: string, entity: string, id: string };
+    //0- Récupérer la base de données par son nom
+    const entityDataSource = (await this.app.DB.getDataBase(database));
     //1- Trouver l'entité par son nom
-   const entityClass = entityDataSource.getEntityByName(entity);
-   console.log(entityClass);
-   if (!entityClass) {
-     return reply.status(404).send({ error: `Entity '${entity}' not found` }); // 👈 Error ou message?
-   }
-   //2- Créer une instance de EntityRepository
-    const repository =  new EntityRepository(entityDataSource.getDataSource() ,entityClass);
-   //4- recupérer les données de l'entité depuis le body de la requête
-  //5- Mettre à jour l'entité
-  const entityId = Number(id);
-  const result = await repository.delete(entityId);
-  //5-a Vérifier si l'entité a été crée
-  if (!result) return reply.status(404).send({ error: `Entity '${entity}' could not be updated` });
-  //6- Retourner les données
-   return reply.status(204).send();
+    const entityClass = entityDataSource.getEntityByName(entity);
+
+    //2- Créer une instance de EntityRepository
+    const repository =  new EntityRepository(entityDataSource.getDataSource() ,entityClass!);
+    //4- recupérer les données de l'entité depuis le body de la requête
+    //5- Mettre à jour l'entité
+    const entityId = Number(id);
+    const result = await repository.delete(entityId);
+    console.log(result);
+    //5-a Vérifier si l'entité a été crée
+    if (!result)  throw new CustomIdNotFoundError(`Entity '${entity}' with ID ${id} could not be deleted`) //return generateErrorResponse(reply, 404, `Entity '${entity}' could not be deleted`);
+      //6- Retourner les données
+      return generateSucessResponse(reply,200, result);
+    }
+    catch (error) {
+      console.log(error);
+      return generateErrorResponse(reply, error);
+    }
   };
   
   //liste des base de données
   // 📌 📢 Route : GET /databases
   getDatabases = async (req: FastifyRequest, reply: FastifyReply) => {
-    const databases = this.app.DB.getDataBaseNames();
-    return reply.send(databases);
+    try {
+      const databases = this.app.DB.getDataBaseNames();
+      return generateSucessResponse(reply,200, databases);
+    }
+    catch (error) {
+      return generateErrorResponse(reply, error);
+    }
   }
   // 📌 📢 Route : GET /databases
   getDatabaseEntitys = async (req: FastifyRequest, reply: FastifyReply) => {
-    const { database } = req.params as { database: string };
-  
-    const entityDataSource = await this.app.DB.getDataBase(database);
-    if (!entityDataSource) {
-      return reply.status(404).send({ error: `Database '${database}' not found` });
+    try {
+      const { database } = req.params as { database: string };
+      const entityDataSource = await this.app.DB.getDataBase(database);
+      const entityClass = entityDataSource.getEntitys();
+      const entityArray = Object.values(entityClass).map((entity:any ) => entity.name);
+      return generateSucessResponse(reply,200, entityArray);
     }
-    const entityClass = entityDataSource.getEntitys();
-    const entityArray = Object.values(entityClass).map((entity:any ) => entity.name);
-    return reply.send({ ...entityArray });
+    catch (error) {
+      return generateErrorResponse(reply, error);
+    }
   }
   
 }

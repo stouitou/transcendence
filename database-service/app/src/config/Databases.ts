@@ -1,6 +1,6 @@
 import { AuthProvider } from "@src/models/AuthProvider.entity";
 import { User } from "@src/models/User.entity";
-import { DataSource, EntityTarget, ObjectLiteral } from "typeorm";
+import { DataSource, EntityNotFoundError, EntityTarget, ObjectLiteral } from "typeorm";
 
 type DatabaseParams = {
 	type: "sqlite" | "mysql";
@@ -90,7 +90,7 @@ export class Databases {
 	async getDataBase(databaseName: string) {
 		const database = this.dataBases[databaseName];
 		if (!database) {
-			throw new Error(`Database ${databaseName} not found`);
+			throw new DatabaseNotFoundError(`Database ${databaseName} not found`);
 		}
 		return database;
 	}
@@ -100,6 +100,34 @@ export class Databases {
 
 }
 
+export class DatabaseNotFoundError extends Error {
+	public code: string;
+	constructor(message: string) {
+		super(message);
+		this.name = "DatabaseNotFoundError";
+		this.message = message;
+		this.code = "DATABASE_NOT_FOUND";
+	}
+}
+export class CustomEntityNotFoundError extends Error {
+	public code: string;
+	constructor(message: string) {
+		super(message);
+		this.name = "EntityNotFoundError";
+		this.message = message;
+		this.code = "ENTITY_NOT_FOUND";
+	}
+}
+
+export class CustomIdNotFoundError extends Error {
+	public code: string;
+	constructor(message: string) {
+		super(message);
+		this.name = "NotFoundError";
+		this.message = message;
+		this.code = "ID_NOT_FOUND";
+	}
+}
 /**
  * creation d'une class de configuration de base de données
  * qui permettra de gérer plusieurs bases de données
@@ -142,6 +170,7 @@ export class DatabaseService {
 		const entity = this.entityMap[entityName.toLowerCase()] || null;
         if (!entity) {
             console.warn(`⚠️ Entité '${entityName}' non trouvée.`);
+			throw new CustomEntityNotFoundError(`Entity ${entityName} not found`);
         }
 		return entity;
 	}

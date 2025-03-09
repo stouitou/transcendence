@@ -1,5 +1,6 @@
-import { Repository, DeepPartial, FindManyOptions, FindOneOptions, ObjectLiteral, EntityTarget, DataSource } from "typeorm";
-import { AppDataSource } from "../config/data-source";
+import { CustomEntityNotFoundError } from "@src/config/Databases";
+import { Repository, DeepPartial, FindManyOptions, FindOneOptions, ObjectLiteral, EntityTarget, DataSource, EntityMetadata } from "typeorm";
+
 
 /**
  * Repository générique pour les entités de la base de données.
@@ -12,7 +13,7 @@ import { AppDataSource } from "../config/data-source";
 export class EntityRepository<T extends ObjectLiteral> {
   private repo: Repository<T>;
 
-  constructor(entityDataSource: DataSource,entity: EntityTarget<T>) {
+  constructor(private entityDataSource: DataSource,private entity: EntityTarget<T>) {
  //   this.repo = AppDataSource.getRepository(entity);
     this.repo = entityDataSource.getRepository(entity);
   }
@@ -31,6 +32,7 @@ export class EntityRepository<T extends ObjectLiteral> {
 
   // 📌 🔍 Trouver un élément par ID avec relations optionnelles
   async findById(id: number, relations: string[] = []): Promise<T | null> {
+    console.log("🚀 ~ file: Entity.repository.ts ~ line 77 ~ EntityRepository ~ findById ~ id", id)
     return this.repo.findOne({ where: { id } as any, relations } as FindOneOptions<T>);
   }
 
@@ -63,26 +65,102 @@ export class EntityRepository<T extends ObjectLiteral> {
   // 📌 ✏️ Mettre à jour un élément
   async update(id: number, data: DeepPartial<T>): Promise<T | null> {
     const entity = await this.repo.findOne({ where: { id } as any });
-    if (!entity) return null;
-    return this.repo.save({ ...entity, ...data });
+    if (!entity) throw new CustomEntityNotFoundError(`L'entité @TODO avec l'ID ${id} n'existe pas.`);
+   // this.repo.merge(entity, data);
+     // ❌ Supprimer explicitement l'ID de data s'il est présent
+    // const dataRemoveid = this.removeIdsRecursively(data); // 🔥 Supprime tous les `id`
+     
+   /*  if ("id" in data) {
+      delete (data as Partial<T>).id;
+      console.warn("❌ L'ID ne peut pas être modifié. il a été supprimé des données. traitement en cours...");
+    }  */
+
+
+
+    //1️⃣ Filtrer les propriétés valides
+    const cleanData = filterValidProperties(this.repo,data);
+    console.log("🚀 cleandata", cleanData)
+    //2️⃣ mettre a jour les relation si il y en a
+   
+    if (Object.keys(cleanData).length === 0) {
+      console.warn("⚠️ Aucune donnée valide à mettre à jour.");
+      return entity;
+    }
+
+ /*  if ("id" in data) {
+    delete (data as Partial<T>).id;
+    console.warn("❌ L'ID ne peut pas être modifié. il a été supprimé des données. traitement en cours...");
+  } */
+    return this.repo.save({ ...entity, ...cleanData });
+   // return this.repo.save({ ...entity, ...data });
   }
 
   // 📌 ❌ Supprimer un élément
   async delete(id: number): Promise<boolean> {
-    console.log("🚀 ~ file: Entity.repository.ts ~ line 74 ~ EntityRepository ~ delete ~ id", id)
-    const result = await this.repo.delete(id);
-    console.log("🚀 ~ file: Entity.repository.ts ~ line 76 ~ EntityRepository ~ delete ~ result", result)
-    return result.affected !== 0;
-    /*
-      try {
     const result = await this.repo.delete(id);
     return result.affected !== 0;
-  } catch (error) {
-    if (error.code === "SQLITE_CONSTRAINT") {
-      console.error("Foreign key constraint violation:", error.message);
-      // Handle the error appropriately
-    }
-    throw error;
-  }*/
   }
+
+
+
+  //❌❌❌❌❌❌ ne marche pas
+  removeIdsRecursively<T>(data: T): T {
+    if (Array.isArray(data)) {
+      return data.map(item => this.removeIdsRecursively(item)) as T;
+    } else if (typeof data === "object" && data !== null) {
+      const newData = { ...data };
+      if ("id" in newData) {
+        delete newData.id; // Supprime `id` à la racine
+        console.warn("❌ L'ID ne peut pas être modifié. il a été supprimé des données. traitement en cours...");
+      }
+      for (const key in newData) {
+        if (typeof newData[key] === "object") {
+          newData[key] = this.removeIdsRecursively(newData[key]); // Récursion sur les objets imbriqués
+        }
+      }
+      return newData;
+    }
+    return data;
+  }
+
+
+  
 }
+
+ //function filterValidProperties<T extends ObjectLiteral>(repo: Repository<T>, data: any): Partial<T> {
+ export  function filterValidProperties<T extends ObjectLiteral>(repo: Repository<T>, data: any): Partial<T> {
+    const entityMetadata: EntityMetadata = repo.metadata;
+  
+    // 📌 Récupérer les colonnes + relations
+    const validKeys = new Set([
+      ...entityMetadata.columns.map(col => col.propertyName),
+      ...entityMetadata.relations.map(rel => rel.propertyName)
+    ]);
+  
+    if (Array.isArray(data)) {
+      return data.map(item => filterValidProperties(repo, item)) as any;
+    } else if (typeof data === "object" && data !== null) {
+      return Object.keys(data).reduce((acc:any , key) => {
+        if (validKeys.has(key)) {
+          const relation = entityMetadata.relations.find(rel => rel.propertyName === key);
+  
+          if (relation) {
+            // Si c'est une relation, appliquer récursivement le filtrage sur l'entité liée
+            const relatedRepo = repo.manager.getRepository(relation.type as any);
+            acc[key] = Array.isArray(data[key])
+              ? data[key].map(item => filterValidProperties(relatedRepo, item))
+              : filterValidProperties(relatedRepo, data[key]);
+          } else {
+            // Sinon, c'est une colonne normale, on la garde
+            acc[key] = data[key];
+          }
+        }
+        return acc;
+      }, {} as Partial<T>);
+    }
+  
+    return data;
+  }
+  
+
+

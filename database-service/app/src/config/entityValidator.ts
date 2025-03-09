@@ -1,20 +1,22 @@
-import { getMetadataArgsStorage, EntityTarget, ObjectLiteral } from "typeorm";
-import { getEntityByName } from "./entityMap";
+import { getMetadataArgsStorage,  ObjectLiteral } from "typeorm";
+import { FastifyInstance } from "fastify";
 
 /**
+ * @TODO 1️⃣ rendre cette fonction utilisable dans les controllers ou l'implemente dans une classe db
  * Valide les données d'une entité et les transforme en instance de l'entité.
  * 
  * @param entityClassName Nom de l'entité
  * @param data Données à valider
  * @returns Un objet avec le statut de la validation, l'entité et les erreurs.
  */
-export function entityValidator<T extends ObjectLiteral>(
+export async function entityValidator<T extends ObjectLiteral>(
+  app: FastifyInstance,
   entityClassName: string,
   data: any
-): { valid: boolean; entity?: T; errors?: string[] } {
+): Promise<{ valid: boolean; entity?: T; errors?: string[] }> {
   
   // 📌 1️⃣ Récupérer la classe de l'entité
-  const entityClass = getEntityByName(entityClassName) as EntityTarget<T>;
+  const entityClass = (await app.DB.getDataBase(" ")).getEntityByName(entityClassName)  // getEntityByName(entityClassName) as EntityTarget<T>;
   if (!entityClass) {
     return { valid: false, errors: [`L'entité '${entityClassName}' n'existe pas.`] };
   }

@@ -13,6 +13,6 @@ export class AuthProvider {
   @Column({ type: "text" })
   provider_id: string;
 
-  @ManyToOne(() => User, (user) => user.authProviders, { onDelete: "CASCADE" })
+  @ManyToOne(() => User, (user) => user.authProviders, {onUpdate: 'CASCADE',  onDelete: "CASCADE" })
   user: User;
 }

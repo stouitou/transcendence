@@ -15,7 +15,8 @@ export class User {
   @Column({ type: "text", default: "user" })
   role: string;
 
-  @OneToMany(() => AuthProvider, (authproviders) => authproviders.user,{ cascade: true, onDelete: 'CASCADE',nullable:true })//✅ Ajout de la relation OneToMany
+  @OneToMany(() => AuthProvider, (authproviders) => authproviders.user,{ cascade: true, onDelete: 'CASCADE',nullable:true,
+    onUpdate: 'CASCADE',  })//✅ Ajout de la relation OneToMany
   authProviders: AuthProvider[];
   
 }

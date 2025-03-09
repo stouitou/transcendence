@@ -72,8 +72,6 @@ services:
       context: ./database-service
       dockerfile: ./Dockerfile
     container_name: database-services
-    ports: # pour accéder à l'application en local pour le développement
-      - "5432:3000"
     volumes:
       - ./database-service/app:/app #app source code
       - ./database-service/app/node_modules:/app/node_modules #node_modules

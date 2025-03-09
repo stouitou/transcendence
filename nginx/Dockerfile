@@ -11,6 +11,7 @@ RUN apt-get update && apt-get upgrade -y && \
 # Copier les fichiers de configuration Nginx dans le répertoire /etc/nginx/conf.d/ du conteneur
 COPY  ./conf/nginx.conf /etc/nginx/nginx.conf
 COPY  ./templates /etc/nginx/templates
+COPY  ./proxy /etc/nginx/conf/configProxy
 #COPY  ./conf/default.conf /etc/nginx/conf.d/
 #COPY  ./conf/localhost.conf /etc/nginx/conf.d/
 

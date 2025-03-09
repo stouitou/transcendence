@@ -1,47 +1,28 @@
 import "reflect-metadata";
 import Fastify from "fastify";
-import { AppDataSource } from "./config/data-source";
-import { userRoutes } from "./routes/user.routes";
-import { authProviderRoutes } from "./routes/authProvider.routes";
 import { registerSwagger } from "./plugins/swagger";
 import dotenvPlugin from "./plugins/dotenvPlugin";
 import { entityRoutes } from "./routes/entity.routes";
 import databases from "./plugins/databases";
+import { managerRoutes } from "./routes/manager.routes";
 
-// Initialisation des connexions
-async function initDatabases() {
-  // Initialisation des connexions aux bases de données
-  /* await MainDB.initialize();
-  console.log("MainDB connected!"); */
-
-  await AppDataSource.initialize();
-  console.log("AppDataSource connected!");
-}
 
 const start = async () => {
   try {
-   // await initDatabases();  // ✅ D'abord, connexion aux DB
+    const app = Fastify({ logger: true, ignoreTrailingSlash: true });   // ✅ On crée une instance de Fastify
+    await app.register(dotenvPlugin);        // ✅ On charge le plugin Dotenv
+    await app.register(databases);           // ✅ On charge le plugin Databases
+    await registerSwagger(app);              // ✅ Ensuite, on charge le plugin Swagger
 
-    const app = Fastify({ logger: true });
-    await app.register(dotenvPlugin);
-    await app.register(databases);  // ✅ Ensuite, on charge les routes
-    await registerSwagger(app);  // ✅ Ensuite, on charge le plugin Swagger
+    // ✅ Gestion des erreurs
+    // 📌 Si une erreur est levée, on log l'erreur et on renvoie une réponse d'erreur
+    app.setErrorHandler(function (error, request, reply) {
+      this.log.error(error)
+      reply.status(409).send({ setErrorHandler: error }) // 409 Conflict @TODO: create errorhandling()
+    })
 
-/*     app.get("/", async () => {
-      return { message: "Hello World" };
-    });
-    app.get("/api2", async () => {
-      return { message: "Hello World" };
-    });
-    app.get("/api2/", async () => {
-      return { message: "Hello World" };
-    });
-    app.get("/database", async () => {
-      return { message: "Hello World" };
-    }); */
-    app.register(entityRoutes ,{prefix:"/api2/database2"});  // ✅ Ensuite, on charge les routes
-    app.register(userRoutes ,{prefix:"/api2/database"});  // ✅ Ensuite, on charge les routes
-   // app.register(authProviderRoutes ,{prefix:"/api2/database"});  // ✅ Ensuite, on charge les routes
+    app.register(entityRoutes ,{prefix:"/api/v2/database"});
+    app.register(managerRoutes ,{prefix:"/api/v2/database/manager"});
 
     app.listen({port: 3000, host: "0.0.0.0" }, () => {
       console.log("Server running on http://localhost:3000");
