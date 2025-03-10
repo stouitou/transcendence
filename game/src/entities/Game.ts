@@ -33,11 +33,17 @@ export class Game {
 	}
 
 	/* METHODS */
-	public launch() {
+	public launch() : Promise<void> {
+		return new Promise((resolve) => {
 		const loop = () => {
 
 			if (this._round === 0)
+			{
+				this._player1.setInfoEndGame(this._player2);
+				this._player2.setInfoEndGame(this._player1);
+				resolve();
 				return ;
+			}
 
 			// Launch movement
 			if (this._beginning)
@@ -81,6 +87,7 @@ export class Game {
 		};
 
 		loop();
-		// this.emit("end");
+	});
 	}
+	
 }
