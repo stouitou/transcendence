@@ -1,0 +1,1 @@
+import './component/pong-game.ts';

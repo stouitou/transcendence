@@ -37,19 +37,26 @@ export class Tournament {
         return false;
     }
     launchGame(nofMatch) {
+        // function nextMatch(index: number) {
+        // 	if (index >= nofMatch)
+        // 		return ;
+        // }
+        // const	i = 0;
+        // const	game = this._match.get(i);
+        // if (game && game.length === 2) {
+        // 	this._game = new Game(game[0], game[1]);
+        // 	this._game.on("end", () => nextMatch(i + 1));
+        // 	this._game.launch();
+        // }
         let i = 1;
         while (i <= nofMatch) {
             const game = this._match.get(i);
             //console.log(game);
             if (game && game.length === 2) {
-                console.log("launch game");
-                console.log("game[0].name", game[0].name);
-                console.log("game[1].name", game[1].name);
                 this._game = new Game(game[0], game[1]);
                 this._game.launch();
             }
-            else
-                i++;
+            i++;
         }
         // loop (des matches sont encore possible sur la ligne)
         // {

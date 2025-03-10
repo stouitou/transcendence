@@ -12,6 +12,7 @@ const player5 = new Player("Paul5");
 const players: Player[] = [player1, player2, player3, player4, player5];
 
 //const game = new Game(player1, player2);
+// game.launch();
 const game = new Tournament(5, players);
 // let players: Player[] = [new Player("Olivier"), new Player("Sarah"), new Player("test1"), new Player("test2"), new Player("test3"), new Player("test4"), new Player("test5")];
 // const tournament = new Tournament(7, players);

@@ -2,6 +2,7 @@ import { Ball } from './Ball.js';
 import { Paddle } from './Paddle.js';
 import { Player } from './Player.js';
 import { Score } from './Score.js';
+// import { EventEmitter } from "events";
 
 
 // export allows to use this class in another file
@@ -20,6 +21,7 @@ export class Game {
 	
 	/* CONSTRUCTOR */
 	public constructor(player1: Player, player2:Player) {
+		// super();	// call EventEmitter constructor
 		this._ball = new Ball;
 		this._paddleRight = new Paddle(1);
 		this._paddleLeft = new Paddle(2);
@@ -79,5 +81,6 @@ export class Game {
 		};
 
 		loop();
+		// this.emit("end");
 	}
 }

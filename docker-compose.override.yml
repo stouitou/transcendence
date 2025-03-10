@@ -13,6 +13,8 @@ services:
     ports:
       - "${BACKEND_SERVER_SSH_PORT}:443"
       - "${BACKEND_SERVER_PORT}:80"
+      - "5173:5173"
+      - 5555:5555
     networks:
       - transcendence_network
     restart: unless-stopped
@@ -51,7 +53,37 @@ services:
     networks:
       - transcendence_network
 
+# auth-service:
+  exemple-webcomponent:
+    build:
+      context: ./exemple-webcomponent
+      dockerfile: ./Dockerfile
+    container_name: exemple-webcomponent
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - sqlite-service
+    volumes:
+      - ./exemple-webcomponent/app:/app
+      - ./exemple-webcomponent/app/node_modules:/app/node_modules
+    networks:
+      - transcendence_network
 
+# auth-service:
+  exemple-external-container:
+    build:
+      context: ./exemple-external-container
+      dockerfile: ./Dockerfile
+    container_name: exemple-external-container
+    environment:
+      - NODE_ENV=development
+    depends_on:
+      - sqlite-service
+    volumes:
+      - ./exemple-external-container/app:/app
+      - ./exemple-external-container/app/node_modules:/app/node_modules
+    networks:
+      - transcendence_network
 #ajout d'un service de base de données
   sqlite-service:
     build:
