@@ -11,19 +11,23 @@ export class Game {
 	private readonly _paddleLeft: Paddle;
 	private readonly _paddleRight: Paddle;
 	private readonly _score: Score;
+	private readonly _player1: Player; //joueur de droite
+	private readonly _player2: Player; //joueur de gauche
 
 	private _round: number = 3;
 	
 	private _beginning: boolean = true;
 	
 	/* CONSTRUCTOR */
-	public constructor() {
+	public constructor(player1: Player, player2:Player) {
 		this._ball = new Ball;
 		this._paddleRight = new Paddle(1);
 		this._paddleLeft = new Paddle(2);
 		this._score = new Score;
+		this._player1 = player1;
+		this._player2 = player2;
 
-		// this.launch();
+		//this.launch();
 	}
 
 	/* METHODS */
@@ -38,7 +42,7 @@ export class Game {
 				this._ball.move(this._ball.startingSpeed);
 			else
 				this._ball.move(this._ball.speed);
-	
+
 			this._paddleLeft.move();
 			this._paddleRight.move();
 
@@ -60,6 +64,11 @@ export class Game {
 				this._ball.direction.y *= -1;
 			// ...or get out the field
 			else if (this._ball.right <= 0 || this._ball.left >= window.innerWidth) {
+				if (this._ball.right > window.innerWidth) //pas propre, a revoir
+					this._player2.incrementScore();
+				else
+					this._player1.incrementScore();
+
 				this._score.increaseScore(this._ball.right);
 				this._beginning = true;
 				this._ball.spawn();

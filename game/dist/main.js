@@ -1,5 +1,13 @@
 import { Player } from './entities/Player.js';
 import { Tournament } from './entities/Tournament.js';
-let players = [new Player("Olivier"), new Player("Sarah"), new Player("test1"), new Player("test2"), new Player("test3"), new Player("test4"), new Player("test5")];
-const tournament = new Tournament(7, players);
+const player1 = new Player("Olivier1");
+const player2 = new Player("Sarah2");
+const player3 = new Player("Pierre3");
+const player4 = new Player("Bess4");
+const player5 = new Player("Paul5");
+const players = [player1, player2, player3, player4, player5];
+//const game = new Game(player1, player2);
+const game = new Tournament(5, players);
+// let players: Player[] = [new Player("Olivier"), new Player("Sarah"), new Player("test1"), new Player("test2"), new Player("test3"), new Player("test4"), new Player("test5")];
+// const tournament = new Tournament(7, players);
 //const game = new Game();

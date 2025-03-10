@@ -7,9 +7,9 @@ export class Score {
         this._opacity = 0.4;
         this._player2 = 0;
         this._player1 = 0;
-        this._message = this._player2 + " - " + this._player1;
+        this._score = this._player2 + " - " + this._player1;
         this._board = document.createElement('div');
-        this._board.textContent = this._message;
+        this._board.textContent = this._score;
         this._board.style.font = `${this._font}`;
         this._board.style.color = this._color;
         this._board.style.fontSize = `${this._size}px`;
@@ -28,7 +28,7 @@ export class Score {
         return this._player1;
     }
     get message() {
-        return this._message;
+        return this._score;
     }
     /* SETTER */
     set player2(newScore) {
@@ -41,7 +41,7 @@ export class Score {
     }
     /* METHODS */
     setMessage() {
-        this._message = this._player2 + " - " + this._player1;
+        this._score = this._player2 + " - " + this._player1;
         this.displayScores();
     }
     increaseScore(ball) {
@@ -52,6 +52,6 @@ export class Score {
         this.setMessage();
     }
     displayScores() {
-        this._board.textContent = this._message;
+        this._board.textContent = this._score;
     }
 }

@@ -9,13 +9,13 @@ export class Score {
 
 	private _player2: number = 0;
 	private _player1: number = 0;
-	private _message: string = this._player2 + " - " + this._player1;
+	private _score: string = this._player2 + " - " + this._player1;
 
 	/* CONSTRUCTOR */
 	public constructor() {
 		this._board = document.createElement('div');
 
-		this._board.textContent = this._message;
+		this._board.textContent = this._score;
 		this._board.style.font = `${this._font}`;
 		this._board.style.color = this._color;
 		this._board.style.fontSize = `${this._size}px`;
@@ -38,7 +38,7 @@ export class Score {
 	}
 
 	public get message () {
-		return this._message;
+		return this._score;
 	}
 
 	/* SETTER */
@@ -54,7 +54,7 @@ export class Score {
 
 	/* METHODS */
 	public setMessage () {
-		this._message = this._player2 + " - " + this._player1;
+		this._score = this._player2 + " - " + this._player1;
 		this.displayScores();
 	}
 
@@ -67,6 +67,6 @@ export class Score {
 	}
 
 	public displayScores () {
-		this._board.textContent = this._message;
+		this._board.textContent = this._score;
 	}
 }

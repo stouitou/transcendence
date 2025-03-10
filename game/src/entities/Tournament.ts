@@ -7,7 +7,7 @@ export class Tournament {
 	private readonly _nofPlayers: number;
 
 	private _match: Map<number, Player[]> = new Map();
-	private _game: Game = new Game();
+	private _game: Game | null = null;
 
 	/* CONSTRUCTOR */
 	public constructor(nofPlayers: number, players: Player[]) {
@@ -27,8 +27,8 @@ export class Tournament {
 			else
 				this._match.set(players[i].id, [players[i]]);
 		}
-		for (let i: number = 0; i <= (nofPlayers + 1) / 2; i++)
-			console.log(this._match.get(i));
+		// for (let i: number = 0; i <= (nofPlayers + 1) / 2; i++)
+		// 	console.log(this._match.get(i));
 		this.launchGame((nofPlayers + 1) / 2)
 	}
 
@@ -50,11 +50,15 @@ export class Tournament {
 
 		while (i <= nofMatch) {
 			const game = this._match.get(i);
-			console.log(game);
+			//console.log(game);
 			if (game && game.length === 2) {
 				console.log("launch game");
+				console.log("game[0].name", game[0].name);
+				console.log("game[1].name", game[1].name);
+            	this._game = new Game(game[0], game[1]);
 				this._game.launch();
 			}
+			i++;
 		}
 		// loop (des matches sont encore possible sur la ligne)
 		// {

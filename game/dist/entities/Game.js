@@ -4,14 +4,16 @@ import { Score } from './Score.js';
 // export allows to use this class in another file
 export class Game {
     /* CONSTRUCTOR */
-    constructor() {
+    constructor(player1, player2) {
         this._round = 3;
         this._beginning = true;
         this._ball = new Ball;
         this._paddleRight = new Paddle(1);
         this._paddleLeft = new Paddle(2);
         this._score = new Score;
-        // this.launch();
+        this._player1 = player1;
+        this._player2 = player2;
+        //this.launch();
     }
     /* METHODS */
     launch() {
@@ -42,6 +44,10 @@ export class Game {
                 this._ball.direction.y *= -1;
             // ...or get out the field
             else if (this._ball.right <= 0 || this._ball.left >= window.innerWidth) {
+                if (this._ball.right > window.innerWidth) //pas propre, a revoir
+                    this._player2.incrementScore();
+                else
+                    this._player1.incrementScore();
                 this._score.increaseScore(this._ball.right);
                 this._beginning = true;
                 this._ball.spawn();
