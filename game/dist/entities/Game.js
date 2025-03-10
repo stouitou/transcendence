@@ -1,27 +1,25 @@
 import { Ball } from './Ball.js';
-import { Paddle } from './Paddle.js';
-import { Score } from './Score.js';
-// import { EventEmitter } from "events";
+import { Board } from './Board.js';
 // export allows to use this class in another file
 export class Game {
     /* CONSTRUCTOR */
     constructor(player1, player2) {
         this._round = 3;
         this._beginning = true;
-        // super();	// call EventEmitter constructor
-        this._ball = new Ball;
-        this._paddleRight = new Paddle(1);
-        this._paddleLeft = new Paddle(2);
-        this._score = new Score;
+        this._ball = new Ball();
+        this._board = new Board(player1, player2);
         this._player1 = player1;
+        player1.paddle = 1;
         this._player2 = player2;
-        //this.launch();
+        player2.paddle = 2;
     }
     /* METHODS */
     launch() {
         return new Promise((resolve) => {
             const loop = () => {
                 if (this._round === 0) {
+                    this._player1.setInfoEndGame(this._player2);
+                    this._player2.setInfoEndGame(this._player1);
                     resolve();
                     return;
                 }
@@ -30,30 +28,26 @@ export class Game {
                     this._ball.move(this._ball.startingSpeed);
                 else
                     this._ball.move(this._ball.speed);
-                this._paddleLeft.move();
-                this._paddleRight.move();
-                this._paddleLeft.updatePosition();
-                this._paddleRight.updatePosition();
+                this._player1.paddle.move();
+                this._player2.paddle.move();
+                this._player1.paddle.updatePosition();
+                this._player2.paddle.updatePosition();
                 this._ball.updatePosition();
                 // If touch a paddle...
-                if (this._paddleLeft.collision(this._ball)) {
+                if (this._player1.paddle.collision(this._ball)) {
                     this._beginning = false;
-                    this._ball.bounce(this._paddleLeft);
+                    this._ball.bounce(this._player1.paddle);
                 }
-                else if (this._paddleRight.collision(this._ball)) {
+                else if (this._player2.paddle.collision(this._ball)) {
                     this._beginning = false;
-                    this._ball.bounce(this._paddleRight);
+                    this._ball.bounce(this._player2.paddle);
                 }
                 // ...or touch a wall...
                 else if (this._ball.top <= 0 || this._ball.bottom >= window.innerHeight)
                     this._ball.direction.y *= -1;
                 // ...or get out the field
                 else if (this._ball.right <= 0 || this._ball.left >= window.innerWidth) {
-                    if (this._ball.right > window.innerWidth) //pas propre, a revoir
-                        this._player2.incrementScore();
-                    else
-                        this._player1.incrementScore();
-                    this._score.increaseScore(this._ball.right);
+                    this._board.update(this._ball.right);
                     this._beginning = true;
                     this._ball.spawn();
                     this._round--;

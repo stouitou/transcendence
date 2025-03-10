@@ -51,16 +51,15 @@ export class Tournament {
             while (i <= nofMatch) {
                 const game = this._match.get(i);
                 console.log("I = ", i);
-                if (game && game.length === 2 && game[0].id === i) {
-                    console.log("Je suis I dans le if ", i);
-                    console.log("launch game");
-                    console.log("game[0].name", game[0].name);
-                    console.log("game[1].name", game[1].name);
-                    console.log("this._match.get(i)", this._match.get(i));
+                if (game && game.length === 2) {
+                    // console.log("Je suis I dans le if ", i);
+                    // console.log("launch game");
+                    // console.log("game[0].name", game[0].name);
+                    // console.log("game[1].name", game[1].name);
+                    // console.log("this._match.get(i)", this._match.get(i));
                     this._game = new Game(game[0], game[1]);
                     yield this._game.launch();
-                    document.body.innerHTML = '';
-                    //document.body.style.display = 'none';
+                    document.body.innerHTML = ''; //a revoir, remet la page a 0
                 }
                 i++;
             }

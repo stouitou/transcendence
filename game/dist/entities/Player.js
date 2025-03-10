@@ -1,12 +1,13 @@
-//import { Paddle } from "./Paddle";
+import { Paddle } from "./Paddle.js";
 export class Player {
     /* CONSTRUCTOR */
     constructor(name) {
-        //private _paddle: Paddle | null = null;
-        this._score = 0;
-        this._id = -1;
+        this._lastOpponent = null;
         //this._paddle = paddle;
         this._name = name;
+        this._id = -1;
+        this._score = 0;
+        this._lastWin = false;
     }
     /* GETTERS */
     get score() {
@@ -18,19 +19,34 @@ export class Player {
     get id() {
         return this._id;
     }
-    // public get paddle() : Paddle | null
-    // {
-    //     return this._paddle;
-    // }
+    get lastWin() {
+        return this._lastWin;
+    }
+    get paddle() {
+        return this._paddle;
+    }
     /* SETTERS */
     set id(id) {
         this._id = id;
     }
-    // public set paddle(paddle: Paddle)
-    // {
-    //     this._paddle = paddle;
-    // }
+    set lastOpponent(lastOpponent) {
+        this._lastOpponent = lastOpponent;
+    }
+    set lastWin(lastWin) {
+        this._lastWin = lastWin;
+    }
+    set paddle(location) {
+        this._paddle = new Paddle(location);
+    }
     incrementScore() {
         this._score += 1;
+    }
+    setInfoEndGame(lastOpponent) {
+        this._lastOpponent = lastOpponent._name;
+        if (this._score > lastOpponent._score)
+            this._lastWin = true;
+        else
+            this.lastWin = false;
+        this._score = 0;
     }
 }

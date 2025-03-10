@@ -1,23 +1,30 @@
-//import { Paddle } from "./Paddle";
+import { Paddle } from "./Paddle.js";
 
 export class Player {
-    private _score: number = 0;
-	private readonly _name: string;
-	//private _paddle: Paddle | null = null;
 
-	private _id: number = -1;
-	private _lastOpponent: string | null = null;
-	private _lastWin: boolean = false;
+	private readonly _name: string;
+	private 		_paddle?: Paddle;
+	private			_id: number;
+
+	private 		_score: number;
+	private			_lastOpponent: string | null = null;
+	private			_lastWin: boolean;
 
 	/* CONSTRUCTOR */
-	public constructor (name: string) {
-        //this._paddle = paddle;
+/* 	public constructor (name: string) {
 		this._name = name;
+		this._id = -1;
+		this._score = 0;
+		this._lastWin = false;
+	} */
+	public constructor (player: {_name?:string,id?:Number}) {
+		this._name = player._name??"rand"
+		this._id = -1;
+		this._score = 0;
+		this._lastWin = false;
 	}
-
 	/* GETTERS */
-	public get score()
-    {
+	public get score() {
         return this._score;
     }	
 
@@ -29,18 +36,13 @@ export class Player {
 		return this._id;
 	}
 
-	// public get lastOpponent () {
-	// 	return this._lastOpponent;
-	// }
-
 	public get lastWin () {
 		return this._lastWin;
 	}
 
-	// public get paddle() : Paddle | null
-    // {
-    //     return this._paddle;
-    // }
+	public get paddle () : Paddle | null {
+        return this._paddle ?? null;
+    }
 
 	/* SETTERS */
 	public set id (id: number) {
@@ -51,29 +53,24 @@ export class Player {
 		this._lastOpponent = lastOpponent;
 	}
 
-	
-
 	public set lastWin (lastWin: boolean) {
 		this._lastWin = lastWin;
 	}
 
+	public set paddle (location: number) {
+		this._paddle = new Paddle(location);
+	}
 
-	// public set paddle(paddle: Paddle)
-    // {
-    //     this._paddle = paddle;
-    // }
-
-	public incrementScore()
-    {
+	public incrementScore() {
         this._score += 1;
     }
 
-	public setInfoEndGame(lastOpponent: Player)
-	{
+	public setInfoEndGame(lastOpponent: Player) {
 		this._lastOpponent = lastOpponent._name;
 		if (this._score > lastOpponent._score)
 			this._lastWin = true;
 		else
 			this.lastWin = false;
+		this._score = 0;
 	}
 }

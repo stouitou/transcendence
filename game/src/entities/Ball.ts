@@ -5,19 +5,19 @@ import { Paddle } from "./Paddle.js";
 export class Ball {
 
 	/* PRIVATE ATTRIBUTES */
-	private readonly _element: HTMLDivElement;
-	private readonly _diameter: number = 30;
-	private readonly _radius: number = this._diameter / 2;
-	private readonly _color: string = 'rgb(0, 0, 0)';
-	private readonly _speed: number = 8;
-	private readonly _startingSpeed: number = 4;
-	private _direction: Direction;
+	private readonly	_element: HTMLDivElement;
+	private readonly	_diameter: number = 30;
+	private readonly	_radius: number = this._diameter / 2;
+	private readonly	_color: string = 'rgb(0, 0, 0)';
+	private readonly	_speed: number = 8;
+	private readonly	_startingSpeed: number = 4;
+	private				_direction: Direction;
 
 	// Fetch current coordinates
-	private _top: number;
-	private _bottom: number;
-	private _left: number;
-	private _right: number;
+	private				_top: number;
+	private				_bottom: number;
+	private				_left: number;
+	private				_right: number;
 
 	/* CONSTRUCTOR */
 	public constructor() {
