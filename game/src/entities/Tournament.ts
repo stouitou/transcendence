@@ -27,8 +27,8 @@ export class Tournament {
 			else
 				this._match.set(players[i].id, [players[i]]);
 		}
-		// for (let i: number = 0; i <= (nofPlayers + 1) / 2; i++)
-		// 	console.log(this._match.get(i));
+		for (let i: number = 0; i <= (nofPlayers + 1) / 2; i++)
+			console.log(this._match.get(i));
 		this.launchGame((nofPlayers + 1) / 2)
 	}
 
@@ -45,18 +45,21 @@ export class Tournament {
 		return false;		
 	}
 
-	private launchGame(nofMatch: number) {
+	private async launchGame(nofMatch: number) {
 		let i: number = 1;
 
 		while (i <= nofMatch) {
 			const game = this._match.get(i);
-			//console.log(game);
+			console.log("I = ", i);
 			if (game && game.length === 2) {
-				console.log("launch game");
-				console.log("game[0].name", game[0].name);
-				console.log("game[1].name", game[1].name);
+				// console.log("Je suis I dans le if ", i);
+				// console.log("launch game");
+				// console.log("game[0].name", game[0].name);
+				// console.log("game[1].name", game[1].name);
+				// console.log("this._match.get(i)", this._match.get(i));
             	this._game = new Game(game[0], game[1]);
-				this._game.launch();
+				await this._game.launch();
+				document.body.innerHTML = ''; //a revoir, remet la page a 0
 			}
 			i++;
 		}

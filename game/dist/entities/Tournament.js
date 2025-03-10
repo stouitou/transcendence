@@ -1,3 +1,12 @@
+var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, generator) {
+    function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
+    return new (P || (P = Promise))(function (resolve, reject) {
+        function fulfilled(value) { try { step(generator.next(value)); } catch (e) { reject(e); } }
+        function rejected(value) { try { step(generator["throw"](value)); } catch (e) { reject(e); } }
+        function step(result) { result.done ? resolve(result.value) : adopt(result.value).then(fulfilled, rejected); }
+        step((generator = generator.apply(thisArg, _arguments || [])).next());
+    });
+};
 import { Game } from "./Game.js";
 export class Tournament {
     /* CONSTRUCTOR */
@@ -20,8 +29,8 @@ export class Tournament {
             else
                 this._match.set(players[i].id, [players[i]]);
         }
-        // for (let i: number = 0; i <= (nofPlayers + 1) / 2; i++)
-        // 	console.log(this._match.get(i));
+        for (let i = 0; i <= (nofPlayers + 1) / 2; i++)
+            console.log(this._match.get(i));
         this.launchGame((nofPlayers + 1) / 2);
     }
     takenId(id, nofPlayers, players) {
@@ -37,27 +46,32 @@ export class Tournament {
         return false;
     }
     launchGame(nofMatch) {
-        let i = 1;
-        while (i <= nofMatch) {
-            const game = this._match.get(i);
-            //console.log(game);
-            if (game && game.length === 2) {
-                console.log("launch game");
-                console.log("game[0].name", game[0].name);
-                console.log("game[1].name", game[1].name);
-                this._game = new Game(game[0], game[1]);
-                this._game.launch();
-            }
-            else
+        return __awaiter(this, void 0, void 0, function* () {
+            let i = 1;
+            while (i <= nofMatch) {
+                const game = this._match.get(i);
+                console.log("I = ", i);
+                if (game && game.length === 2 && game[0].id === i) {
+                    console.log("Je suis I dans le if ", i);
+                    console.log("launch game");
+                    console.log("game[0].name", game[0].name);
+                    console.log("game[1].name", game[1].name);
+                    console.log("this._match.get(i)", this._match.get(i));
+                    this._game = new Game(game[0], game[1]);
+                    yield this._game.launch();
+                    document.body.innerHTML = '';
+                    //document.body.style.display = 'none';
+                }
                 i++;
-        }
-        // loop (des matches sont encore possible sur la ligne)
-        // {
-        // 	check si 2 1,2,3 sont dans les ids();
-        // 	lance les matchs();
-        // 	met a jour les id();
-        // }
-        // passe a la ligne suivante si cest possible if fin de la Game();
-        // 	loop;
+            }
+            // loop (des matches sont encore possible sur la ligne)
+            // {
+            // 	check si 2 1,2,3 sont dans les ids();
+            // 	lance les matchs();
+            // 	met a jour les id();
+            // }
+            // passe a la ligne suivante si cest possible if fin de la Game();
+            // 	loop;
+        });
     }
 }
