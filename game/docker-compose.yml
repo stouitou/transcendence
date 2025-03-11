@@ -1,0 +1,11 @@
+services:
+  game:
+    build: ./.
+    container_name: game
+    ports:
+      - "3000:3000"
+    volumes:
+      - .:/app
+      - /app/node_modules
+    stdin_open: true
+    tty: true

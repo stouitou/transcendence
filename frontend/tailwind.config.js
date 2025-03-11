@@ -4,7 +4,7 @@ module.exports = {
   theme: {
     extend: {
       fontFamily: {
-        clash: ["ClashDisplay", "sans-serif"],
+        archivo: ['"Archivo Black"', 'sans-serif'],
       },
     },
   },
