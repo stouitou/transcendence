@@ -1,16 +1,9 @@
 import { Paddle } from "./Paddle.js";
 export class Player {
     /* CONSTRUCTOR */
-    /* 	public constructor (name: string) {
-            this._name = name;
-            this._id = -1;
-            this._score = 0;
-            this._lastWin = false;
-        } */
-    constructor(player) {
-        var _a;
+    constructor(name) {
         this._lastOpponent = null;
-        this._name = (_a = player._name) !== null && _a !== void 0 ? _a : "rand";
+        this._name = name;
         this._id = -1;
         this._score = 0;
         this._lastWin = false;
@@ -49,7 +42,7 @@ export class Player {
         this._score += 1;
     }
     setInfoEndGame(lastOpponent) {
-        this._lastOpponent = lastOpponent._name;
+        this._lastOpponent = lastOpponent;
         if (this._score > lastOpponent._score)
             this._lastWin = true;
         else

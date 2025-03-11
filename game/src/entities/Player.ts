@@ -7,23 +7,18 @@ export class Player {
 	private			_id: number;
 
 	private 		_score: number;
-	private			_lastOpponent: string | null = null;
+	private			_lastOpponent: Player | null = null;
 	private			_lastWin: boolean;
 
 	/* CONSTRUCTOR */
-/* 	public constructor (name: string) {
+	public constructor (name: string) {
 		this._name = name;
 		this._id = -1;
 		this._score = 0;
 		this._lastWin = false;
-	} */
-	public constructor (player: {_name?:string,id?:Number}) {
-		this._name = player._name??"rand"
-		this._id = -1;
-		this._score = 0;
-		this._lastWin = false;
 	}
-	/* GETTERS */
+
+		/* GETTERS */
 	public get score() {
         return this._score;
     }	
@@ -49,7 +44,7 @@ export class Player {
 		this._id = id;
 	}
 
-	public set lastOpponent (lastOpponent: string) {
+	public set lastOpponent (lastOpponent: Player) {
 		this._lastOpponent = lastOpponent;
 	}
 
@@ -66,7 +61,7 @@ export class Player {
     }
 
 	public setInfoEndGame(lastOpponent: Player) {
-		this._lastOpponent = lastOpponent._name;
+		this._lastOpponent = lastOpponent;
 		if (this._score > lastOpponent._score)
 			this._lastWin = true;
 		else

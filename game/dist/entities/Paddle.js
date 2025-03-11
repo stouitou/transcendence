@@ -7,6 +7,7 @@ export class Paddle {
         this._color = 'rgb(0, 0, 0)';
         this._speed = 5;
         this._keys = {};
+        this._pause = false;
         this._location = location;
         // Creates the paddle object
         this._element = document.createElement('div');
@@ -29,8 +30,9 @@ export class Paddle {
         this._left = this._element.offsetLeft;
         this._right = this._left + this._width;
         // Arrow function makes this referring to the paddle and not to the document
-        document.addEventListener('keydown', (event) => this._keys[event.key] = true);
-        document.addEventListener('keyup', (event) => this._keys[event.key] = false);
+        this.eventListeners();
+        // document.addEventListener('keydown', (event) => this._keys[event.key] = true);
+        // document.addEventListener('keyup', (event) => this._keys[event.key] = false);
         // modify document to be able to move paddles anytime
     }
     /* GETTERS */
@@ -66,8 +68,17 @@ export class Paddle {
         return this._keys;
     }
     ;
+    get pause() {
+        return this._pause;
+    }
+    ;
+    set pause(value) {
+        this._pause = value;
+    }
     /* METHODS */
     move() {
+        if (this._pause)
+            return;
         // Fetch the x value of the top of 
         // the paddle, and the keys that are being pressed
         const moveUp = (this._keys['ArrowUp'] && this._location === 1) || (this._keys['s'] && this._location === 2);
@@ -93,5 +104,9 @@ export class Paddle {
             ball.bottom >= this._top &&
             ball.top <= this._bottom)
             return (true);
+    }
+    eventListeners() {
+        document.addEventListener('keydown', (event) => this._keys[event.key] = true);
+        document.addEventListener('keyup', (event) => this._keys[event.key] = false);
     }
 }
