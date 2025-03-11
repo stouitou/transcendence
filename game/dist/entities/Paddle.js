@@ -66,8 +66,6 @@ export class Paddle {
         return this._keys;
     }
     ;
-    setLocation(rank) {
-    }
     /* METHODS */
     move() {
         // Fetch the x value of the top of 

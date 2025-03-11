@@ -24,8 +24,36 @@ export class Game {
 		player2.paddle = 2;
 	}
 
+	public startCountdown() : Promise<void> {
+        return new Promise((resolve) => {
+        let counter;
+        let textContent: string[] = ["3", "2", "1", "GO !", ""];
+
+        counter = document.createElement('div');
+
+        counter.textContent = textContent[0];
+        counter.style.font = 'system-ui';
+        counter.style.color = 'rgb(100, 100, 100)';
+        counter.style.fontSize = '320px';
+        counter.style.top = "50%";
+        counter.style.left = "50%";
+        counter.style.position = "absolute";
+        counter.style.transform = "translate(-50%, -50%)";
+
+        document.body.appendChild(counter);
+
+        for (let x = 1; x < textContent.length; x++) {
+            setTimeout(() => { counter.textContent = textContent[x]; 
+                if (x === textContent.length - 1)
+                    resolve(); }, x * 1000); }
+
+        });
+    }
+
+   
 	/* METHODS */
-	public launch() : Promise<void> {
+	public async launch() : Promise<void> {
+        await this.startCountdown();
 		return new Promise((resolve) => {
 			const loop = () => {
 

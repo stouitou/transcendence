@@ -87,6 +87,8 @@ export class Paddle {
 		return this._keys;
 	};
 
+	
+
 	/* METHODS */
 	public move() {
 		// Fetch the x value of the top of 

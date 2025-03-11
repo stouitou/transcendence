@@ -1,10 +1,16 @@
 import { Paddle } from "./Paddle.js";
 export class Player {
     /* CONSTRUCTOR */
-    constructor(name) {
+    /* 	public constructor (name: string) {
+            this._name = name;
+            this._id = -1;
+            this._score = 0;
+            this._lastWin = false;
+        } */
+    constructor(player) {
+        var _a;
         this._lastOpponent = null;
-        //this._paddle = paddle;
-        this._name = name;
+        this._name = (_a = player._name) !== null && _a !== void 0 ? _a : "rand";
         this._id = -1;
         this._score = 0;
         this._lastWin = false;
@@ -23,7 +29,8 @@ export class Player {
         return this._lastWin;
     }
     get paddle() {
-        return this._paddle;
+        var _a;
+        return (_a = this._paddle) !== null && _a !== void 0 ? _a : null;
     }
     /* SETTERS */
     set id(id) {
