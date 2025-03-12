@@ -14,10 +14,10 @@ export class Board {
         this._element.style.color = this._color;
         this._element.style.fontSize = `${this._size}px`;
         this._element.style.opacity = `${this._opacity}`;
-        this._element.style.top = "10%";
-        this._element.style.left = "50%";
-        this._element.style.position = "absolute";
-        this._element.style.transform = "translateX(-50%)";
+        this._element.style.top = '10%';
+        this._element.style.left = '50%';
+        this._element.style.position = 'absolute';
+        this._element.style.transform = 'translateX(-50%)';
         document.body.appendChild(this._element);
     }
     /* GETTERS */
@@ -31,7 +31,7 @@ export class Board {
         return this._posting;
     }
     /* METHODS */
-    update(ball) {
+    score(ball) {
         if (ball >= window.innerWidth)
             this._player2.incrementScore();
         else

@@ -9,25 +9,27 @@ export class Player {
         this._lastWin = false;
     }
     /* GETTERS */
-    get score() {
-        return this._score;
-    }
     get name() {
         return this._name;
     }
     get id() {
         return this._id;
     }
+    get paddle() {
+        return this._paddle;
+    }
+    get score() {
+        return this._score;
+    }
     get lastWin() {
         return this._lastWin;
-    }
-    get paddle() {
-        var _a;
-        return (_a = this._paddle) !== null && _a !== void 0 ? _a : null;
     }
     /* SETTERS */
     set id(id) {
         this._id = id;
+    }
+    set paddle(location) {
+        this._paddle = new Paddle(location);
     }
     set lastOpponent(lastOpponent) {
         this._lastOpponent = lastOpponent;
@@ -35,18 +37,15 @@ export class Player {
     set lastWin(lastWin) {
         this._lastWin = lastWin;
     }
-    set paddle(location) {
-        this._paddle = new Paddle(location);
-    }
     incrementScore() {
         this._score += 1;
     }
-    setInfoEndGame(lastOpponent) {
+    setInfoEndGame(pointsToWin, lastOpponent) {
         this._lastOpponent = lastOpponent;
-        if (this._score > lastOpponent._score)
+        if (this._score === pointsToWin)
             this._lastWin = true;
         else
-            this.lastWin = false;
+            this._lastWin = false;
         this._score = 0;
     }
 }
