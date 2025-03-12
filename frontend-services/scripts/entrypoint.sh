@@ -33,13 +33,12 @@ cp -R /node_modules /app
 
 
   if [ "$NODE_ENV" = "development" ]; then
-
-    npm run build
+  npm install
+  npm run dev
 
     # Start the application in watch mode
     log "$CYAN" "INFO" "Démarrage de l'application en mode développement avec nodemon..."
     # Start the application in watch mode
-  #  exec npm run preview
     exec npm run dev
   else
     log "$GREEN" "INFO" "Mode production activé : installation des dépendances de production..."

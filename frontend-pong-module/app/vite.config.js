@@ -1,7 +1,7 @@
 import { defineConfig } from 'vite';
 
 export default defineConfig({
-  base: "/component-alias/",  // ← Important ! Pour que tout soit bien servi sous /component-alias/
+  base: "/frontend-pong-module/",  // ← Important ! Pour que tout soit bien servi sous /component-alias/
   server: {
     cors: true,    
     port: 3000,
@@ -17,12 +17,12 @@ export default defineConfig({
     host: "0.0.0.0",
   },
   build: {
-    rollupOptions: {
+  /*   rollupOptions: {
       input: {
        // main: './index.html',
         module: './src/pong-game.ts', // Spécifiez le chemin vers votre module
       },
-    },
+    }, */
     target: 'esnext',
     minify: false,
     cssCodeSplit: false,

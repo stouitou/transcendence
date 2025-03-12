@@ -10,11 +10,7 @@ export class PongGame extends LitElement {
 		this.game = new Game();
 	}
   static styles = css`
-    :host {
-      display: flex;
-      flex-direction: column;
-     
-    }
+
     .game {
       display: flex;
       flex-direction: column;

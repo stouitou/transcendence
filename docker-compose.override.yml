@@ -66,30 +66,32 @@ services:
       - transcendence_network
 
   #frontend_services:
-  exemple-frontend-services:
+  frontend-services:
     build:
-      context: ./exemple/exemple-frontend-services
+      context: ./frontend-services
       dockerfile: ./Dockerfile
-    container_name: frontend-services-vite
+    container_name: frontend-services
     environment:
       - NODE_ENV=development
     volumes:
-      - ./exemple/exemple-frontend-services/app:/app
-      - ./exemple/exemple-frontend-services/app/node_modules:/app/node_modules
+      - ./frontend-services/app:/app
+      - ./frontend-services/app/node_modules:/app/node_modules
     networks:
       - transcendence_network
+    depends_on:
+      - frontend-pong-module
 
-
-  exemple-component-module:
+ #Pong-Moudle
+  frontend-pong-module:
     build:
-      context: ./exemple/exemple-component-module
+      context: ./frontend-pong-module
       dockerfile: ./Dockerfile
-    container_name: exemple-component-module
+    container_name: frontend-pong-module
     environment:
       - NODE_ENV=development
     volumes:
-      - ./exemple/exemple-component-module/app:/app
-      - ./exemple/exemple-component-module/app/node_modules:/app/node_modules
+      - ./frontend-pong-module/app:/app
+      - ./frontend-pong-module/app/node_modules:/app/node_modules
     networks:
       - transcendence_network
 

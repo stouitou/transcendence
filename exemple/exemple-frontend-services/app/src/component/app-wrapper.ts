@@ -8,9 +8,16 @@ export class AppWrapper extends LitElement {
 
   static styles = css`
     :host {
-      display: block;
+      display: flex;
+      flex-direction: column;
       padding: 1rem;
     }
+    .content {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+    }
+    
   `;
 
   constructor() {

@@ -4,13 +4,18 @@
     <meta charset="UTF-8" />
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <link rel="stylesheet" href="/css/index.css">
     <title>Test affichage composant micro-frontend</title>
     <script type="module" src="/src/main.ts"></script>
-    <!--                       <app-host:port>/<alias>/<path-to-component.ts>        -->
-    <script type="module" src="https://localhost:4433/component-alias/src/pong-game.ts"></script>
-
+    <script type="module" src="/src/wrapper.ts"></script>
   </head>
   <body>
+    <header>
+      <h1>Test affichage composant micro-frontend</h1>
+      <user-component name="LaK@Rot" id="12548" score="9999999"/>
+    </header>
     <app-wrapper/>
+
+  <!--  <game-component></game-component> -->
   </body>
 </html>

@@ -55,6 +55,32 @@ services:
     restart: always
     networks:
       - transcendence_network
+
+   #frontend_services:
+  frontend-services:
+    build:
+      context: ./frontend-services
+      dockerfile: ./Dockerfile
+    container_name: frontend-services
+    volumes:
+      - ./frontend-services/app:/app
+    networks:
+      - transcendence_network
+    depends_on:
+      - frontend-pong-module
+      - nginx
+
+ #Pong-Moudle
+  frontend-pong-module:
+    build:
+      context: ./frontend-pong-module
+      dockerfile: ./Dockerfile
+    container_name: frontend-pong-module
+    volumes:
+      - ./frontend-pong-module/app:/app
+    networks:
+      - transcendence_network
+
 # network and volumes
 networks:
   transcendence_network:
