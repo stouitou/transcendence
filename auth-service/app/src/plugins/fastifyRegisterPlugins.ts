@@ -6,9 +6,7 @@ import jwtPlugin ,{ JWT } from "../plugins/jwtPlugin";
 import { AuthService } from "../services/auth.service";
 import  ServicesPlugin  from "../plugins/services"; 
 import { registerAuthPlugin } from "./auth.plugin";
-import UserModelServices from "../plugins/userServices";
-import { UserModel } from "../models/User.Model";
-import test from "../routes/test.routes";
+
 interface AuthenticatedUser { role: string; id?: number; name?: string; }
 declare module 'fastify' {
    interface FastifyRequest {
@@ -18,18 +16,16 @@ declare module 'fastify' {
 }
 declare module 'fastify' {
    interface FastifyInstance {
-	userModels: UserModel;
 	authService: AuthService;
 	jwt: JWT;
   }
 }
 export async function registerPlugins(app: FastifyInstance) {
-	await app.register(UserModelServices); // Intégration de UserServices UserModels
+	//await app.register(UserModelServices); // Intégration de UserServices UserModels
 	await registerSwagger(app); // Intégration de Swagger
 	app.register(jwtPlugin); // Intégration de jwtPlugin
 	app.register(dotenvPlugin); // Intégration de dotenvPlugin
 	app.register(ServicesPlugin);
 	await registerAuthPlugin(app);
 	await app.register(authRoutes, { prefix: "/api/auth/" }); // register auth routes
-	await app.register(test); //@TODO remove this register test routes 
 }

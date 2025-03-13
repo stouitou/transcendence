@@ -1,17 +1,44 @@
 import { FastifyInstance } from "fastify";
 import { OauthProviderResponse } from "../types/provider.types";
-import { UserRepository } from "../repository/UserRepository";
-import { User } from "../models/User";
-import { AuthProvider } from "../models/authProvider";
-import { AuthRepository } from "../repository/AuthRepository";
-import  {AuthProviderController}  from "../controllers/authProvider.controller";
+//import { UserRepository } from "../repository/UserRepository";
+import { User } from "../models/User.models";
+//import { AuthProvider } from "../Entity/AuthProvider.entity";
+//import AuthProviderRepository from "@src/repository/AuthProvider.repository";
+import UserRepository from "@src/repository/User.repository";
+import bcrypt from "bcryptjs"
 
+/**
+ * Service d'authentification
+ * rappel: un service est une classe qui contient des méthodes qui effectuent des opérations spécifiques
+ * -- Il est utilisé pour effectuer des opérations métier, des opérations de base de données, etc.
+ * -- Il est utilisé pour effectuer des opérations spécifiques qui ne sont pas liées à une entité ou à un contrôleur.
+ */
 export class AuthService {
 
-  constructor(private app: FastifyInstance) {}
+  private UserRepository: UserRepository;
 
-  // 🔐 Génération d'un token JWT
-  generateToken(user: { id: number }) {
+  constructor(private app: FastifyInstance) {
+    this.UserRepository = new UserRepository();
+  }
+
+  /**
+   * Vérifier si le mot de passe est valide
+   * 
+   * @param password 
+   * @param hash 
+   * @returns 
+   */
+  private isValidPassword(password: string, hash: string) {
+    return bcrypt.compare(password, hash);
+  }
+
+  /**
+   * Générer un token JWT
+   *
+   * @param user
+   * @returns
+   */
+  generateToken(user: { id: number }) { //@TODO : changer le type de user et retourner un objet User complet
     return this.app.jwt.sign(
      // { id: user.id },
       { ...user },//on envoie tout l'objet user
@@ -19,47 +46,61 @@ export class AuthService {
     );
   }
 
-  // 🔄 Vérifier un utilisateur avec email/password
-  async validateUser(email: string, password: string) {
+  /**
+   * 🔄 Vérifier un utilisateur avec email/password
+   * 
+   * @param email 
+   * @param password 
+   * @returns 
+   */
+  async validateUser(email: string, password: string): Promise<User | null> {
 
-    //1- on recupere l'authProvider par email
-    const authprovider = /* null;// */ await AuthRepository.getAutProviderByEmail(email);
+    //1- on recupere l'User par email grace a la methode getOneByParams
+    //  de UserRepository grace au filtre sur authProviders
+    const params = {authProviders:{provider_id:email, provider:"local"}};
+    const existingUser = await this.UserRepository.getOneByParams(params);
 
     //2- on verifie si l'objet est null, si c'est le cas mail inconnu
-    if (!authprovider) return null;
+    if (!existingUser) return null;
 
     //3- on verifie le mot de passe avec bcrypt via la methode isValidPassword de AuthProvider
-    const isPasswordValid = authprovider.isValidPassword(password)
+    const isPasswordValid = this.isValidPassword(password, "existingUser.password");
     if (!isPasswordValid) return null;
 
     //4- on retourne l'authProvider
-    console.log("🔐 AuthService:validate user ok ")
-    return authprovider;
+    console.log("🔐🟢 AuthService:validate user ok 🟢")
+    return existingUser;
   }
  
   
-  // 🔄 Vérifier un utilisateur avec profile.id/provider
-  async validateAuthProvider(provider_id: string, provider: string) {
-  
-    //1- on recupere l'authProvider par email
-    const authprovider =  await AuthRepository.getAutProviderByProviderId(provider_id,provider);
-    console.log("🔐 AuthService:validateAuthProvider()  --start--  email ",provider_id, " authprovider ",authprovider)
+  /**
+   * 🔄 Vérifier un utilisateur avec un fournisseur d'authentification
+   * 
+   * @param provider_id 
+   * @param provider 
+   * @returns 
+   */
+  async validateAuthProvider(provider_id: string, provider: string): Promise<User | null> {
+    const params = { authProviders:{"provider_id":provider_id, provider}};
+    //1- on recupere l'authProvider par email    
+    const existingUser = await this.UserRepository.getOneByParams(params);
+    console.log("🔐 AuthService:validateAuthProvider()  --start--  email ",provider_id, " authprovider ",existingUser)
   
     //2- on verifie si l'objet est null, si c'est le cas mail inconnu
-    if (!authprovider) return null;
-    /* 
-    //3- on verifie le mot de passe avec bcrypt via la methode isValidPassword de AuthProvider
-      const isPasswordValid = authprovider.isValidPassword(password)
-      if (!isPasswordValid) return null; 
-    */
+    if (!existingUser) return null;
   
-    //4- on retourne l'authProvider
-    console.log("🔐 AuthService:validateAuthProvider user ok ")
-    return authprovider;
+    //3- on retourne l'authProvider
+    console.log("🔐 AuthService:validateAuthProvider user ok 🟢")
+    return existingUser;
   }
 
 
-  // 🔄 Rafraîchir le token JWT (optionnel)
+  /**
+   * 🔄 Rafraîchir un token
+   * 
+   * @param token 
+   * @returns 
+   */
   refreshToken(token: string) {
     try {
       const decoded = this.app.jwt.verify(token, "REFRESH_TOKEN_PUBLIC_KEY") as any;
@@ -69,41 +110,89 @@ export class AuthService {
     }
   }
 
-  // 🆕 Créer un utilisateur (avec hash du mot de passe)
-  async createUser(email: string, password: string) {
-    // 1 - creer une instance de AuthProvider
-    const newAuthProvider =  AuthProvider.create("local",  email, 0, password); // une instance de AuthProvider
 
-   // 2 - une instance de User
-    const newUser = await User.create("", "", [newAuthProvider]);
+  /**
+   * 🔄 Créer un utilisateur
+   *  le mot de passe sera crypté
+   * 
+   * @param email 
+   * @param password 
+   * @returns 
+   */
+  async createUser(email: string, password: string) :Promise<User | null>{
+    // 1 - vérifier si l'utilisateur existe déjà
 
-    // 3 - enregistrer le user dans la base de données
-    const user = await UserRepository.createUser(newUser.toJSON());
+    // 2- crypter le mot de passe
+    const passwordHash = bcrypt.hashSync(password, 10);
+    // 3- creer un nouvel utilisateur
+    const newuser = new User({ authProviders: [{provider: "local", provider_id: email, password:passwordHash}]});
+    
+    // 4 - enregistrer le user dans la base de données
+    const user = await this.UserRepository.create(newuser);
 
-    // 4 - enregistrer l'authProvider dans la base de données enrichie de l'id du user
-    newAuthProvider.setUserFKId(user.id);
-    const authProvider = await AuthRepository.createAuthProvider(newAuthProvider.toJSON());//a renomer en AuthProviderRepository
-
-    //5-merge user et authProvider
-    const userWithAuthProvider = {...user,authProviders:[authProvider]};
-
-    //6- s'assoir et regarder le resultat
-    console.log("🔐AuthService:  createUser()  userWithAuthProvider created : ",userWithAuthProvider)
-    return userWithAuthProvider;
+    // 5- retourner le user
+    console.log("🔐AuthService:  createUser()  userWithAuthProvider created : ",user)
+    return user;
   }
   
+  /**
+   * 🔄 Créer un JWT pour un provider
+   * 
+   * @param profile 
+   * @param provider 
+   * @returns 
+   */
   buildOauthProviderResponse(user: { id: number,role:string }): OauthProviderResponse {
     const token = this.generateToken(user);
     return { user, token };
   }
 
-  // 🆕 Créer ou mettre à jour un utilisateur avec un provider OAuth
+  /**
+   * 🔄 Créer un utilisateur avec un fournisseur d'authentification OAuth
+   * 
+   * @param profile 
+   * @param provider 
+   * @returns 
+   */
   async createUserWithOauthProvider(profile:any, provider: string): Promise<OauthProviderResponse> {
-    const user = await new  AuthProviderController().registerWithOauthProvider(profile, provider);
+    const user = await this.registerWithOauthProvider(profile, provider);
       if (user) {
         //on retourne le jwt
         return this.buildOauthProviderResponse({ id: user.id ,role: user.role});
       }
     throw new Error("User already exists");
   }
+   
+/** //@TODO : devrait être dans le service
+   * Créer ou mettre à jour un utilisateur avec un fournisseur d'authentification OAuth
+   *
+   * @param profile
+   * @param provider
+   */
+async registerWithOauthProvider(profile:any, provider: string) {
+  console.log("auth.controller.ts  registerWithOauthProvider  start register")
+  // 1️⃣- extraire l'identifiant du fournisseur d'authentification
+  let provider_id = "";
+  if (provider === "google") {
+    provider_id = `${profile.id}`;
+  } else if (provider === "facebook") {
+    provider_id = profile.id;
+  } else if (provider === "github") {
+    provider_id = `${profile.id}`
+  } else if (provider === "42api") {
+    provider_id = `${profile.id}`;
+  }
+  // on dispose de l'objet profile qui contient les informations de l'utilisateur 
+  // et de provider qui contient le nom du fournisseur d'authentification
+  // on peut donc créer un utilisateur avec ces informations
+  // 2️⃣- vérifier si l'utilisateur existe déjà dans la base de données
+  const params = {authProviders:{"provider_id":provider_id, provider}};
+  const existingUser = await this.UserRepository.getOneByParams(params);
+  // 3️⃣- si l'utilisateur existe déjà, le retourner
+  if (existingUser) return existingUser;
+  // 4️⃣- si l'utilisateur n'existe pas, le créer
+  const user = await  this.UserRepository.create({authProviders: [{provider: provider, provider_id}] });
+  // 5️⃣- retourner l'utilisateur
+  return user;
+}
 }

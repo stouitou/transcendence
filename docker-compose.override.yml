@@ -1,13 +1,16 @@
 services:
+
+# Basic server
   nginx:
     image: nginx
     container_name: nginx_dev
     build:
       context: ./nginx
-      dockerfile: Dockerfile
+      dockerfile: ./Dockerfile
     volumes:
       - ./nginx/templates:/etc/nginx/templates
       - ./pong:/var/www/pong
+    env_file: .env
     depends_on:
       - backend_services
     ports:
@@ -18,30 +21,29 @@ services:
     networks:
       - transcendence_network
     restart: unless-stopped
-    env_file: .env
 
-# auth-service:
+# Authentification service:
   auth_services:
+    container_name: auth_service
     build:
       context: ./auth-service
       dockerfile: ./Dockerfile
-    container_name: auth_service
+    volumes:
+      - ./auth-service/app:/app
+      - ./auth-service/app/node_modules:/app/node_modules
     environment:
       - NODE_ENV=development
     depends_on:
       - sqlite-service
-    volumes:
-      - ./auth-service/app:/app
-      - ./auth-service/app/node_modules:/app/node_modules
     networks:
       - transcendence_network
 
  #backend_services:     
   backend_services:
+    container_name: backend_services
     build:
       context: ./backend
       dockerfile: ./Dockerfile
-    container_name: backend_services
     environment:
       - NODE_ENV=development
     depends_on:
@@ -84,6 +86,7 @@ services:
       - ./exemple-external-container/app/node_modules:/app/node_modules
     networks:
       - transcendence_network
+
 #ajout d'un service de base de données
   sqlite-service:
     build:
@@ -112,6 +115,18 @@ services:
     volumes:
       - ./pong/app:/app
       - ./pong/app/node_modules:/app/node_modules
+
+  database-services:
+    build:
+      context: ./database-service
+      dockerfile: ./Dockerfile
+    container_name: database-services
+    environment:
+      - NODE_ENV=development
+    volumes:
+      - ./database-service/app:/app #app source code
+      - ./database-service/app/node_modules:/app/node_modules #node_modules
+    restart: always
     networks:
       - transcendence_network
 

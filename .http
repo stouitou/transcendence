@@ -41,3 +41,63 @@ Content-Type: application/json
 {
 "database": "usersDB2"
 }
+
+### create a new User
+POST https://localhost:4433/api2/database/users HTTP/1.1
+Content-Type: application/json
+
+{
+
+"email": "joe50@mail.com",
+"name": "12345678",
+ "authProviders": [
+    { "provider": "google", "provider_id": "12345" },
+    { "provider": "github", "provider_id": "67890" }
+  ]
+}
+
+### get all databases
+GET  https://localhost:4433/api2/database/users HTTP/1.1
+Content-Type: application/json
+
+### get a database by id
+GET  https://localhost:4433/api2/database/users/3 HTTP/1.1
+Content-Type: application/json
+
+
+
+### get all users
+GET  https://localhost:4433/api2/database2/myDb/table/user HTTP/1.1
+
+### get a user by id
+
+### create a new User
+POST https://localhost:4433/api2/database2/myDb/table/user HTTP/1.1
+Content-Type: application/json
+
+{
+
+"email": "joe53@mail.com",
+"name": "12345678",
+ "authProviders": [
+    { "provider": "google", "provider_id": "12345" },
+    { "provider": "github", "provider_id": "67890" }
+  ]
+}
+
+### create a new User
+DELETE  https://localhost:4433/api2/database2/myDb/table/user/id/1 HTTP/1.1
+
+
+### get a user by id
+GET  https://localhost:4433/api2/database2/myDb/table/user?relations=authProviders HTTP/1.1
+
+### get a user by id
+GET  https://localhost:4433/api2/database2/myDb/table/authprovider?relations=user HTTP/1.1
+
+### get seulement dans le conteneur
+GET  http://database-services:3000/api2/database2/myDb/table/authprovider?relations=user HTTP/1.1
+
+### get seulement dans le conteneur
+
+GET  https://localhost:4433/api/v2/database/myDb/table/localhost:4433/api/v2/database/myDb/table/AuthProvider HTTP/1.1

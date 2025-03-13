@@ -7,7 +7,8 @@ import { registerGoogleStrategy , registerGithubStrategy } from "./oauth/index";
 
 import { AuthSchema } from "../schemas/auth.schema";
 
-import { UserRepository } from "../repository/UserRepository";
+//import { UserRepository } from "../repository/UserRepository";
+import  UserRepository  from "../repository/User.repository";
 export async function registerAuthPlugin(app: FastifyInstance) {
 	// 🔹 Middleware pour les sessions
 	const safeSecret = "1223484dgjhfhkjgh;k,gjhkhghng,bldflbgh,ldf,bl,dl,nbldnl,dfl,glshdfkvihskd";
@@ -31,7 +32,8 @@ export async function registerAuthPlugin(app: FastifyInstance) {
 	// Désérialisation : on récupère les infos de l'utilisateur depuis l'ID stocké
 	fastifyPassport.registerUserDeserializer(async (id:number, request) => {
     console.log("🔓 Désérialisation de l'utilisateur, ID:", id);
-    return await UserRepository.getUserById(id);
+	const userRepository = new UserRepository();
+    return await userRepository.getById(id);
   });
   // 🔹 Enregistrer les stratégies OAuth
   registerGoogleStrategy(app, fastifyPassport);
