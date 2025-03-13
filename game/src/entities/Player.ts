@@ -7,7 +7,7 @@ export class Player {
 	private				_paddle!: Paddle;
 
 	private 			_score: number;
-	private				_lastOpponent: Player | null = null;
+	// private				_lastOpponent: Player | null = null;
 	private				_lastWin: boolean;
 	private				_lastScore: number;
 
@@ -54,9 +54,9 @@ export class Player {
 		this._paddle = new Paddle(location);
 	}	
 
-	public set lastOpponent (lastOpponent: Player) {
-		this._lastOpponent = lastOpponent;
-	}	
+	// public set lastOpponent (lastOpponent: Player) {
+	// 	this._lastOpponent = lastOpponent;
+	// }	
 
 	public set lastWin (lastWin: boolean) {
 		this._lastWin = lastWin;
@@ -66,8 +66,7 @@ export class Player {
         this._score += 1;
     }
 
-	public setInfoEndGame (pointsToWin: number, lastOpponent: Player) {
-		this._lastOpponent = lastOpponent;
+	public setInfoEndGame (pointsToWin: number) {
 		if (this._score === pointsToWin)
 			this._lastWin = true;
 		else
@@ -75,4 +74,13 @@ export class Player {
 		this._lastScore = this._score;
 		this._score = 0;
 	}
+	// public setInfoEndGame (pointsToWin: number, lastOpponent: Player) {
+	// 	this._lastOpponent = lastOpponent;
+	// 	if (this._score === pointsToWin)
+	// 		this._lastWin = true;
+	// 	else
+	// 		this._lastWin = false;
+	// 	this._lastScore = this._score;
+	// 	this._score = 0;
+	// }
 }

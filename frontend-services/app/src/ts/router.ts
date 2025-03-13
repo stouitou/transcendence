@@ -35,8 +35,9 @@ function renderHome(container: HTMLElement) {
 const pongGameScript = async () => {
 	const script
 		= document.createElement('script');
+    const canvas = document.getElementById("pongCanvas");
 	script.type = 'module';
-	script.src = 'https://localhost:4433/frontend-pong-module/src/component/pong-game.js';
+	script.src = 'https://localhost:4433/frontend-pong-module/src/component/pong-game.js?size=canvas';
 	window.document.head.appendChild(script);
 };
 

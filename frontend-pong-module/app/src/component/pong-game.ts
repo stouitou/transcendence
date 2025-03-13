@@ -1,26 +1,28 @@
 import { LitElement, html, css } from 'lit';
 import { customElement } from 'lit/decorators.js';
 import { Player } from '../entities/Player.js';
-import { Tournament } from '../entities/Tournament.js';
+// import { Tournament } from '../entities/Tournament.js';
+import { Game } from '../entities/Game.js';
 
 @customElement('game-component')
 export class PongGame extends LitElement {
-	private game:Tournament;
-	constructor() {
+	private game:Game;
+	// private tournament:Tournament;
+	constructor(canvas: HTMLCanvasElement) {
 		super();
 	//	this.game = new Game();
     
-    const player1 = new Player({_name:"Olivier1"});
-    const player2 = new Player({_name:"Sarah2"});
-    const player3 = new Player({_name:"Pierre3"});
-    const player4 = new Player({_name:"Bess4"});
-    const player5 = new Player({_name:"Paul5"});
+    const player1 = new Player("Olivier1");
+    const player2 = new Player("Sarah2");
+    // const player3 = new Player("Pierre3");
+    // const player4 = new Player("Bess4");
+    // const player5 = new Player("Paul5");
     
-    const players: Player[] = [player1, player2, player3, player4, player5];
+    // const players: Player[] = [player1, player2, player3, player4, player5];
     
-    // const game = new Game(player1, player2);
-    // game.launch();
-    this.game = new Tournament(5, players);
+    this.game = new Game(canvas, player1, player2);
+    this.game.launch();
+    // this.game = new Tournament(players);
 	}
   static styles = css`
 

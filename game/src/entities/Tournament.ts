@@ -4,14 +4,16 @@ import { Game } from "./Game.js";
 export class Tournament {
 
 	private readonly	_players: Player[];
+	private readonly	_test: number;
 
 	private				_round: Player[] = [];
 	private				_match: Map<number, Player[] | null> = new Map();
 	private				_game!: Game;
 
 	/* CONSTRUCTOR */
-	public constructor(players: Player[]) {
+	public constructor(nofPlayers: number, players: Player[]) {
 		this._players = players;
+		this._test = nofPlayers;
 
 		this.randomize();
 		
