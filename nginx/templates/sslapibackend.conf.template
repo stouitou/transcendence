@@ -26,6 +26,7 @@ server {
     include /etc/nginx/conf/configProxy/*.conf;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
     location /api/ {
         proxy_pass http://backend_services:3000;        
         proxy_set_header Host $host;
@@ -46,6 +47,8 @@ server {
 
 =======
 >>>>>>> nbrigui
+=======
+>>>>>>> origin/nbrigui
     access_log /var/log/nginx/access.log;
     error_log /var/log/nginx/error.log;
 }

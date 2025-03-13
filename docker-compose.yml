@@ -24,7 +24,7 @@ services:
       dockerfile: ./Dockerfile
     container_name: auth_service
     depends_on:
-      - sqlite-service
+      - database-services
     volumes:
       - ./auth-service/app:/app
     networks:
@@ -37,7 +37,7 @@ services:
       dockerfile: ./Dockerfile
     container_name: backend_services
     depends_on:
-      - sqlite-service
+      - database-services
       - auth_services
     volumes:
       - ./backend/app:/app
@@ -45,17 +45,6 @@ services:
       - transcendence_network
   
 #ajout d'un service de base de données
-  sqlite-service:
-    build:
-      context: ./sqlite-service
-      dockerfile: ./Dockerfile
-    container_name: sqlite-service 
-    volumes:
-      - ./sqlite-service/app:/app #app source code
-      - ./sqlite-service/data:/data #database data
-    restart: always
-    networks:
-      - transcendence_network
   database-services:
     build:
       context: ./database-service
@@ -63,10 +52,35 @@ services:
     container_name: database-services
     volumes:
       - ./database-service/app:/app #app source code
-      - ./database-service/app/node_modules:/app/node_modules #node_modules
     restart: always
     networks:
       - transcendence_network
+
+   #frontend_services:
+  frontend-services:
+    build:
+      context: ./frontend-services
+      dockerfile: ./Dockerfile
+    container_name: frontend-services
+    volumes:
+      - ./frontend-services/app:/app
+    networks:
+      - transcendence_network
+    depends_on:
+      - frontend-pong-module
+      - nginx
+
+ #Pong-Moudle
+  frontend-pong-module:
+    build:
+      context: ./frontend-pong-module
+      dockerfile: ./Dockerfile
+    container_name: frontend-pong-module
+    volumes:
+      - ./frontend-pong-module/app:/app
+    networks:
+      - transcendence_network
+
 # network and volumes
 networks:
   transcendence_network:
@@ -78,12 +92,7 @@ volumes:
       type: none
       device: ./backend/app/build
       o: bind
-  databases_data:
-    driver: local
-    driver_opts:
-      type: none
-      device: ./databases
-      o: bind
+
   certs_data:
     driver: local
     driver_opts:

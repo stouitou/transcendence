@@ -29,16 +29,11 @@ log "$CYAN"  "DEBUG" "    node version : $(node -v)"
 log "$CYAN"  "DEBUG" "************************************"
 # Copy the node_modules folder to the app directory
 log "$CYAN" "INFO" "Copie du dossier node_modules vers le répertoire de l'application..."
-log "$YELLOW"  "INFO" "    utilisateur : $(whoami)"
-log "$YELLOW"  "INFO" "    pwd : $(pwd)"
-log "$RED"  "DEBUG" "    permission sur les dossiers /node_modules /app : $(ls -l / | grep node_modules) $(ls -l / | grep app)"
 cp -R /node_modules /app
 
-#change the user to node
-log "$CYAN" "INFO" "Changement de l'utilisateur à node..."
-su node
 
   if [ "$NODE_ENV" = "development" ]; then
+    npm run build
     # Start the application in watch mode
     log "$CYAN" "INFO" "Démarrage de l'application en mode développement avec nodemon..."
     # Start the application in watch mode
