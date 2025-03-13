@@ -97,12 +97,12 @@ export class Game {
     }
     countdown() {
         return new Promise((resolve) => {
-            const countdown = ["3", "2", "1", "GO!", ""];
+            const countdown = [this._player2.name + " VS " + this._player1.name, "3", "2", "1", "GO!", ""];
             const counter = document.createElement('div');
             counter.textContent = countdown[0];
             counter.style.font = 'system-ui';
-            counter.style.color = 'rgb(100, 100, 100)';
-            counter.style.fontSize = '300px';
+            counter.style.color = 'rgb(255, 0, 0)';
+            counter.style.fontSize = '150px';
             counter.style.top = "50%";
             counter.style.left = "50%";
             counter.style.position = "absolute";
@@ -111,6 +111,10 @@ export class Game {
             for (let x = 1; x < countdown.length; x++) {
                 setTimeout(() => {
                     counter.textContent = countdown[x];
+                    if (x === 1) {
+                        counter.style.fontSize = '300px';
+                        counter.style.color = 'rgb(100, 100, 100)';
+                    }
                     if (x === countdown.length - 1)
                         resolve();
                 }, x * 1000);

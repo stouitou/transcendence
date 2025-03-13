@@ -7,6 +7,7 @@ export class Player {
         this._id = -1;
         this._score = 0;
         this._lastWin = false;
+        this._lastScore = 0;
     }
     /* GETTERS */
     get name() {
@@ -23,6 +24,9 @@ export class Player {
     }
     get lastWin() {
         return this._lastWin;
+    }
+    get lastScore() {
+        return this._lastScore;
     }
     /* SETTERS */
     set id(id) {
@@ -46,6 +50,7 @@ export class Player {
             this._lastWin = true;
         else
             this._lastWin = false;
+        this._lastScore = this._score;
         this._score = 0;
     }
 }

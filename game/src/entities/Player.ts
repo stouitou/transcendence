@@ -9,6 +9,7 @@ export class Player {
 	private 			_score: number;
 	private				_lastOpponent: Player | null = null;
 	private				_lastWin: boolean;
+	private				_lastScore: number;
 
 	/* CONSTRUCTOR */
 	constructor (name: string) {
@@ -16,6 +17,7 @@ export class Player {
 		this._id = -1;
 		this._score = 0;
 		this._lastWin = false;
+		this._lastScore = 0;
 	}
 
 	/* GETTERS */
@@ -38,7 +40,11 @@ export class Player {
 	public get lastWin () {
 		return this._lastWin;
 	}	
-
+	
+	public get lastScore() {
+		return this._lastScore;
+	}		
+	
 	/* SETTERS */
 	public set id (id: number) {
 		this._id = id;
@@ -66,6 +72,7 @@ export class Player {
 			this._lastWin = true;
 		else
 			this._lastWin = false;
+		this._lastScore = this._score;
 		this._score = 0;
 	}
 }

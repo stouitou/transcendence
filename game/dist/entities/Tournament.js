@@ -87,14 +87,16 @@ export class Tournament {
         let array = [[0, 0], [0, 0], [0, 0]];
         let FLAG = false;
         let FLAG1 = false;
-        console.log("3 plqyers");
+        console.log("3 players");
         const loop = (x, y) => __awaiter(this, void 0, void 0, function* () {
             this._game = new Game(this._round[y], this._round[x]);
             yield this._game.launch();
             array[x][0] += this._round[x].lastWin ? 1 : 0;
-            array[x][1] += this._round[x].score;
+            array[x][1] += this._round[x].lastScore;
             array[y][0] += this._round[y].lastWin ? 1 : 0;
-            array[y][1] += this._round[y].score;
+            array[y][1] += this._round[y].lastScore;
+            document.body.innerHTML = ''; //a revoir, remet la page a 0
+            console.log(array);
             if (FLAG == false) {
                 FLAG = true;
                 yield loop(1, 2);

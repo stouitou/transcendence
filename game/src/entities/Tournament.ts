@@ -96,20 +96,21 @@ export class Tournament {
 		let FLAG: boolean = false;
 		let FLAG1: boolean = false;
 
-		console.log("3 players");
 		const loop = async (x: number, y: number) => {
 			this._game = new Game(this._round[y], this._round[x]);
 			await this._game.launch();
 			array[x][0] += this._round[x].lastWin ? 1 : 0;
-			array[x][1] += this._round[x].score;
+			array[x][1] += this._round[x].lastScore;
 
 			array[y][0] += this._round[y].lastWin ? 1 : 0;
-			array[y][1] += this._round[y].score;
+			array[y][1] += this._round[y].lastScore;
 
-			if (FLAG == false) {
-				FLAG = true; await loop(1, 2); }
-			if (FLAG1 == false) {
-				FLAG1 = true; await loop(0, 2); }
+			document.body.innerHTML = ''; //a revoir, remet la page a 0
+			console.log(array);
+			if (FLAG == false)
+				FLAG = true; await loop(1, 2);
+			if (FLAG1 == false)
+				FLAG1 = true; await loop(0, 2);
 		}
 		loop(0, 1);
 	}
