@@ -6,11 +6,11 @@ export class Ball {
         this._diameter = 30;
         this._radius = this._diameter / 2;
         this._color = 'rgb(0, 0, 0)';
+        // For the movement
         this._speed = 8;
         this._startingSpeed = 4;
         // Creates the ball object
         this._element = document.createElement('div');
-        this._element.classList.add('ball');
         // Gives the ball basic values
         this._element.style.width = `${this._diameter}px`;
         this._element.style.height = `${this._diameter}px`;
@@ -24,8 +24,6 @@ export class Ball {
         this._bottom = this._top + this._diameter;
         this._left = this._element.offsetLeft;
         this._right = this._left + this._diameter;
-        // "Draws" the ball in the window
-        document.body.appendChild(this._element);
     }
     /* GETTERS */
     get element() {

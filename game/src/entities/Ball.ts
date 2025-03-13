@@ -4,14 +4,16 @@ import { Paddle } from "./Paddle.js";
 // export allows to use this class in another file
 export class Ball {
 
-	/* PRIVATE ATTRIBUTES */
+	/* ATTRIBUTES */
 	private readonly	_element: HTMLDivElement;
 	private readonly	_diameter: number = 30;
 	private readonly	_radius: number = this._diameter / 2;
 	private readonly	_color: string = 'rgb(0, 0, 0)';
+
+	// For the movement
 	private readonly	_speed: number = 8;
 	private readonly	_startingSpeed: number = 4;
-	private				_direction: Direction;
+	private readonly	_direction: Direction;
 
 	// Fetch current coordinates
 	private				_top: number;
@@ -20,12 +22,9 @@ export class Ball {
 	private				_right: number;
 
 	/* CONSTRUCTOR */
-	public constructor() {
-
+	constructor () {
 		// Creates the ball object
 		this._element = document.createElement('div');
-		this._element.classList.add('ball');
-
 		// Gives the ball basic values
 		this._element.style.width = `${this._diameter}px`;
 		this._element.style.height = `${this._diameter}px`;
@@ -41,9 +40,6 @@ export class Ball {
 		this._bottom = this._top + this._diameter;
 		this._left = this._element.offsetLeft;
 		this._right = this._left + this._diameter;
-		
-		// "Draws" the ball in the window
-		document.body.appendChild(this._element);
 	}
 	
 	/* GETTERS */
@@ -85,14 +81,14 @@ export class Ball {
 
 	/* METHODS */
 	// Update current position
-	public updatePosition() {
+	public updatePosition () {
 		this._top = this._element.offsetTop;
 		this._bottom = this._top + this._diameter;
 		this._left = this._element.offsetLeft;
 		this._right = this._left + this._diameter;
 	}
 
-	public spawn() {
+	public spawn () {
 		// Randomize position
 		const pos = (Math.random() * 100) / 3;
 
