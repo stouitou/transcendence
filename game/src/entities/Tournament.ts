@@ -96,7 +96,7 @@ export class Tournament {
 		let FLAG: boolean = false;
 		let FLAG1: boolean = false;
 
-		console.log("3 plqyers");
+		console.log("3 players");
 		const loop = async (x: number, y: number) => {
 			this._game = new Game(this._round[y], this._round[x]);
 			await this._game.launch();
@@ -105,7 +105,7 @@ export class Tournament {
 
 			array[y][0] += this._round[y].lastWin ? 1 : 0;
 			array[y][1] += this._round[y].score;
-			
+
 			if (FLAG == false) {
 				FLAG = true; await loop(1, 2); }
 			if (FLAG1 == false) {
