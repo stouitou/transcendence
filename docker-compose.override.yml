@@ -1,16 +1,13 @@
 services:
-
-# Basic server
   nginx:
     image: nginx
     container_name: nginx_dev
     build:
       context: ./nginx
-      dockerfile: ./Dockerfile
+      dockerfile: Dockerfile
     volumes:
       - ./nginx/templates:/etc/nginx/templates
       - ./pong:/var/www/pong
-    env_file: .env
     depends_on:
       - backend_services
     ports:
@@ -19,29 +16,30 @@ services:
     networks:
       - transcendence_network
     restart: unless-stopped
+    env_file: .env
 
-# Authentification service:
+# auth-service:
   auth_services:
-    container_name: auth_service
     build:
       context: ./auth-service
       dockerfile: ./Dockerfile
-    volumes:
-      - ./auth-service/app:/app
-      - ./auth-service/app/node_modules:/app/node_modules
+    container_name: auth_service
     environment:
       - NODE_ENV=development
     depends_on:
       - database-services
+    volumes:
+      - ./auth-service/app:/app
+      - ./auth-service/app/node_modules:/app/node_modules
     networks:
       - transcendence_network
 
  #backend_services:     
   backend_services:
-    container_name: backend_services
     build:
       context: ./backend
       dockerfile: ./Dockerfile
+    container_name: backend_services
     environment:
       - NODE_ENV=development
     depends_on:
@@ -53,38 +51,6 @@ services:
     networks:
       - transcendence_network
 
-  exemple-webcomponent:
-    build:
-      context: ./exemple-webcomponent
-      dockerfile: ./Dockerfile
-    container_name: exemple-webcomponent
-    environment:
-      - NODE_ENV=development
-    depends_on:
-      - sqlite-service
-    volumes:
-      - ./exemple-webcomponent/app:/app
-      - ./exemple-webcomponent/app/node_modules:/app/node_modules
-    networks:
-      - transcendence_network
-
-# auth-service:
-  exemple-external-container:
-    build:
-      context: ./exemple-external-container
-      dockerfile: ./Dockerfile
-    container_name: exemple-external-container
-    environment:
-      - NODE_ENV=development
-    depends_on:
-      - sqlite-service
-    volumes:
-      - ./exemple-external-container/app:/app
-      - ./exemple-external-container/app/node_modules:/app/node_modules
-    networks:
-      - transcendence_network
-
-#ajout d'un service de base de données
   database-services:
     build:
       context: ./database-service
