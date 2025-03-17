@@ -33,10 +33,15 @@ export class User {
  @JoinTable()
  tournaments: Tournaments[];
 
-  //chaque joueur a plusieurs parties
+   //chaque joueur a plusieurs parties
   @ManyToMany(() => Game, (game) => game.players ,{ /* cascade: true, */ onUpdate: 'CASCADE', nullable: true })
   @JoinTable()
   games: Game[];
+
+  //chaque joueur a plusieurs amis
+  @ManyToMany(() => User, (user) => user.friends ,{ /* cascade: true, */ onUpdate: 'CASCADE', nullable: true })
+  @JoinTable()
+  friends: User[];
 
   @CreateDateColumn()
   created_at: Date;

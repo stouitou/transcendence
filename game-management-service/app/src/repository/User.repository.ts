@@ -5,7 +5,8 @@
  * -- Permet de changer facilement de DB sans modifier le code des services.
  */
 import Helpers, { IParams } from "../repository/helpers";
-import { User } from "../models/User.models";
+//import { User } from "../models/User.models";
+import { User } from "../models/User";
 import { IRepository } from "./Base/IRepository";
 import { BaseRepository } from "./Base/BaseRepository";
 
@@ -31,7 +32,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
   // - le nom de la table,
   // - les relations (nom des propriétés liées à d'autres tables)
   constructor() {
-    super("myDb", "user", ["authProviders","tournaments","games","friends"]);
+    super("myDb", "user", ["authProviders"]);
   }
   //create
   create = async (user: Partial<User>): Promise<User> => {
@@ -56,6 +57,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
   };
 
   private getRelations = (): string => {
+    console.log("🔐 UserRepository.getRelations()  --this.RELATIONS--",this.RELATIONS)
     if (this.RELATIONS.length === 0) {
       return "";
     }
@@ -80,7 +82,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
 
  getById= async (id: number): Promise<User | null> => {
       
-    const url = `${this.URL}/id/${id}${this.getRelations()}`;// on ajoute toutes les relations
+    const url = `${this.URL}/id/${id}?relations=authProviders`;//{this.getRelations()}
     console.log("🔐 UserRepository.getById()  --url--",url)
     const response = await fetch(url);
     const  result  = await response.json();
@@ -128,7 +130,9 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
 
   //update
   update = async (user: Partial<User>):Promise<User>=>{
+    console.log("🔐 UserRepository.update()  --user--",user)
     const { id, ...userExtracted } = user;
+    console.log("🔐 UserRepository.update()  --userExtracted--",userExtracted)
     const response = await fetch(`${this.URL}/id/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -137,6 +141,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
       }),
     });
     const data = await response.json();
+    console.log("🔐 UserRepository.update()  --data--",data)
     //const userUpdated = User.fromJSON(data.data);
     const userUpdated =data.data;
     if (!userUpdated) {
@@ -146,9 +151,8 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
   }
   //delete
   delete = async (id: number) :Promise<boolean>=>{
-    const response = await fetch(`${this.URL}/id/${id}`, {
-      method: "DELETE",
-      headers: { "Content-Type": "application/json" },     
+    const response = await fetch(`${this.URL}/id/${id}`, {// delete sans body!!! ou avec body non vide si content-type: application/json
+      method: "DELETE",     
     });
     const data = await response.json();
     return data;

@@ -18,16 +18,12 @@ export class User{
   created_at: Date;
   updated_at: Date;
   role: string;
-  friends?: User[];
+  level?: number;
+  //authProviders: AuthProvider[];
+  //tournaments: Tournaments[];
+  //games: Game[];
 
-/*   constructor(data: Partial<User>) {
-     this.id = 0;
-     this.role = "user";
-     this.created_at = new Date();
-     this.updated_at = new Date(); 
-     Object.assign(this, data);
-    } */
-  
+ 
 	constructor(data: Partial<User>
 	 /*  public id: number,
 	 // private passwordHash: string,
@@ -74,25 +70,8 @@ export class User{
     updated_at: new Date(json.updated_at),
     role: json.role
   });
-   /*  return new User(
-      json.id,
-      json.name,
-      json.avatar,
-	    authProviders,// (json.authProviders as AuthProvider[]).map(AuthProvider.fromJSON),
-      new Date(json.created_at),
-      new Date(json.updated_at),
-      json.role
-    ); */
   }
 
-/*   // 🔹 Vérifier un mot de passe lors d'une connexion
-  async verifyPassword(password: string): Promise<boolean> {
-    return bcrypt.compare(password, this.passwordHash);
-  } */
-/*     private static fieldMappings: Record<string, string[]> = {
-      UserBody: ["email", "name"],
-      UserSafe: ["id", "email", "name", "createdAt"],
-    }; */
     createFilter<T extends Record<string, any>>(): Record<keyof T, true> {
       return new Proxy({} as Record<keyof T, true>, {
         get: (_, prop) => true

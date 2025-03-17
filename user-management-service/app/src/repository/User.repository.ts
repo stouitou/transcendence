@@ -32,7 +32,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
   // - le nom de la table,
   // - les relations (nom des propriétés liées à d'autres tables)
   constructor() {
-    super("myDb", "user", ["authProviders"]);
+    super("myDb", "user", ["authProviders","tournaments","games","friends"]);
   }
   //create
   create = async (user: Partial<User>): Promise<User> => {
@@ -82,7 +82,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
 
  getById= async (id: number): Promise<User | null> => {
       
-    const url = `${this.URL}/id/${id}?relations=authProviders`;//{this.getRelations()}
+    const url = `${this.URL}/id/${id}${this.getRelations()}`;//{this.getRelations()}
     console.log("🔐 UserRepository.getById()  --url--",url)
     const response = await fetch(url);
     const  result  = await response.json();
@@ -153,6 +153,60 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
   delete = async (id: number) :Promise<boolean>=>{
     const response = await fetch(`${this.URL}/id/${id}`, {// delete sans body!!! ou avec body non vide si content-type: application/json
       method: "DELETE",     
+    });
+    const data = await response.json();
+    return data;
+  }
+
+  addFriend = async (userId: number, friendId: number): Promise<boolean> => { 
+    //1- recuperer le user et les id de ses amis
+    const user = await  this.getById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const { friends } = user;
+    //1- en faire un tableau d'int avec les id des amis
+    const friendsIds = friends? friends.map((friend: User) => friend.id):[];
+    //1- verifier si l'ami est deja dans la liste
+    if (friendsIds.includes(friendId)) {
+      throw new Error("Friend already added");
+    }
+    //2- ajouter le new id de l'ami
+    friendsIds.push(friendId);
+    //3- update
+    const response = await fetch(`${this.URL}/id/${userId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        friends: friendsIds,
+      }),
+    });
+    const data = await response.json();
+    return data;
+  }
+
+  removeFriend = async (userId: number, friendId: number): Promise<boolean> => {
+    //1- recuperer le user et les id de ses amis
+    const user = await  this.getById(userId);
+    if (!user) {
+      throw new Error("User not found");
+    }
+    const { friends } = user;
+    //1- en faire un tableau d'int avec les id des amis
+    const friendsIds = friends? friends.map((friend: User) => friend.id):[];
+    //1- verifier si l'ami est deja dans la liste
+    if (!friendsIds.includes(friendId)) {
+      throw new Error("Friend not found");
+    }
+    //2- supprimer le new id de l'ami
+    const newFriendsIds = friendsIds.filter((id: number) => id !== friendId);
+    //3- update
+    const response = await fetch(`${this.URL}/id/${userId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        friends: newFriendsIds,
+      }),
     });
     const data = await response.json();
     return data;

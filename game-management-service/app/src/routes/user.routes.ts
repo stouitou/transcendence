@@ -95,8 +95,6 @@ async function userRoutes(app: FastifyInstance) {
   app.get("/", {/* preHandler: [loggerMiddleware], *//* schema: UserSchema.getUsers */}, userController.getUsers);
   app.get("/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserById);
   app.put("/me",/*  {schema: UserSchema.updateUser}, */ userController.updateMe);
-  app.put("/me/addFriend",/*  {schema: UserSchema.updateUser}, */ userController.addFriend);
-  app.put("/me/removeFriend",/*  {schema: UserSchema.updateUser}, */ userController.removeFriend);
   app.put("/:id", {schema: UserSchema.updateUser}, userController.updateUser);
   app.delete("/:id",/*  {schema: UserSchema.deleteUser}, */ userController.deleteUser);
  // app.post("/query", {schema: UserSchema.requestQuery}, userController.requestQuery);

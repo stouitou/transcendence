@@ -46,8 +46,6 @@ export class UserController {
     this.updateMe = this.updateMe.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
     this.updateUserAvatar = this.updateUserAvatar.bind(this);
-    this.addFriend = this.addFriend.bind(this);
-    this.removeFriend = this.removeFriend.bind(this);
   }
   //constructor(private userService: UserService) {}
 
@@ -167,34 +165,6 @@ export class UserController {
       }
       return reply.send(user);
     }
-
-    //add Friend
-    async addFriend(request: FastifyRequest<{/*  Params: { id: string}, */Body:{ friendId:string} }>, reply: FastifyReply) {
-     // const userId = parseInt(request.params.id);
-     const userId = Number(request.authenticatedUser?.id);
-     if (!userId) {
-       return reply.status(400).send({ error: 'Invalid user id' });
-     }
-      const friendId = parseInt(request.body.friendId);
-      //const user = await this.userService.deleteUser(userId);
-     // const user = await UserRepository.delete(userId);
-      const user = await this.userRepository.addFriend(userId,friendId);
-      return reply.send(user);
-    }
-    //remove Friend
-    async removeFriend(request: FastifyRequest<{/*  Params: { id: string }, */Body:{ friendId:string}  }>, reply: FastifyReply) {
-     // const userId = parseInt(request.params.id);
-     const userId = Number(request.authenticatedUser?.id);
-     if (!userId) {
-       return reply.status(400).send({ error: 'Invalid user id' });
-     }
-      const friendId = parseInt(request.body.friendId);
-      //const user = await this.userService.deleteUser(userId);
-     // const user = await UserRepository.delete(userId);
-      const user = await this.userRepository.removeFriend(userId,friendId);
-      return reply.send(user);
-    }
-
 
   async deleteUser(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     const userId = parseInt(request.params.id);

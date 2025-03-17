@@ -31,6 +31,25 @@ Content-Type: application/json
 {
 "name": "player2"
 }
+### new user as player4
+POST https://localhost:4433/api/v2/database/myDb/table/user HTTP/1.1
+Content-Type: application/json
+
+{
+"name": "player4",
+"authProviders": [
+    { "provider": "local", "provider_id": "player4@mail.com", "password":"1234hashPasword" }
+  ],
+  "friends": [1,2]
+}
+
+### update user1 with friends
+PUT https://localhost:4433/api/v2/database/myDb/table/user/id/1 HTTP/1.1
+Content-Type: application/json
+
+{
+"friends": [2]
+}
 
 ### GET USERS
 ### get users
