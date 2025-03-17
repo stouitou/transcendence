@@ -83,7 +83,30 @@ export class AuthController extends BaseController {
 
     const token = this.app.authService.generateToken(user);
     console.log("🟢 token ",token)
+
+        // Définir le cookie avec le token
+      reply.setCookie('authToken', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production', // Utiliser 'secure' en production
+          sameSite: 'strict',
+          path: '/',
+          maxAge: 3600 // 1 heure
+      });
     return reply.status(201).send({ token: token });
+  }
+
+  /**
+   * Déconnexion (logout)
+   * 
+   * @param req 
+   * @param reply 
+   * @returns 
+   */
+  async logout(req: FastifyRequest, reply: FastifyReply) {
+    console.log("🔴 logout")
+    // Supprimer le cookie
+    reply.clearCookie('authToken');
+    return reply.status(200).send({ message: "Logged out" });
   }
 
   // 🟢 Vérification du token
@@ -98,6 +121,16 @@ export class AuthController extends BaseController {
       const decoded = this.app.jwt.verify(token,"ACCESS_TOKEN_PUBLIC_KEY") as any;
       console.log("🟢 me decoded",decoded)
 
+      /**
+       * debug token info
+       * 
+       */
+      const iatDate = new Date(decoded.iat * 1000);
+      const expDate = new Date(decoded.exp * 1000);
+      console.log("Issued At:");
+      console.log("Issued At:", iatDate);
+      console.log("Expires At:", expDate);
+
   
    //const result = await  UserRepository.getUserById(decoded.id);
    const result = await  this.UserRepository.getById(decoded.id);
@@ -110,7 +143,20 @@ export class AuthController extends BaseController {
    console.log("81 🟢 me result",result)  
    return reply.status(200).send(result);
     } catch (err) {
-      return reply.status(401).send({ error: "Invalid token" });
+      console.error("🔴 me error",err)
+      if (err.message === "jwt expired") {
+        console.log("🔴 me jwt expired")
+        return reply.status(401).send({ error: "Token expired",statusText:"Token expired" });
+      }
+      if (err.message === "Invalid token") {
+        console.log("🔴 me invalid token")
+        return reply.status(401).send({ error: "Invalid token",statusText:"Invalid token" });
+      }
+      console.log("🔴 me error","err")
+      console.log("🔴 me mess error",err.message)
+     
+
+      return reply.status(401).send({ error: err.message, statusText:err.message });
     }
   }
 
@@ -133,8 +179,9 @@ export class AuthController extends BaseController {
   //  reply.send(profile);
     console.log("🔓 42 Api Callback", profile);
     const user = await this.app.authService.createUserWithOauthProvider(profile, "42api");
-    console.log("🔓 42 Api Callback", user);
-    reply.send( user);
+   // console.log("🔓 42 Api Callback", user);
+   return user;
+   // reply.send( user);
       
     } catch (error) {
       reply.send(error);

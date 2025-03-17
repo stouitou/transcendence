@@ -11,6 +11,7 @@ async function authRoutes(app: FastifyInstance) {
   // Routes base Auth
   app.post("/register", { schema: AuthSchema.register }, authController.register);
   app.post("/login", { schema: AuthSchema.login }, authController.login);
+  app.post("/logout"/* , { schema: AuthSchema.login } */, authController.logout);
   app.get("/me", /* { schema: AuthSchema.profileMe }, */ authController.me);//@DEBUG
  // app.get("/logout", { schema: AuthSchema.logout }, authController.logout);
   
@@ -26,8 +27,19 @@ async function authRoutes(app: FastifyInstance) {
       preValidation:   FastifyPassport.authenticate('google', { failureRedirect: '/login' })
     },
     function (req, res) {
+      const user = req.user as User & { token: string };
+      const token = user.token ?? "";
       console.log("🔗 google callback")
-      res.send(req.user)}
+      //res.send(req.user)
+      res.setCookie('authToken', token, {
+        httpOnly: true,
+        secure: true,//process.env.NODE_ENV === 'production', // Utiliser 'secure' en production
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 3600 // 1 heure
+    });
+      
+      res.redirect(`https://localhost:4433/uploads/index.html`);}
   );
 
   app.get("/github/callback",
@@ -35,7 +47,17 @@ async function authRoutes(app: FastifyInstance) {
       schema: AuthSchema.oauthCallback,
       preValidation: FastifyPassport.authenticate('github', { authInfo: false ,failureRedirect : "/"})
     },
-    (req, reply) => reply.send(req.user)
+    function (req, res) {
+      const user = req.user as User & { token: string };
+      const token = user.token ?? "";
+      res.setCookie('authToken', token, {
+        httpOnly: true,
+        secure: true,//process.env.NODE_ENV === 'production', // Utiliser 'secure' en production
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 3600 // 1 heure
+    });      
+    res.redirect(`https://localhost:4433/uploads/index.html`);}
   );
 
   //no setup 
@@ -44,7 +66,17 @@ async function authRoutes(app: FastifyInstance) {
       schema: AuthSchema.oauthCallback,
       preValidation: FastifyPassport.authenticate('facebook', { authInfo: false ,failureRedirect : "/"})
     },
-    (req, reply) => reply.send(req.user)
+    function (req, res) {
+      const user = req.user as User & { token: string };
+      const token = user.token ?? "";
+      res.setCookie('authToken', token, {
+        httpOnly: true,
+        secure: true,//process.env.NODE_ENV === 'production', // Utiliser 'secure' en production
+        sameSite: 'strict',
+        path: '/',
+        maxAge: 3600 // 1 heure
+    });      
+    res.redirect(`https://localhost:4433/uploads/index.html`);}
   );
 
     // Route pour gérer le callback
@@ -59,8 +91,18 @@ async function authRoutes(app: FastifyInstance) {
       const { token } = await app.fortyTwoOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
       console.log("🔓 42 Callback Token:", token);
       const {access_token} = token;
-      const jwtToken = await authController.oauthCallbackApi42(request, reply, access_token);
-      return  reply.send({ token: jwtToken });
+      const user = await authController.oauthCallbackApi42(request, reply, access_token); // @TODO change to Promise<string>
+     // const user = req.user as User & { token: string };
+      const authToken = (user as unknown as User & { token: string }).token ?? "";
+        reply.setCookie('authToken', authToken as unknown as string, {
+          httpOnly: true,
+          secure: true,//process.env.NODE_ENV === 'production', // Utiliser 'secure' en production
+          sameSite: 'strict',
+          path: '/',
+          maxAge: 3600 // 1 heure
+      });      
+      reply.redirect(`https://localhost:4433/uploads/index.html`);
+    //  return  reply.send({ token: jwtToken });
     } catch (err) {
       reply.send(err);
     }
