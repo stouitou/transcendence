@@ -1,13 +1,14 @@
 import { Ball } from "./Ball.js";
+// import { Display } from "./Display.js";
 
 // export allows to use this class in another file
-export class Paddle {
+export class	Paddle {
 
 	/* ATTRIBUTES */
 	private readonly	_element: HTMLDivElement;
 	private readonly	_width: number = 20;
 	private readonly	_height: number = 120;
-	private readonly	_color: string = 'rgb(0, 0, 0)';
+	private readonly	_color: string = "rgb(0, 0, 0)";
 
 	private readonly	_speed: number = 5;
 	private				_keys: { [key: string]: boolean } = {};
@@ -21,16 +22,18 @@ export class Paddle {
 
 	/* CONSTRUCTOR */
 	constructor(location: number = 1 | 2) {
+		// super(canvas);
+
 		this._location = location;
 
 		// Creates the paddle object
-		this._element = document.createElement('div');
+		this._element = document.createElement("div");
 		// this._element.classList.add('paddle');
 		// Gives the paddle all its values
 		this._element.style.width = `${this._width}px`;
 		this._element.style.height = `${this._height}px`;
 		this._element.style.backgroundColor = `${this._color}`;
-		this._element.style.position = 'absolute';
+		this._element.style.position = "absolute";
 		this._element.style.top = `calc(50% - ${this._height / 2}px)`;	// this._element.style.top = `${(window.innerHeight / 2) - (this._height / 2)}px`;
 
 		if (location === 1)
@@ -38,6 +41,8 @@ export class Paddle {
 		else if (location === 2)
 			this._element.style.left = `calc(5% - ${this._width / 2}px)`;
 		// "Draws" the paddle in the window
+		// const	gameContainer = this._canvas.parentElement as HTMLElement;
+		// gameContainer.appendChild(this._element);
 		document.body.appendChild(this._element);
 
 		// Update position

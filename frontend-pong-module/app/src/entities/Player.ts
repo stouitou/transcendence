@@ -2,6 +2,9 @@ import { Paddle } from "./Paddle.js";
 
 export class Player {
 
+	/* ATTIBUTES */
+	// private readonly 	_canvas: HTMLCanvasElement;
+
 	private readonly 	_name: string;
 	private				_id: number;
 	private				_paddle!: Paddle;
@@ -13,6 +16,7 @@ export class Player {
 
 	/* CONSTRUCTOR */
 	constructor (name: string) {
+		// this._canvas = canvas;
 		this._name = name;
 		this._id = -1;
 		this._score = 0;
@@ -70,6 +74,7 @@ export class Player {
 		this._lastScore = score;
 	}	
 
+	/* METHODS */
 	public incrementScore () {
         this._score += 1;
     }
@@ -83,13 +88,4 @@ export class Player {
 		this._lastScore = this._score;
 		this._score = 0;
 	}
-	// public setInfoEndGame (pointsToWin: number, lastOpponent: Player) {
-	// 	this._lastOpponent = lastOpponent;
-	// 	if (this._score === pointsToWin)
-	// 		this._lastWin = true;
-	// 	else
-	// 		this._lastWin = false;
-	// 	this._lastScore = this._score;
-	// 	this._score = 0;
-	// }
 }

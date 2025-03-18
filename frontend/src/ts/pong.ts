@@ -1,6 +1,6 @@
 // pongGame.ts
 export function startGame(): void {
-    const canvas = document.getElementById("pongCanvas") as HTMLCanvasElement | null;
+    const canvas = document.getElementById("gameCanvas") as HTMLCanvasElement | null;
     if (!canvas) {
         throw new Error("Canvas element not found");
     }

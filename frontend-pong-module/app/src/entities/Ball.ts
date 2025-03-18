@@ -1,14 +1,15 @@
 import { Direction } from './Direction.js';
+// import { Display } from './Display.js';
 import { Paddle } from "./Paddle.js";
 
 // export allows to use this class in another file
-export class Ball {
+export class	Ball {
 
 	/* ATTRIBUTES */
 	private readonly	_element: HTMLDivElement;
 	private readonly	_diameter: number = 30;
 	private readonly	_radius: number = this._diameter / 2;
-	private readonly	_color: string = 'rgb(0, 0, 0)';
+	private readonly	_color: string = "rgb(0, 0, 0)";
 
 	// For the movement
 	private readonly	_speed: number = 8;
@@ -23,14 +24,16 @@ export class Ball {
 
 	/* CONSTRUCTOR */
 	constructor () {
+		// super(canvas);
+
 		// Creates the ball object
-		this._element = document.createElement('div');
+		this._element = document.createElement("div");
 		// Gives the ball basic values
 		this._element.style.width = `${this._diameter}px`;
 		this._element.style.height = `${this._diameter}px`;
 		this._element.style.backgroundColor = this._color;					// color of the ball
-		this._element.style.borderRadius = '50%';							// makes it round
-		this._element.style.position = 'absolute';							// doesn't interact with other objects or text
+		this._element.style.borderRadius = "50%";							// makes it round
+		this._element.style.position = "absolute";							// doesn't interact with other objects or text
 
 		// Gives the ball a random direction and position
 		this._direction = new Direction(0, 0);
