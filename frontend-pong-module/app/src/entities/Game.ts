@@ -53,7 +53,7 @@ export class	Game {
 		this._board.display();
 		return new Promise((resolve) => {
 			 const	gameContainer = this._canvas.parentElement as HTMLElement;
-			 gameContainer.appendChild(this._ball.element);	
+			 gameContainer.appendChild(this._ball.element);
 			//document.body.appendChild(this._ball.element);
 
 			const loop = () => {

@@ -1,0 +1,19 @@
+body {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	height: 100vh; /* Hauteur = toute la fenêtre */
+	margin: 0;
+	background-color: rgb(255, 255, 255); /* Optionnel, fond plus visible */
+}
+  
+#game-container {
+	display: flex;
+	justify-content: center;
+	align-items: center;
+	width: 800px; /* Ajuste légèrement plus grand que le canvas */
+	height: 400px;
+	border: 2px solid rgb(216, 216, 216); /* Optionnel, pour voir la zone */
+	background-color: rgb(30, 30, 30); /* Optionnel, fond plus visible */
+}
+    

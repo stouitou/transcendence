@@ -2,6 +2,7 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
+    <link rel="stylesheet" href="/src/css/canvas.css">
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Test affichage PONG</title>
@@ -9,7 +10,9 @@
     
   </head>
   <body>
-    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <div class="game-container"></div>
+      <canvas id="gameCanvas" width="800" height="400"></canvas>
+    </div>
     <game-component canvasId="gameCanvas"></game-component>
   </body>
 </html>

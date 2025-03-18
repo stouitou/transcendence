@@ -3,14 +3,19 @@ import { Game } from "./Game.js";
 
 export class Tournament {
 
+	private readonly	_canvas: HTMLCanvasElement;
+
 	private readonly	_players: Player[];
 
 	private				_round: Player[] = [];
 	private				_match: Map<number, Player[] | null> = new Map();
 	private				_game!: Game;
+	private				_nextMatch: HTMLDivElement | null = null;
 
 	/* CONSTRUCTOR */
-	public constructor(players: Player[]) {
+	public constructor(players: Player[], canvas: HTMLCanvasElement) {
+		this._canvas = canvas;
+
 		this._players = players;
 
 		this.randomize();
@@ -51,6 +56,7 @@ export class Tournament {
 	}
 
 	private async launchGame (nofMatch: number) {
+		await this.showNextMatch();
 		console.log("number of match: ", nofMatch);
 
 		this._round.length = 0;
@@ -61,7 +67,7 @@ export class Tournament {
 			console.log("starting game");
 			const game = this._match.get(i);
 			if (game && game.length === 2) {
-            	this._game = new Game(game[0], game[1]);
+            	this._game = new Game(game[0], game[1], this._canvas);
 				await this._game.launch();
 				document.body.innerHTML = ''; //a revoir, remet la page a 0
 				this._round[j] = game[0].lastWin ? game[0] : game[1];
@@ -95,7 +101,7 @@ export class Tournament {
 		let FLAG1: boolean = false;
 
 		const loop = async (x: number, y: number) => {
-			this._game = new Game(this._round[y], this._round[x]);
+			this._game = new Game(this._round[y], this._round[x], this._canvas);
 			await this._game.launch();
 			array[x][0] += this._round[x].lastWin ? 1 : 0;
 			array[x][1] += this._round[x].lastScore;
@@ -115,5 +121,65 @@ export class Tournament {
 			}
 		}
 		loop(0, 1);
+	}
+
+	private showNextMatch() : Promise<void>
+    {
+        return new Promise((resolve) => {
+			const keys = Array.from(this._match.keys()); // Liste des clés
+			let i: number = 0;
+			let tab: string[] = ["Next match:" + "<br>"];
+			let game = this._match.get(i);
+
+			for (let i = 0; i < keys.length; i++) {
+				console.log("keys[i]: ", keys[i]);
+			}
+			i = 0;
+			// this._match.forEach((values) => {
+			// 	if (values)
+			// 		tab[i] = tab[i] + `${values.join(" VS ")}`;
+			// })
+			while (i < keys.length) {
+				if (game) {
+					if (game[1])
+						tab[i + 1] = tab[i] + game[0].name + " VS " + game[1].name + "<br>";
+					else
+						tab[i + 1] = tab[i] + game[0].name + "<br>";
+				}
+				i++;
+				game = this._match.get(i);
+			}
+			//if (game)
+			//    tab = tab + game[0].name;
+			this._nextMatch = document.createElement('div');
+
+			this._nextMatch.innerHTML = tab[0];
+			this._nextMatch.style.font = `30px`;
+			this._nextMatch.style.color = 'rgba(41, 112, 97, 0.57)';
+			this._nextMatch.style.fontSize = `50px`;
+			//this._nextMatch.style.opacity = ${this._opacity};
+			this._nextMatch.style.top = '50%';
+			this._nextMatch.style.left = '50%';
+			this._nextMatch.style.position = 'absolute';
+			this._nextMatch.style.transform = 'translate(-50%, -50%)';
+			
+			document.body.appendChild(this._nextMatch);
+			for (let x = 1; x < i + 1; x++) {
+				setTimeout(() => { 
+					//console.log("tab[x] : ", tab[x]);
+					const nextMatch = document.createElement('div');
+					if (this._nextMatch)
+						this._nextMatch.innerHTML = tab[x]
+						document.body.appendChild(nextMatch);
+					}, x * 800); 
+			}
+			document.addEventListener('keydown', (event) => {
+				if (event.key === "Enter") {
+					if (this._nextMatch)
+						this._nextMatch.innerHTML = "";
+					resolve();
+				}
+			});
+        });
 	}
 }
