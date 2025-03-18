@@ -9,7 +9,7 @@ import { Versus } from './Versus.js';
 export class	Game {
 
 	/* ATTRIBUTES */
-	// private readonly	_canvas: HTMLCanvasElement;
+	 private readonly	_canvas: HTMLCanvasElement;
 
 	private readonly	_ball: Ball;
 	private readonly	_board: Board;
@@ -26,8 +26,8 @@ export class	Game {
 	private				_break: boolean = false;
 
 	/* CONSTRUCTOR */
-	constructor(player1: Player, player2:Player) {
-		// this._canvas = canvas;
+	constructor(player1: Player, player2:Player, canvas: HTMLCanvasElement) {
+		this._canvas = canvas;
 		this._ball = new Ball();
 		this._board = new Board(player1, player2);
 		this._player1 = player1;
@@ -52,9 +52,9 @@ export class	Game {
 		await this._countdown.start();
 		this._board.display();
 		return new Promise((resolve) => {
-			// const	gameContainer = this._canvas.parentElement as HTMLElement;
-			// gameContainer.appendChild(this._ball.element);	
-			document.body.appendChild(this._ball.element);
+			 const	gameContainer = this._canvas.parentElement as HTMLElement;
+			 gameContainer.appendChild(this._ball.element);	
+			//document.body.appendChild(this._ball.element);
 
 			const loop = () => {
 				if (this.endOfGame()) {

@@ -5,10 +5,11 @@
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Test affichage PONG</title>
-    <script type="module" src="/src/component/pong-game.ts"></script>
+    <script type="module" src="/src/component/oneVSone.ts"></script>
     
   </head>
   <body>
-    <game-component/>
+    <canvas id="gameCanvas" width="800" height="600"></canvas>
+    <game-component canvasId="gameCanvas"></game-component>
   </body>
 </html>
