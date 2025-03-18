@@ -3,6 +3,7 @@ import  TournamentsRepository  from '@src/repository/Tournament.repository';
 import { TournamentsBody } from '@src/models/Tournaments';
 import { User } from '@src/models/User';
 import { Game } from '@src/models/Game';
+import RoundRepository from '@src/repository/Round.repository';
 
 export class TournamentsController {
  private tournamentsRepository = new TournamentsRepository();
@@ -14,6 +15,9 @@ export class TournamentsController {
     this.updateTournament = this.updateTournament.bind(this);
     this.deleteTournament = this.deleteTournament.bind(this);
     this.addPlayerToTournament = this.addPlayerToTournament.bind(this);
+    this.closeRegistrationsAndGenerateFirstRound = this.closeRegistrationsAndGenerateFirstRound.bind(this);
+    this.generateNextRound = this.generateNextRound.bind(this);
+    this.updateMatchResult = this.updateMatchResult.bind(this);
   }
   //1- ON CREE UN TOURNOI
 
@@ -50,13 +54,15 @@ export class TournamentsController {
     }
 
     const matches = this.generateMatches(players);
+    const roundRepository = new RoundRepository();
+    const rounds = await roundRepository.create({games:matches,state:'in_progress',current:0});
+    //update the tournament 
+
+    const updatedTournament = await this.tournamentsRepository.update({id:gameId,rounds:[{id:rounds.id}],state:'in_progress',currentRound:0});
+   
+
     
-   // tournament.rounds = [matches];
-    tournament.games = [matches];
-    tournament.state = 'in_progress';
-    tournament.currentRound = 0;
-    await this.tournamentsRepository.update(tournament);
-    return reply.send(tournament);
+    return reply.send(updatedTournament);
 }
 //** - utils: ON GENERE LES MATCHS
 //generate matches

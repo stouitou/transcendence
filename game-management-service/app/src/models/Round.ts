@@ -1,20 +1,22 @@
 import { Game } from "./Game";
-import { Round } from "./Round";
+import { Tournaments } from "./Tournaments";
 import { User } from "./User";
 
 
-export class Tournaments{
+export class Round{
   id: number;
   games: Game[];
   state: string;
   players?: User[]/*  | number[] */;
   created_at: Date;
   updated_at: Date;
-  rounds?: Round[];  
+  tournaments?: Tournaments;
+  current: number;
 
  
-	constructor(data: Partial<Tournaments>) {
+	constructor(data: Partial<Round>) {
     this.id = 0;
+    this.current = 0;
     this.games = [];
     this.state = "en attente";
     this.players = [];
@@ -26,7 +28,7 @@ export class Tournaments{
 }
 
 
-export type TournamentsCreate = {
+export type RoundCreate = {
   players: number[];
   difficulty: number;
   state: string;
@@ -35,7 +37,7 @@ export type TournamentsCreate = {
   updated_at: Date;
 }
 // 📌 Définition des modèles avec contraintes
-export type TournamentsBody = {
+export type RoundBody = {
   id: number;
   games: Game[];
   state: string;
@@ -44,7 +46,7 @@ export type TournamentsBody = {
   updated_at: Date;
 }
 
-export type TournamentsSafe = {
+export type RoundSafe = {
   id: number;
   games: Game[];
   state: string;
@@ -54,9 +56,9 @@ export type TournamentsSafe = {
 }
 
 // 📌 Interface pour garantir que le modèle ne contient QUE des clés de User
-export type TournamentsModel<T extends Partial<Record<keyof Tournaments, any>>> = T;
+export type RoundModel<T extends Partial<Record<keyof Round, any>>> = T;
 // 📌 Définition des modèles avec contraintes
-export const TournamentsBody: TournamentsModel<TournamentsBody> = {
+export const RoundBody: RoundModel<RoundBody> = {
   id: 0,
   games: [],
   state: "en attente",
@@ -64,7 +66,7 @@ export const TournamentsBody: TournamentsModel<TournamentsBody> = {
   created_at: new Date(),
   updated_at: new Date(),
 };
-export const TournamentsSafe: TournamentsModel<TournamentsSafe> = {
+export const RoundSafe: RoundModel<RoundSafe> = {
   id: 0,
   games: [],
   state: "en attente",
@@ -73,7 +75,7 @@ export const TournamentsSafe: TournamentsModel<TournamentsSafe> = {
   updated_at: new Date(),
 };
 
-export const TournamentsCreate: TournamentsModel<TournamentsCreate> = {
+export const RoundCreate: RoundModel<RoundCreate> = {
   players: [],
   difficulty: 0,
   state: "en attente",

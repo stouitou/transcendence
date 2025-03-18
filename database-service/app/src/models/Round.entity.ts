@@ -1,16 +1,16 @@
 import "reflect-metadata";
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, UpdateDateColumn, CreateDateColumn,  ManyToMany, OneToMany } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, UpdateDateColumn, CreateDateColumn,  ManyToMany, OneToMany, ManyToOne } from "typeorm";
 
 import { User } from "./User.entity";
 import { Game } from "./Game.entity";
-import { Round } from "./Round.entity";
+import { Tournaments } from "./Tournament.entity";
 
 @Entity()
-export class Tournaments {
+export class Round {
   @PrimaryGeneratedColumn()
   id: number;
 
-  //chaque Tournoi a plusieurs parties
+  //chaque Round a plusieurs parties
   @OneToMany(() => Game, (game) => game.tournaments, { cascade: true , onUpdate: 'CASCADE' , nullable: true })
   @JoinColumn()
   games: Game[];
@@ -18,7 +18,9 @@ export class Tournaments {
   //etat de la partie
   @Column({ type: "text", default: "en attente" }) //en attente, en cours, terminee
   state: string;
-
+  //etat de la partie
+  @Column({ type: "int", default: 0 }) //en attente, en cours, terminee
+  current: number;
   //chaque Tournoi a plusieurs joueurs
   @ManyToMany(() => User, (user) => user.tournaments, { cascade: true , onUpdate: 'CASCADE' , nullable: true  })
   @JoinColumn()
@@ -30,9 +32,9 @@ export class Tournaments {
   @UpdateDateColumn()
   updated_at: Date;
 
-  //chaque tournoi a plusieurs rounds
-  @ManyToMany(() => Round, (round) => round.tournaments, { cascade: true , onUpdate: 'CASCADE' , nullable: true })
-  @JoinColumn()
-  rounds: Round[];  
+  //chaque round a un tournoi
+  @ManyToOne(() => Tournaments, (tournaments) => tournaments.rounds, { /* nullable: true, */ onUpdate: 'CASCADE', eager:true })
+  @JoinColumn()//Utile?
+  tournaments: Tournaments;
 }
 
