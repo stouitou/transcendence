@@ -1,9 +1,9 @@
 import { Ball } from './Ball.js';
-import { Board } from './Board.js';
-import { Countdown } from './Countdown.js';
-import { Pause } from './Pause.js';
+import { Board } from '../display/Board.js';
+import { Countdown } from '../additional/Countdown.js';
+import { Pause } from '../additional/Pause.js';
 import { Player } from './Player.js';
-import { Versus } from './Versus.js';
+import { Versus } from '../display/Versus.js';
 
 // export allows to use this class in another file
 export class	Game {
@@ -28,15 +28,15 @@ export class	Game {
 	/* CONSTRUCTOR */
 	constructor(player1: Player, player2:Player, canvas: HTMLCanvasElement) {
 		this._canvas = canvas;
-		this._ball = new Ball();
-		this._board = new Board(player1, player2);
+		this._ball = new Ball(this._canvas);
+		this._board = new Board(player1, player2, this._canvas);
 		this._player1 = player1;
 		player1.paddle = 1;
 		this._player2 = player2;
 		player2.paddle = 2;
-		this._pause = new Pause();
-		this._versus = new Versus(player1, player2);
-		this._countdown = new Countdown();
+		this._pause = new Pause(this._canvas);
+		this._versus = new Versus(player1, player2, this._canvas);
+		this._countdown = new Countdown(this._canvas);
 
 		this.eventListeners();
 	}

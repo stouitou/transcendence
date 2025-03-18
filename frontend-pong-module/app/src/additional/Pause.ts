@@ -1,6 +1,6 @@
-// import { Display } from "./Display";
+import { Display } from "../display/Display";
 
-export class	Pause {
+export class	Pause extends Display {
 
 	/* ATTRIBUTES */
 	private readonly	_left: HTMLDivElement;				// left part of the symbol
@@ -14,8 +14,8 @@ export class	Pause {
 	private readonly	_horizontal:  number = 48;			// horizontal position in percentage
 
 	/* CONSTRUCTOR */
-	constructor () {
-		// super(canvas);
+	constructor (canvas: HTMLCanvasElement) {
+		super(canvas);
 
 		this._left = document.createElement("div");
 		this._left.style.width = `${this._width}px`;

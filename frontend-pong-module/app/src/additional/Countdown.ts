@@ -1,4 +1,6 @@
-export class	Countdown {
+import { Display } from "../display/Display";
+
+export class	Countdown extends Display {
 
 	/* ATTIBUTES */
 	private readonly	_element: HTMLDivElement;
@@ -11,7 +13,9 @@ export class	Countdown {
 	private readonly	_horizontal: number = 50;			// horizontal position in percentage
 
 	/* CONSTRUCTOR */
-	constructor () {
+	constructor (canvas: HTMLCanvasElement) {
+		super(canvas);
+
 		this._element = document.createElement("div");
 
 		this._element.textContent = `${this._countdown[0]}`;

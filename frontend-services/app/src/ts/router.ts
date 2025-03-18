@@ -36,33 +36,9 @@ const pongGameScript = async () => {
 	const script = document.createElement('script');
     // const canvas = document.getElementById("pongCanvas");
 	script.type = 'module';
-	script.src = 'https://localhost:4433/frontend-pong-module/src/component/oneVSone.js';
+	script.src = 'https://localhost:4433/frontend-pong-module/src/component/oneVSone.ts';
     window.document.head.appendChild(script);
 };
-
-// async function renderGame (container: HTMLElement) {
-//     const   heading = document.createElement('h2');
-//     heading.textContent = 'Game Page';
-//     container.appendChild(heading);
-
-//     const   canvas = document.createElement("canvas");
-//     if (!canvas)
-//         throw new Error("No canvas found in the document") ;
-//     canvas.id = "canvas";
-//     const   gameContainer = document.createElement("div");
-//     gameContainer.id = "gameContainer";
-//     gameContainer.style.height = `${canvas.height}`;
-//     gameContainer.style.width = `${canvas.width}`;
-//     gameContainer.appendChild(canvas);
-    
-    
-//     document.addEventListener('DOMContentLoaded',async () => {
-//         const   pongHtmlElement = document.createElement("game-component");
-//         gameContainer.appendChild(pongHtmlElement);
-//     });
-
-//     await pongGameScript(canvas);
-// }
 
 async function renderGame(container: HTMLElement) {
     const heading = document.createElement('h2');

@@ -1,60 +1,43 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Player } from '../entities/Player.js';
-import { Tournament } from '../entities/Tournament.js';
+// import { Tournament } from '../entities/Tournament.js';
 import { Game } from '../entities/Game.js';
 
 @customElement('game-component')
-export class oneVSone extends LitElement {
+export class  oneVSone extends LitElement {
   @property({ type: String }) canvasId!: string;
-  // private readonly  _canvas: HTMLCanvasElement | null = null;
-  // private   _game!: Game;
-	private tournament!: Tournament;
-  
+
+  /* ATTRIBUTES */
+  private _canvas: HTMLCanvasElement | null = null;
+  private _game!: Game;
+
+  /* CONSTRUCTOR */
 	constructor () {
     super();
     console.log("Starting game...");
-    // const canvas = window.document.getElementById("canvas") as HTMLCanvasElement | null;
-    // if (!canvas)
-    //   throw new Error("No canvas found");
-    // this._canvas = canvas;
-
-    // this._canvas.style.background = 'rgb(0, 87, 0)';
-//    const player1 = new Player("First");
-//    const player2 = new Player("Second");
-
-// this.tournament = new Tournament(players);
-//    this._game = new Game(player1, player2);
-//    this._game.launch();
-}
-
-
-firstUpdated () {
-  const canvas = window.document.getElementById(this.canvasId) as HTMLCanvasElement | null;
-  if (!canvas) {
-    throw new Error("No canvas found");
   }
-  // canvas.style.background = 'rgb(0, 87, 0)';
-  const player1 = new Player("First");
-  const player2 = new Player("Second");
-  const player3 = new Player("Pierre3");
-  const player4 = new Player("Bess4");
-  const player5 = new Player("Paul5");
-  
-  const players: Player[] = [player1, player2, player3, player4, player5];
-  this.tournament = new Tournament(players, canvas);
 
-    // this._game = new Game(player1, player2, canvas);
-    // this._game.launch();
+  firstUpdated () {
+    this._canvas = window.document.getElementById(this.canvasId) as HTMLCanvasElement | null;
+    if (!this._canvas) {
+      throw new Error("No canvas found");
+    }
 
-    // this._game/* .start() */;
+    this._canvas.style.background = 'rgb(0, 87, 0)';
+
+    const player1 = new Player("First", this._canvas);
+    const player2 = new Player("Second", this._canvas);
+    
+    // const players: Player[] = [player1, player2];
+
+    this._game = new Game(player1, player2, this._canvas);
+    this._game.launch();
   }
   
   render () {
     return html`
-    <div class="game">
-    <p>Pong Game Component</p>
-    </div>
+      <div class="game"></div>
     `;
   }
 
@@ -73,7 +56,7 @@ firstUpdated () {
 }
 
 // Enregistrement du composant avec une balise personnalisée
-//customElements.define('pong-game', PongGame);
+// customElements.define('pong-game', PongGame);
 declare global {
   interface HTMLElementTagNameMap {
 	  'game-component': oneVSone;

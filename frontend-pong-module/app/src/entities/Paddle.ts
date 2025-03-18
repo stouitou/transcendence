@@ -1,8 +1,8 @@
 import { Ball } from "./Ball.js";
-// import { Display } from "./Display.js";
+import { Display } from "../display/Display.js";
 
 // export allows to use this class in another file
-export class	Paddle {
+export class	Paddle extends Display {
 
 	/* ATTRIBUTES */
 	private readonly	_element: HTMLDivElement;
@@ -21,8 +21,8 @@ export class	Paddle {
 	private 			_right: number;
 
 	/* CONSTRUCTOR */
-	constructor(location: number = 1 | 2) {
-		// super(canvas);
+	constructor(location: number = 1 | 2, canvas: HTMLCanvasElement) {
+		super(canvas);
 
 		this._location = location;
 
@@ -34,7 +34,8 @@ export class	Paddle {
 		this._element.style.height = `${this._height}px`;
 		this._element.style.backgroundColor = `${this._color}`;
 		this._element.style.position = "absolute";
-		this._element.style.top = `calc(50% - ${this._height / 2}px)`;	// this._element.style.top = `${(window.innerHeight / 2) - (this._height / 2)}px`;
+		this._element.style.top = `${this._canvas.offsetTop + (50 / 100 * this._canvas.height)}px`;	// this._element.style.top = `${(window.innerHeight / 2) - (this._height / 2)}px`;
+		// this._element.style.top = `calc(50% - ${this._height / 2}px)`;	// this._element.style.top = `${(window.innerHeight / 2) - (this._height / 2)}px`;
 
 		if (location === 1)
 			this._element.style.right = `calc(5% + ${this._width / 2}px)`;

@@ -1,9 +1,9 @@
 import { Direction } from './Direction.js';
-// import { Display } from './Display.js';
+import { Display } from '../display/Display.js';
 import { Paddle } from "./Paddle.js";
 
 // export allows to use this class in another file
-export class	Ball {
+export class	Ball extends Display {
 
 	/* ATTRIBUTES */
 	private readonly	_element: HTMLDivElement;
@@ -23,8 +23,8 @@ export class	Ball {
 	private				_right: number;
 
 	/* CONSTRUCTOR */
-	constructor () {
-		// super(canvas);
+	constructor (canvas: HTMLCanvasElement) {
+		super(canvas);
 
 		// Creates the ball object
 		this._element = document.createElement("div");

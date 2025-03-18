@@ -1,6 +1,7 @@
-import { Player } from "./Player.js";
+import { Display } from "./Display.js";
+import { Player } from "../entities/Player.js";
 
-export class	Versus {
+export class	Versus extends Display {
 
 	/* ATTRIBUTES */
 	private readonly	_right: HTMLDivElement;
@@ -13,7 +14,8 @@ export class	Versus {
 	private readonly	_horizontal: number = 5;			// horizontal position in percentage
 
 	/* CONSTRUCTOR */
-	constructor (player1: Player, player2: Player) {
+	constructor (player1: Player, player2: Player, canvas: HTMLCanvasElement) {
+		super(canvas);
 
 		this._right = document.createElement("div");
 		this._right.textContent = player1.name;

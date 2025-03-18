@@ -2,7 +2,7 @@
 <html lang="fr">
   <head>
     <meta charset="UTF-8" />
-    <link rel="stylesheet" href="/src/css/canvas.css">
+    <link rel="stylesheet" href="/canvas.css">
     <link rel="icon" type="image/svg+xml" href="/vite.svg" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Test affichage PONG</title>
@@ -10,8 +10,8 @@
     
   </head>
   <body>
-    <div class="game-container"></div>
-      <canvas id="gameCanvas" width="800" height="400"></canvas>
+    <div class="game-container" style="padding-top: 0px;padding-left: 0px;padding-bottom: 0px;padding-right: 0px;height: 600px;width: 800px; justify-content: center; align-items: center;">
+      <canvas id="gameCanvas" width="800" height="600"></canvas>
     </div>
     <game-component canvasId="gameCanvas"></game-component>
   </body>
