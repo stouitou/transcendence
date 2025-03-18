@@ -78,6 +78,7 @@ async function gameRoutes(app: FastifyInstance) {
   app.get("/", {/* preHandler: [loggerMiddleware], *//* schema: UserSchema.getTournaments */}, tounamentsController.getTournaments);
   app.get("/:id",/*  {schema: UserSchema.getTournamentById} ,*/ tounamentsController.getTournamentById);
   app.put("/:id"/* , {schema: UserSchema.updateUser} */, tounamentsController.updateTournament);
+  app.put("/:id/addPlayer"/* , {schema: UserSchema.updateUser} */, tounamentsController.addPlayerToTournament);
   app.delete("/:id",/*  {schema: UserSchema.deleteTournament}, */ tounamentsController.deleteTournament);
  // app.post("/query", {schema: UserSchema.requestQuery}, tounamentsController.requestQuery);
   //pour tester les users

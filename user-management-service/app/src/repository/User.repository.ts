@@ -67,15 +67,13 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
   //read
   getAll = async (): Promise<User[]> =>{
    
-    //return data.map(User.fromJSON);
     const url = `${this.URL}${this.getRelations()}`;
     console.log("🔐 UserRepository.getAll()  --start-- fetch from: ", this.URL)
     const response = await fetch(url);
     console.log("🔐 UserRepository.getAll()  --response--",response)
     const data = await response.json();
     console.log("🔐 UserRepository.getAll()  --data--",data)
-    const results = data.data//.map((user: User) => User.fromJSON(user));
-    //const results = data.data.map(User.fromJSON);
+    const results = data.data
     console.log("🔐 UserRepository.getAll()  --results--",results)
     return {...results};
   }

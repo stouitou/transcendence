@@ -8,6 +8,7 @@ import  { IParams } from "./helpers";
 import { Tournaments } from "../models/Tournaments";
 import { IRepository } from "./Base/IRepository";
 import { BaseRepository } from "./Base/BaseRepository";
+import { User } from "@src/models/User";
 
 /**
  * TournamentsRepository - Gestion des appels HTTP à la DB
@@ -155,6 +156,44 @@ class TournamentsRepository extends BaseRepository<Tournaments> implements IRepo
     });
     const data = await response.json();
     return data;
+  }
+
+  addPlayer = async (gameId: number, playerId: number): Promise<Tournaments | null> => {
+    //1- recuperer le tournoi
+    const tournament = await this.getById(gameId);
+    if (!tournament) {
+      return null;
+    }
+    console.log("🔐 TournamentsRepository.addPlayer()  --tournament--",tournament)
+    //2- recuperer les joueurs et en faire un tableau d'int avec les id des joueurs
+    const { players } = tournament;
+    const playersIds = players?players.map((player: User) => player.id):[];
+    //3- verifier si le joueur est deja dans le tournoi
+    if (playersIds.includes(playerId)) {
+      return tournament;
+    }
+    //4- ajouter le joueur
+    playersIds.push(playerId);
+    //5- mettre à jour le tournoi
+
+    const response = await fetch(`${this.URL}/id/${gameId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        players: playersIds,
+      }),
+    });
+    const data = await response.json();
+    return data.data;
+  }
+  newfilters = (params: IParams) => {
+    let queryString = "?";
+    for (const key in params) {
+      if (params[key] !== null) {
+        queryString += `${key}=${params[key]}&`;
+      }
+    }
+    return queryString;
   }
 }
 export default TournamentsRepository;
