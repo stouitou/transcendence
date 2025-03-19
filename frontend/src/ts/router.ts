@@ -9,175 +9,279 @@ function clearContainer(container: HTMLElement) {
     }
 }
 
+import {
+    Engine,
+    Scene,
+    FreeCamera,
+    Camera,
+    Vector3,
+    HemisphericLight,
+    MeshBuilder,
+    StandardMaterial,
+    Color3,
+    Color4
+} from 'babylonjs';
+
+import {
+    Engine,
+    Scene,
+    FreeCamera,
+    Camera,
+    Vector3,
+    HemisphericLight,
+    MeshBuilder,
+    StandardMaterial,
+    Color3,
+    Color4
+} from 'babylonjs';
+
 export function renderHome(container: HTMLElement) {
-    // Clear existing content
+    // 1) Clear existing DOM content
     while (container.firstChild) {
         container.removeChild(container.firstChild);
     }
 
-    // Create a hero section container
-    const heroSection = document.createElement('section');
-    heroSection.className = "relative w-full h-screen overflow-hidden bg-black";
-    container.appendChild(heroSection);
-
-    // Create the canvas
+    // 2) Create a full-size canvas
     const canvas = document.createElement('canvas');
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-    canvas.width = heroSection.clientWidth;
-    canvas.height = heroSection.clientHeight;
-    heroSection.appendChild(canvas);
+    canvas.className = 'w-full h-screen block';
+    container.appendChild(canvas);
 
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        console.error('Could not get 2D context for canvas.');
-        return;
+    // 3) Babylon engine & scene
+    const engine = new Engine(canvas, true);
+    const scene = new Scene(engine);
+    // White background for high contrast
+    scene.clearColor = new Color4(1, 1, 1, 1);
+
+    // 4) Orthographic camera
+    const camera = new FreeCamera('camera', new Vector3(0, 0, 50), scene);
+    camera.setTarget(Vector3.Zero());
+    camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
+
+    let baseOrthoSize = 30;
+    function updateCameraOrtho() {
+        const rect = engine.getRenderingCanvasClientRect();
+        const aspect = rect.width / rect.height;
+
+        camera.orthoTop = baseOrthoSize;
+        camera.orthoBottom = -baseOrthoSize;
+        camera.orthoLeft = -baseOrthoSize * aspect;
+        camera.orthoRight = baseOrthoSize * aspect;
     }
+    updateCameraOrtho();
 
-    // Handle resizing
-    window.addEventListener('resize', () => {
-        canvas.width = heroSection.clientWidth;
-        canvas.height = heroSection.clientHeight;
-    });
+    // 5) Light for some shading
+    const light = new HemisphericLight('light', new Vector3(0, 1, 0), scene);
+    light.intensity = 0.9;
 
-    // Track mouse for the fog effect
-    let mouseX = canvas.width / 2;
-    let mouseY = canvas.height / 2;
-    heroSection.addEventListener('mousemove', (e) => {
-        const rect = heroSection.getBoundingClientRect();
-        mouseX = e.clientX - rect.left;
-        mouseY = e.clientY - rect.top;
-    });
+    // 6) Define your “pastel” color materials (as you specified)
+    const matPastelPink = new StandardMaterial('matPastelPink', scene);
+    matPastelPink.diffuseColor = Color3.FromHexString('#ff0063');
+    matPastelPink.specularColor = new Color3(0.3, 0.3, 0.3);
 
-    // Particle interface
-    interface Particle {
-        x: number;
-        y: number;
+    const matPastelYellow = new StandardMaterial('matPastelYellow', scene);
+    matPastelYellow.diffuseColor = Color3.FromHexString('#ff0000');
+    matPastelYellow.specularColor = new Color3(0.3, 0.3, 0.3);
+
+    const matPastelGreen = new StandardMaterial('matPastelGreen', scene);
+    matPastelGreen.diffuseColor = Color3.FromHexString('#00ffa1');
+    matPastelGreen.specularColor = new Color3(0.3, 0.3, 0.3);
+
+    const matPastelBlue = new StandardMaterial('matPastelBlue', scene);
+    matPastelBlue.diffuseColor = Color3.FromHexString('#0032ff');
+    matPastelBlue.specularColor = new Color3(0.3, 0.3, 0.3);
+
+    const matPastelPurple = new StandardMaterial('matPastelPurple', scene);
+    matPastelPurple.diffuseColor = Color3.FromHexString('#d7b5ff');
+    matPastelPurple.specularColor = new Color3(0.3, 0.3, 0.3);
+
+    const matPastelPeach = new StandardMaterial('matPastelPeach', scene);
+    matPastelPeach.diffuseColor = Color3.FromHexString('#FFD1BA');
+    matPastelPeach.specularColor = new Color3(0.3, 0.3, 0.3);
+
+    // Put them into an array
+    const ballMaterials = [
+        matPastelPink,
+        matPastelYellow,
+        matPastelGreen,
+        matPastelBlue,
+        matPastelPurple,
+        matPastelPeach
+    ];
+
+    // 7) We'll store ball data here
+    interface Ball {
+        mesh: BABYLON.Mesh;
         vx: number;
         vy: number;
-        size: number;
+        radius: number;
     }
+    const balls: Ball[] = [];
 
-    // Create an array of particles
-    const particles: Particle[] = createParticles(60, canvas.width, canvas.height);
+    // 8) Create & spawn the balls
+    const NUM_SPHERES = 50;
+    const SPHERE_RADIUS = 1;
 
-    // Animation loop
-    function animate() {
-        // Clear the canvas fully
-        ctx.fillStyle = 'black';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Update and draw all particles
-        updateParticles(particles, canvas.width, canvas.height);
-        drawParticles(ctx, particles);
-
-        // Draw the fog effect around the mouse
-        drawFog(ctx, mouseX, mouseY, 80);
-
-        requestAnimationFrame(animate);
-    }
-    animate();
-
-    // Create a content container for heading, text, and a button
-    const content = document.createElement('div');
-    content.className = "relative z-10 flex flex-col items-center justify-center w-full h-full text-center text-white pointer-events-none";
-
-    const heading = document.createElement('h2');
-    heading.textContent = 'PONG GAME';
-    heading.className = "text-3xl md:text-5xl font-bold mb-4 pointer-events-auto";
-    content.appendChild(heading);
-
-    // Example button
-    const enterButton = document.createElement('button');
-    enterButton.textContent = "CLICK TO START PLAYING";
-    enterButton.className = "px-6 py-3 bg-white text-black rounded-md hover:bg-gray-300 transition-colors pointer-events-auto";
-    enterButton.addEventListener('click', () => {
-        window.location.hash = '#login';
-    });
-    content.appendChild(enterButton);
-
-    heroSection.appendChild(content);
-
-    // --- Helper Functions Below ---
-
-    // Creates an array of particles
-    function createParticles(count: number, width: number, height: number): Particle[] {
-        const arr: Particle[] = [];
+    function spawnBalls(count: number) {
         for (let i = 0; i < count; i++) {
-            arr.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                vx: (Math.random() - 0.5) * 5, // small random velocity
-                vy: (Math.random() - 0.5) * 5,
-                size: 2 + Math.random() * 4,     // random size
-            });
+            // Build the sphere
+            const sphere = MeshBuilder.CreateSphere(
+                `sphere_${i}`,
+                { diameter: SPHERE_RADIUS * 2, segments: 24 },
+                scene
+            );
+
+            // Pick a random neon/pastel material
+            const randomMat = ballMaterials[Math.floor(Math.random() * ballMaterials.length)];
+            sphere.material = randomMat;
+
+            // Random position within the current camera bounds
+            const bounds = getCameraBounds();
+            sphere.position.x = randomRange(bounds.left + SPHERE_RADIUS, bounds.right - SPHERE_RADIUS);
+            sphere.position.y = randomRange(bounds.bottom + SPHERE_RADIUS, bounds.top - SPHERE_RADIUS);
+            sphere.position.z = 0;
+
+            // Random velocity
+            const vx = randomRange(-0.2, 0.2);
+            const vy = randomRange(-0.2, 0.2);
+
+            balls.push({ mesh: sphere, vx, vy, radius: SPHERE_RADIUS });
         }
-        return arr;
+    }
+    spawnBalls(NUM_SPHERES);
+
+    // 9) Animate & collisions
+    scene.onBeforeRenderObservable.add(() => {
+        const dt = engine.getDeltaTime() * 0.001;
+        const { left, right, top, bottom } = getCameraBounds();
+
+        // Move & bounce on edges
+        for (const b of balls) {
+            b.mesh.position.x += b.vx * dt * 60;
+            b.mesh.position.y += b.vy * dt * 60;
+
+            if (b.mesh.position.x > right - b.radius) {
+                b.mesh.position.x = right - b.radius;
+                b.vx *= -1;
+            } else if (b.mesh.position.x < left + b.radius) {
+                b.mesh.position.x = left + b.radius;
+                b.vx *= -1;
+            }
+            if (b.mesh.position.y > top - b.radius) {
+                b.mesh.position.y = top - b.radius;
+                b.vy *= -1;
+            } else if (b.mesh.position.y < bottom + b.radius) {
+                b.mesh.position.y = bottom + b.radius;
+                b.vy *= -1;
+            }
+        }
+
+        // 2D sphere-sphere collisions
+        for (let i = 0; i < balls.length; i++) {
+            for (let j = i + 1; j < balls.length; j++) {
+                resolveCollision2D(balls[i], balls[j]);
+            }
+        }
+    });
+
+    // 10) Render loop
+    engine.runRenderLoop(() => {
+        scene.render();
+    });
+
+    // 11) Handle resizing
+    window.addEventListener('resize', () => {
+        engine.resize();
+        updateCameraOrtho();
+    });
+
+    // 12) Add a centered overlay (header + button)
+    addCenteredOverlay(container);
+
+    // --- Helper Functions ---
+
+    function getCameraBounds() {
+        return {
+            left: camera.orthoLeft,
+            right: camera.orthoRight,
+            top: camera.orthoTop,
+            bottom: camera.orthoBottom
+        };
+    }
+
+    function randomRange(min: number, max: number) {
+        return Math.random() * (max - min) + min;
+    }
+
+    function resolveCollision2D(a: Ball, b: Ball) {
+        const dx = b.mesh.position.x - a.mesh.position.x;
+        const dy = b.mesh.position.y - a.mesh.position.y;
+        const distSq = dx * dx + dy * dy;
+        const radiusSum = a.radius + b.radius;
+
+        if (distSq <= radiusSum * radiusSum) {
+            const dist = Math.sqrt(distSq) || 0.00001;
+            const nx = dx / dist;
+            const ny = dy / dist;
+
+            const vaDot = a.vx * nx + a.vy * ny;
+            const vbDot = b.vx * nx + b.vy * ny;
+            // Swap the normal components for perfect elastic collision
+            const aFactor = vbDot - vaDot;
+            const bFactor = vaDot - vbDot;
+
+            a.vx += aFactor * nx;
+            a.vy += aFactor * ny;
+            b.vx += bFactor * nx;
+            b.vy += bFactor * ny;
+
+            // Slight separation so they don't stick
+            const overlap = radiusSum - dist;
+            a.mesh.position.x -= (overlap * 0.5) * nx;
+            a.mesh.position.y -= (overlap * 0.5) * ny;
+            b.mesh.position.x += (overlap * 0.5) * nx;
+            b.mesh.position.y += (overlap * 0.5) * ny;
+        }
     }
 
     /**
-     * Moves particles and bounces them off the edges, like a Pong ball.
+     * Creates a centered overlay with a heading + "Let's start" button
+     * The button navigates to #login when clicked.
      */
-    function updateParticles(particles: Particle[], width: number, height: number) {
-        for (const p of particles) {
-            p.x += p.vx;
-            p.y += p.vy;
+    function addCenteredOverlay(parent: HTMLElement) {
+        // Container overlay
+        const overlay = document.createElement('div');
+        overlay.className = `
+          absolute top-0 left-0
+          w-full h-full
+          flex flex-col items-center justify-center
+          pointer-events-none
+          z-10`;
+        // "Let's Start" button
+        const btn = document.createElement('button');
+        btn.textContent = 'Let’s Start';
+        btn.className = `
+  px-10 py-3
+  font-archivo
+  text-black
+  border border-black
+  rounded-md
+  pointer-events-auto
+  transition-colors duration-300
+  hover:bg-black hover:text-white
+  focus:outline-none
+`;
+        btn.addEventListener('click', () => {
+            window.location.hash = '#login';
+        });
+        overlay.appendChild(btn);
 
-            // Bounce horizontally
-            if (p.x < 0) {
-                p.x = 0;
-                p.vx *= -1; // reverse horizontal velocity
-            } else if (p.x > width) {
-                p.x = width;
-                p.vx *= -1;
-            }
-
-            // Bounce vertically
-            if (p.y < 0) {
-                p.y = 0;
-                p.vy *= -1; // reverse vertical velocity
-            } else if (p.y > height) {
-                p.y = height;
-                p.vy *= -1;
-            }
-        }
-    }
-
-    // Draws the particles as small, soft circles
-    function drawParticles(ctx: CanvasRenderingContext2D, particles: Particle[]) {
-        ctx.save();
-        ctx.fillStyle = 'white';
-        for (const p of particles) {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        ctx.restore();
-    }
-
-    /**
-     * Creates a foggy “window” effect around the mouse
-     * This version uses 'screen' blend for a hazy highlight
-     */
-    function drawFog(ctx: CanvasRenderingContext2D, mx: number, my: number, radius: number) {
-        const gradient = ctx.createRadialGradient(mx, my, 0, mx, my, radius);
-        gradient.addColorStop(0, 'rgba(255,255,255,0.15)');
-        gradient.addColorStop(0.7, 'rgba(255,255,255,0.02)');
-        gradient.addColorStop(1, 'rgba(255,255,255,0)');
-
-        ctx.save();
-        ctx.globalCompositeOperation = 'screen'; // or 'lighter'
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(mx, my, radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-
-        // Reset composite operation
-        ctx.globalCompositeOperation = 'source-over';
+        // Make parent container "relative" so absolute overlay is anchored here
+        parent.classList.add('relative');
+        parent.appendChild(overlay);
     }
 }
+
+
 
 
 
