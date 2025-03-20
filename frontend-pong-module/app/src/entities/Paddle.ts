@@ -34,17 +34,21 @@ export class	Paddle extends Display {
 		this._element.style.height = `${this._height}px`;
 		this._element.style.backgroundColor = `${this._color}`;
 		this._element.style.position = "absolute";
-		this._element.style.top = `${this._canvas.offsetTop + (50 / 100 * this._canvas.height)}px`;	// this._element.style.top = `${(window.innerHeight / 2) - (this._height / 2)}px`;
+		this._element.style.top = `${this._canvas.offsetTop + (50 / 100 * this._canvas.height) - (this._height / 2)}px`;	// this._element.style.top = `${(window.innerHeight / 2) - (this._height / 2)}px`;
 		// this._element.style.top = `calc(50% - ${this._height / 2}px)`;	// this._element.style.top = `${(window.innerHeight / 2) - (this._height / 2)}px`;
 
-		if (location === 1)
-			this._element.style.right = `calc(5% + ${this._width / 2}px)`;
-		else if (location === 2)
-			this._element.style.left = `calc(5% - ${this._width / 2}px)`;
+		if (location === 1) {
+			this._element.style.left = `${this._field.left + ((100 - 2) / 100 * this._canvas.width) - this._width}px`;
+			// this._element.style.right = `calc(5% + ${this._width / 2}px)`;
+		}
+		else if (location === 2) {
+			this._element.style.left = `${this._field.left + (2 / 100 * this._canvas.width)}px`;
+			// this._element.style.left = `calc(5% - ${this._width / 2}px)`;
+		}
 		// "Draws" the paddle in the window
 		// const	gameContainer = this._canvas.parentElement as HTMLElement;
 		// gameContainer.appendChild(this._element);
-		document.body.appendChild(this._element);
+		this._gameContainer.appendChild(this._element);
 
 		// Update position
 		this._top = this._element.offsetTop;

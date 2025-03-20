@@ -11,7 +11,7 @@ export class	Board extends Display {
 	private readonly	_color: string = "rgb(0, 0, 0)";	// color of the text
 	private readonly	_opacity: number = 1;				// opacity of the text
 	private readonly	_size: number = 70;					// size of the text in pixel
-	private readonly	_vertical: number = 5;				// vertical position in percentage
+	private readonly	_vertical: number = 0;				// vertical position in percentage
 	private readonly	_horizontal: number = 25;			// horizontal position in percentage
 
 	private readonly	_player1: Player;
@@ -32,10 +32,10 @@ export class	Board extends Display {
 		this._right.style.color = `${this._color}`;
 		this._right.style.opacity = `${this._opacity}`;
 		this._right.style.fontSize = `${this._size}px`;
-		this._right.style.top = `${this._canvas.offsetTop}px`;
+		this._right.style.top = `${this._canvas.offsetTop + this._vertical / 100 * this._canvas.height}px`;
 		this._right.style.left = `${this._canvas.offsetLeft + ((100 - this._horizontal) / 100 * this._canvas.width)}px`;
 		this._right.style.position = 'absolute';
-		
+
 		// Score of the second player (on the left)
 		this._left = document.createElement("div");
 

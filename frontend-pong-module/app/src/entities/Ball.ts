@@ -95,8 +95,8 @@ export class	Ball extends Display {
 		// Randomize position
 		const pos = (Math.random() * 100) / 3;
 
-		this._element.style.top = `calc(33% - ${this._radius}px + ${pos}%)`;	// random vertically (from 33% to 66% of the window)
-		this._element.style.left = `calc(50% - ${this._radius}px)`;				// centered horizontally (15px is half the size of the ball)
+		this._element.style.top = `${this._field.top + 33 / 100 * this._field.height + pos / 100 * this._field.height}px`;	// random vertically (from 33% to 66% of the window)
+		this._element.style.left = `${this._field.left + 50 / 100 * this._field.width - this._radius}px`;				// centered horizontally (15px is half the size of the ball)
 
 		// Ramdomize direction
 		const add = Math.random() * 30;
