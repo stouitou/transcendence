@@ -3,285 +3,310 @@
 import { createButton } from './button';
 import {startGame} from "./pong";
 
+const user = {
+    avatar: "grr", 
+    name: "bob", 
+    role: "admin", 
+    createdAt: "Today" 
+}
+
 function clearContainer(container: HTMLElement) {
     while (container.firstChild) {
         container.removeChild(container.firstChild);
     }
 }
 
-import {
-    Engine,
-    Scene,
-    FreeCamera,
-    Camera,
-    Vector3,
-    HemisphericLight,
-    MeshBuilder,
-    StandardMaterial,
-    Color3,
-    Color4
-} from 'babylonjs';
-
 export function renderHome(container: HTMLElement) {
-    // 1) Clear existing DOM content
+    // Clear existing content
     while (container.firstChild) {
         container.removeChild(container.firstChild);
     }
 
-    // 2) Create a full-size canvas
+    // Create a hero section container
+    const heroSection = document.createElement('section');
+    heroSection.className = "relative w-full h-screen overflow-hidden bg-black";
+    container.appendChild(heroSection);
+
+    // Create the canvas
     const canvas = document.createElement('canvas');
-    canvas.className = 'w-full h-screen block';
-    container.appendChild(canvas);
+    canvas.style.position = 'absolute';
+    canvas.style.top = '0';
+    canvas.style.left = '0';
+    canvas.width = heroSection.clientWidth;
+    canvas.height = heroSection.clientHeight;
+    heroSection.appendChild(canvas);
 
-    // 3) Babylon engine & scene
-    const engine = new Engine(canvas, true);
-    const scene = new Scene(engine);
-    // White background for high contrast
-    scene.clearColor = new Color4(1, 1, 1, 1);
-
-    // 4) Orthographic camera
-    const camera = new FreeCamera('camera', new Vector3(0, 0, 50), scene);
-    camera.setTarget(Vector3.Zero());
-    camera.mode = Camera.ORTHOGRAPHIC_CAMERA;
-
-    let baseOrthoSize = 30;
-    function updateCameraOrtho() {
-        const rect = engine.getRenderingCanvasClientRect();
-        const aspect = rect.width / rect.height;
-
-        camera.orthoTop = baseOrthoSize;
-        camera.orthoBottom = -baseOrthoSize;
-        camera.orthoLeft = -baseOrthoSize * aspect;
-        camera.orthoRight = baseOrthoSize * aspect;
+    const ctx = canvas.getContext('2d');
+    if (!ctx) {
+        console.error('Could not get 2D context for canvas.');
+        return;
     }
-    updateCameraOrtho();
 
-    // 5) Light for some shading
-    const light = new HemisphericLight('light', new Vector3(0, 1, 0), scene);
-    light.intensity = 0.9;
+    // Handle resizing
+    window.addEventListener('resize', () => {
+        canvas.width = heroSection.clientWidth;
+        canvas.height = heroSection.clientHeight;
+    });
 
-    // 6) Define your “pastel” color materials (as you specified)
-    const matPastelPink = new StandardMaterial('matPastelPink', scene);
-    matPastelPink.diffuseColor = Color3.FromHexString('#ff0063');
-    matPastelPink.specularColor = new Color3(0.3, 0.3, 0.3);
+    // Track mouse for the fog effect
+    let mouseX = canvas.width / 2;
+    let mouseY = canvas.height / 2;
+    heroSection.addEventListener('mousemove', (e) => {
+        const rect = heroSection.getBoundingClientRect();
+        mouseX = e.clientX - rect.left;
+        mouseY = e.clientY - rect.top;
+    });
 
-    const matPastelYellow = new StandardMaterial('matPastelYellow', scene);
-    matPastelYellow.diffuseColor = Color3.FromHexString('#ff0000');
-    matPastelYellow.specularColor = new Color3(0.3, 0.3, 0.3);
-
-    const matPastelGreen = new StandardMaterial('matPastelGreen', scene);
-    matPastelGreen.diffuseColor = Color3.FromHexString('#00ffa1');
-    matPastelGreen.specularColor = new Color3(0.3, 0.3, 0.3);
-
-    const matPastelBlue = new StandardMaterial('matPastelBlue', scene);
-    matPastelBlue.diffuseColor = Color3.FromHexString('#0032ff');
-    matPastelBlue.specularColor = new Color3(0.3, 0.3, 0.3);
-
-    const matPastelPurple = new StandardMaterial('matPastelPurple', scene);
-    matPastelPurple.diffuseColor = Color3.FromHexString('#d7b5ff');
-    matPastelPurple.specularColor = new Color3(0.3, 0.3, 0.3);
-
-    const matPastelPeach = new StandardMaterial('matPastelPeach', scene);
-    matPastelPeach.diffuseColor = Color3.FromHexString('#FFD1BA');
-    matPastelPeach.specularColor = new Color3(0.3, 0.3, 0.3);
-
-    // Put them into an array
-    const ballMaterials = [
-        matPastelPink,
-        matPastelYellow,
-        matPastelGreen,
-        matPastelBlue,
-        matPastelPurple,
-        matPastelPeach
-    ];
-
-    // 7) We'll store ball data here
-    interface Ball {
-        mesh: BABYLON.Mesh;
+    // Particle interface
+    interface Particle {
+        x: number;
+        y: number;
         vx: number;
         vy: number;
-        radius: number;
+        size: number;
     }
-    const balls: Ball[] = [];
 
-    // 8) Create & spawn the balls
-    const NUM_SPHERES = 50;
-    const SPHERE_RADIUS = 1;
+    // Create an array of particles
+    const particles: Particle[] = createParticles(60, canvas.width, canvas.height);
 
-    function spawnBalls(count: number) {
+    // Animation loop
+    function animate() {
+        if (!ctx)
+            return;
+        // Clear the canvas fully
+        ctx.fillStyle = 'black';
+        ctx.fillRect(0, 0, canvas.width, canvas.height);
+
+        // Update and draw all particles
+        updateParticles(particles, canvas.width, canvas.height);
+        drawParticles(ctx, particles);
+
+        // Draw the fog effect around the mouse
+        drawFog(ctx, mouseX, mouseY, 80);
+
+        requestAnimationFrame(animate);
+    }
+    animate();
+
+    // Create a content container for heading, text, and a button
+    const content = document.createElement('div');
+    content.className = "relative z-10 flex flex-col items-center justify-center w-full h-full text-center text-white pointer-events-none";
+
+    const heading = document.createElement('h2');
+    heading.textContent = 'PONG GAME';
+    heading.className = "text-3xl md:text-5xl font-bold mb-4 pointer-events-auto";
+    content.appendChild(heading);
+
+    // Example button
+    const enterButton = document.createElement('button');
+    enterButton.textContent = "CLICK TO START PLAYING";
+    enterButton.className = "px-6 py-3 bg-white text-black rounded-md hover:bg-gray-300 transition-colors pointer-events-auto";
+    enterButton.addEventListener('click', () => {
+        window.location.hash = '#login';
+    });
+    content.appendChild(enterButton);
+
+    heroSection.appendChild(content);
+
+    // --- Helper Functions Below ---
+
+    // Creates an array of particles
+    function createParticles(count: number, width: number, height: number): Particle[] {
+        const arr: Particle[] = [];
         for (let i = 0; i < count; i++) {
-            // Build the sphere
-            const sphere = MeshBuilder.CreateSphere(
-                `sphere_${i}`,
-                { diameter: SPHERE_RADIUS * 2, segments: 24 },
-                scene
-            );
-
-            // Pick a random neon/pastel material
-            const randomMat = ballMaterials[Math.floor(Math.random() * ballMaterials.length)];
-            sphere.material = randomMat;
-
-            // Random position within the current camera bounds
-            const bounds = getCameraBounds();
-            sphere.position.x = randomRange(bounds.left + SPHERE_RADIUS, bounds.right - SPHERE_RADIUS);
-            sphere.position.y = randomRange(bounds.bottom + SPHERE_RADIUS, bounds.top - SPHERE_RADIUS);
-            sphere.position.z = 0;
-
-            // Random velocity
-            const vx = randomRange(-0.2, 0.2);
-            const vy = randomRange(-0.2, 0.2);
-
-            balls.push({ mesh: sphere, vx, vy, radius: SPHERE_RADIUS });
+            arr.push({
+                x: Math.random() * width,
+                y: Math.random() * height,
+                vx: (Math.random() - 0.5) * 5, // small random velocity
+                vy: (Math.random() - 0.5) * 5,
+                size: 2 + Math.random() * 4,     // random size
+            });
         }
-    }
-    spawnBalls(NUM_SPHERES);
-
-    // 9) Animate & collisions
-    scene.onBeforeRenderObservable.add(() => {
-        const dt = engine.getDeltaTime() * 0.001;
-        const { left, right, top, bottom } = getCameraBounds();
-
-        // Move & bounce on edges
-        for (const b of balls) {
-            b.mesh.position.x += b.vx * dt * 60;
-            b.mesh.position.y += b.vy * dt * 60;
-
-            if (b.mesh.position.x > right - b.radius) {
-                b.mesh.position.x = right - b.radius;
-                b.vx *= -1;
-            } else if (b.mesh.position.x < left + b.radius) {
-                b.mesh.position.x = left + b.radius;
-                b.vx *= -1;
-            }
-            if (b.mesh.position.y > top - b.radius) {
-                b.mesh.position.y = top - b.radius;
-                b.vy *= -1;
-            } else if (b.mesh.position.y < bottom + b.radius) {
-                b.mesh.position.y = bottom + b.radius;
-                b.vy *= -1;
-            }
-        }
-
-        // 2D sphere-sphere collisions
-        for (let i = 0; i < balls.length; i++) {
-            for (let j = i + 1; j < balls.length; j++) {
-                resolveCollision2D(balls[i], balls[j]);
-            }
-        }
-    });
-
-    // 10) Render loop
-    engine.runRenderLoop(() => {
-        scene.render();
-    });
-
-    // 11) Handle resizing
-    window.addEventListener('resize', () => {
-        engine.resize();
-        updateCameraOrtho();
-    });
-
-    // 12) Add a centered overlay (header + button)
-    addCenteredOverlay(container);
-
-    // --- Helper Functions ---
-
-    function getCameraBounds() {
-        return {
-            left: camera.orthoLeft,
-            right: camera.orthoRight,
-            top: camera.orthoTop,
-            bottom: camera.orthoBottom
-        };
-    }
-
-    function randomRange(min: number, max: number) {
-        return Math.random() * (max - min) + min;
-    }
-
-    function resolveCollision2D(a: Ball, b: Ball) {
-        const dx = b.mesh.position.x - a.mesh.position.x;
-        const dy = b.mesh.position.y - a.mesh.position.y;
-        const distSq = dx * dx + dy * dy;
-        const radiusSum = a.radius + b.radius;
-
-        if (distSq <= radiusSum * radiusSum) {
-            const dist = Math.sqrt(distSq) || 0.00001;
-            const nx = dx / dist;
-            const ny = dy / dist;
-
-            const vaDot = a.vx * nx + a.vy * ny;
-            const vbDot = b.vx * nx + b.vy * ny;
-            // Swap the normal components for perfect elastic collision
-            const aFactor = vbDot - vaDot;
-            const bFactor = vaDot - vbDot;
-
-            a.vx += aFactor * nx;
-            a.vy += aFactor * ny;
-            b.vx += bFactor * nx;
-            b.vy += bFactor * ny;
-
-            // Slight separation so they don't stick
-            const overlap = radiusSum - dist;
-            a.mesh.position.x -= (overlap * 0.5) * nx;
-            a.mesh.position.y -= (overlap * 0.5) * ny;
-            b.mesh.position.x += (overlap * 0.5) * nx;
-            b.mesh.position.y += (overlap * 0.5) * ny;
-        }
+        return arr;
     }
 
     /**
-     * Creates a centered overlay with a heading + "Let's start" button
-     * The button navigates to #login when clicked.
+     * Moves particles and bounces them off the edges, like a Pong ball.
      */
-    function addCenteredOverlay(parent: HTMLElement) {
-        // Container overlay
-        const overlay = document.createElement('div');
-        overlay.className = `
-          absolute top-0 left-0
-          w-full h-full
-          flex flex-col items-center justify-center
-          pointer-events-none
-          z-10`;
-        // "Let's Start" button
-        const btn = document.createElement('button');
-        btn.textContent = 'Let’s Start';
-        btn.className = `
-  px-10 py-3
-  font-archivo
-  text-black
-  border border-black
-  rounded-md
-  pointer-events-auto
-  transition-colors duration-300
-  hover:bg-black hover:text-white
-  focus:outline-none
-`;
-        btn.addEventListener('click', () => {
-            window.location.hash = '#login';
-        });
-        overlay.appendChild(btn);
+    function updateParticles(particles: Particle[], width: number, height: number) {
+        for (const p of particles) {
+            p.x += p.vx;
+            p.y += p.vy;
 
-        // Make parent container "relative" so absolute overlay is anchored here
-        parent.classList.add('relative');
-        parent.appendChild(overlay);
+            // Bounce horizontally
+            if (p.x < 0) {
+                p.x = 0;
+                p.vx *= -1; // reverse horizontal velocity
+            } else if (p.x > width) {
+                p.x = width;
+                p.vx *= -1;
+            }
+
+            // Bounce vertically
+            if (p.y < 0) {
+                p.y = 0;
+                p.vy *= -1; // reverse vertical velocity
+            } else if (p.y > height) {
+                p.y = height;
+                p.vy *= -1;
+            }
+        }
+    }
+
+    // Draws the particles as small, soft circles
+    function drawParticles(ctx: CanvasRenderingContext2D, particles: Particle[]) {
+        ctx.save();
+        ctx.fillStyle = 'white';
+        for (const p of particles) {
+            ctx.beginPath();
+            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+            ctx.fill();
+        }
+        ctx.restore();
+    }
+
+    /**
+     * Creates a foggy “window” effect around the mouse
+     * This version uses 'screen' blend for a hazy highlight
+     */
+    function drawFog(ctx: CanvasRenderingContext2D, mx: number, my: number, radius: number) {
+        const gradient = ctx.createRadialGradient(mx, my, 0, mx, my, radius);
+        gradient.addColorStop(0, 'rgba(255,255,255,0.15)');
+        gradient.addColorStop(0.7, 'rgba(255,255,255,0.02)');
+        gradient.addColorStop(1, 'rgba(255,255,255,0)');
+
+        ctx.save();
+        ctx.globalCompositeOperation = 'screen'; // or 'lighter'
+        ctx.fillStyle = gradient;
+        ctx.beginPath();
+        ctx.arc(mx, my, radius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+
+        // Reset composite operation
+        ctx.globalCompositeOperation = 'source-over';
     }
 }
 
 
 
+// function renderGame(container: HTMLElement) {
+//     const heading = document.createElement('h2');
+//     heading.textContent = 'Game Page';
 
+//     const paragraph = document.createElement('p');
+//     paragraph.textContent = 'Loading game...';
+//     startGame();
+//     container.appendChild(heading);
+//     container.appendChild(paragraph);
+// }
+
+const pongGameScript = async () => {
+	const script
+		= document.createElement('script');
+	script.type = 'module';
+	script.src = 'https://localhost:4433/frontend-pong-module/app/src/component/pong-game.ts';
+    console.log("script src: ", script.src);
+    window.document.head.appendChild(script);
+};
 
 function renderGame(container: HTMLElement) {
-    const heading = document.createElement('h2');
-    heading.textContent = 'Game Page';
+    // Clear container if needed
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
 
-    const paragraph = document.createElement('p');
-    paragraph.textContent = 'Loading game...';
-    startGame();
-    container.appendChild(heading);
-    container.appendChild(paragraph);
+    // Create game wrapper div
+    const gameWrapper = document.createElement("div");
+    gameWrapper.className = "flex flex-col items-center justify-center space-y-4";
+
+    // Create canvas element
+    const canvas = document.createElement("canvas");
+    canvas.id = "pongCanvas";
+    canvas.width = 1000;
+    canvas.height = 400;
+    canvas.className = "shadow-lg rounded-lg";
+
+    // Create Start Game button
+    const startButton = document.createElement("button");
+    startButton.textContent = "Start Game";
+    startButton.className = "mt-4 px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition";
+    
+    const startTournamentButton = document.createElement("button");
+    startTournamentButton.textContent = "Start Tournament";
+    startTournamentButton.className = "px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-green-600 transition";
+
+    // Add event listener to start game
+    startButton.addEventListener("click", () => {
+        if (typeof startGame === "function") {
+            pongGameScript();
+            startButton.remove();
+            startTournamentButton.remove();
+        } else {
+            console.error("startGame function is not defined!");
+        }
+    });
+
+    startTournamentButton.addEventListener("click", () => {
+        if (typeof renderTournament === "function") {
+            renderTournament(container);
+        } else {
+            console.error("renderTournament function is not defined!");
+        }
+    })
+    // Append elements to wrapper
+    gameWrapper.appendChild(canvas);
+    gameWrapper.appendChild(startButton);
+    gameWrapper.appendChild(startTournamentButton);
+
+    // Append game wrapper to container
+    container.appendChild(gameWrapper);
 }
+
+function renderTournament(container: HTMLElement) {
+    // Clear container if needed
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+
+    // Create tournament wrapper div
+    const tournamentWrapper = document.createElement("div");
+    tournamentWrapper.className = "flex flex-col items-center justify-center space-y-4";
+
+    // Create heading
+    const heading = document.createElement("h2");
+    heading.textContent = "Tournament Mode";
+    heading.className = "text-3xl font-bold text-center mb-6 text-gray-800";
+
+    // Create tournament info paragraph
+    const infoText = document.createElement("p");
+    infoText.textContent = "Get ready for the tournament! Players will compete to be the champion.";
+    infoText.className = "text-lg text-gray-600 text-center max-w-md";
+
+    // Create Start Tournament button
+    const startTournamentButton = document.createElement("button");
+    startTournamentButton.textContent = "Start Tournament";
+    startTournamentButton.className = "px-6 py-3 bg-green-500 text-white rounded-lg shadow-md hover:bg-green-600 transition";
+
+    // Event listener for Start Tournament
+    startTournamentButton.addEventListener("click", () => {
+        // if (typeof startTournament === "function") {
+        //     startTournament();
+        //     startTournamentButton.remove();
+        // } else {
+        //     console.error("startTournament function is not defined!");
+        // }
+    });
+
+    // Append elements to wrapper
+    tournamentWrapper.appendChild(heading);
+    tournamentWrapper.appendChild(infoText);
+    tournamentWrapper.appendChild(startTournamentButton);
+
+    // Append tournament wrapper to container
+    container.appendChild(tournamentWrapper);
+}
+
 
 function renderLogin(container: HTMLElement) {
     // Clear container if needed.
@@ -500,6 +525,86 @@ function renderInfo(container: HTMLElement) {
     container.appendChild(paragraph);
 }
 
+function renderProfile(container: HTMLElement, user: { 
+    avatar: string, 
+    name: string, 
+    role: string, 
+    createdAt: string 
+}){
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+
+    // Create profile card container
+    const profileCard = document.createElement("div");
+    profileCard.className = "max-w-md mx-auto bg-white rounded-lg shadow-lg p-6 text-center";
+
+    const avatarImg = document.createElement("img");
+    avatarImg.src = user.avatar;
+    avatarImg.alt = "User Avatar";
+    avatarImg.className = "w-24 h-24 mx-auto rounded-full border-4 border-gray-300 mb-4";
+    profileCard.appendChild(avatarImg);
+
+    const nameElement = document.createElement("h2");
+    nameElement.textContent = user.name;
+    nameElement.className = "text-2xl font-semibold text-gray-800";
+    profileCard.appendChild(nameElement);
+
+    const roleElement = document.createElement("p");
+    roleElement.textContent = `Role: ${user.role}`;
+    roleElement.className = `text-lg font-medium mt-2 ${user.role === "admin" ? "text-red-500" : "text-blue-500"}`;
+    profileCard.appendChild(roleElement);
+
+    const createdAtElement = document.createElement("p");
+    createdAtElement.textContent = `Joined: ${new Date(user.createdAt).toLocaleDateString()}`;
+    createdAtElement.className = "text-gray-600 text-sm mt-2";
+    profileCard.appendChild(createdAtElement);
+
+    // View Game History Button
+    const historyButton = document.createElement("button");
+    historyButton.textContent = "View Game History";
+    historyButton.className = "mt-4 bg-blue-500 text-white px-4 py-2 rounded-lg hover:bg-blue-600 transition-colors";
+    historyButton.addEventListener("click", () => renderGameHistory(container, user.name));
+    profileCard.appendChild(historyButton);
+
+    // Append profile card to container
+    container.appendChild(profileCard);
+}
+
+function renderGameHistory(container: HTMLElement, username: string) {
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+
+    const title = document.createElement("h2");
+    title.textContent = `${username}'s Game History`;
+    title.className = "text-2xl font-semibold text-center text-gray-800 mb-4";
+    container.appendChild(title);
+
+    // Example game history (replace with real data from API)
+    const gameHistory = [
+        { date: "2024-02-20", result: "Win" },
+        { date: "2024-02-18", result: "Loss" },
+        { date: "2024-02-15", result: "Win" }
+    ];
+
+    // Create list container
+    const listContainer = document.createElement("div");
+    listContainer.className = "max-w-md mx-auto bg-white rounded-lg shadow-md p-4";
+
+    // Generate history items
+    gameHistory.forEach(game => {
+        const gameItem = document.createElement("p");
+        gameItem.textContent = `📅 ${game.date} - ${game.result}`;
+        gameItem.className = game.result === "Win" ? "text-green-500" : "text-red-500";
+        listContainer.appendChild(gameItem);
+    });
+
+    container.appendChild(listContainer);
+}
+
+
+
 function renderNotFound(container: HTMLElement) {
     const heading = document.createElement('h2');
     heading.textContent = '404';
@@ -536,6 +641,9 @@ export function router() {
             break;
         case '#register':
             renderRegister(mainElement);
+            break;
+        case '#profile':
+            renderProfile(mainElement, user);
             break;
         default:
             renderNotFound(mainElement);

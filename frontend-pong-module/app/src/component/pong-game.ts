@@ -1,15 +1,18 @@
 import { LitElement, html, css } from 'lit';
-import { customElement } from 'lit/decorators.js';
+import { customElement, property } from 'lit/decorators.js';
 import { Player } from '../entities/Player.js';
 import { Tournament } from '../entities/Tournament.js';
 
 @customElement('game-component')
 export class PongGame extends LitElement {
+  @property({ type: String }) canvasId!: string;
 	private game:Tournament;
-	constructor() {
-		super();
+
+  constructor() {
+    super();
+    console.log("In pong-game.ts");
 	//	this.game = new Game();
-    
+
     const player1 = new Player({_name:"Olivier1"});
     const player2 = new Player({_name:"Sarah2"});
     const player3 = new Player({_name:"Pierre3"});
@@ -46,6 +49,7 @@ export class PongGame extends LitElement {
   }
 }
 
+new PongGame();
 // Enregistrement du composant avec une balise personnalisée
 //customElements.define('pong-game', PongGame);
 
