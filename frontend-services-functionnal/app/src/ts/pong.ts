@@ -1,11 +1,12 @@
 // pongGame.ts
 export function startGame(): void {
-    const canvas = document.getElementById("pongCanvas") as HTMLCanvasElement | null;
+    console.log("Starting game...");
+    const canvas = window.document.getElementById("pongCanvas") as HTMLCanvasElement | null;
     if (!canvas) {
         throw new Error("Canvas element not found");
     }
 
-    const ctx = canvas.getContext("2d");
+     const ctx = canvas.getContext("2d");
     if (!ctx) {
         throw new Error("2D context not available");
     }
