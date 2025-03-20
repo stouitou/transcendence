@@ -6,15 +6,15 @@ import { router } from './router';
 
 document.addEventListener('DOMContentLoaded', () => {
     // Insert the header component.
-    const headerElement = createHeader({
-        title: 'Plastic Pong Game',
-        links: [
-            { href: '#game', text: 'Game' },
-            { href: '#login', text: 'Log-In' },
-            { href: '#info', text: 'Info' }
-        ]
-    });
-    document.body.insertBefore(headerElement, document.body.firstChild);
+    // const headerElement = createHeader({
+    //     title: 'Plastic Pong Game',
+    //     links: [
+    //         { href: '#game', text: 'Game' },
+    //         { href: '#login', text: 'Log-In' },
+    //         { href: '#info', text: 'Info' }
+    //     ]
+    // });
+    // document.body.insertBefore(headerElement, document.body.firstChild);
 
     // Initialize routing on first load.
     router();
