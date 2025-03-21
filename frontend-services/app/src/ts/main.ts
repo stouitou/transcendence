@@ -9,9 +9,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const headerElement = createHeader({
         title: 'Plastic Pong Game',
         links: [
+            { href: '#home', text: 'Home' },
             { href: '#game', text: 'Game' },
             { href: '#login', text: 'Log-In' },
-            { href: '#info', text: 'Info' }
+            { href: '#info', text: 'Info' },
+            { href: '#register', text: 'Register' },
+            { href: '#profile', text: 'Profile' }
         ]
     });
     document.body.insertBefore(headerElement, document.body.firstChild);
