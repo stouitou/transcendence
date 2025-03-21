@@ -188,25 +188,11 @@ export function renderHome(container: HTMLElement) {
     }
 }
 
-
-
-// function renderGame(container: HTMLElement) {
-//     const heading = document.createElement('h2');
-//     heading.textContent = 'Game Page';
-
-//     const paragraph = document.createElement('p');
-//     paragraph.textContent = 'Loading game...';
-//     startGame();
-//     container.appendChild(heading);
-//     container.appendChild(paragraph);
-// }
-
 const pongGameScript = async () => {
 	const script = document.createElement('script');
     // const canvas = document.getElementById("pongCanvas");
 	script.type = 'module';
 	script.src = 'https://localhost:4433/frontend-pong-module/app/src/component/oneVSone.ts';
-    console.log("script src: ", script.src);
     window.document.head.appendChild(script);
 };
 
@@ -223,8 +209,8 @@ function renderGame(container: HTMLElement) {
     // Create canvas element
     const canvas = document.createElement("canvas");
     canvas.id = "pongCanvas";
-    canvas.width = 1000;
-    canvas.height = 400;
+    canvas.width = 600;
+    canvas.height = 500;
     canvas.className = "shadow-lg rounded-lg";
 
     // Create Start Game button
@@ -239,6 +225,9 @@ function renderGame(container: HTMLElement) {
     // Add event listener to start game
     startButton.addEventListener("click", () => {
         if (typeof startGame === "function") {
+            const gameComponent = document.createElement("game-component");
+            gameComponent.setAttribute("canvasId", "pongCanvas");
+            container.appendChild(gameComponent);
             pongGameScript();
             startButton.remove();
             startTournamentButton.remove();

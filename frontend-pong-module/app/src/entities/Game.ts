@@ -51,10 +51,8 @@ export class	Game {
 		this._versus.display();
 		await this._countdown.start();
 		this._board.display();
+		this._ball.element.style.display = "block";
 		return new Promise((resolve) => {
-			 const	gameContainer = this._canvas.parentElement as HTMLElement;
-			 gameContainer.appendChild(this._ball.element);
-			//document.body.appendChild(this._ball.element);
 
 			const loop = () => {
 				if (this.endOfGame()) {
@@ -79,12 +77,13 @@ export class	Game {
 					// else if (this._ball.top <= 0 || this._ball.bottom >= gameContainer.height)
 					// 	this._ball.direction.y *= -1;
 					// Avoid the ball being blocked in the middle of the wall ?
-					else if (this._ball.top <= 0) {
-						this._ball.element.style.top = '0px';				
+					else if (this._ball.top <= this._canvas.offsetTop) {
+						this._ball.element.style.top = `${this._canvas.style.top}px`;				
 						this._ball.direction.y *= -1;
 					}
-					else if (this._ball.bottom >= window.innerHeight) {
-						this._ball.element.style.top = `calc(${window.innerHeight} + ${this._ball.diameter})px`;				
+					else if (this._ball.bottom >= this._canvas.offsetTop + this._canvas.height) {
+						console.log("touched the bottom");
+						this._ball.element.style.top = `calc(${this._canvas.offsetTop + this._canvas.height - this._ball.diameter})px`;				
 						this._ball.direction.y *= -1;
 					}
 					// else if (this._ball.top <= gameContainer.offsetTop) {
@@ -101,15 +100,15 @@ export class	Game {
 						this._beginning = true;
 						this._ball.spawn();
 					}
-					// else if (this._ball.right <= gameContainer.offsetLeft || this._ball.left >= gameContainer.offsetLeft + gameContainer.offsetWidth) {
-					// 	this._board.score(this._ball.right);
-					// 	this._beginning = true;
-					// 	this._ball.spawn();
-					// }
+					else if (this._ball.right <= this._ball.gameContainer.offsetLeft || this._ball.left >= this._ball.gameContainer.offsetLeft + this._ball.gameContainer.offsetWidth) {
+						this._board.score(this._ball.right);
+						this._beginning = true;
+						this._ball.spawn();
+					}
 				}
 				requestAnimationFrame(loop);
 			};
-
+			
 			loop();
 		});
 	}
@@ -127,6 +126,7 @@ export class	Game {
 	}
 
 	private launchMovement () {
+
 		if (this._beginning)
 			this._ball.move(this._ball.startingSpeed);
 		else

@@ -20,10 +20,6 @@ export class Tournament {
 
 		this.randomize();
 		
-		console.log("random :")
-		for (let i = 0; i < this._round.length; i++)
-			console.log(this._round[i]);
-
 		this.createMatch();
 
 		this.launchGame(Math.round(this._round.length / 2));
@@ -49,22 +45,16 @@ export class Tournament {
 				index++;
 			}
 		}
-
-		console.log("match:");
-		for (let i = 0; i < Math.round(this._round.length / 2); i++)
-			console.log(this._match.get(i));
 	}
 
 	private async launchGame (nofMatch: number) {
 		await this.showNextMatch();
-		console.log("number of match: ", nofMatch);
 
 		this._round.length = 0;
 		let i: number = 0;
 		let	j = 0;
 
 		while (i <= nofMatch) {
-			console.log("starting game");
 			const game = this._match.get(i);
 			if (game && game.length === 2) {
             	this._game = new Game(game[0], game[1], this._canvas);
@@ -79,10 +69,6 @@ export class Tournament {
 			}
 			i++;
 		}
-
-		console.log("next round :")
-		for (let i = 0; i < this._round.length; i++)
-			console.log(this._round[i]);
 
 		this._match.clear();
 		if (this._round.length === 3) {
@@ -110,7 +96,6 @@ export class Tournament {
 			array[y][1] += this._round[y].lastScore;
 
 			document.body.innerHTML = ''; //a revoir, remet la page a 0
-			console.log(array);
 			if (FLAG == false) {
 				FLAG = true;
 				await loop(1, 2);
@@ -131,14 +116,6 @@ export class Tournament {
 			let tab: string[] = ["Next match:" + "<br>"];
 			let game = this._match.get(i);
 
-			for (let i = 0; i < keys.length; i++) {
-				console.log("keys[i]: ", keys[i]);
-			}
-			i = 0;
-			// this._match.forEach((values) => {
-			// 	if (values)
-			// 		tab[i] = tab[i] + `${values.join(" VS ")}`;
-			// })
 			while (i < keys.length) {
 				if (game) {
 					if (game[1])
@@ -166,7 +143,6 @@ export class Tournament {
 			document.body.appendChild(this._nextMatch);
 			for (let x = 1; x < i + 1; x++) {
 				setTimeout(() => { 
-					//console.log("tab[x] : ", tab[x]);
 					const nextMatch = document.createElement('div');
 					if (this._nextMatch)
 						this._nextMatch.innerHTML = tab[x]
