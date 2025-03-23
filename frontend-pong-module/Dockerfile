@@ -3,7 +3,10 @@ FROM node:23-alpine
 # Copier package.json et installer les dépendances en premier (pour utiliser le cache)
 COPY ./app/package*.json ./
 RUN apk add --no-cache xdg-utils
-RUN npm install npm@11.1.0
+RUN mkdir /node_modules
+RUN chown -R node:node /node_modules
+RUN npm install -g npm@11.2.0
+
 
 #RUN npm install
 
