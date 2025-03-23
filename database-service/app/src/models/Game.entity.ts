@@ -3,6 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, UpdateDat
 import { GameHistory } from "./GameHistory.entity";
 import { User } from "./User.entity";
 import { Tournaments } from "./Tournament.entity";
+import { Round } from "./Round.entity";
 
 @Entity()
 export class Game {
@@ -31,10 +32,10 @@ export class Game {
   @JoinColumn()
   players: User[];
 
-  //chaque partie a un ou aucun tournoi
-  @ManyToOne(() => Tournaments, (tournaments) => tournaments.games, { /* cascade: true , */ onUpdate: 'CASCADE'  })
+  //chaque partie a un ou aucun round
+  @ManyToOne(() => Round, (rounds) => rounds.games, { /* cascade: true , */ onUpdate: 'CASCADE'  })
   @JoinColumn() //Utile?
-  tournaments: Tournaments;
+  rounds: Round;
 
   @CreateDateColumn()
   created_at: Date;

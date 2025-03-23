@@ -9,6 +9,7 @@ import { Tournaments } from "../models/Tournaments";
 import { IRepository } from "./Base/IRepository";
 import { BaseRepository } from "./Base/BaseRepository";
 import { User } from "@src/models/User";
+import { Round } from "@src/models/Round";
 
 /**
  * TournamentsRepository - Gestion des appels HTTP à la DB
@@ -32,7 +33,7 @@ class TournamentsRepository extends BaseRepository<Tournaments> implements IRepo
   // - le nom de la table,
   // - les relations (nom des propriétés liées à d'autres tables)
   constructor() {
-    super("myDb", "tournaments", ["games", "players"]);
+    super("myDb", "tournaments", [/* "games", */ "players","rounds"]);
   }
   //create
   create = async (game: Partial<Tournaments>): Promise<Tournaments> => {
@@ -82,7 +83,8 @@ class TournamentsRepository extends BaseRepository<Tournaments> implements IRepo
 
  getById= async (id: number): Promise<Tournaments | null> => {
       
-    const url = `${this.URL}/id/${id}?relations=players&relations=games`;//{this.getRelations()}
+    //const url = `${this.URL}/id/${id}?relations=players&relations=rounds&relations=rounds.games&relations=rounds.games.players`;//{this.getRelations()}
+    const url = `${this.URL}/id/${id}?relations=players&relations=rounds&relations=rounds.games&relations=rounds.games.players`;//{this.getRelations()}
     console.log("🔐 TournamentsRepository.getById()  --url--",url)
     const response = await fetch(url);
     const  result  = await response.json();
@@ -186,6 +188,39 @@ class TournamentsRepository extends BaseRepository<Tournaments> implements IRepo
     const data = await response.json();
     return data.data;
   }
+
+  addRound = async (tournamentsId: number, RoundId: number,currentRound:number): Promise<Tournaments | null> => {
+    //1- recuperer le tournoi
+    const tournament = await this.getById(tournamentsId);
+    if (!tournament) {
+      return null;
+    }
+    console.log("🔐 TournamentsRepository.addRound()  --tournament--",tournament)
+    //2- recuperer les joueurs et en faire un tableau d'int avec les id des joueurs
+    const { rounds } = tournament;
+    const roundsIds = rounds?rounds.map((round: Round) => round.id):[];
+    //3- verifier si le joueur est deja dans le tournoi
+    if (roundsIds.includes(RoundId)) {
+      return tournament;
+    }
+    //4- ajouter le joueur
+    roundsIds.push(RoundId);
+    //5- mettre à jour le tournoi
+
+    const response = await fetch(`${this.URL}/id/${tournamentsId}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        rounds: roundsIds,
+        currentRound,
+        state: "in_progress"  
+      }),
+    });
+    const data = await response.json();
+    console.log("🔐 TournamentsRepository.addRound()  --data--",data)
+    return data.data;
+  }
+
   newfilters = (params: IParams) => {
     let queryString = "?";
     for (const key in params) {

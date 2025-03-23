@@ -3,6 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToMany, UpdateDateColumn, Cr
 import { AuthProvider } from "./AuthProvider.entity";
 import { Game } from "./Game.entity";
 import { Tournaments } from "./Tournament.entity";
+import { Round } from "./Round.entity";
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -32,6 +33,10 @@ export class User {
   @ManyToMany(() => Tournaments, (tournements) => tournements.players ,{ onUpdate: 'CASCADE', nullable: true })
  @JoinTable()
  tournaments: Tournaments[];
+  //chaque joueur a un ou plusieurs round /Tournois
+  @ManyToMany(() => Round, (rounds) => rounds.players ,{ onUpdate: 'CASCADE', nullable: true })
+ @JoinTable()
+ rounds: Round[];
 
    //chaque joueur a plusieurs parties
   @ManyToMany(() => Game, (game) => game.players ,{ /* cascade: true, */ onUpdate: 'CASCADE', nullable: true })

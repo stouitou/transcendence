@@ -1,82 +1,36 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import  GameRepository  from '@src/repository/Game.repository';
 import { GameBody } from '@src/models/Game';
-/* 
-
-export type User = {
-  id:        number;
-  email?:     string;
-  name?:      string;
-  avatar?:    string;
-  password?:  string;
-  providers?:  AutProvider[];
-  createdAt: Date;
-  updatedAt: Date;
-};
-
-export type FullUser = User & {// moche mais fera le taf pour le moment
-  providers: AutProvider[];
-}
-
-export type AutProvider = {
-  id: string;
-  provider: string;
-  providerId: string;
-  gameId: number;
-  user: User;
-}
-
-interface UpdateGameBody extends User{}
- */
 
 export class GameController {
- private gameRepository = new GameRepository();
-  constructor() {
-    this.gameRepository = new GameRepository()
-    this.createGame = this.createGame.bind(this);
-    this.getGames = this.getGames.bind(this);
-    this.getGameById = this.getGameById.bind(this);
-    this.updateGame = this.updateGame.bind(this);
-    this.deleteGame = this.deleteGame.bind(this);
-  }
-  //constructor(private userService: UserService) {}
+  private gameRepository = new GameRepository();
+    constructor() {
+      this.gameRepository = new GameRepository()
+      this.createGame = this.createGame.bind(this);
+      this.getGames = this.getGames.bind(this);
+      this.getGameById = this.getGameById.bind(this);
+      this.updateGame = this.updateGame.bind(this);
+      this.deleteGame = this.deleteGame.bind(this);
+    }
 
- /*  async  registerUser( request: FastifyRequest<{ Body: CreateGameBody }>, reply: FastifyReply) {
-
+  async createGame(request: FastifyRequest<{ Body: GameBody }>, reply: FastifyReply) {  
     const { ...requestBody } = request.body;
-    const { name, email } = requestBody;
-    console.log("UserController registerUser ", name, email);
-    try {
-      const user = await this.userService.registerUser(name, email);
-      return reply.status(201).send(user);
-    } catch (error) {
-      return reply.status(400).send({ error: error.message });
+    const games = await this.gameRepository.create(requestBody);
+    if (!games) {
+      return reply.status(404).send({ error: 'Game creation failed' });
     }
-  } */
-
-    async createGame(request: FastifyRequest<{ Body: GameBody }>, reply: FastifyReply) {  
-      const { ...requestBody } = request.body;
-      //const users = await UserRepository.create(requestBody);
-      const users = await this.gameRepository.create(requestBody);
-      if (!users) {
-        return reply.status(404).send({ error: 'User not found' });
-      }
-      return reply.status(201).send(users);
-    }
+    return reply.status(201).send(games);
+  }
 
   async getGames(request: FastifyRequest, reply: FastifyReply) {  
-    console.log("--UserController getGames ");
-       // const users = await UserRepository.getAll();
-    const users = await  this.gameRepository.getAll();
-        console.log("UserController getGames ",users);
-    return reply.send(users);
+    console.log("--GameController getGames ");
+    const games = await  this.gameRepository.getAll();
+        console.log("GameController getGames ",games);
+    return reply.send(games);
   }
 
-
   async getGameById(request:  FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
-    const gameId = Number(request.params.id);    
-  //  const user = await this.userService.getGame(gameId);
-    //const user = await UserRepository.getById(gameId);
+    const gameId = Number(request.params.id);
     const game = await this.gameRepository.getById(gameId);
         if (!game) {
       return reply.status(404).send({ error: 'game not found' });
@@ -95,23 +49,19 @@ export class GameController {
     const { ...requestBody } = request.body;
     const { state } = requestBody;
 
-    //check if user exists
-   // const user = await UserRepository.update(gameId,requestBody);
-    const user = await this.gameRepository.update({id:gameId,state});//@TODO providers??
-    console.log("UserController updateGame ",user);
+    const game = await this.gameRepository.update({id:gameId,state});
+    console.log("GameController updateGame ",game);
 
-    if (!user) {
-      return reply.status(404).send({ error: 'User not found' });
+    if (!game) {
+      return reply.status(404).send({ error: 'Game not found' });
     }
-    return reply.send(user);
+    return reply.send(game);
   }
-  
+
   async deleteGame(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     const gameId = parseInt(request.params.id);
-    //const user = await this.userService.deleteGame(gameId);
-   // const user = await UserRepository.delete(gameId);
-    const user = await this.gameRepository.delete(gameId);
-    return reply.send(user);
+    const game = await this.gameRepository.delete(gameId);
+    return reply.send(game);
   }
 }
 

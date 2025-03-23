@@ -1,8 +1,4 @@
 import { FastifyInstance } from "fastify";
-import {UserController} from "../controllers/user.controller";
-import { UserSchema } from '../schemas/user.schema';
-
-import  { AuthMiddleware } from "../middlewares/auth.middleware";
 import { GameController } from "@src/controllers/game.controller";
 
 
@@ -11,7 +7,6 @@ async function gameRoutes(app: FastifyInstance) {
   
   //1- Création d'une instance de UserController
   const gameController = new GameController();
-  const authMiddleware = new AuthMiddleware(app);
   //2- Définition des Hooks
   /**
    * onRequest : Hook qui est exécuté avant que Fastify ne commence à traiter la requête.

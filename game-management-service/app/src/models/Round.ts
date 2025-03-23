@@ -7,10 +7,10 @@ export class Round{
   id: number;
   games: Game[];
   state: string;
-  players?: User[]/*  | number[] */;
+  players?: User[] | number[];
   created_at: Date;
   updated_at: Date;
-  tournaments?: Tournaments;
+  tournaments?: Partial<Tournaments>[];
   current: number;
 
  

@@ -1,8 +1,4 @@
 import { FastifyInstance } from "fastify";
-import {UserController} from "../controllers/user.controller";
-import { UserSchema } from '../schemas/user.schema';
-
-import  { AuthMiddleware } from "../middlewares/auth.middleware";
 import { TournamentsController } from "@src/controllers/tournaments.controller";
 
 
@@ -11,7 +7,6 @@ async function gameRoutes(app: FastifyInstance) {
   
   //1- Création d'une instance de UserController
   const tounamentsController = new TournamentsController();
-  const authMiddleware = new AuthMiddleware(app);
   //2- Définition des Hooks
   /**
    * onRequest : Hook qui est exécuté avant que Fastify ne commence à traiter la requête.
@@ -79,6 +74,10 @@ async function gameRoutes(app: FastifyInstance) {
   app.get("/:id",/*  {schema: UserSchema.getTournamentById} ,*/ tounamentsController.getTournamentById);
   app.put("/:id"/* , {schema: UserSchema.updateUser} */, tounamentsController.updateTournament);
   app.put("/:id/addPlayer"/* , {schema: UserSchema.updateUser} */, tounamentsController.addPlayerToTournament);
+  //closeregistration and generate 1rst round
+  app.put("/:id/closeRegistration"/* , {schema: UserSchema.updateUser} */, tounamentsController.closeRegistrationsAndGenerateFirstRound);
+  //generate next round
+  app.put("/:id/generateNextRound"/* , {schema: UserSchema.updateUser} */, tounamentsController.generateNextRound);
   app.delete("/:id",/*  {schema: UserSchema.deleteTournament}, */ tounamentsController.deleteTournament);
  // app.post("/query", {schema: UserSchema.requestQuery}, tounamentsController.requestQuery);
   //pour tester les users

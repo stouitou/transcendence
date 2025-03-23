@@ -5,7 +5,6 @@ import { Round } from "@src/models/Round.entity";
 import { Tournaments } from "@src/models/Tournament.entity";
 import { User } from "@src/models/User.entity";
 import { DataSource, EntityNotFoundError, EntityTarget, ObjectLiteral } from "typeorm";
-
 type DatabaseParams = {
 	type: "sqlite" | "mysql";
 	database: string;// Chemin du fichier SQLite

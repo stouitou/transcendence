@@ -6,18 +6,48 @@ import { Game } from '@src/models/Game';
 import RoundRepository from '@src/repository/Round.repository';
 
 export class TournamentsController {
- private tournamentsRepository = new TournamentsRepository();
+  private tournamentsRepository = new TournamentsRepository();
   constructor() {
     this.tournamentsRepository = new TournamentsRepository()
+    //helpers
+    this.isOpen = this.isOpen.bind(this);
+    this.generateMatches = this.generateMatches.bind(this);    
+    this.generateRound = this.generateRound.bind(this);
+    //basic crud
     this.createTournament = this.createTournament.bind(this);
     this.getTournaments = this.getTournaments.bind(this);
     this.getTournamentById = this.getTournamentById.bind(this);
     this.updateTournament = this.updateTournament.bind(this);
     this.deleteTournament = this.deleteTournament.bind(this);
+    //tournament actions
     this.addPlayerToTournament = this.addPlayerToTournament.bind(this);
     this.closeRegistrationsAndGenerateFirstRound = this.closeRegistrationsAndGenerateFirstRound.bind(this);
     this.generateNextRound = this.generateNextRound.bind(this);
-    this.updateMatchResult = this.updateMatchResult.bind(this);
+
+  }
+
+  /**
+   * check if the tournament is open for registration
+   * @param tounamentId 
+   * @returns 
+   */
+  async isOpen(tounamentId:number) {
+    const tournament = await this.tournamentsRepository.getById(tounamentId);
+    //tournament exist?
+    if (!tournament) {
+        return {isOpen:false, error: 'Tournament not found' };
+    }
+    //tournament is open for registration? created_at + 5min > now
+    const dateCreatedAt = new Date(tournament.created_at);
+    const dateNow = new Date();
+    if (dateCreatedAt.getTime() + 5 * 60 * 1000 < dateNow.getTime()) {      
+        return { isOpen: false, message: `Registration is closed, timeOut dateCreatedAt ${dateCreatedAt} dateNow ${dateNow}` };
+    }
+
+    if (tournament.state !== 'en attente') {
+        return { isOpen: false, message: 'Registration is closed' };    }
+
+    return { isOpen: true }; //tournament.state === 'registration';
   }
   //1- ON CREE UN TOURNOI
 
@@ -25,17 +55,46 @@ export class TournamentsController {
   //add player to tournament
   async addPlayerToTournament(request: FastifyRequest<{ Params: { id: string }, Body: {playerId:number} }>, reply: FastifyReply) {
     //@TODO definir une limite au nombre de joueurs
-    const gameId = Number(request.params.id);
+    const tounamentId = Number(request.params.id);
     const { playerId } = request.body;
-    console.log("🔐TournamentsController addPlayerToTournament()  --gameId--",gameId
+    console.log("🔐TournamentsController addPlayerToTournament()  --tounamentId--",tounamentId
     , " --playerId--",playerId);
-    const tournament = await this.tournamentsRepository.addPlayer(gameId, Number(playerId));
+    //isOpen
+    const isOpen = await this.isOpen(tounamentId);
+    if (!isOpen.isOpen) {
+      return reply.status(400).send({ error:isOpen.message });
+    }
+    const tournament = await this.tournamentsRepository.addPlayer(tounamentId, Number(playerId));
     if (!tournament) {
       return reply.status(404).send({ error: 'game not found' });
     }
     return reply.send(tournament);
   }
 
+  //** - utils: ON GENERE LES MATCHS
+  //generate matches
+  generateMatches(players: User[]): {players: Partial<User>[]}[] {
+    const matches = [];
+    for (let i = 0; i < players.length; i += 2) {
+        if (i + 1 < players.length) {
+            matches.push({players:[{id:players[i].id}, {id:players[i + 1].id}]});
+        } else {
+            matches.push({players:[{id:players[i].id}, { id: 0, name: 'IA' }]});//@TODO IA
+          // matches.push([players[i],  new User({ id: 0, name: 'IA' })]);
+        }
+    }
+    return matches;
+  }
+  //** - utils: ON GENERE LE ROUND avec les matchs
+  async generateRound(players: User[], gameId: number, currentRoundIndex: number = 0) {
+    const matches = this.generateMatches(players as User[]) as Game[]; 
+    const playersIds = (players as User[]).map((player: User) => player.id);
+    const roundRepository = new RoundRepository();
+    const rounds = await roundRepository.create({players:playersIds, games:matches, state:'in_progress', current:currentRoundIndex});
+    //update the tournament 
+    const updatedTournament = await this.tournamentsRepository.addRound(gameId, rounds.id, currentRoundIndex);
+    return updatedTournament;
+  }
 
   //3 - ON FERME LES INSCRIPTIONS ET ON GENERE LE PREMIER ROUND
   //close registrations and generate first round
@@ -52,208 +111,90 @@ export class TournamentsController {
     if (players.length < 2) {
         return reply.status(400).send({ error: 'Not enough players to generate a tournament' });
     }
-
-    const matches = this.generateMatches(players);
-    const roundRepository = new RoundRepository();
-    const rounds = await roundRepository.create({games:matches,state:'in_progress',current:0});
-    //update the tournament 
-
-    const updatedTournament = await this.tournamentsRepository.update({id:gameId,rounds:[{id:rounds.id}],state:'in_progress',currentRound:0});
-   
-
-    
-    return reply.send(updatedTournament);
-}
-//** - utils: ON GENERE LES MATCHS
-//generate matches
-generateMatches(players: User[]): {players: Partial<User>[]}[] {
-  const matches = [];
-  for (let i = 0; i < players.length; i += 2) {
-      if (i + 1 < players.length) {
-          matches.push({players:[{id:players[i].id}, {id:players[i + 1].id}]});
-      } else {
-          matches.push({players:[{id:players[i].id}, { id: 0, name: 'IA' }]});
-         // matches.push([players[i],  new User({ id: 0, name: 'IA' })]);
-      }
-  }
-  return matches;
-}
-
-//4 - ON GENERE LE ROUND SUIVANT
-//generate next round
-async generateNextRound(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
-  const gameId = Number(request.params.id);
-  const tournament = await this.tournamentsRepository.getById(gameId);
-  if (!tournament) {
-      return reply.status(404).send({ error: 'Tournament not found' });
-  }
-  // Check if the tournament is in progress
-  if (tournament.state !== 'in_progress') {
-      return reply.status(400).send({ error: 'Tournament is not in progress' });
-  }
-  // Check if the current round exist and is finished
-  const currentRoundIndex = tournament.currentRound;
-  if (currentRoundIndex === tournament.rounds.length - 1) {
-     //check if the current round is finished
-      const currentRound = tournament.rounds[currentRoundIndex];
-      const isRoundFinished = currentRound.every(match => match[0].id !== 0 && match[1].id !== 0);
-      if (!isRoundFinished) {
-          return reply.status(400).send({ error: 'Current round is not finished' });
-      }
-  }
-  //check if the current round is the final round
-  if (tournament.rounds[currentRoundIndex].length === 1) {
-      //c'est la finale
-      //on verifie le resultat
-      const finalMatch:Game = tournament.rounds[currentRoundIndex][0];
-      if (finalMatch.gameHistory) {//si le match a un historique
-        //on verifie le resultat
-        const winner = finalMatch.gameHistory.score1 > finalMatch.gameHistory.score2 ? finalMatch.players[0] : finalMatch.players[1];
-      //  tournament.winner = winner;
-        return reply.status(200).send({ winner });
+    if (tournament.state === 'in_progress') {
+        return reply.status(400).send({ error: 'Tournament is not in registration' });
     }
+
+  /*     const matches = this.generateMatches(players) as Game[];
+    const playersIds = players.map((player: User) => player.id);
+    const roundRepository = new RoundRepository();
+    const rounds = await roundRepository.create({players:playersIds, games:matches,state:'in_progress',current:0});
+    //update the tournament 
+    const updatedTournament = await this.tournamentsRepository.addRound(gameId,Number(rounds.id),0); */
+    const updatedTournament = await this.generateRound(players as User[], gameId);
+    return reply.send(updatedTournament);
   }
 
-  const lastRound = tournament.rounds[currentRoundIndex];
-  const winners = lastRound.map(match => match[0]); // Assuming the first player in each match is the winner
-
-  if (winners.length < 2) {
-      return reply.status(400).send({ error: 'Not enough players to generate the next round' });
-  }
-
-  const nextRound = this.generateMatches(winners);
-  tournament.rounds.push(nextRound);
-  tournament.currentRound += 1;
-  await this.tournamentsRepository.update(tournament);
-  return reply.send(tournament);
-}
-
-//5 - ON MET A JOUR LE RESULTAT D'UN MATCH
-//update match result
-async updateMatchResult(request: FastifyRequest<{ Params: { id: string }, Body: { roundIndex: number, matchIndex: number, winnerId: number } }>, reply: FastifyReply) {
-  const gameId = Number(request.params.id);
-  const { roundIndex, matchIndex, winnerId } = request.body;
-  const tournament = await this.tournamentsRepository.getById(gameId);
-  if (!tournament) {
-      return reply.status(404).send({ error: 'Tournament not found' });
-  }
-
-  tournament.rounds[roundIndex][matchIndex][0] = winnerId; // Update the winner
-  await this.tournamentsRepository.update(tournament);
-  return reply.send(tournament);
-}
-
-
-  async generateTournament(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+  //4 - ON GENERE LE ROUND SUIVANT
+  //generate next round
+  async generateNextRound(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     const gameId = Number(request.params.id);
     const tournament = await this.tournamentsRepository.getById(gameId);
     if (!tournament) {
-        return reply.status(404).send({ error: 'game not found' });
+        return reply.status(404).send({ error: 'Tournament not found' });
+    }
+    // Check if the tournament is in progress
+    if (tournament.state !== 'in_progress') {
+        return reply.status(400).send({ error: 'Tournament is not in progress' });
+    }
+    if (!tournament.rounds || tournament.currentRound === undefined) {
+        return reply.status(400).send({ error: 'No rounds in the tournament' });
     }
 
-    const { players } = tournament;
-    if (!players) {
-        return reply.status(400).send({ error: 'No players in the tournament' });
+    // Check if the current round exist and is finished
+    const currentRoundIndex = tournament.currentRound!;
+
+    const lastRound = tournament.rounds[currentRoundIndex];
+    const isRoundFinished = lastRound.games.map(game =>game.gameHistory != null).reduce((acc, curr) => acc && curr, true);
+    if (!isRoundFinished) {
+        return reply.status(400).send({ error: 'Current round is not finished' });
     }
+    const winners = lastRound.games.map(game => game.gameHistory!.score1 > game.gameHistory!.score2 ? game.players[0] : game.players[1]);
+    console.log("🔐TournamentsController winners",winners);
 
-    if (players.length < 2) {
-        return reply.status(400).send({ error: 'Not enough players to generate a tournament' });
+    if (winners.length < 2) {
+      const updatedTournament = await this.tournamentsRepository.update({id:gameId,state:'finished',winner:winners[0]});
+      return reply.status(200).send({ winner: winners[0] });
     }
-
-    const matches = this.generateMatches(players);
-    tournament.rounds = [matches];
-    await this.tournamentsRepository.update(tournament);
-    return reply.send(tournament);
-
-/*     const rounds = [];//@TODO : à revoir const rounds = [[user1, user2], [user3, user4], [user5, user6], [user7, user8]];
-    let currentRound:User[] = players; // [user1, user2, user3, user4, user5, user6, user7, user8];
-
-    while (currentRound.length > 1) {
-        const nextRound:User[][] = [];
-        for (let i = 0; i < currentRound.length; i += 2) {
-            if (i + 1 < currentRound.length) {
-                nextRound.push([currentRound[i], currentRound[i + 1]]);
-            } else {
-                nextRound.push([currentRound[i], new User({ id: 0, name: 'IA' })]);
-            }
-        }
-        rounds.push(nextRound);
-        currentRound = nextRound.map(match => match[0]);
-    }
-
-    tournament.rounds = rounds;
-    await this.tournamentsRepository.update(tournament);
-    return reply.send(tournament); */
-}
-
-
-
-
-
-
-  //generer un tournoi avec les players
-  async generateTournament2(request: FastifyRequest<{ Body: TournamentsBody }>, reply: FastifyReply) {
-    //0- le nombre de joueurs inscrit sert de reference
-    // a chaque round, on divise par 2 le nombre de joueurs
-    //le tournois se termine quand il ne reste plus qu'un joueur
-    // exemple : 1,2,3,4,5,6,7,8
-    // round 1 : 1-8, 2-7, 3-6, 4-5
-    // round 2 : 1-4, 2-3
-    // round 3 : 1-2
-    // round 4 : 1 (gagnant)
-
-    //1- recuperer les joueurs
-    //1-1 si le nombre de joueurs est egal à 2, generer un match
-    //1-2 si le nombre de joueurs est egal à 1, generer un match IA
-    //1-3 si le nombre de joueurs est superieur à 2, generer un tournoi
-
-    //2- generer les matchs
-
-
-    //1-1- verifier si le nombre de joueurs est pair (sinon ajouter un joueur IA)
-    //1-2- verifier si le nombre de joueurs est superieur à 2
-    //2- generer les matchs (1/4, 1/2, 1/1)
-    //2-1- verifier si le nombre de matchs est pair (sinon ajouter un match IA)
-
-    //3- generer les scores
-    //4- generer les classements
-    //5- generer les gagnants
-
+    /* const matches = this.generateMatches(winners as User[]) as Game[]; 
+    const playersIds = (winners as User[]).map((player: User) => player.id);
+    const roundRepository = new RoundRepository();
+    const rounds = await roundRepository.create({players:playersIds, games:matches,state:'in_progress',current:currentRoundIndex+1});
+    //update the tournament 
+    const updatedTournament = await this.tournamentsRepository.addRound(gameId,rounds.id,currentRoundIndex + 1); */
+    const updatedTournament = await this.generateRound(winners as User[], gameId, currentRoundIndex + 1);
+    return reply.send(updatedTournament);
   }
 
     async createTournament(request: FastifyRequest<{ Body: TournamentsBody }>, reply: FastifyReply) {  
       const { ...requestBody } = request.body;
-      //const users = await UserRepository.create(requestBody);
-      const users = await this.tournamentsRepository.create(requestBody);
-      if (!users) {
-        return reply.status(404).send({ error: 'User not found' });
+      const tournament = await this.tournamentsRepository.create(requestBody);
+      if (!tournament) {
+        return reply.status(404).send({ error: 'Tournament creation failed' });
       }
-      return reply.status(201).send(users);
+      return reply.status(201).send(tournament);
     }
 
   async getTournaments(request: FastifyRequest, reply: FastifyReply) {  
-    console.log("--UserController getTournaments ");
-       // const users = await UserRepository.getAll();
-    const users = await  this.tournamentsRepository.getAll();
-        console.log("UserController getTournaments ",users);
-    return reply.send(users);
+    console.log("--TournamentsController getTournaments ");
+    const tournaments = await  this.tournamentsRepository.getAll();
+        console.log("TournamentsController getTournaments ",tournaments);
+    return reply.send(tournaments);
   }
 
 
   async getTournamentById(request:  FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
-    const gameId = Number(request.params.id);    
-  //  const user = await this.userService.getTournament(gameId);
-    //const user = await UserRepository.getById(gameId);
-    const game = await this.tournamentsRepository.getById(gameId);
-        if (!game) {
-      return reply.status(404).send({ error: 'game not found' });
+    const tournamentId = Number(request.params.id);
+    const tournaments = await this.tournamentsRepository.getById(tournamentId);
+        if (!tournaments) {
+      return reply.status(404).send({ error: 'tournaments not found' });
     }
-    return reply.send(game);
+    return reply.send(tournaments);
   }
 
   async updateTournament(request: FastifyRequest<{ Params: { id: string }, Body: {state:string} }>, reply: FastifyReply) {
-    const gameId = Number(request.params.id);
-    if (!gameId) {
+    const tournamentId = Number(request.params.id);
+    if (!tournamentId) {
       return reply.status(400).send({ error: 'Invalid user id' });
     }
     if (!request.body) {
@@ -261,24 +202,19 @@ async updateMatchResult(request: FastifyRequest<{ Params: { id: string }, Body: 
     }
     const { ...requestBody } = request.body;
     const { state } = requestBody;
+    const updatedTournament = await this.tournamentsRepository.update({id:tournamentId, state});//@TODO providers??
+    console.log("TournamentsController updateTournament ",updatedTournament);
 
-    //check if user exists
-   // const user = await UserRepository.update(gameId,requestBody);
-    const user = await this.tournamentsRepository.update({id:gameId,state});//@TODO providers??
-    console.log("UserController updateTournament ",user);
-
-    if (!user) {
-      return reply.status(404).send({ error: 'User not found' });
+    if (!updatedTournament) {
+      return reply.status(404).send({ error: 'Tournament not found' });
     }
-    return reply.send(user);
+    return reply.send(updatedTournament);
   }
   
   async deleteTournament(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
-    const gameId = parseInt(request.params.id);
-    //const user = await this.userService.deleteTournament(gameId);
-   // const user = await UserRepository.delete(gameId);
-    const user = await this.tournamentsRepository.delete(gameId);
-    return reply.send(user);
+    const tounamentId = parseInt(request.params.id);
+    const tournament = await this.tournamentsRepository.delete(tounamentId);
+    return reply.send(tournament);
   }
 }
 

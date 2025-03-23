@@ -3,7 +3,7 @@ import  RoundRepository  from '@src/repository/Round.repository';
 import { RoundBody } from '@src/models/Round';
 
 export class RoundController {
- private roundRepository = new RoundRepository();
+  private roundRepository = new RoundRepository();
   constructor() {
     this.roundRepository = new RoundRepository()
     this.createRound = this.createRound.bind(this);
@@ -15,38 +15,33 @@ export class RoundController {
 
     async createRound(request: FastifyRequest<{ Body: RoundBody }>, reply: FastifyReply) {  
       const { ...requestBody } = request.body;
-      //const users = await UserRepository.create(requestBody);
-      const users = await this.roundRepository.create(requestBody);
-      if (!users) {
-        return reply.status(404).send({ error: 'User not found' });
+      const round = await this.roundRepository.create(requestBody);
+      if (!round) {
+        return reply.status(404).send({ error: 'round not created' });
       }
-      return reply.status(201).send(users);
+      return reply.status(201).send(round);
     }
 
   async getRounds(request: FastifyRequest, reply: FastifyReply) {  
-    console.log("--UserController getRounds ");
-       // const users = await UserRepository.getAll();
-    const users = await  this.roundRepository.getAll();
-        console.log("UserController getRounds ",users);
-    return reply.send(users);
+    console.log("--RoundController getRounds ");
+    const rounds = await  this.roundRepository.getAll();
+        console.log("RoundController getRounds ",rounds);
+    return reply.send(rounds);
   }
 
-
   async getRoundById(request:  FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
-    const gameId = Number(request.params.id);    
-  //  const user = await this.userService.getRound(gameId);
-    //const user = await UserRepository.getById(gameId);
-    const game = await this.roundRepository.getById(gameId);
-        if (!game) {
-      return reply.status(404).send({ error: 'game not found' });
+    const roundId = Number(request.params.id);
+    const round = await this.roundRepository.getById(roundId);
+        if (!round) {
+      return reply.status(404).send({ error: 'Round not found' });
     }
-    return reply.send(game);
+    return reply.send(round);
   }
 
   async updateRound(request: FastifyRequest<{ Params: { id: string }, Body: {state:string} }>, reply: FastifyReply) {
-    const gameId = Number(request.params.id);
-    if (!gameId) {
-      return reply.status(400).send({ error: 'Invalid user id' });
+    const roundId = Number(request.params.id);
+    if (!roundId) {
+      return reply.status(400).send({ error: 'Invalid round id' });
     }
     if (!request.body) {
       return reply.status(400).send({ error: 'Invalid request body' });
@@ -54,23 +49,19 @@ export class RoundController {
     const { ...requestBody } = request.body;
     const { state } = requestBody;
 
-    //check if user exists
-   // const user = await UserRepository.update(gameId,requestBody);
-    const user = await this.roundRepository.update({id:gameId,state});//@TODO providers??
-    console.log("UserController updateRound ",user);
+    const round = await this.roundRepository.update({id:roundId,state});
+    console.log("RoundController updateRound ",round);
 
-    if (!user) {
-      return reply.status(404).send({ error: 'User not found' });
+    if (!round) {
+      return reply.status(404).send({ error: 'Round not found' });
     }
-    return reply.send(user);
+    return reply.send(round);
   }
   
   async deleteRound(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
-    const gameId = parseInt(request.params.id);
-    //const user = await this.userService.deleteRound(gameId);
-   // const user = await UserRepository.delete(gameId);
-    const user = await this.roundRepository.delete(gameId);
-    return reply.send(user);
+    const roundId = parseInt(request.params.id);
+    const round = await this.roundRepository.delete(roundId);
+    return reply.send(round);
   }
 }
 

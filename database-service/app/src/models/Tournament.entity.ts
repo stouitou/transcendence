@@ -2,7 +2,6 @@ import "reflect-metadata";
 import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, UpdateDateColumn, CreateDateColumn,  ManyToMany, OneToMany } from "typeorm";
 
 import { User } from "./User.entity";
-import { Game } from "./Game.entity";
 import { Round } from "./Round.entity";
 
 @Entity()
@@ -10,10 +9,14 @@ export class Tournaments {
   @PrimaryGeneratedColumn()
   id: number;
 
-  //chaque Tournoi a plusieurs parties
-  @OneToMany(() => Game, (game) => game.tournaments, { cascade: true , onUpdate: 'CASCADE' , nullable: true })
+  //current round
+  @Column({ type: "int", default: 0 }) //en attente, en cours, terminee
+  currentRound: number;
+
+  //chaque Tournoi a plusieurs parties+
+  @OneToMany(() => Round, (round) => round.tournaments, { cascade: true , onUpdate: 'CASCADE' , nullable: true/* ,eager:true */ })
   @JoinColumn()
-  games: Game[];
+  rounds: Round[];
 
   //etat de la partie
   @Column({ type: "text", default: "en attente" }) //en attente, en cours, terminee
@@ -30,9 +33,10 @@ export class Tournaments {
   @UpdateDateColumn()
   updated_at: Date;
 
-  //chaque tournoi a plusieurs rounds
-  @ManyToMany(() => Round, (round) => round.tournaments, { cascade: true , onUpdate: 'CASCADE' , nullable: true })
-  @JoinColumn()
-  rounds: Round[];  
+  //un seul ganant
+  @OneToOne(() => User, (user) => user.tournaments, { nullable: true, onUpdate: 'CASCADE', eager:true })
+  @JoinColumn()//Utile?
+  winner: User;
+
 }
 

@@ -1,23 +1,19 @@
 import { FastifyInstance } from "fastify";
-import {UserController} from "../controllers/user.controller";
-import { UserSchema } from '../schemas/user.schema';
 
-import  { AuthMiddleware } from "../middlewares/auth.middleware";
-
-//@TODO pour tester les hooks
+import { RoundController } from "@src/controllers/Round.controller";
 
 
-async function userRoutes(app: FastifyInstance) {
+
+async function roundRoutes(app: FastifyInstance) {
   
   //1- Création d'une instance de UserController
-  const userController = new UserController();
-  const authMiddleware = new AuthMiddleware(app);
+  const roundController = new RoundController();
   //2- Définition des Hooks
   /**
    * onRequest : Hook qui est exécuté avant que Fastify ne commence à traiter la requête.
    * Il est utile pour les tâches qui doivent être effectuées pour chaque requête.
    */
-  app.addHook('onRequest', async (request, reply) => {
+/*   app.addHook('onRequest', async (request, reply) => {
     const authToken = request.cookies.authToken;
     if (authToken && !request.headers.authorization) {
       request.headers.authorization = `Bearer ${authToken}`;
@@ -61,7 +57,7 @@ async function userRoutes(app: FastifyInstance) {
       console.error("🟥 userRoutes onRequest error",error)
       return reply.code(error.status).send({ error: error.message });
     }
-  })
+  }) */
 
   /**
    * preParsing : Hook qui est exécuté avant que Fastify ne commence à analyser le corps de la requête.
@@ -72,57 +68,18 @@ async function userRoutes(app: FastifyInstance) {
   }) */
 
   //3- Définition des routes
-  app.get('/me',{/* preHandler: [authMiddleware.authMiddleware],schema: UserSchema.me */}, async function (req, reply) {
-    console.log("🔗 userRoutes /me")
-    //console.log("🔗 userRoutes /me req.authenticatedUser",req.authenticatedUser)
-    return reply.code(200).send({ ... req.authenticatedUser })
-  })
 
 
 
-  app.get('/decode', /* {schema: UserSchema.bebugResponse}, */async (request, reply) => {
-    console.log("🔗 userRoutes /decode")
-
-    if (!request.authenticatedUser) {
-      // Si le token n'est pas présent, on retourne une erreur
-      return reply.status(401).send({ error: "Accès interdit, token requis." });
-    }
-    return reply.code(200).send({ ...request.authenticatedUser });
-  })
-
-
-
-  app.get("/", {/* preHandler: [loggerMiddleware], *//* schema: UserSchema.getUsers */}, userController.getUsers);
-  app.get("/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserById);
-  app.put("/me",/*  {schema: UserSchema.updateUser}, */ userController.updateMe);
-  app.put("/:id", {schema: UserSchema.updateUser}, userController.updateUser);
-  app.delete("/:id",/*  {schema: UserSchema.deleteUser}, */ userController.deleteUser);
- // app.post("/query", {schema: UserSchema.requestQuery}, userController.requestQuery);
+  app.get("/", {/* preHandler: [loggerMiddleware], *//* schema: UserSchema.getTournaments */}, roundController.getRounds);
+  app.get("/:id",/*  {schema: UserSchema.getTournamentById} ,*/ roundController.getRoundById);
+  app.put("/:id"/* , {schema: UserSchema.updateUser} */, roundController.updateRound);
+  //  app.put("/:id/addPlayer"/* , {schema: UserSchema.updateUser} */, roundController.addRoundToTournament);
+  app.delete("/:id",/*  {schema: UserSchema.deleteTournament}, */ roundController.deleteRound);
+ // app.post("/query", {schema: UserSchema.requestQuery}, roundController.requestQuery);
   //pour tester les users
-  app.post("/", {schema: UserSchema.createUser }, userController.createUser);
+  app.post("/"/* , {schema: UserSchema.createTournament } */, roundController.createRound);
 
-
- app.post('/upload-avatar', { //@TODO : à rename /me/upload-avatar
-  schema: {
-    consumes: ['multipart/form-data'],
-/*    body: {
-    type: 'object',
-     // required: ['avatar'],
-      properties: {
-        // file that gets decoded to string
-          file: { type: 'string', format: 'binary' }
-      },
-  }  */
-/*     body: {
-      type: 'object',
-     // required: ['avatar'],
-      properties: {
-        // file that gets decoded to string
-          avatar: { type: 'string', format: 'binary' }
-      },
-    } */
-  }
-}, userController.updateUserAvatar);
 }
 
-export default userRoutes;
+export default roundRoutes;

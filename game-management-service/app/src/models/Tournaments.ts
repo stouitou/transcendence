@@ -5,12 +5,14 @@ import { User } from "./User";
 
 export class Tournaments{
   id: number;
-  games: Game[];
-  state: string;
+  games?: Game[];
+  state?: string;
   players?: User[]/*  | number[] */;
   created_at: Date;
   updated_at: Date;
-  rounds?: Round[];  
+  rounds?: Round[];
+  currentRound?: number;
+  winner?: User | number;
 
  
 	constructor(data: Partial<Tournaments>) {

@@ -31,7 +31,7 @@ class RoundRepository extends BaseRepository<Round> implements IRepository<Round
   // - le nom de la table,
   // - les relations (nom des propriétés liées à d'autres tables)
   constructor() {
-    super("myDb", "round", ["tournaments", "players"]);
+    super("myDb", "round", ["tournaments", "players","games"]);
   }
   //create
   create = async (round: Partial<Round>): Promise<Round> => {
@@ -49,7 +49,7 @@ class RoundRepository extends BaseRepository<Round> implements IRepository<Round
     console.log("🔐Round.repository.ts RoundRepository.create()  --roundCreated--",roundCreated)
    // const roundCreated = User.fromJSON(data.data);
     if (!roundCreated) {
-      throw new Error("User creation failed");
+      throw new Error("🔐Round creation failed");
     }
     console.log(" RoundRepository.create()  --roundCreated-- OK")
     return roundCreated;
@@ -81,7 +81,7 @@ class RoundRepository extends BaseRepository<Round> implements IRepository<Round
 
  getById= async (id: number): Promise<Round | null> => {
       
-    const url = `${this.URL}/id/${id}?relations=players`;//{this.getRelations()}
+    const url = `${this.URL}/id/${id}${this.getRelations()}`;//?relations=players{this.getRelations()}
     console.log("🔐 RoundRepository.getById()  --url--",url)
     const response = await fetch(url);
     const  result  = await response.json();
@@ -90,15 +90,7 @@ class RoundRepository extends BaseRepository<Round> implements IRepository<Round
     return data?? null;
   }
 
-/*   getByParams = async(params: IParams) : Promise<User[] | null> => {
 
-    const queryString = Helpers.buildQueryString(params);
-    const url = `${this.URL}?${queryString}`;
-    const response = await fetch(url);
-    const data = await response.json();
-   // return data.map(User.fromJSON);
-    return data.data;
-  } */
   getByParams = async(params: IParams) : Promise<Round[] | null> => {
   
     //  const queryString = Helpers.buildQueryString(params);
@@ -112,20 +104,19 @@ class RoundRepository extends BaseRepository<Round> implements IRepository<Round
      // return data.map(User.fromJSON);
       return data.data?data.data[0]?data.data:null:null;
     }
-    getOneByParams = async(params: any) : Promise<Round | null> => {  
-      //  const queryString = Helpers.buildQueryString(params);
-        const queryString = this.newfilters(params);
-        console.log("🔐 RoundRepository.getByParams()  --queryString--",queryString)
-        const url = `${this.URL}${queryString}`;
-        const response = await fetch(url);
-        console.log("🔐 RoundRepository.getByParams()  --response--",response)
-        const data = await response.json();
-        console.log("🔐 RoundRepository.getByParams()  --data--",data)
-       // return data.map(User.fromJSON);
-        return data.data?data.data[0]?data.data[0]:null:null;
-      }
 
-
+  getOneByParams = async(params: any) : Promise<Round | null> => {  
+    //  const queryString = Helpers.buildQueryString(params);
+      const queryString = this.newfilters(params);
+      console.log("🔐 RoundRepository.getByParams()  --queryString--",queryString)
+      const url = `${this.URL}${queryString}`;
+      const response = await fetch(url);
+      console.log("🔐 RoundRepository.getByParams()  --response--",response)
+      const data = await response.json();
+      console.log("🔐 RoundRepository.getByParams()  --data--",data)
+      // return data.map(User.fromJSON);
+      return data.data?data.data[0]?data.data[0]:null:null;
+    }
 
   //update
   update = async (user: Partial<Round>):Promise<Round>=>{
@@ -148,6 +139,7 @@ class RoundRepository extends BaseRepository<Round> implements IRepository<Round
     }
     return userUpdated;
   }
+  
   //delete
   delete = async (id: number) :Promise<boolean>=>{
     const response = await fetch(`${this.URL}/id/${id}`, {// delete sans body!!! ou avec body non vide si content-type: application/json

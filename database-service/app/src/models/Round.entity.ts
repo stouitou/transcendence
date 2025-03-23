@@ -11,7 +11,7 @@ export class Round {
   id: number;
 
   //chaque Round a plusieurs parties
-  @OneToMany(() => Game, (game) => game.tournaments, { cascade: true , onUpdate: 'CASCADE' , nullable: true })
+  @OneToMany(() => Game, (game) => game.rounds, { cascade: true , onUpdate: 'CASCADE' , nullable: true })
   @JoinColumn()
   games: Game[];
 
@@ -21,8 +21,9 @@ export class Round {
   //etat de la partie
   @Column({ type: "int", default: 0 }) //en attente, en cours, terminee
   current: number;
+  
   //chaque Tournoi a plusieurs joueurs
-  @ManyToMany(() => User, (user) => user.tournaments, { cascade: true , onUpdate: 'CASCADE' , nullable: true  })
+  @ManyToMany(() => User, (user) => user.rounds, { cascade: true , onUpdate: 'CASCADE' , nullable: true  })
   @JoinColumn()
   players: User[];
   
@@ -33,8 +34,8 @@ export class Round {
   updated_at: Date;
 
   //chaque round a un tournoi
-  @ManyToOne(() => Tournaments, (tournaments) => tournaments.rounds, { /* nullable: true, */ onUpdate: 'CASCADE', eager:true })
-  @JoinColumn()//Utile?
+  @ManyToOne(() => Tournaments, (tournaments) => tournaments.rounds, { nullable: true, onUpdate: 'CASCADE'/* , eager:true */ })
+ // @JoinColumn()//Utile?
   tournaments: Tournaments;
 }
 
