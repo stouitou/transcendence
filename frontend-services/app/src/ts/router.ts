@@ -6,6 +6,21 @@ import { getState } from './state';
 
 import { createButton } from './button';
 import {startGame} from "./pong";
+import {
+    Engine,
+    Scene,
+    FreeCamera,
+    Camera,
+    Vector3,
+    HemisphericLight,
+    MeshBuilder,
+    StandardMaterial,
+    Color3,
+    Color4
+} from 'babylonjs';
+
+import { initBallsBackground } from './background'; // your path
+
 
 const user = {
     avatar: "grr", 
@@ -20,176 +35,53 @@ function clearContainer(container: HTMLElement) {
     }
 }
 
+
 export function renderHome(container: HTMLElement) {
     // Clear existing content
     while (container.firstChild) {
         container.removeChild(container.firstChild);
     }
 
-    // Create a hero section container
-    const heroSection = document.createElement('section');
-    heroSection.className = "relative w-full h-screen overflow-hidden bg-black";
-    container.appendChild(heroSection);
+    // Mark container as relative, so absolutely positioned elements anchor properly
+    container.classList.add('relative');
 
-    // Create the canvas
-    const canvas = document.createElement('canvas');
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-    canvas.width = heroSection.clientWidth;
-    canvas.height = heroSection.clientHeight;
-    heroSection.appendChild(canvas);
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        console.error('Could not get 2D context for canvas.');
-        return;
-    }
-
-    // Handle resizing
-    window.addEventListener('resize', () => {
-        canvas.width = heroSection.clientWidth;
-        canvas.height = heroSection.clientHeight;
+    // 1) Initialize the background
+    const { engine, scene, camera, canvas } = initBallsBackground(container, {
+        numSpheres: 50,
+        sphereRadius: 1,
+        backgroundColor: new Color4(1, 1, 1, 1)
+        // materials?: [... your custom StandardMaterials ...]
     });
 
-    // Track mouse for the fog effect
-    let mouseX = canvas.width / 2;
-    let mouseY = canvas.height / 2;
-    heroSection.addEventListener('mousemove', (e) => {
-        const rect = heroSection.getBoundingClientRect();
-        mouseX = e.clientX - rect.left;
-        mouseY = e.clientY - rect.top;
-    });
+    // 2) Create your overlay
+    const overlay = document.createElement('div');
+    overlay.className = `
+    absolute top-0 left-0
+    w-full h-full
+    flex flex-col items-center justify-center
+    pointer-events-none
+    z-10
+  `;
+    container.appendChild(overlay);
 
-    // Particle interface
-    interface Particle {
-        x: number;
-        y: number;
-        vx: number;
-        vy: number;
-        size: number;
-    }
-
-    // Create an array of particles
-    const particles: Particle[] = createParticles(60, canvas.width, canvas.height);
-
-    // Animation loop
-    function animate() {
-        if (!ctx)
-            return;
-        // Clear the canvas fully
-        ctx.fillStyle = 'black';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Update and draw all particles
-        updateParticles(particles, canvas.width, canvas.height);
-        drawParticles(ctx, particles);
-
-        // Draw the fog effect around the mouse
-        drawFog(ctx, mouseX, mouseY, 80);
-
-        requestAnimationFrame(animate);
-    }
-    animate();
-
-    // Create a content container for heading, text, and a button
-    const content = document.createElement('div');
-    content.className = "relative z-10 flex flex-col items-center justify-center w-full h-full text-center text-white pointer-events-none";
-
-    const heading = document.createElement('h2');
-    heading.textContent = 'PONG GAME';
-    heading.className = "text-3xl md:text-5xl font-bold mb-4 pointer-events-auto";
-    content.appendChild(heading);
-
-    // Example button
-    const enterButton = document.createElement('button');
-    enterButton.textContent = "CLICK TO START PLAYING";
-    enterButton.className = "px-6 py-3 bg-white text-black rounded-md hover:bg-gray-300 transition-colors pointer-events-auto";
-    enterButton.addEventListener('click', () => {
+    // Example "Let's Start" button
+    const btn = document.createElement('button');
+    btn.textContent = 'Let’s Start';
+    btn.className = `
+    px-10 py-3
+    font-archivo
+    text-black
+    border border-black
+    rounded-md
+    pointer-events-auto
+    transition-colors duration-300
+    hover:bg-black hover:text-white
+    focus:outline-none
+  `;
+    btn.addEventListener('click', () => {
         window.location.hash = '#login';
     });
-    content.appendChild(enterButton);
-
-    heroSection.appendChild(content);
-
-    // --- Helper Functions Below ---
-
-    // Creates an array of particles
-    function createParticles(count: number, width: number, height: number): Particle[] {
-        const arr: Particle[] = [];
-        for (let i = 0; i < count; i++) {
-            arr.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                vx: (Math.random() - 0.5) * 5, // small random velocity
-                vy: (Math.random() - 0.5) * 5,
-                size: 2 + Math.random() * 4,     // random size
-            });
-        }
-        return arr;
-    }
-
-    /**
-     * Moves particles and bounces them off the edges, like a Pong ball.
-     */
-    function updateParticles(particles: Particle[], width: number, height: number) {
-        for (const p of particles) {
-            p.x += p.vx;
-            p.y += p.vy;
-
-            // Bounce horizontally
-            if (p.x < 0) {
-                p.x = 0;
-                p.vx *= -1; // reverse horizontal velocity
-            } else if (p.x > width) {
-                p.x = width;
-                p.vx *= -1;
-            }
-
-            // Bounce vertically
-            if (p.y < 0) {
-                p.y = 0;
-                p.vy *= -1; // reverse vertical velocity
-            } else if (p.y > height) {
-                p.y = height;
-                p.vy *= -1;
-            }
-        }
-    }
-
-    // Draws the particles as small, soft circles
-    function drawParticles(ctx: CanvasRenderingContext2D, particles: Particle[]) {
-        ctx.save();
-        ctx.fillStyle = 'white';
-        for (const p of particles) {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        ctx.restore();
-    }
-
-    /**
-     * Creates a foggy “window” effect around the mouse
-     * This version uses 'screen' blend for a hazy highlight
-     */
-    function drawFog(ctx: CanvasRenderingContext2D, mx: number, my: number, radius: number) {
-        const gradient = ctx.createRadialGradient(mx, my, 0, mx, my, radius);
-        gradient.addColorStop(0, 'rgba(255,255,255,0.15)');
-        gradient.addColorStop(0.7, 'rgba(255,255,255,0.02)');
-        gradient.addColorStop(1, 'rgba(255,255,255,0)');
-
-        ctx.save();
-        ctx.globalCompositeOperation = 'screen'; // or 'lighter'
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(mx, my, radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-
-        // Reset composite operation
-        ctx.globalCompositeOperation = 'source-over';
-    }
+    overlay.appendChild(btn);
 }
 
 const pongGameScript = async () => {
@@ -301,58 +193,132 @@ function renderTournament(container: HTMLElement) {
 }
 
 
-function renderLogin(container: HTMLElement) {
-    // Clear container if needed.
+export function renderLogin(container: HTMLElement) {
+    // 1) Clear container
     while (container.firstChild) {
         container.removeChild(container.firstChild);
     }
 
-    // Create form element
-    const loginForm = document.createElement("form");
-    loginForm.className = "max-w-sm mx-auto p-6 bg-white rounded-lg shadow-lg";
+    // 2) Ensure container is positioned relative for layering
+    container.classList.add('relative');
 
-    // Create heading
-    const heading = document.createElement("h2");
-    heading.textContent = "Login";
-    heading.className = "text-3xl font-bold text-center mb-6 text-gray-800";
+    // 3) Initialize your Babylon "balls" background
+    initBallsBackground(container, {
+        numSpheres: 30,
+        sphereRadius: 1.2,
+        backgroundColor: new Color4(1, 1, 1, 1)
+    });
+
+    // 4) Create an overlay to center the login form
+    const overlay = document.createElement('div');
+    overlay.className = `
+    absolute
+    top-0 left-0
+    w-full h-full
+    flex items-center justify-center
+    pointer-events-none
+    z-10
+  `;
+    container.appendChild(overlay);
+
+    // 5) Build the login form
+    const loginForm = document.createElement('form');
+    loginForm.className = `
+    pointer-events-auto
+    w-full max-w-sm
+    px-8 py-6
+    bg-white/30
+    backdrop-blur-md
+    border border-white/20
+    rounded-lg
+    shadow-md
+    text-gray-800
+    font-archivo
+  `;
+    overlay.appendChild(loginForm);
+
+    // 6) Heading
+    const heading = document.createElement('h2');
+    heading.textContent = 'Login';
+    heading.className = `
+    text-3xl
+    font-bold
+    mb-6
+    text-center
+    tracking-wide
+  `;
     loginForm.appendChild(heading);
 
-    // Create Email label and input container
-    const emailLabel = document.createElement("label");
-    emailLabel.textContent = "Email:";
-    emailLabel.setAttribute("for", "email");
-    emailLabel.className = "block text-gray-700 mb-2";
+    // 7) Email label & input
+    const emailLabel = document.createElement('label');
+    emailLabel.textContent = 'Email';
+    emailLabel.className = `
+    block
+    text-sm
+    font-semibold
+    mb-1
+  `;
     loginForm.appendChild(emailLabel);
 
-    const emailInput = document.createElement("input");
-    emailInput.type = "email";
-    emailInput.id = "email";
-    emailInput.placeholder = "Enter your email";
-    emailInput.className =
-        "w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4";
+    const emailInput = document.createElement('input');
+    emailInput.type = 'email';
+    emailInput.placeholder = 'Enter your email';
+    emailInput.className = `
+    w-full
+    border-b border-gray-300
+    bg-transparent
+    px-2 py-2
+    mb-6
+    focus:outline-none
+    focus:border-blue-500
+    transition-colors
+  `;
     loginForm.appendChild(emailInput);
 
-    // Create Password label and input container
-    const passwordLabel = document.createElement("label");
-    passwordLabel.textContent = "Password:";
-    passwordLabel.setAttribute("for", "password");
-    passwordLabel.className = "block text-gray-700 mb-2";
+    // 8) Password label & input
+    const passwordLabel = document.createElement('label');
+    passwordLabel.textContent = 'Password';
+    passwordLabel.className = `
+    block
+    text-sm
+    font-semibold
+    mb-1
+  `;
     loginForm.appendChild(passwordLabel);
 
-    const passwordInput = document.createElement("input");
-    passwordInput.type = "password";
-    passwordInput.id = "password";
-    passwordInput.placeholder = "Enter your password";
-    passwordInput.className =
-        "w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-6";
+    const passwordInput = document.createElement('input');
+    passwordInput.type = 'password';
+    passwordInput.placeholder = 'Enter your password';
+    passwordInput.className = `
+    w-full
+    border-b border-gray-300
+    bg-transparent
+    px-2 py-2
+    mb-6
+    focus:outline-none
+    focus:border-blue-500
+    transition-colors
+  `;
     loginForm.appendChild(passwordInput);
 
-    // Create login button
-    const loginButton = document.createElement("button");
-    loginButton.type = "submit";
-    loginButton.textContent = "Login";
-    loginButton.className =
-        "w-full bg-blue-500 text-white py-3 rounded-md hover:bg-blue-600 transition-colors";
+    // 9) Login button
+    const loginButton = document.createElement('button');
+    loginButton.type = 'submit';
+    loginButton.textContent = 'Login';
+    loginButton.className = `
+    w-full
+    py-3
+    border border-black
+    text-black
+    rounded-md
+    transition-colors
+    duration-300
+    hover:bg-black
+    hover:text-white
+    focus:outline-none
+    font-semibold
+    tracking-wide
+  `;
     loginForm.appendChild(loginButton);
 
     // Optionally, add a submit event listener for the form.
@@ -366,17 +332,18 @@ function renderLogin(container: HTMLElement) {
         // Insert your login handling logic...
     });
 
-    const linkContainer = document.createElement("p");
-    linkContainer.className = "text-center mt-4";
-    
-    const link = document.createElement("a");
-    link.textContent = "Create here!";
-    link.href = "#";
-    link.className = "text-blue-500 hover:underline";
-    link.addEventListener("click", (e) => {
+    // 10) “Don’t have an account?” link
+    const linkContainer = document.createElement('p');
+    linkContainer.className = 'text-center mt-6 text-sm';
+
+    const registerLink = document.createElement('a');
+    registerLink.textContent = 'Create here!';
+    registerLink.href = '#';
+    registerLink.className = 'text-blue-500 hover:underline ml-1';
+    registerLink.addEventListener('click', (e) => {
         e.preventDefault();
-        history.pushState({}, "", "#register");
-        renderRegister(container); // Call renderRegister when the link is clicked
+        history.pushState({}, '', '#register');
+        renderRegister(container);
     });
     
     linkContainer.appendChild(document.createTextNode("Don't have an account? "));
@@ -385,8 +352,6 @@ function renderLogin(container: HTMLElement) {
     appendLoginButton(loginForm);
 
     loginForm.appendChild(linkContainer);
-
-    container.appendChild(loginForm);
 }
 
 function renderRegister(container: HTMLElement) {
