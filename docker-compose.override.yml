@@ -7,7 +7,6 @@ services:
       dockerfile: Dockerfile
     volumes:
       - ./nginx/templates:/etc/nginx/templates
-      - ./pong:/var/www/pong
       - ./user-management-service/app/uploads:/usr/share/nginx/html/uploads
     depends_on:
       - user-management-service
