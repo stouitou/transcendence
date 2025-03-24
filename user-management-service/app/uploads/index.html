@@ -1,0 +1,43 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<meta name="viewport" content="width=device-width, initial-scale=1.0">
+	<meta http-equiv="Content-Security-Policy" content="img-src 'self' https://lh3.googleusercontent.com https://avatars.githubusercontent.com https://cdn.intra.42.fr;">
+	<!-- <meta http-equiv="Content-Security-Policy" content="img-src 'self' https://avatars.githubusercontent.com;"> -->
+	<title>test de visualisation</title>
+
+<!-- 	<script>
+		const socket = new WebSocket("wss://localhost:4433/ws", "echo-protocol");
+
+socket.onopen = () => {
+    console.log("Connecté via WSS !");
+};
+
+socket.onmessage = (event) => {
+    console.log("Message reçu :", event.data);
+};
+
+socket.onerror = (error) => {
+    console.error("Erreur WebSocket :", error);
+};
+
+socket.onclose = () => {
+    console.log("Connexion fermée");
+};
+	</script> -->
+</head>
+<body>
+	<message-component id="1"></message-component>
+	<user-login-section id="1"></user-login-section>
+	<user-profil-section id="1"></user-profil-section>
+	<view-profil-component></view-profil-component>
+	<edit-profile-component></edit-profile-component>
+</body>
+
+<script  type="module" src="js/message-component.js"></script>
+<script  type="module" src="js/user-login-component.js"></script>
+<script type="module" src="js/user-profile-component.js"></script>
+<script type="module" src="js/view-profile-component.js"></script>
+<script type="module" src="js/edit-profile-component.js"></script>
+</html>

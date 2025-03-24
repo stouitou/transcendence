@@ -42,7 +42,9 @@ export class AuthService {
     return this.app.jwt.sign(
      // { id: user.id },
       { ...user },//on envoie tout l'objet user
-      { expiresIn: "1h" }
+      { expiresIn: "10h" } //@DEBUG
+      //{ expiresIn: "1h" } 
+      //{ expiresIn: "1m" } // 1 minute
     );
   }
 
@@ -119,13 +121,13 @@ export class AuthService {
    * @param password 
    * @returns 
    */
-  async createUser(email: string, password: string) :Promise<User | null>{
+  async createUser(name:string , email: string, password: string) :Promise<User | null>{
     // 1 - vérifier si l'utilisateur existe déjà
 
     // 2- crypter le mot de passe
     const passwordHash = bcrypt.hashSync(password, 10);
     // 3- creer un nouvel utilisateur
-    const newuser = new User({ authProviders: [{provider: "local", provider_id: email, password:passwordHash}]});
+    const newuser = new User({name, authProviders: [{provider: "local", provider_id: email, password:passwordHash}]});
     
     // 4 - enregistrer le user dans la base de données
     const user = await this.UserRepository.create(newuser);
@@ -173,14 +175,27 @@ async registerWithOauthProvider(profile:any, provider: string) {
   console.log("auth.controller.ts  registerWithOauthProvider  start register")
   // 1️⃣- extraire l'identifiant du fournisseur d'authentification
   let provider_id = "";
+  let name = "";
+  let avatar = "";
   if (provider === "google") {
     provider_id = `${profile.id}`;
+    name = profile.displayName;
+    avatar = profile.photos[0].value;
   } else if (provider === "facebook") {
     provider_id = profile.id;
+    name = profile.displayName;
+    avatar = profile.photos[0].value;
   } else if (provider === "github") {
     provider_id = `${profile.id}`
+    name = profile.username;
+    avatar = profile.photos[0].value;
   } else if (provider === "42api") {
     provider_id = `${profile.id}`;
+    name =
+      profile.first_name && profile.last_name
+        ? `${profile.first_name} ${profile.last_name}`
+        : profile.login;
+    avatar = profile.image.link;
   }
   // on dispose de l'objet profile qui contient les informations de l'utilisateur 
   // et de provider qui contient le nom du fournisseur d'authentification
@@ -191,7 +206,7 @@ async registerWithOauthProvider(profile:any, provider: string) {
   // 3️⃣- si l'utilisateur existe déjà, le retourner
   if (existingUser) return existingUser;
   // 4️⃣- si l'utilisateur n'existe pas, le créer
-  const user = await  this.UserRepository.create({authProviders: [{provider: provider, provider_id}] });
+  const user = await  this.UserRepository.create({name , avatar , authProviders: [{provider: provider, provider_id}] });
   // 5️⃣- retourner l'utilisateur
   return user;
 }

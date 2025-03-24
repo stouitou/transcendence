@@ -1,0 +1,163 @@
+// test with REST Client extension for Visual Studio Code
+// https://marketplace.visualstudio.com/items?itemName=humao.rest-client
+// remove the databaseFile in ./app/data/myDb.sqlite for a fresh start
+// Each line presents a request to the database-service
+// create a new User with AUthProviders
+// create a new User
+// create a new Game
+// ceate a new GameHistory
+// create a new Tournament
+// upade a Tournament
+// upade a Game
+// get data from the database
+
+
+### CREATE A 2 NEW USERS
+### new user as player1
+POST https://localhost:4433/api/v2/database/myDb/table/user HTTP/1.1
+Content-Type: application/json
+
+{
+"name": "player1",
+"authProviders": [
+    { "provider": "local", "provider_id": "player1@mail.com", "password":"1234hashPasword" }
+  ]
+}
+
+### new user as player2
+POST https://localhost:4433/api/v2/database/myDb/table/user HTTP/1.1
+Content-Type: application/json
+
+{
+"name": "player2"
+}
+### new user as player4
+POST https://localhost:4433/api/v2/database/myDb/table/user HTTP/1.1
+Content-Type: application/json
+
+{
+"name": "player4",
+"authProviders": [
+    { "provider": "local", "provider_id": "player4@mail.com", "password":"1234hashPasword" }
+  ],
+  "friends": [1,2]
+}
+
+### update user1 with friends
+PUT https://localhost:4433/api/v2/database/myDb/table/user/id/1 HTTP/1.1
+Content-Type: application/json
+
+{
+"friends": [2]
+}
+
+### GET USERS
+### get users
+GET  https://localhost:4433/api/v2/database/myDb/table/user HTTP/1.1
+
+### get user1 with relations authProviders
+GET  https://localhost:4433/api/v2/database/myDb/table/user?relations=authProviders&filters={"id":"1"} HTTP/1.1
+
+### get user1
+GET  https://localhost:4433/api/v2/database/myDb/table/user/id/1 HTTP/1.1
+
+
+### get user2
+GET  https://localhost:4433/api/v2/database/myDb/table/user/id/2 HTTP/1.1
+
+
+
+### nouveau Game
+POST https://localhost:4433/api/v2/database/myDb/table/game HTTP/1.1
+Content-Type: application/json
+
+{
+"players": [1, 2]
+}
+
+
+### nouveau Game avec player1 et player3 (new user) // ne sera pas utilise comme ca
+POST https://localhost:4433/api/v2/database/myDb/table/game HTTP/1.1
+Content-Type: application/json
+
+{
+"players": [1, {"name": "player3"}]
+}
+
+### verification des games depuis users
+GET  https://localhost:4433/api/v2/database/myDb/table/user?relations=games HTTP/1.1
+
+### nouveau games avec relations players as user //@TODO devrais je replacer par users???
+GET  https://localhost:4433/api/v2/database/myDb/table/game?relations=players HTTP/1.1
+
+### creation d'un gameHistory
+POST https://localhost:4433/api/v2/database/myDb/table/gameHistory HTTP/1.1
+Content-Type: application/json
+
+{
+  "score1": 10,
+  "player1": 1,
+  "score2": 5,
+  "player2": 2,
+  "game": {"id":1}
+}
+### mise a jour du state du game
+PUT https://localhost:4433/api/v2/database/myDb/table/game/id/1 HTTP/1.1
+Content-Type: application/json
+
+{
+  "state": "terminee"
+}
+
+### MODE TOURNOIS
+### create a tournament
+POST https://localhost:4433/api/v2/database/myDb/table/tournaments HTTP/1.1
+Content-Type: application/json
+
+{
+  "games": [{
+      "players": [{"id": 1}, {"id": 2}]
+       }],
+  
+  "players": [1, 2]
+}
+### get tournament
+GET  https://localhost:4433/api/v2/database/myDb/table/tournaments HTTP/1.1
+
+### get tournament avec relations games
+GET  https://localhost:4433/api/v2/database/myDb/table/tournaments?relations=games HTTP/1.1
+
+### get tournament 1 avec relations games et games.players
+GET  https://localhost:4433/api/v2/database/myDb/table/tournaments/id/1?relations=games&relations=players&relations=games.players HTTP/1.1
+### nous retourne les games du tournois 1 avec les players de chaque game ici games.id = 2 et games.players = [{id: 1}, {id: 2}]
+
+
+### creation d'un gameHistory pour la game.id=2 dans le tournois 1
+POST https://localhost:4433/api/v2/database/myDb/table/gameHistory HTTP/1.1
+Content-Type: application/json
+
+{
+  "score1": 10,
+  "player1": 1,
+  "score2": 50,
+  "player2": 2,
+  "game": {"id":2}
+}
+
+### GET gameHistory 
+GET https://localhost:4433/api/v2/database/myDb/table/gameHistory HTTP/1.1
+### get game 2 avec relations gameHistory (gameHistory est automatiquement lie a game)
+GET https://localhost:4433/api/v2/database/myDb/table/game/id/2 HTTP/1.1
+
+
+### get game 2 avec relations gameHistory et players
+GET https://localhost:4433/api/v2/database/myDb/table/game/id/2?relations=players HTTP/1.1
+
+
+### mise a jour du state du Tournament 1
+PUT https://localhost:4433/api/v2/database/myDb/table/tournaments/id/1 HTTP/1.1
+Content-Type: application/json
+
+{
+  "state": "terminee"
+}

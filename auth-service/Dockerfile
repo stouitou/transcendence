@@ -3,17 +3,12 @@ FROM node:23-alpine
 # Copier package.json et installer les dépendances en premier (pour utiliser le cache)
 COPY ./app/package*.json ./
 
-RUN npm install npm@11.1.0
-
-#RUN npm install
-
 # Create and change to the app directory
 WORKDIR /app
+RUN npm install -g npm@11.2.0
+RUN npm install 
 
 RUN chown -R node:node /app
-
-# Copy the rest of the application code
-EXPOSE 3000
 
 # Copier le script d'entrée
 COPY ./scripts/entrypoint.sh /usr/local/bin/entrypoint.sh

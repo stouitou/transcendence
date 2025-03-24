@@ -22,6 +22,10 @@ server {
     ssl_certificate /etc/nginx/ssl/transcendence.crt;
     ssl_certificate_key /etc/nginx/ssl/transcendence.key;
 
+    location /uploads/ {        
+        root /usr/share/nginx/html;
+        autoindex on;
+    }
     #include all proxy configuration location
     include /etc/nginx/conf/configProxy/*.conf;
 

@@ -1,0 +1,15 @@
+{"level":30,"time":1740334296058,"pid":247,"hostname":"9f7b9bec129c","msg":"Server listening at http://127.0.0.1:3000"}
+{"level":30,"time":1740334296059,"pid":247,"hostname":"9f7b9bec129c","msg":"Server listening at http://172.19.0.2:3000"}
+{"level":30,"time":1740334296059,"pid":247,"hostname":"9f7b9bec129c","msg":"🚀 Server running on node container http://localhost:3000"}
+{"level":30,"time":1740334477480,"pid":217,"hostname":"4b2c39acf574","msg":"Server listening at http://127.0.0.1:3000"}
+{"level":30,"time":1740334477481,"pid":217,"hostname":"4b2c39acf574","msg":"Server listening at http://172.20.0.2:3000"}
+{"level":30,"time":1740334477481,"pid":217,"hostname":"4b2c39acf574","msg":"🚀 Server running on node container http://localhost:3000"}
+{"level":30,"time":1740334482939,"pid":264,"hostname":"4b2c39acf574","msg":"Server listening at http://127.0.0.1:3000"}
+{"level":30,"time":1740334482940,"pid":264,"hostname":"4b2c39acf574","msg":"Server listening at http://172.20.0.2:3000"}
+{"level":30,"time":1740334482941,"pid":264,"hostname":"4b2c39acf574","msg":"🚀 Server running on node container http://localhost:3000"}
+{"level":30,"time":1740334595392,"pid":311,"hostname":"4b2c39acf574","msg":"Server listening at http://127.0.0.1:3000"}
+{"level":30,"time":1740334595392,"pid":311,"hostname":"4b2c39acf574","msg":"Server listening at http://172.20.0.2:3000"}
+{"level":30,"time":1740334595393,"pid":311,"hostname":"4b2c39acf574","msg":"🚀 Server running on node container http://localhost:3000"}
+{"level":30,"time":1740335467299,"pid":415,"hostname":"4b2c39acf574","msg":"Server listening at http://127.0.0.1:3000"}
+{"level":30,"time":1740335467300,"pid":415,"hostname":"4b2c39acf574","msg":"Server listening at http://172.20.0.2:3000"}
+{"level":30,"time":1740335467300,"pid":415,"hostname":"4b2c39acf574","msg":"🚀 Server running on node container http://localhost:3000"}
