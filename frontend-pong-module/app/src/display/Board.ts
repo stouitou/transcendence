@@ -6,6 +6,7 @@ export class	Board extends Display {
 	/* ATTRIBUTES */
 	private readonly	_right: HTMLDivElement;
 	private readonly	_left: HTMLDivElement;
+	private readonly	_botom: HTMLDListElement | null = null;
 
 	private readonly	_font: string = "system-ui";		// typeface of the text
 	private readonly	_color: string = "rgb(0, 0, 0)";	// color of the text
@@ -16,14 +17,14 @@ export class	Board extends Display {
 
 	private readonly	_player1: Player;
 	private	readonly	_player2: Player;
+	private readonly	_player3: Player | null = null;
 
 	/* CONSTRUCTOR */
-	constructor(player1: Player, player2: Player, canvas: HTMLCanvasElement) {
+	constructor(players: Player[], canvas: HTMLCanvasElement) {
 		super(canvas);
 
-		this._player1 = player1;
-		this._player2 = player2;
-
+		this._player1 = players[0];
+		this._player2 = players[1];
 		// Score of the first player (on the right)
 		this._right = document.createElement("div");
 
@@ -46,6 +47,22 @@ export class	Board extends Display {
 		this._left.style.top = `${this._canvas.offsetTop}px`;
 		this._left.style.left = `${this._canvas.offsetLeft + (this._horizontal / 100 * this._canvas.width)}px`;
 		this._left.style.position = 'absolute';
+
+		// if (players[2]) {
+		// 	this._player3 = players[2];
+			
+		// 	if(!this._botom) {
+		// 	this._botom = document.createElement("div");
+
+		// 	this._botom.textContent = `${this._player3.score}`;
+		// 	this._botom.style.font = `${this._font}`;
+		// 	this._botom.style.color = `${this._color}`;
+		// 	this._botom.style.fontSize = `${this._size}px`;
+		// 	this._botom.style.top = `${this._canvas.offsetTop}px`;
+		// 	this._botom.style.left = `${this._canvas.offsetLeft + (this._horizontal / 100 * this._canvas.width)}px`;
+		// 	this._botom.style.position = 'absolute';
+		// 	this._botom.textContent = `${this._player2.score}`; }
+		// }
 	}
 	
 	/* GETTERS */

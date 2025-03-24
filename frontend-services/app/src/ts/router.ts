@@ -206,7 +206,7 @@ const pongGameScript = async () => {
     // const canvas = document.getElementById("pongCanvas");
 	script.type = 'module';
 	script.src = 'https://localhost:4433/frontend-pong-module/app/src/component/oneVSone.ts';
-    console.log("script src: ", script.src);
+    //console.log("script src: ", script.src);
     window.document.head.appendChild(script);
 };
 

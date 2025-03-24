@@ -21,7 +21,7 @@ export class	Paddle extends Display {
 	private 			_right: number;
 
 	/* CONSTRUCTOR */
-	constructor(location: number = 1 | 2, canvas: HTMLCanvasElement) {
+	constructor(location: number = 1 | 2 | 3 | 4, canvas: HTMLCanvasElement) {
 		super(canvas);
 
 		this._location = location;
@@ -30,20 +30,40 @@ export class	Paddle extends Display {
 		this._element = document.createElement("div");
 		// this._element.classList.add('paddle');
 		// Gives the paddle all its values
-		this._element.style.width = `${this._width}px`;
-		this._element.style.height = `${this._height}px`;
+		
 		this._element.style.backgroundColor = `${this._color}`;
 		this._element.style.position = "absolute";
-		this._element.style.top = `${this._canvas.offsetTop + (50 / 100 * this._canvas.height) - (this._height / 2)}px`;	// this._element.style.top = `${(window.innerHeight / 2) - (this._height / 2)}px`;
-		// this._element.style.top = `calc(50% - ${this._height / 2}px)`;	// this._element.style.top = `${(window.innerHeight / 2) - (this._height / 2)}px`;
 
-		if (location === 1) {
-			this._element.style.left = `${this._field.left + ((100 - 2) / 100 * this._canvas.width) - this._width}px`;
-			// this._element.style.right = `calc(5% + ${this._width / 2}px)`;
+		if (location === 1 || location === 2) {
+			this._element.style.width = `${this._width}px`;
+			this._element.style.height = `${this._height}px`;
+			this._element.style.top = `${this._canvas.offsetTop + (50 / 100 * this._canvas.height) - (this._height / 2)}px`;	// this._element.style.top = `${(window.innerHeight / 2) - (this._height / 2)}px`;
+			// this._element.style.top = `calc(50% - ${this._height / 2}px)`;	// this._element.style.top = `${(window.innerHeight / 2) - (this._height / 2)}px`;
+
+			if (location === 1) {
+				this._element.style.left = `calc(-5% + ${this._canvas.offsetLeft + this._canvas.width}px)`;
+				// this._element.style.right = `calc(5% + ${this._width / 2}px)`;
+			}
+			else if (location === 2) {
+				this._element.style.left = `calc(5% + ${this._canvas.offsetLeft - this._width}px)`;
+				// this._element.style.left = `calc(5% - ${this._width / 2}px)`;
+			}
 		}
-		else if (location === 2) {
-			this._element.style.left = `${this._field.left + (2 / 100 * this._canvas.width)}px`;
-			// this._element.style.left = `calc(5% - ${this._width / 2}px)`;
+		else if (location === 3 || location === 4) {
+			this._element.style.width = `${this._height}px`;
+			this._element.style.height = `${this._width}px`;
+			this._element.style.left = `${this._canvas.offsetLeft + (50 / 100 * this._canvas.width) - (this._height / 2)}px`; // a revoir quand le canvas sera bon
+
+			if (location === 3) {
+				console.log("top =", this._field.top + (this._canvas.width));
+				this._element.style.top = `calc(-5% + ${this._canvas.offsetTop + this._canvas.height - this._width}px)`;
+				//this._element.style.top = `${this._field.top + (this._canvas.height)}px`;
+			}
+			else if (location === 4) {
+				console.log("top =", this._field.top + (this._canvas.width));
+				this._element.style.top = `calc(5% + ${this._canvas.offsetTop }px)`;
+				//this._element.style.top = `${this._field.top + (this._canvas.height)}px`;
+			}
 		}
 		// "Draws" the paddle in the window
 		// const	gameContainer = this._canvas.parentElement as HTMLElement;

@@ -6,7 +6,7 @@ import { Game } from '../entities/Game.js';
 
 @customElement('game-component')
 export class  oneVSone extends LitElement {
-  @property({ type: String }) canvasId!: string;
+  @property({ type: String }) canvasId: string = "pongCanvas";
 
   /* ATTRIBUTES */
   private _canvas: HTMLCanvasElement | null = null;
@@ -15,7 +15,6 @@ export class  oneVSone extends LitElement {
   /* CONSTRUCTOR */
 	constructor () {
     super();
-    console.log("Starting game...");
   }
 
   firstUpdated () {
@@ -23,23 +22,28 @@ export class  oneVSone extends LitElement {
     if (!this._canvas) {
       throw new Error("No canvas found");
     }
-
+    
     this._canvas.style.background = 'rgb(0, 87, 0)';
-
+    
     const player1 = new Player("First", this._canvas);
     const player2 = new Player("Second", this._canvas);
+    const player3 = new Player("Three", this._canvas);
+    const player4 = new Player("Four", this._canvas);
     
-    // const players: Player[] = [player1, player2];
+    const players: Player[] = [player1, player2, player3, player4]
+  
+    this._game = new Game(players, this._canvas);
 
-    this._game = new Game(player1, player2, this._canvas);
     this._game.launch();
   }
-  
-  render () {
-    return html`
-      <div class="game"></div>
-    `;
-  }
+/*  RAJOUTE UNE ZONE VIDE A DROITE DU CANVAS  */
+//   render () {
+//     return html`
+//       <div class="game">
+//         <p>Pong Game Component</p>
+//       </div>
+//     `;
+//   }
 
   static styles = css`
   
