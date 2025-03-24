@@ -1,5 +1,9 @@
 // router.ts
 
+import { appendLoginButton, handleLogin, handleRegister, renderLogout } from './auth';
+import { fetchProfileData } from './fetchProfile';
+import { getState } from './state';
+
 import { createButton } from './button';
 import {startGame} from "./pong";
 
@@ -352,12 +356,13 @@ function renderLogin(container: HTMLElement) {
     loginForm.appendChild(loginButton);
 
     // Optionally, add a submit event listener for the form.
-    loginForm.addEventListener("submit", (e) => {
+    loginForm.addEventListener("submit", async(e) => {
         e.preventDefault();
         // Process the login here, e.g., collect email and password values and send them to your server.
         const email = emailInput.value;
         const password = passwordInput.value;
-        console.log("Email:", email, "Password:", password);
+        console.log("Email:", email, "Password:", password?"Password is not empty (never show password in console please)":"Password is empty");
+        await handleLogin({ email, password });
         // Insert your login handling logic...
     });
 
@@ -376,6 +381,9 @@ function renderLogin(container: HTMLElement) {
     
     linkContainer.appendChild(document.createTextNode("Don't have an account? "));
     linkContainer.appendChild(link);
+
+    appendLoginButton(loginForm);
+
     loginForm.appendChild(linkContainer);
 
     container.appendChild(loginForm);
@@ -479,7 +487,8 @@ function renderRegister(container: HTMLElement) {
             return;
         }
 
-        console.log("Name:", name, "Email:", email, "Password:", password);
+        console.log("Name:", name, "Email:", email, "Password:", password?"Password is not empty (never show password in console please)":"Password is empty");
+        handleRegister({ name, email, password });
         // Insert your registration handling logic...
     });
     const linkContainer = document.createElement("p");
@@ -520,6 +529,8 @@ function renderProfile(container: HTMLElement, user: {
     role: string, 
     createdAt: string 
 }){
+    if (!getState().user) fetchProfileData();
+
     while (container.firstChild) {
         container.removeChild(container.firstChild);
     }
@@ -558,6 +569,8 @@ function renderProfile(container: HTMLElement, user: {
 
     // Append profile card to container
     container.appendChild(profileCard);
+    
+    if (getState().isLoggedIn)  renderLogout(container);
 }
 
 function renderGameHistory(container: HTMLElement, username: string) {
@@ -610,6 +623,7 @@ export function router() {
     const mainElement = document.querySelector('main');
     if (!mainElement) return;
 
+    const state = getState();
     clearContainer(mainElement);
 
     // Use the hash to determine the route; default to home.
@@ -632,7 +646,7 @@ export function router() {
             renderRegister(mainElement);
             break;
         case '#profile':
-            renderProfile(mainElement, user);
+            renderProfile(mainElement, state.user??user);
             break;
         default:
             renderNotFound(mainElement);

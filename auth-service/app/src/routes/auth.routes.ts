@@ -2,9 +2,9 @@ import { FastifyInstance } from "fastify";
 import FastifyPassport from "@fastify/passport";
 import { AuthController } from "../controllers/auth.controller";
 import { AuthSchema } from "../schemas/auth.schema";
-import UserRepository from "@src/repository/User.repository";
-import AuthProviderRepository from "@src/repository/AuthProvider.repository";
 import { User } from "@src/models/User.models";
+
+const redirectUrlAfterLoginSuccess = "https://localhost:4433/#profile";
 async function authRoutes(app: FastifyInstance) {
 
   const authController = new AuthController(app);
@@ -39,7 +39,7 @@ async function authRoutes(app: FastifyInstance) {
         maxAge: 3600 // 1 heure
     });
       
-      res.redirect(`https://localhost:4433/uploads/index.html`);}
+      res.redirect(redirectUrlAfterLoginSuccess);}
   );
 
   app.get("/github/callback",
@@ -57,7 +57,7 @@ async function authRoutes(app: FastifyInstance) {
         path: '/',
         maxAge: 3600 // 1 heure
     });      
-    res.redirect(`https://localhost:4433/uploads/index.html`);}
+    res.redirect(redirectUrlAfterLoginSuccess);}
   );
 
   //no setup 
@@ -76,7 +76,7 @@ async function authRoutes(app: FastifyInstance) {
         path: '/',
         maxAge: 3600 // 1 heure
     });      
-    res.redirect(`https://localhost:4433/uploads/index.html`);}
+    res.redirect(redirectUrlAfterLoginSuccess);}
   );
 
     // Route pour gérer le callback
@@ -101,7 +101,7 @@ async function authRoutes(app: FastifyInstance) {
           path: '/',
           maxAge: 3600 // 1 heure
       });      
-      reply.redirect(`https://localhost:4433/uploads/index.html`);
+      reply.redirect(redirectUrlAfterLoginSuccess);
     //  return  reply.send({ token: jwtToken });
     } catch (err) {
       reply.send(err);

@@ -7,6 +7,7 @@ export const AuthSchema = {
   // Schéma pour la récupération de tous les utilisateurs
   register: {
 	body: Type.Object({
+		name: Type.String({ examples: ["Sup€rKaRoT"] }),
 		email: Type.String({ format: 'email', examples: ["jack@mail.com"]}),
 		password: Type.String(({ minLength: 8 }))
 	  }),

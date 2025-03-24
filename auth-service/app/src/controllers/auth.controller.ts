@@ -45,7 +45,7 @@ export class AuthController extends BaseController {
    */ 
   async register(req: FastifyRequest, reply: FastifyReply) {
 	  console.log("🔵 AuthController  start register")
-    const { email, password } = req.body as { email: string; password: string };
+    const { name, email, password } = req.body as { name : string, email: string; password: string };
     // Vérifier si l'utilisateur existe déjà dan AuthProvider
     const existingUser = await this.AuthProviderRepository.getByParams({provider_id:email,provider:"local"});
   	console.log("❓ AuthController   existingUser: ", existingUser)
@@ -55,7 +55,7 @@ export class AuthController extends BaseController {
     console.log("🟠 AuthController  try create User")
 
     // Créer l'utilisateur  
-    const newUser = await this.app.authService.createUser(email, password);
+    const newUser = await this.app.authService.createUser(name, email, password);
 	  console.log("🟡 newUser",newUser)
     if (!newUser) {
       return reply.status(400).send({ error: "User already exists" });

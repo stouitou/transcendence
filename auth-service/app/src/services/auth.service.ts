@@ -121,13 +121,13 @@ export class AuthService {
    * @param password 
    * @returns 
    */
-  async createUser(email: string, password: string) :Promise<User | null>{
+  async createUser(name:string , email: string, password: string) :Promise<User | null>{
     // 1 - vérifier si l'utilisateur existe déjà
 
     // 2- crypter le mot de passe
     const passwordHash = bcrypt.hashSync(password, 10);
     // 3- creer un nouvel utilisateur
-    const newuser = new User({ authProviders: [{provider: "local", provider_id: email, password:passwordHash}]});
+    const newuser = new User({name, authProviders: [{provider: "local", provider_id: email, password:passwordHash}]});
     
     // 4 - enregistrer le user dans la base de données
     const user = await this.UserRepository.create(newuser);

@@ -24,4 +24,6 @@ document.addEventListener('DOMContentLoaded', () => {
 
     // Listen for hash changes to update the view.
     window.addEventListener('hashchange', router);
+    // Subscribe to state changes to re-render the router
+    document.addEventListener('stateChange', router);
 });
