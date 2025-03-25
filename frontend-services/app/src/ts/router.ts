@@ -1,5 +1,9 @@
 // router.ts
 
+import { appendLoginButton, handleLogin, handleRegister, renderLogout } from './auth';
+import { fetchProfileData } from './fetchProfile';
+import { getState } from './state';
+
 import { createButton } from './button';
 import {startGame} from "./pong";
 
@@ -188,25 +192,11 @@ export function renderHome(container: HTMLElement) {
     }
 }
 
-
-
-// function renderGame(container: HTMLElement) {
-//     const heading = document.createElement('h2');
-//     heading.textContent = 'Game Page';
-
-//     const paragraph = document.createElement('p');
-//     paragraph.textContent = 'Loading game...';
-//     startGame();
-//     container.appendChild(heading);
-//     container.appendChild(paragraph);
-// }
-
 const pongGameScript = async () => {
 	const script = document.createElement('script');
     // const canvas = document.getElementById("pongCanvas");
 	script.type = 'module';
 	script.src = 'https://localhost:4433/frontend-pong-module/app/src/component/oneVSone.ts';
-    //console.log("script src: ", script.src);
     window.document.head.appendChild(script);
 };
 
@@ -223,8 +213,8 @@ function renderGame(container: HTMLElement) {
     // Create canvas element
     const canvas = document.createElement("canvas");
     canvas.id = "pongCanvas";
-    canvas.width = 1000;
-    canvas.height = 400;
+    canvas.width = 600;
+    canvas.height = 500;
     canvas.className = "shadow-lg rounded-lg";
 
     // Create Start Game button
@@ -239,6 +229,9 @@ function renderGame(container: HTMLElement) {
     // Add event listener to start game
     startButton.addEventListener("click", () => {
         if (typeof startGame === "function") {
+            const gameComponent = document.createElement("game-component");
+            gameComponent.setAttribute("canvasId", "pongCanvas");
+            container.appendChild(gameComponent);
             pongGameScript();
             startButton.remove();
             startTournamentButton.remove();
@@ -363,12 +356,13 @@ function renderLogin(container: HTMLElement) {
     loginForm.appendChild(loginButton);
 
     // Optionally, add a submit event listener for the form.
-    loginForm.addEventListener("submit", (e) => {
+    loginForm.addEventListener("submit", async(e) => {
         e.preventDefault();
         // Process the login here, e.g., collect email and password values and send them to your server.
         const email = emailInput.value;
         const password = passwordInput.value;
-        console.log("Email:", email, "Password:", password);
+        console.log("Email:", email, "Password:", password?"Password is not empty (never show password in console please)":"Password is empty");
+        await handleLogin({ email, password });
         // Insert your login handling logic...
     });
 
@@ -387,6 +381,9 @@ function renderLogin(container: HTMLElement) {
     
     linkContainer.appendChild(document.createTextNode("Don't have an account? "));
     linkContainer.appendChild(link);
+
+    appendLoginButton(loginForm);
+
     loginForm.appendChild(linkContainer);
 
     container.appendChild(loginForm);
@@ -490,7 +487,8 @@ function renderRegister(container: HTMLElement) {
             return;
         }
 
-        console.log("Name:", name, "Email:", email, "Password:", password);
+        console.log("Name:", name, "Email:", email, "Password:", password?"Password is not empty (never show password in console please)":"Password is empty");
+        handleRegister({ name, email, password });
         // Insert your registration handling logic...
     });
     const linkContainer = document.createElement("p");
@@ -531,6 +529,8 @@ function renderProfile(container: HTMLElement, user: {
     role: string, 
     createdAt: string 
 }){
+    if (!getState().user) fetchProfileData();
+
     while (container.firstChild) {
         container.removeChild(container.firstChild);
     }
@@ -569,6 +569,8 @@ function renderProfile(container: HTMLElement, user: {
 
     // Append profile card to container
     container.appendChild(profileCard);
+    
+    if (getState().isLoggedIn)  renderLogout(container);
 }
 
 function renderGameHistory(container: HTMLElement, username: string) {
@@ -621,6 +623,7 @@ export function router() {
     const mainElement = document.querySelector('main');
     if (!mainElement) return;
 
+    const state = getState();
     clearContainer(mainElement);
 
     // Use the hash to determine the route; default to home.
@@ -643,7 +646,7 @@ export function router() {
             renderRegister(mainElement);
             break;
         case '#profile':
-            renderProfile(mainElement, user);
+            renderProfile(mainElement, state.user??user);
             break;
         default:
             renderNotFound(mainElement);

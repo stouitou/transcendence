@@ -31,7 +31,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
   // - le nom de la table,
   // - les relations (nom des propriétés liées à d'autres tables)
   constructor() {
-    super("myDb", "user", ["authProviders"]);
+    super("myDb", "user", ["authProviders","tournaments","games","friends"]);
   }
   //create
   create = async (user: Partial<User>): Promise<User> => {
@@ -80,7 +80,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
 
  getById= async (id: number): Promise<User | null> => {
       
-    const url = `${this.URL}/id/${id}?relations=authProviders`;//{this.getRelations()}
+    const url = `${this.URL}/id/${id}${this.getRelations()}`;// on ajoute toutes les relations
     console.log("🔐 UserRepository.getById()  --url--",url)
     const response = await fetch(url);
     const  result  = await response.json();

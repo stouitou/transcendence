@@ -1,0 +1,19 @@
+
+# Configuration pour <domain> avec SSL
+server {
+    listen 9090;
+
+    server_name ${BACKEND_SERVER_NAME};
+    server_tokens off;
+
+    location /ws {
+        proxy_pass http://ws-service:3000;  
+            proxy_http_version 1.1;
+            proxy_set_header Upgrade $http_upgrade;
+            proxy_set_header Connection "Upgrade";
+            proxy_set_header Host $host;
+    }
+
+    access_log /var/log/nginx/access.log;
+    error_log /var/log/nginx/error.log;
+}

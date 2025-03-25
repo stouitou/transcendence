@@ -8,13 +8,13 @@ export class	Pause extends Display {
 
 	private readonly	_width: number = 17;				// width in pixel
 	private readonly	_height: number = 50;				// height in pixel
-	private readonly	_color: string = "rgb(0, 0, 0)";	//	color of the symbol
+	private readonly	_color: string = "rgb(255, 0, 0)";	//	color of the symbol
 	private readonly	_opacity: number = 0.2;				// opacity of the symbol
 	private readonly	_vertical:  number = 5;				// vertical position in percentage
 	private readonly	_horizontal:  number = 48;			// horizontal position in percentage
 
 	/* CONSTRUCTOR */
-	constructor (canvas: HTMLCanvasElement) {
+	constructor (canvas: HTMLDivElement) {
 		super(canvas);
 
 		this._left = document.createElement("div");

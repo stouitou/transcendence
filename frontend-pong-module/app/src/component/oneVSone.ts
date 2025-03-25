@@ -1,15 +1,16 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Player } from '../entities/Player.js';
-// import { Tournament } from '../entities/Tournament.js';
 import { Game } from '../entities/Game.js';
 
 @customElement('game-component')
 export class  oneVSone extends LitElement {
-  @property({ type: String }) canvasId: string = "pongCanvas";
+  // @property({ type: String }) canvasId: string = "pongCanvas";
+  @property({ type: String }) gameContainerId: string = "game-container";
 
   /* ATTRIBUTES */
-  private _canvas: HTMLCanvasElement | null = null;
+  // private _canvas: HTMLCanvasElement | null = null;
+  private _area: HTMLDivElement | null = null;
   private _game!: Game;
 
   /* CONSTRUCTOR */
@@ -18,27 +19,44 @@ export class  oneVSone extends LitElement {
   }
 
   firstUpdated () {
-    this._canvas = window.document.getElementById(this.canvasId) as HTMLCanvasElement | null;
-    if (!this._canvas) {
-      throw new Error("No canvas found");
-    }
-    
-    this._canvas.style.background = 'rgb(0, 87, 0)';
-    
-    const player1 = new Player("First", this._canvas);
-    const player2 = new Player("Second", this._canvas);
-    const player3 = new Player("Three", this._canvas);
-    const player4 = new Player("Four", this._canvas);
-    
-    const players: Player[] = [player1, player2, player3]
-  
-    this._game = new Game(players, this._canvas);
 
+    // this._canvas = window.document.getElementById(this.canvasId) as HTMLCanvasElement | null;
+    // if (!this._canvas) {
+    //   throw new Error("No canvas found");
+    // }
+    
+    this._area = window.document.getElementById(this.gameContainerId) as HTMLDivElement | null;
+    if (!this._area) {
+      throw new Error("No game container found");
+    }
+    this._area.style.width = "700px";
+    this._area.style.height = "500px";
+    this._area.style.position = "absolute";
+    this._area.style.top = "50vh";
+    this._area.style.left = "50vw";
+    this._area.style.transform = "translate(-50%, -50%)";
+    this._area.style.margin = "0%";
+    this._area.style.padding = "0%";
+    this._area.style.background = "rgb(0, 0, 0)";
+    
+    const player1 = new Player("First", this._area);
+    const player2 = new Player("Second", this._area);
+    const player3 = new Player("Three", this._area);
+    const player4 = new Player("Four", this._area);
+    
+    const players: Player[] = [player1, player2, player3];
+
+    this._game = new Game(players, this._area);
     this._game.launch();
+  }
+  
+  render () {
+    return html`
+    `;
   }
 
   static styles = css`
-  
+
   .game {
     display: flex;
     flex-direction: column;
