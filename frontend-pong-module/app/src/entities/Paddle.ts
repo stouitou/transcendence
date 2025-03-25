@@ -110,12 +110,14 @@ export class Paddle extends Display {
 	// Update current position
 	public updatePosition() {
 		if (this._location === 1 || this._location === 2) {
+			console.log("1 and 2")
 			this._top = this._element.offsetTop;
 			this._bottom = this._top + this._height;
 			this._left = this._element.offsetLeft;
 			this._right = this._left + this._width;
 		}
 		else {
+			console.log("3 and 4")
 			this._top = this._element.offsetTop;
 			this._bottom = this._top + this._width;
 			this._left = this._element.offsetLeft;
