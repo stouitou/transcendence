@@ -71,25 +71,17 @@ export class	Game {
 				if (!this._break) {
 					this.launchMovement();
 
-					//console.log("this._ball.right: ", this._ball.right, " this._ball.gameContainer.offsetLeft + this._ball.gameContainer.offsetWidth: ",  this._ball.gameContainer.offsetLeft + this._ball.gameContainer.offsetWidth);
 					// If touch a paddle...
 					if (this._players[0].paddle.collision(this._ball)) {
-						// console.log("paddle1 collision");
 						this._beginning = false;
-						// this._ball.bounce(this._players[0].paddle);
 					}
 					else if (this._players[1].paddle.collision(this._ball)) {
-						// console.log("paddle2 collision");
 						this._beginning = false;
-						// this._ball.bounce(this._players[1].paddle);
 					}
 					else if (this._players[2].paddle.collision(this._ball)) {
-						// console.log("paddle3 collision");
 						this._beginning = false;
-						// this._ball.bounce(this._players[2].paddle);
 					}
 					// ...or touch a wall...
-					// Avoid the ball being blocked in the middle of the wall ?
 					else if (!this._players[3] && this._ball.top <= 0) {
 						this._ball.element.style.top = "0%";				
 						this._ball.direction.y *= -1;
@@ -99,8 +91,8 @@ export class	Game {
 						this._ball.direction.y *= -1;
 					}
 					// ...or get out the field
-					else if ((this._ball.left >= this._canvas.offsetWidth || this._ball.right <= 0)
-						|| (this._players[2] && this._ball.top >= this._canvas.offsetHeight)) {
+					else if (this._ball.left >= this._canvas.offsetWidth || this._ball.right <= 0 || 
+						(this._players[2] && this._ball.top >= this._canvas.offsetHeight)) {
 						this._board.score(this._ball.left);
 						this._beginning = true;
 						this._ball.spawn();

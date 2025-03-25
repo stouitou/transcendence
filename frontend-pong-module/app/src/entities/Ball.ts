@@ -127,11 +127,13 @@ export class	Ball extends Display {
 			this._direction.x *= -1;	
 
 			// Position the ball outside of the paddle to avoid being blocked
-			if (this._left < paddle.right && this._left > paddle.left)
-				this._element.style.left = `${paddle.right}px`;
-			else if (this._right > paddle.left && this._right < paddle.right)
-				this._element.style.left = `calc(${paddle.left - this._diameter} - 1)px`;
-
+			// if (this._left < paddle.right && this._left > paddle.left)
+			if (paddle.location === 1)
+				this._element.style.right = `calc(${paddle.left} - 1)px`;
+			// else if (this._right > paddle.left && this._right < paddle.right)
+			else
+				this._element.style.left = `calc(${paddle.right} + 1)px`;
+			
 			// Formula for the rebound : θrebound ​= θmax ​× (2 × ((yimpact ​− ypaddle) / paddle height)​)
 			const impact: number = 2 * (((this._top + this._radius) - (paddle.top + (paddle.height / 2))) / paddle.height);
 			const angle = ((55 * Math.PI / 180) * impact) + (5 * Math.PI / 180);	// get an angle between 5 and 60 degrees
@@ -143,8 +145,12 @@ export class	Ball extends Display {
 			this._direction.y *= -1;	
 
 			// Position the ball outside of the paddle to avoid being blocked
-			if (this._bottom > paddle.top && this._top < paddle.top) {
+			// if (this._bottom > paddle.top && this._top < paddle.top) {
+			if (paddle.location === 3) {
 				this._element.style.bottom = `calc(${paddle.top} - 1)px`;
+			}
+			else {
+				this._element.style.top = `calc(${paddle.bottom} + 1)px`;
 			}
 
 			// Formula for the rebound : θrebound ​= θmax ​× (2 × ((yimpact ​− ypaddle) / paddle height)​)

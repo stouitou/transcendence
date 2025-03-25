@@ -128,28 +128,22 @@ export class Paddle extends Display {
 
 	public move() {
 		// Fetch the x value of the top of the paddle, and the keys that are being pressed
-		const moveUp = (this._keys['ArrowUp'] && this._location === 1) || (this._keys['s'] && this._location === 2);
-		const moveDown = (this._keys['ArrowDown'] && this._location === 1) || (this._keys['x'] && this._location === 2);
-
+		const	moveUp = (this._keys['ArrowUp'] && this._location === 1) || (this._keys['s'] && this._location === 2);
+		const	moveDown = (this._keys['ArrowDown'] && this._location === 1) || (this._keys['x'] && this._location === 2);
 		const	moveRigth = (this._keys['ArrowRight'] && this._location === 3);// || (this._keys['d'] && this._location === 4);
 		const	moveLeft = (this._keys['ArrowLeft'] && this._location === 3);// || (this._keys['a'] && this._location === 4);
-		//console.log("moveRigth", moveRigth);
 
 		// Move subsequently
 		if (moveUp) {
-			// console.log("Top");
 			this._element.style.top = `${Math.max(0, this._top - this._speed)}px`;
 		}
 		if (moveDown) {
-			// console.log("Down");
 			this._element.style.top = `${Math.min(this._canvas.offsetHeight - this._height, this._top + this._speed)}px`;
 		}
 		if (moveLeft) {
-			// console.log("Rigth"); 
 			this._element.style.left = `${Math.max(0, this._left - this._speed)}px`;
 		}
 		if (moveRigth) {
-			// console.log("Left");
 			this._element.style.left = `${Math.min(this._canvas.offsetWidth - this._height, this._left + this._speed)}px`;
 		}
 	}
@@ -159,7 +153,6 @@ export class Paddle extends Display {
 			ball.left <= this._right &&
 			ball.bottom >= this._top &&
 			ball.top <= this._bottom) {
-				console.log("collision");
 				ball.bounce(this); 
 				return (true);
 			}
