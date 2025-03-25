@@ -9,7 +9,7 @@ export class	Ball extends Display {
 	private readonly	_element: HTMLDivElement;
 	private readonly	_diameter: number = 30;
 	private readonly	_radius: number = this._diameter / 2;
-	private readonly	_color: string = "rgb(0, 0, 0)";
+	private readonly	_color: string = "rgb(255, 0, 0)";
 
 	// For the movement
 	private readonly	_speed: number = 8;
@@ -23,7 +23,7 @@ export class	Ball extends Display {
 	private				_right!: number;
 
 	/* CONSTRUCTOR */
-	constructor (canvas: HTMLCanvasElement) {
+	constructor (canvas: HTMLDivElement) {
 		super(canvas);
 
 		// Creates the ball object
@@ -34,10 +34,10 @@ export class	Ball extends Display {
 		this._element.style.backgroundColor = this._color;					// color of the ball
 		this._element.style.borderRadius = "50%";							// makes it round
 		this._element.style.position = "absolute";							// doesn't interact with other objects or text
-		this._element.style.marginTop = "0px";
-		this._element.style.marginLeft = "0px";
+		this._element.style. margin = "0%";
+		this._element.style.padding = "0%";
 		// this._element.style.display = "none";							// doesn't interact with other objects or text
-		this._gameContainer.appendChild(this._element);
+		this._canvas.appendChild(this._element);
 
 		// Gives the ball a random direction and position
 		this._direction = new Direction(0, 0);
@@ -95,14 +95,12 @@ export class	Ball extends Display {
 	public spawn () {
 		// Randomize position
 		const pos = (Math.random() * 100) / 3;
+		const top = 33 + pos;
 
-		console.log(this._gameContainer);
-		console.log(this._canvas);
-		this._element.style.top = `${((0.33 * this._field.height) + (pos / 100 * this._field.height)) - this._radius}px`;	// random vertically (from 33% to 66% of the window)
-		this._element.style.left = `0px`;				// centered horizontally (15px is half the size of the ball)
-		// this._element.style.left = `${(0.5 * this._field.width) - this._radius}px`;				// centered horizontally (15px is half the size of the ball)
-		console.log("in spawn, ball left after 50%: ", this._element.style.left);
-
+		this._element.style.top = `${top}%`;
+		this._element.style.left = "50%";				// centered horizontally (15px is half the size of the ball)
+		this.updatePosition();
+		
 		// Ramdomize direction
 		const add = Math.random() * 30;
 

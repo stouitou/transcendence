@@ -9,7 +9,7 @@ import { Versus } from '../display/Versus.js';
 export class	Game {
 
 	/* ATTRIBUTES */
-	 private readonly	_canvas: HTMLCanvasElement;
+	 private readonly	_canvas: HTMLDivElement;
 
 	private readonly	_ball: Ball;
 	private readonly	_board: Board;
@@ -26,7 +26,7 @@ export class	Game {
 	private				_break: boolean = false;
 
 	/* CONSTRUCTOR */
-	constructor(player1: Player, player2:Player, canvas: HTMLCanvasElement) {
+	constructor(player1: Player, player2:Player, canvas: HTMLDivElement) {
 		this._canvas = canvas;
 		this._ball = new Ball(this._canvas);
 		this._board = new Board(player1, player2, this._canvas);
@@ -66,10 +66,12 @@ export class	Game {
 
 					// If touch a paddle...
 					if (this._player1.paddle.collision(this._ball)) {
+						console.log("paddle1 collision");
 						this._beginning = false;
 						this._ball.bounce(this._player1.paddle);
 					}
 					else if (this._player2.paddle.collision(this._ball)) {
+						console.log("paddle2 collision");
 						this._beginning = false;
 						this._ball.bounce(this._player2.paddle);
 					}
@@ -77,13 +79,12 @@ export class	Game {
 					// else if (this._ball.top <= 0 || this._ball.bottom >= gameContainer.height)
 					// 	this._ball.direction.y *= -1;
 					// Avoid the ball being blocked in the middle of the wall ?
-					else if (this._ball.top <= this._canvas.offsetTop) {
-						this._ball.element.style.top = `${this._canvas.style.top}px`;				
+					else if (this._ball.top <= 0) {
+						this._ball.element.style.top = "0%";				
 						this._ball.direction.y *= -1;
 					}
-					else if (this._ball.bottom >= this._canvas.offsetTop + this._canvas.height) {
-						console.log("touched the bottom");
-						this._ball.element.style.top = `calc(${this._canvas.offsetTop + this._canvas.height - this._ball.diameter})px`;				
+					else if (this._ball.bottom >= this._canvas.offsetHeight) {
+						this._ball.element.style.bottom = "100%";				
 						this._ball.direction.y *= -1;
 					}
 					// else if (this._ball.top <= gameContainer.offsetTop) {
@@ -91,20 +92,20 @@ export class	Game {
 					// 	this._ball.direction.y *= -1;
 					// }
 					// else if (this._ball.bottom >= gameContainer.offsetTop + gameContainer.offsetHeight) {
-					// 	this._ball.element.style.top = `calc(${gameContainer.offsetTop + gameContainer.offsetHeight - this._ball.diameter})px`;				
-					// 	this._ball.direction.y *= -1;
+						// 	this._ball.element.style.top = `calc(${gameContainer.offsetTop + gameContainer.offsetHeight - this._ball.diameter})px`;				
+						// 	this._ball.direction.y *= -1;
+						// }
+						// ...or get out the field
+					else if (this._ball.left >= this._canvas.offsetWidth || this._ball.right <= 0) {
+						this._board.score(this._ball.right);
+						this._beginning = true;
+						this._ball.spawn();
+					}
+					// else if (this._ball.right <= this._ball.gameContainer.offsetLeft || this._ball.left >= this._ball.gameContainer.offsetLeft + this._ball.gameContainer.offsetWidth) {
+					// 	this._board.score(this._ball.right);
+					// 	this._beginning = true;
+					// 	this._ball.spawn();
 					// }
-					// ...or get out the field
-					else if (this._ball.right >= window.innerWidth || this._ball.left <= 0) {
-						this._board.score(this._ball.right);
-						this._beginning = true;
-						this._ball.spawn();
-					}
-					else if (this._ball.right <= this._ball.gameContainer.offsetLeft || this._ball.left >= this._ball.gameContainer.offsetLeft + this._ball.gameContainer.offsetWidth) {
-						this._board.score(this._ball.right);
-						this._beginning = true;
-						this._ball.spawn();
-					}
 				}
 				requestAnimationFrame(loop);
 			};
