@@ -71,6 +71,7 @@ export class	Game {
 				if (!this._break) {
 					this.launchMovement();
 
+					//console.log("this._ball.right: ", this._ball.right, " this._ball.gameContainer.offsetLeft + this._ball.gameContainer.offsetWidth: ",  this._ball.gameContainer.offsetLeft + this._ball.gameContainer.offsetWidth);
 					// If touch a paddle...
 					if (this._players[0].paddle.collision(this._ball)) {
 						this._beginning = false;
@@ -88,8 +89,8 @@ export class	Game {
 						this._ball.element.style.top = `${this._canvas.style.top}px`;				
 						this._ball.direction.y *= -1;
 					}
-					else if (this._ball.bottom >= this._canvas.offsetTop + this._canvas.height) {
-						console.log("touched the bottom");
+					else if (!this._players[2] && this._ball.bottom >= this._canvas.offsetTop + this._canvas.height) {
+						//console.log("touched the bottom");
 						this._ball.element.style.top = `calc(${this._canvas.offsetTop + this._canvas.height - this._ball.diameter})px`;				
 						this._ball.direction.y *= -1;
 					}
@@ -103,12 +104,14 @@ export class	Game {
 					// }
 					// ...or get out the field
 					else if (this._ball.right >= window.innerWidth || this._ball.left <= 0) {
+						//console.log("1");
 						this._board.score(this._ball.right);
 						this._beginning = true;
 						this._ball.spawn();
 					}
-					else if (this._ball.right <= this._ball.gameContainer.offsetLeft || this._ball.left >= this._ball.gameContainer.offsetLeft + this._ball.gameContainer.offsetWidth) {
-						this._board.score(this._ball.right);
+					else if (this._ball.right >= this._canvas.offsetLeft + this._canvas.width) {
+						//console.log("2");
+						this._board.score(this._ball.left);
 						this._beginning = true;
 						this._ball.spawn();
 					}
@@ -144,6 +147,12 @@ export class	Game {
 
 		this._players[0].paddle.updatePosition();
 		this._players[1].paddle.updatePosition();
+
+		if (this._players[2]) {
+			this._players[2].paddle.move();
+			this._players[2].paddle.updatePosition();
+		}
+
 		this._ball.updatePosition();
 	}
 

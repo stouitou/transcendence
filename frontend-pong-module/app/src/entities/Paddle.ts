@@ -55,7 +55,7 @@ export class	Paddle extends Display {
 			this._element.style.left = `${this._canvas.offsetLeft + (50 / 100 * this._canvas.width) - (this._height / 2)}px`; // a revoir quand le canvas sera bon
 
 			if (location === 3) {
-				console.log("top =", this._field.top + (this._canvas.width));
+				console.log("paddle bottom");
 				this._element.style.top = `calc(-5% + ${this._canvas.offsetTop + this._canvas.height - this._width}px)`;
 				//this._element.style.top = `${this._field.top + (this._canvas.height)}px`;
 			}
@@ -127,13 +127,27 @@ export class	Paddle extends Display {
 		const	moveUp = (this._keys['ArrowUp'] && this._location === 1) || (this._keys['s'] && this._location === 2);
 		const	moveDown = (this._keys['ArrowDown'] && this._location === 1) || (this._keys['x'] && this._location === 2);
 
+		const	moveRigth = (this._keys['ArrowRight'] && this._location === 3);// || (this._keys['d'] && this._location === 4);
+		const	moveLeft = (this._keys['ArrowLeft'] && this._location === 3);// || (this._keys['a'] && this._location === 4);
+		//console.log("moveRigth", moveRigth);
+
 		// Move subsequently
 		if (moveUp) {
+			console.log("Top");
 			this._element.style.top = `${Math.max(0, this._top - this._speed)}px`;
 		}	
 		if (moveDown) {
+			console.log("Down");
 			this._element.style.top = `${Math.min(window.innerHeight - this._height, this._top + this._speed)}px`;
-		}	
+		}
+		if (moveLeft) {
+			console.log("Rigth");
+			this._element.style.left = `${Math.max(0, this._left - this._speed)}px`;
+		}
+		if (moveRigth) {
+			console.log("Left");
+			this._element.style.left = `${Math.min(window.innerHeight - this._width, this._left + this._speed)}px`;
+		}
 	}	
 
 	public collision (ball: Ball) {

@@ -30,20 +30,12 @@ export class  oneVSone extends LitElement {
     const player3 = new Player("Three", this._canvas);
     const player4 = new Player("Four", this._canvas);
     
-    const players: Player[] = [player1, player2, player3, player4]
+    const players: Player[] = [player1, player2, player3]
   
     this._game = new Game(players, this._canvas);
 
     this._game.launch();
   }
-/*  RAJOUTE UNE ZONE VIDE A DROITE DU CANVAS  */
-//   render () {
-//     return html`
-//       <div class="game">
-//         <p>Pong Game Component</p>
-//       </div>
-//     `;
-//   }
 
   static styles = css`
   
