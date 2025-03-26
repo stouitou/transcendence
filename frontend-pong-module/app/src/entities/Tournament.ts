@@ -3,7 +3,7 @@ import { Game } from "./Game.js";
 
 export class Tournament {
 
-	private readonly	_canvas: HTMLCanvasElement;
+	private readonly	_canvas: HTMLDivElement;
 
 	private readonly	_players: Player[];
 
@@ -13,10 +13,9 @@ export class Tournament {
 	private				_nextMatch: HTMLDivElement | null = null;
 
 	/* CONSTRUCTOR */
-	public constructor(players: Player[], canvas: HTMLCanvasElement) {
-		this._canvas = canvas;
-
+	public constructor(players: Player[], canvas: HTMLDivElement) {
 		this._players = players;
+		this._canvas = canvas;
 
 		this.randomize();
 		

@@ -43,10 +43,11 @@ export class  oneVSone extends LitElement {
     
     const player1 = new Player("First", this._area);
     const player2 = new Player("Second", this._area);
-    const player3 = new Player("Three", this._area);
-    const player4 = new Player("Four", this._area);
+    // const player3 = new Player("Three", this._area);
+    // const player4 = new Player("Four", this._area);
     
-    const players: Player[] = [player1, player2, player3];
+    // const players: Player[] = [player1, player2, player3];
+    const players: Player[] = [player1, player2];
 
     this._game = new Game(players, this._area);
     this._game.launch();

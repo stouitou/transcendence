@@ -1,5 +1,6 @@
 import { Display } from "./Display.js";
 import { Player } from "../entities/Player.js";
+import { Ball } from "../entities/Ball.js";
 
 export class	Board extends Display {
 
@@ -83,14 +84,14 @@ export class	Board extends Display {
 		this._canvas.appendChild(this._left);
 	}
 
-	public score(ball: number) {
+	public score(ball: Ball) {
 
 		// Update scores & contents
-		if (ball >= window.innerWidth) {
+		if (ball.left >= this._canvas.offsetWidth) {
 			this._player2.incrementScore();
 			this._left.textContent = `${this._player2.score}`;
 		}
-		else {
+		else if (ball.right <= 0) {
 			this._player1.incrementScore();
 			this._right.textContent = `${this._player1.score}`;
 		}

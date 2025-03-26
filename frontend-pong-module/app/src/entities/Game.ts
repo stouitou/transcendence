@@ -26,11 +26,15 @@ export class	Game {
 	private				_beginning: boolean = true;
 	private				_break: boolean = false;
 
+	private				_rally: number = 0;
+
 	/* CONSTRUCTOR */
 	constructor(players: Player[], canvas: HTMLDivElement) {
 		this._players = players;
-	
 		this._canvas = canvas;
+		if (this._players.length > 2)
+			this._canvas.style.height = `${this._canvas.style.width}`;
+
 		this._ball = new Ball(this._canvas);
 		this._board = new Board(this._players, this._canvas);
 		//this._player1 = players[0];
@@ -72,28 +76,27 @@ export class	Game {
 					this.launchMovement();
 
 					// If touch a paddle...
-					if (this._players[0].paddle.collision(this._ball)) {
-						this._beginning = false;
-					}
-					else if (this._players[1].paddle.collision(this._ball)) {
-						this._beginning = false;
-					}
-					else if (this._players[2].paddle.collision(this._ball)) {
-						this._beginning = false;
+					for (let i = 0; i < this._players.length; i++) {
+						if (this._players[i].paddle.collision(this._ball)) {
+							this._rally++;
+							this._beginning = false;
+						}
 					}
 					// ...or touch a wall...
+					if (!this._players[2] && this._ball.bottom >= this._canvas.offsetHeight) {
+						this._ball.element.style.bottom = "100%";				
+						this._ball.direction.y *= -1;
+					}
 					else if (!this._players[3] && this._ball.top <= 0) {
 						this._ball.element.style.top = "0%";				
 						this._ball.direction.y *= -1;
 					}
-					else if (!this._players[2] && this._ball.bottom >= this._canvas.offsetHeight) {
-						this._ball.element.style.bottom = "100%";				
-						this._ball.direction.y *= -1;
-					}
 					// ...or get out the field
-					else if (this._ball.left >= this._canvas.offsetWidth || this._ball.right <= 0 || 
-						(this._players[2] && this._ball.top >= this._canvas.offsetHeight)) {
-						this._board.score(this._ball.left);
+					else if (this._ball.left >= this._canvas.offsetWidth ||
+						this._ball.right <= 0 || 
+						(this._players[2] && this._ball.top >= this._canvas.offsetHeight) ||
+						(this._players[3] && this._ball.bottom <= 0)) {
+						this._board.score(this._ball);
 						this._beginning = true;
 						this._ball.spawn();
 					}
