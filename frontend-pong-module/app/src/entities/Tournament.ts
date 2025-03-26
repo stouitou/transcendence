@@ -56,7 +56,7 @@ export class Tournament {
 		while (i <= nofMatch) {
 			const game = this._match.get(i);
 			if (game && game.length === 2) {
-            	this._game = new Game(game[0], game[1], this._canvas);
+            	this._game = new Game(game, this._canvas);
 				await this._game.launch();
 				document.body.innerHTML = ''; //a revoir, remet la page a 0
 				this._round[j] = game[0].lastWin ? game[0] : game[1];

@@ -24,7 +24,7 @@ export class  oneVSone extends LitElement {
     // if (!this._canvas) {
     //   throw new Error("No canvas found");
     // }
-    
+
     this._area = window.document.getElementById(this.gameContainerId) as HTMLDivElement | null;
     if (!this._area) {
       throw new Error("No game container found");
@@ -40,12 +40,12 @@ export class  oneVSone extends LitElement {
     this._area.style.padding = "0%";
     this._area.style.border = "none";
     this._area.style.background = "rgb(0, 0, 0)";
-    
+
     const player1 = new Player("First", this._area);
     const player2 = new Player("Second", this._area);
     // const player3 = new Player("Three", this._area);
     // const player4 = new Player("Four", this._area);
-    
+
     // const players: Player[] = [player1, player2, player3];
     const players: Player[] = [player1, player2];
 
