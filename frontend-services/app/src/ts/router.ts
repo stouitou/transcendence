@@ -3,6 +3,8 @@
 import { appendLoginButton, handleLogin, handleRegister, renderLogout } from './auth';
 import { fetchProfileData } from './fetchProfile';
 import { getState } from './state';
+import { renderRegister } from './register';             // your register screen
+import { renderLogin } from './login';
 
 import { createButton } from './button';
 import {startGame} from "./pong";
@@ -37,7 +39,6 @@ function clearContainer(container: HTMLElement) {
 
 
 export function renderHome(container: HTMLElement) {
-    // Clear existing content
     while (container.firstChild) {
         container.removeChild(container.firstChild);
     }
@@ -45,15 +46,12 @@ export function renderHome(container: HTMLElement) {
     // Mark container as relative, so absolutely positioned elements anchor properly
     container.classList.add('relative');
 
-    // 1) Initialize the background
     const { engine, scene, camera, canvas } = initBallsBackground(container, {
         numSpheres: 50,
         sphereRadius: 1,
         backgroundColor: new Color4(1, 1, 1, 1)
-        // materials?: [... your custom StandardMaterials ...]
     });
 
-    // 2) Create your overlay
     const overlay = document.createElement('div');
     overlay.className = `
     absolute top-0 left-0
@@ -190,290 +188,6 @@ function renderTournament(container: HTMLElement) {
 
     // Append tournament wrapper to container
     container.appendChild(tournamentWrapper);
-}
-
-
-export function renderLogin(container: HTMLElement) {
-    // 1) Clear container
-    while (container.firstChild) {
-        container.removeChild(container.firstChild);
-    }
-
-    // 2) Ensure container is positioned relative for layering
-    container.classList.add('relative');
-
-    // 3) Initialize your Babylon "balls" background
-    initBallsBackground(container, {
-        numSpheres: 30,
-        sphereRadius: 1.2,
-        backgroundColor: new Color4(1, 1, 1, 1)
-    });
-
-    // 4) Create an overlay to center the login form
-    const overlay = document.createElement('div');
-    overlay.className = `
-    absolute
-    top-0 left-0
-    w-full h-full
-    flex items-center justify-center
-    pointer-events-none
-    z-10
-  `;
-    container.appendChild(overlay);
-
-    // 5) Build the login form
-    const loginForm = document.createElement('form');
-    loginForm.className = `
-    pointer-events-auto
-    w-full max-w-sm
-    px-8 py-6
-    bg-white/30
-    backdrop-blur-md
-    border border-white/20
-    rounded-lg
-    shadow-md
-    text-gray-800
-    font-archivo
-  `;
-    overlay.appendChild(loginForm);
-
-    // 6) Heading
-    const heading = document.createElement('h2');
-    heading.textContent = 'Login';
-    heading.className = `
-    text-3xl
-    font-bold
-    mb-6
-    text-center
-    tracking-wide
-  `;
-    loginForm.appendChild(heading);
-
-    // 7) Email label & input
-    const emailLabel = document.createElement('label');
-    emailLabel.textContent = 'Email';
-    emailLabel.className = `
-    block
-    text-sm
-    font-semibold
-    mb-1
-  `;
-    loginForm.appendChild(emailLabel);
-
-    const emailInput = document.createElement('input');
-    emailInput.type = 'email';
-    emailInput.placeholder = 'Enter your email';
-    emailInput.className = `
-    w-full
-    border-b border-gray-300
-    bg-transparent
-    px-2 py-2
-    mb-6
-    focus:outline-none
-    focus:border-blue-500
-    transition-colors
-  `;
-    loginForm.appendChild(emailInput);
-
-    // 8) Password label & input
-    const passwordLabel = document.createElement('label');
-    passwordLabel.textContent = 'Password';
-    passwordLabel.className = `
-    block
-    text-sm
-    font-semibold
-    mb-1
-  `;
-    loginForm.appendChild(passwordLabel);
-
-    const passwordInput = document.createElement('input');
-    passwordInput.type = 'password';
-    passwordInput.placeholder = 'Enter your password';
-    passwordInput.className = `
-    w-full
-    border-b border-gray-300
-    bg-transparent
-    px-2 py-2
-    mb-6
-    focus:outline-none
-    focus:border-blue-500
-    transition-colors
-  `;
-    loginForm.appendChild(passwordInput);
-
-    // 9) Login button
-    const loginButton = document.createElement('button');
-    loginButton.type = 'submit';
-    loginButton.textContent = 'Login';
-    loginButton.className = `
-    w-full
-    py-3
-    border border-black
-    text-black
-    rounded-md
-    transition-colors
-    duration-300
-    hover:bg-black
-    hover:text-white
-    focus:outline-none
-    font-semibold
-    tracking-wide
-  `;
-    loginForm.appendChild(loginButton);
-
-    // Optionally, add a submit event listener for the form.
-    loginForm.addEventListener("submit", async(e) => {
-        e.preventDefault();
-        // Process the login here, e.g., collect email and password values and send them to your server.
-        const email = emailInput.value;
-        const password = passwordInput.value;
-        console.log("Email:", email, "Password:", password?"Password is not empty (never show password in console please)":"Password is empty");
-        await handleLogin({ email, password });
-        // Insert your login handling logic...
-    });
-
-    // 10) “Don’t have an account?” link
-    const linkContainer = document.createElement('p');
-    linkContainer.className = 'text-center mt-6 text-sm';
-
-    const registerLink = document.createElement('a');
-    registerLink.textContent = 'Create here!';
-    registerLink.href = '#';
-    registerLink.className = 'text-blue-500 hover:underline ml-1';
-    registerLink.addEventListener('click', (e) => {
-        e.preventDefault();
-        history.pushState({}, '', '#register');
-        renderRegister(container);
-    });
-    
-    linkContainer.appendChild(document.createTextNode("Don't have an account? "));
-    linkContainer.appendChild(link);
-
-    appendLoginButton(loginForm);
-
-    loginForm.appendChild(linkContainer);
-}
-
-function renderRegister(container: HTMLElement) {
-    // Clear container if needed
-    while (container.firstChild) {
-        container.removeChild(container.firstChild);
-    }
-
-    // Create form element
-    const registerForm = document.createElement("form");
-    registerForm.className = "max-w-sm mx-auto p-6 bg-white rounded-lg shadow-lg";
-
-    // Create heading
-    const heading = document.createElement("h2");
-    heading.textContent = "Register";
-    heading.className = "text-3xl font-bold text-center mb-6 text-gray-800";
-    registerForm.appendChild(heading);
-
-    // Create Name label and input
-    const nameLabel = document.createElement("label");
-    nameLabel.textContent = "Name:";
-    nameLabel.setAttribute("for", "name");
-    nameLabel.className = "block text-gray-700 mb-2";
-    registerForm.appendChild(nameLabel);
-
-    const nameInput = document.createElement("input");
-    nameInput.type = "text";
-    nameInput.id = "name";
-    nameInput.placeholder = "Enter your name";
-    nameInput.className =
-        "w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4";
-    registerForm.appendChild(nameInput);
-
-    // Create Email label and input
-    const emailLabel = document.createElement("label");
-    emailLabel.textContent = "Email:";
-    emailLabel.setAttribute("for", "email");
-    emailLabel.className = "block text-gray-700 mb-2";
-    registerForm.appendChild(emailLabel);
-
-    const emailInput = document.createElement("input");
-    emailInput.type = "email";
-    emailInput.id = "email";
-    emailInput.placeholder = "Enter your email";
-    emailInput.className =
-        "w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4";
-    registerForm.appendChild(emailInput);
-
-    // Create Password label and input
-    const passwordLabel = document.createElement("label");
-    passwordLabel.textContent = "Password:";
-    passwordLabel.setAttribute("for", "password");
-    passwordLabel.className = "block text-gray-700 mb-2";
-    registerForm.appendChild(passwordLabel);
-
-    const passwordInput = document.createElement("input");
-    passwordInput.type = "password";
-    passwordInput.id = "password";
-    passwordInput.placeholder = "Enter your password";
-    passwordInput.className =
-        "w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4";
-    registerForm.appendChild(passwordInput);
-
-    // Create Confirm Password label and input
-    const confirmPasswordLabel = document.createElement("label");
-    confirmPasswordLabel.textContent = "Confirm Password:";
-    confirmPasswordLabel.setAttribute("for", "confirm-password");
-    confirmPasswordLabel.className = "block text-gray-700 mb-2";
-    registerForm.appendChild(confirmPasswordLabel);
-
-    const confirmPasswordInput = document.createElement("input");
-    confirmPasswordInput.type = "password";
-    confirmPasswordInput.id = "confirm-password";
-    confirmPasswordInput.placeholder = "Confirm your password";
-    confirmPasswordInput.className =
-        "w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-6";
-    registerForm.appendChild(confirmPasswordInput);
-
-    // Create register button
-    const registerButton = document.createElement("button");
-    registerButton.type = "submit";
-    registerButton.textContent = "Register";
-    registerButton.className =
-        "w-full bg-blue-500 text-white py-3 rounded-md hover:bg-green-600 transition-colors";
-    registerForm.appendChild(registerButton);
-
-    // Handle form submission
-    registerForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        // Process registration here
-        const name = nameInput.value;
-        const email = emailInput.value;
-        const password = passwordInput.value;
-        const confirmPassword = confirmPasswordInput.value;
-
-        if (password !== confirmPassword) {
-            alert("Passwords do not match!");
-            return;
-        }
-
-        console.log("Name:", name, "Email:", email, "Password:", password?"Password is not empty (never show password in console please)":"Password is empty");
-        handleRegister({ name, email, password });
-        // Insert your registration handling logic...
-    });
-    const linkContainer = document.createElement("p");
-    linkContainer.className = "text-center mt-4";
-
-    const link = document.createElement("a");
-    link.textContent = "Login here!";
-    link.href = "#";
-    link.className = "text-blue-500 hover:underline";
-    link.addEventListener("click", (e) => {
-        e.preventDefault();
-        history.pushState({}, "", "#login");
-
-        renderLogin(container);
-    });
-
-    linkContainer.appendChild(document.createTextNode("Already have an account? "));
-    linkContainer.appendChild(link);
-    registerForm.appendChild(linkContainer);
-    container.appendChild(registerForm);
 }
 
 
