@@ -6,7 +6,7 @@ import { Game } from '../entities/Game.js';
 @customElement('game-component')
 export class  oneVSone extends LitElement {
   // @property({ type: String }) canvasId: string = "pongCanvas";
-  @property({ type: String }) gameContainerId: string = "game-container";
+  @property({ type: String }) gameContainerId: string = "gameWrapper";
 
   /* ATTRIBUTES */
   // private _canvas: HTMLCanvasElement | null = null;

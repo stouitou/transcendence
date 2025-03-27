@@ -98,7 +98,9 @@ function renderGame(container: HTMLElement) {
 
     // Create game wrapper div
     const gameWrapper = document.createElement("div");
+    gameWrapper.id = "gameWrapper";
     gameWrapper.className = "flex flex-col items-center justify-center space-y-4";
+    console.log(gameWrapper);
 
     // Create canvas element
     const canvas = document.createElement("canvas");
