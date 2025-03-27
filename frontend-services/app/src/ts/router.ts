@@ -37,11 +37,11 @@ function clearContainer(container: HTMLElement) {
     }
 }
 
-
 export function renderHome(container: HTMLElement) {
-    while (container.firstChild) {
-        container.removeChild(container.firstChild);
-    }
+    clearContainer(container);
+    // while (container.firstChild) {
+    //     container.removeChild(container.firstChild);
+    // }
 
     // Mark container as relative, so absolutely positioned elements anchor properly
     container.classList.add('relative');
@@ -64,12 +64,12 @@ export function renderHome(container: HTMLElement) {
 
     // Example "Let's Start" button
     const btn = document.createElement('button');
-    btn.textContent = 'Let’s Start';
+    btn.textContent = 'Let’s play';
     btn.className = `
     px-10 py-3
     font-archivo
     text-black
-    border border-black
+    border border-none
     rounded-md
     pointer-events-auto
     transition-colors duration-300
@@ -84,7 +84,6 @@ export function renderHome(container: HTMLElement) {
 
 const pongGameScript = async () => {
 	const script = document.createElement('script');
-    // const canvas = document.getElementById("pongCanvas");
 	script.type = 'module';
 	script.src = 'https://localhost:4433/frontend-pong-module/app/src/component/oneVSone.ts';
     window.document.head.appendChild(script);
@@ -92,28 +91,22 @@ const pongGameScript = async () => {
 
 function renderGame(container: HTMLElement) {
     // Clear container if needed
-    while (container.firstChild) {
-        container.removeChild(container.firstChild);
-    }
+    clearContainer(container);
 
     // Create game wrapper div
     const gameWrapper = document.createElement("div");
     gameWrapper.id = "gameWrapper";
-    gameWrapper.className = "flex flex-col items-center justify-center space-y-4";
-    console.log(gameWrapper);
-
-    // Create canvas element
-    const canvas = document.createElement("canvas");
-    canvas.id = "pongCanvas";
-    canvas.width = 600;
-    canvas.height = 500;
-    canvas.className = "shadow-lg rounded-lg";
+    gameWrapper.className = "flex flex-col items-center justify-center space-y-4 w-[700px] h-[500px]";
 
     // Create Start Game button
     const startButton = document.createElement("button");
     startButton.textContent = "Start Game";
     startButton.className = "mt-4 px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition";
     
+    const startMultiplayerButton = document.createElement("button");
+    startMultiplayerButton.textContent = "Start Multiplayer";
+    startMultiplayerButton.className = "px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-green-600 transition";
+
     const startTournamentButton = document.createElement("button");
     startTournamentButton.textContent = "Start Tournament";
     startTournamentButton.className = "px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-green-600 transition";
@@ -121,11 +114,12 @@ function renderGame(container: HTMLElement) {
     // Add event listener to start game
     startButton.addEventListener("click", () => {
         if (typeof startGame === "function") {
-            const gameComponent = document.createElement("game-component");
-            gameComponent.setAttribute("canvasId", "pongCanvas");
-            container.appendChild(gameComponent);
             pongGameScript();
+            const game = document.createElement("game-component");
+            // game.setAttribute("canvasId", "pongCanvas");
+            container.appendChild(game);
             startButton.remove();
+            startMultiplayerButton.remove();
             startTournamentButton.remove();
         } else {
             console.error("startGame function is not defined!");
@@ -140,8 +134,9 @@ function renderGame(container: HTMLElement) {
         }
     })
     // Append elements to wrapper
-    gameWrapper.appendChild(canvas);
+    // gameWrapper.appendChild(canvas);
     gameWrapper.appendChild(startButton);
+    gameWrapper.appendChild(startMultiplayerButton);
     gameWrapper.appendChild(startTournamentButton);
 
     // Append game wrapper to container
@@ -286,8 +281,6 @@ function renderGameHistory(container: HTMLElement, username: string) {
     container.appendChild(listContainer);
 }
 
-
-
 function renderNotFound(container: HTMLElement) {
     const heading = document.createElement('h2');
     heading.textContent = '404';
@@ -302,7 +295,8 @@ function renderNotFound(container: HTMLElement) {
 // Main router function.
 export function router() {
     const mainElement = document.querySelector('main');
-    if (!mainElement) return;
+    if (!mainElement)
+        return ;
 
     const state = getState();
     clearContainer(mainElement);

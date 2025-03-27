@@ -36,9 +36,8 @@ export class Paddle extends Display {
 		this._element.style.padding = "0%";
 		
 		if (location === 1 || location === 2) {
-			this._element.style.width = "3%";
-			this._element.style.height = "20%";
-			// this._element.style.top = "50%";
+			this._element.style.width = `${this._width}px`;
+			this._element.style.height = `${this._height}px`;
 			this._element.style.top = `calc(${this._canvas.offsetHeight} / 2 - ${this._height} / 2)px`;
 
 			if (location === 1) {
@@ -49,10 +48,9 @@ export class Paddle extends Display {
 			}
 		}
 		else if (location === 3 || location === 4) {
-			this._element.style.width = "20%";
-			this._element.style.height = "3%";
+			this._element.style.width = `${this._height}px`;
+			this._element.style.height = `${this._width}px`;
 			this._element.style.left = `calc(${this._canvas.offsetWidth} / 2 - ${this._width} / 2)px`;
-			// this._element.style.transform = "translateX(-50%)";
 
 			if (location === 3) {
 				this._element.style.bottom = "1%"; 
