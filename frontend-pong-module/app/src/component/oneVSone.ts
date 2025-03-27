@@ -2,6 +2,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Player } from '../entities/Player.js';
 import { Game } from '../entities/Game.js';
+import { menu } from '../display/menu.js';
 
 @customElement('game-component')
 export class  oneVSone extends LitElement {
@@ -25,31 +26,35 @@ export class  oneVSone extends LitElement {
     //   throw new Error("No canvas found");
     // }
     
-    this._area = window.document.getElementById(this.gameContainerId) as HTMLDivElement | null;
-    if (!this._area) {
-      throw new Error("No game container found");
-    }
-    this._area.style.width = "700px";
-    this._area.style.height = "500px";
-    this._area.style.overflow = "hidden";
-    this._area.style.position = "absolute";
-    this._area.style.top = "50vh";
-    this._area.style.left = "50vw";
-    this._area.style.transform = "translate(-50%, -50%)";
-    this._area.style.margin = "0%";
-    this._area.style.padding = "0%";
-    this._area.style.border = "none";
-    this._area.style.background = "rgb(0, 0, 0)";
+    //this._area = window.document.getElementById(this.gameContainerId) as HTMLDivElement | null;
+    // if (!this._area) {
+    //   throw new Error("No game container found");
+    // }
+    // this._area.style.width = "500px";
+    // this._area.style.height = "500px";
+    // this._area.style.overflow = "hidden";
+    // this._area.style.position = "absolute";
+    // this._area.style.top = "50vh";
+    // this._area.style.left = "50vw";
+    // this._area.style.transform = "translate(-50%, -50%)";
+    // this._area.style.margin = "0%";
+    // this._area.style.padding = "0%";
+    // this._area.style.border = "none";
+    // this._area.style.background = "rgb(0, 0, 0)";
     
-    const player1 = new Player("First", this._area);
-    const player2 = new Player("Second", this._area);
-    const player3 = new Player("Three", this._area);
-    const player4 = new Player("Four", this._area);
+    // const player1 = new Player("First", this._area);
+    // const player2 = new Player("Second", this._area);
+    // const player3 = new Player("Three", this._area);
+    // const player4 = new Player("Four", this._area);
     
-    const players: Player[] = [player1, player2, player3];
+    // const players: Player[] = [player1, player2, player3];
 
-    this._game = new Game(players, this._area);
-    this._game.launch();
+    const textButton: string[] = ["1V1", "Tournoi", "Multijoueur"];
+
+    new menu(textButton);
+
+   // this._game = new Game(players, this._area);
+    //this._game.launch();
   }
   
   render () {
