@@ -39,9 +39,10 @@ function clearContainer(container: HTMLElement) {
 
 
 export function renderHome(container: HTMLElement) {
-    while (container.firstChild) {
-        container.removeChild(container.firstChild);
-    }
+    clearContainer(container);
+    // while (container.firstChild) {
+    //     container.removeChild(container.firstChild);
+    // }
 
     // Mark container as relative, so absolutely positioned elements anchor properly
     container.classList.add('relative');
@@ -64,7 +65,7 @@ export function renderHome(container: HTMLElement) {
 
     // Example "Let's Start" button
     const btn = document.createElement('button');
-    btn.textContent = 'Let’s Start';
+    btn.textContent = 'Let’s play';
     btn.className = `
     px-10 py-3
     font-archivo
@@ -92,9 +93,10 @@ const pongGameScript = async () => {
 
 function renderGame(container: HTMLElement) {
     // Clear container if needed
-    while (container.firstChild) {
-        container.removeChild(container.firstChild);
-    }
+    clearContainer(container);
+    // while (container.firstChild) {
+    //     container.removeChild(container.firstChild);
+    // }
 
     // Create game wrapper div
     const gameWrapper = document.createElement("div");
@@ -102,18 +104,25 @@ function renderGame(container: HTMLElement) {
     gameWrapper.className = "flex flex-col items-center justify-center space-y-4";
     console.log(gameWrapper);
 
+    // Append game wrapper to container
+    container.appendChild(gameWrapper);
+
     // Create canvas element
-    const canvas = document.createElement("canvas");
-    canvas.id = "pongCanvas";
-    canvas.width = 600;
-    canvas.height = 500;
-    canvas.className = "shadow-lg rounded-lg";
+    // const canvas = document.createElement("canvas");
+    // canvas.id = "pongCanvas";
+    // canvas.width = 600;
+    // canvas.height = 500;
+    // canvas.className = "shadow-lg rounded-lg";
 
     // Create Start Game button
     const startButton = document.createElement("button");
     startButton.textContent = "Start Game";
     startButton.className = "mt-4 px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition";
     
+    const startMultiplayerButton = document.createElement("button");
+    startMultiplayerButton.textContent = "Start Multiplayer";
+    startMultiplayerButton.className = "px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-green-600 transition";
+
     const startTournamentButton = document.createElement("button");
     startTournamentButton.textContent = "Start Tournament";
     startTournamentButton.className = "px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-green-600 transition";
@@ -121,11 +130,12 @@ function renderGame(container: HTMLElement) {
     // Add event listener to start game
     startButton.addEventListener("click", () => {
         if (typeof startGame === "function") {
-            const gameComponent = document.createElement("game-component");
-            gameComponent.setAttribute("canvasId", "pongCanvas");
-            container.appendChild(gameComponent);
             pongGameScript();
+            const gameComponent = document.createElement("game-component");
+            // gameComponent.setAttribute("canvasId", "pongCanvas");
+            container.appendChild(gameComponent);
             startButton.remove();
+            startMultiplayerButton.remove();
             startTournamentButton.remove();
         } else {
             console.error("startGame function is not defined!");
@@ -140,12 +150,13 @@ function renderGame(container: HTMLElement) {
         }
     })
     // Append elements to wrapper
-    gameWrapper.appendChild(canvas);
+    // gameWrapper.appendChild(canvas);
     gameWrapper.appendChild(startButton);
+    gameWrapper.appendChild(startMultiplayerButton);
     gameWrapper.appendChild(startTournamentButton);
 
-    // Append game wrapper to container
-    container.appendChild(gameWrapper);
+    // // Append game wrapper to container
+    // container.appendChild(gameWrapper);
 }
 
 function renderTournament(container: HTMLElement) {
