@@ -25,6 +25,7 @@ export function createHeader(props: HeaderProps): HTMLElement {
       to-gray-500
       text-transparent  /* Make the text itself transparent */
       bg-clip-text      /* Clip the background to the text shape */
+          flex flex-col items-center
     `;
 
     titleDiv.textContent = props.title;
