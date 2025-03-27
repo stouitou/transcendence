@@ -94,17 +94,53 @@ function handleProviderLogin(provider: string) {
  * @param parent 
  */
 export function appendLoginButton(parent: HTMLElement) {
-	// add new button Action for login method
-		const loginButtonGoogle = createButton(loginWithProviderProps('google'));
-		loginButtonGoogle.className = "w-full bg-red-500 text-white py-3 rounded-md hover:bg-red-600 transition-colors";
-	
-		const loginButtonGithub = createButton(loginWithProviderProps('github'));
-		loginButtonGithub.className = "w-full bg-gray-800 text-white py-3 rounded-md hover:bg-gray-900 transition-colors";
-	
-		const loginButton42Api = createButton(loginWithProviderProps('42api'));
-		loginButton42Api.className = "w-full bg-gray-700 text-white py-3 rounded-md hover:bg-gray-900 transition-colors";
-	
-		parent.appendChild(loginButtonGoogle);
-		parent.appendChild(loginButtonGithub);
-		parent.appendChild(loginButton42Api)
+    // Main "Login" button
+    // If you're creating it from your existing code, just mimic the style approach:
+    const loginButton = document.createElement('button');
+    loginButton.type = 'submit';
+
+
+    // Button for Google
+    const loginButtonGoogle = createButton(loginWithProviderProps('google'));
+    loginButtonGoogle.className = `
+   w-full
+    px-4 py-2
+    border border-gray-600
+    text-gray-600
+    rounded
+    hover:bg-gray-600 hover:text-white
+    transition-colors
+    mb-2
+  `;
+
+    // Button for GitHub
+    const loginButtonGithub = createButton(loginWithProviderProps('github'));
+    loginButtonGithub.className = `
+   w-full
+    px-4 py-2
+    border border-gray-600
+    text-gray-600
+    rounded
+    hover:bg-gray-600 hover:text-white
+    transition-colors
+    mb-2
+  `;
+
+    // Button for 42api
+    const loginButton42Api = createButton(loginWithProviderProps('42api'));
+    loginButton42Api.className = `
+    w-full
+    px-4 py-2
+    border border-gray-600
+    text-gray-600
+    rounded
+    hover:bg-gray-600 hover:text-white
+    transition-colors
+    mb-2
+  `;
+
+    // Append the provider buttons below the main login
+    parent.appendChild(loginButtonGoogle);
+    parent.appendChild(loginButtonGithub);
+    parent.appendChild(loginButton42Api);
 }
