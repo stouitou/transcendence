@@ -1,7 +1,10 @@
 import { AuthProvider } from "@src/models/AuthProvider.entity";
+import { Game } from "@src/models/Game.entity";
+import { GameHistory } from "@src/models/GameHistory.entity";
+import { Round } from "@src/models/Round.entity";
+import { Tournaments } from "@src/models/Tournament.entity";
 import { User } from "@src/models/User.entity";
 import { DataSource, EntityNotFoundError, EntityTarget, ObjectLiteral } from "typeorm";
-
 type DatabaseParams = {
 	type: "sqlite" | "mysql";
 	database: string;// Chemin du fichier SQLite
@@ -17,7 +20,7 @@ static databasesConfigs: DatabasesConfigs = {
 	myDb: {
 	  type: "sqlite",
 	  database: "./data/myDb.sqlite",
-	  entities: [User, AuthProvider],
+	  entities: [User, AuthProvider ,Game, GameHistory,Tournaments,Round],// Entités TypeORM
 	  synchronize: true,
 	  logging: false,
 	//  migrations: ["src/migrations/*.ts"], // npx typeorm migration:generate -n MigrationName && (npx typeorm migration:run || npx typeorm migration:revert)

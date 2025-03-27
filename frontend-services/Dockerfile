@@ -3,9 +3,9 @@ FROM node:23-alpine
 # Copier package.json et installer les dépendances en premier (pour utiliser le cache)
 COPY ./app/package*.json ./
 RUN apk add --no-cache xdg-utils
-RUN npm install npm@11.1.0
 
-#RUN npm install
+RUN npm install -g npm@11.2.0
+RUN npm install
 
 # Create and change to the app directory
 WORKDIR /app
@@ -23,7 +23,6 @@ RUN chmod +x /usr/local/bin/entrypoint.sh
 RUN mkdir /app/node_modules
 RUN chown -R node:node /app/node_modules
 RUN cp -R /node_modules /app/node_modules
-
 
 # Définir l'exécution par défaut
 ENTRYPOINT ["/usr/local/bin/entrypoint.sh"]

@@ -1,49 +1,49 @@
 import { Direction } from './Direction.js';
+import { Display } from '../display/Display.js';
 import { Paddle } from "./Paddle.js";
 
 // export allows to use this class in another file
-export class Ball {
+export class	Ball extends Display {
 
-	/* PRIVATE ATTRIBUTES */
+	/* ATTRIBUTES */
 	private readonly	_element: HTMLDivElement;
 	private readonly	_diameter: number = 30;
 	private readonly	_radius: number = this._diameter / 2;
-	private readonly	_color: string = 'rgb(0, 0, 0)';
+	private readonly	_color: string = "rgb(0, 0, 0)";
+
+	// For the movement
 	private readonly	_speed: number = 8;
 	private readonly	_startingSpeed: number = 4;
-	private				_direction: Direction;
+	private readonly	_direction: Direction;
 
 	// Fetch current coordinates
-	private				_top: number;
-	private				_bottom: number;
-	private				_left: number;
-	private				_right: number;
+	private				_top!: number;
+	private				_bottom!: number;
+	private				_left!: number;
+	private				_right!: number;
 
 	/* CONSTRUCTOR */
-	public constructor() {
+	constructor (canvas: HTMLCanvasElement) {
+		super(canvas);
 
 		// Creates the ball object
-		this._element = document.createElement('div');
-		this._element.classList.add('ball');
-
+		this._element = document.createElement("div");
 		// Gives the ball basic values
 		this._element.style.width = `${this._diameter}px`;
 		this._element.style.height = `${this._diameter}px`;
 		this._element.style.backgroundColor = this._color;					// color of the ball
-		this._element.style.borderRadius = '50%';							// makes it round
-		this._element.style.position = 'absolute';							// doesn't interact with other objects or text
+		this._element.style.borderRadius = "50%";							// makes it round
+		this._element.style.position = "absolute";							// doesn't interact with other objects or text
+		this._element.style.marginTop = "0px";
+		this._element.style.marginLeft = "0px";
+		// this._element.style.display = "none";							// doesn't interact with other objects or text
+		this._gameContainer.appendChild(this._element);
 
 		// Gives the ball a random direction and position
 		this._direction = new Direction(0, 0);
 		this.spawn();
 
-		this._top = this._element.offsetTop;
-		this._bottom = this._top + this._diameter;
-		this._left = this._element.offsetLeft;
-		this._right = this._left + this._diameter;
-		
-		// "Draws" the ball in the window
-		document.body.appendChild(this._element);
+		this.updatePosition();
 	}
 	
 	/* GETTERS */
@@ -85,19 +85,23 @@ export class Ball {
 
 	/* METHODS */
 	// Update current position
-	public updatePosition() {
+	public updatePosition () {
 		this._top = this._element.offsetTop;
 		this._bottom = this._top + this._diameter;
 		this._left = this._element.offsetLeft;
 		this._right = this._left + this._diameter;
 	}
-
-	public spawn() {
+	
+	public spawn () {
 		// Randomize position
 		const pos = (Math.random() * 100) / 3;
 
-		this._element.style.top = `calc(33% - ${this._radius}px + ${pos}%)`;	// random vertically (from 33% to 66% of the window)
-		this._element.style.left = `calc(50% - ${this._radius}px)`;				// centered horizontally (15px is half the size of the ball)
+		console.log(this._gameContainer);
+		console.log(this._canvas);
+		this._element.style.top = `${((0.33 * this._field.height) + (pos / 100 * this._field.height)) - this._radius}px`;	// random vertically (from 33% to 66% of the window)
+		this._element.style.left = `0px`;				// centered horizontally (15px is half the size of the ball)
+		// this._element.style.left = `${(0.5 * this._field.width) - this._radius}px`;				// centered horizontally (15px is half the size of the ball)
+		console.log("in spawn, ball left after 50%: ", this._element.style.left);
 
 		// Ramdomize direction
 		const add = Math.random() * 30;
@@ -116,10 +120,8 @@ export class Ball {
 
 	public move(speed: number) {
 		this._direction.normalize();
-		const currentLeft = this._element.offsetLeft;
-		const currentTop = this._element.offsetTop;
-		this._element.style.left = `${currentLeft + (speed * this._direction.x)}px`
-		this._element.style.top = `${currentTop + (speed * this._direction.y)}px`
+		this._element.style.left = `${this._element.offsetLeft + (speed * this._direction.x)}px`
+		this._element.style.top = `${this._element.offsetTop + (speed * this._direction.y)}px`
 	}
 
 	public bounce(paddle: Paddle) {

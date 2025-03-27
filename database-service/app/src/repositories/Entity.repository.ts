@@ -58,8 +58,12 @@ export class EntityRepository<T extends ObjectLiteral> {
 
   // 📌 🆕 Créer un élément
   async create(data: DeepPartial<T>): Promise<T> {
+    /*
     const entity = this.repo.create(data);
     return this.repo.save(entity);
+    */
+    const entity = await CreateRelatedEntities(this.repo, data);
+    return entity;
   }
 
   // 📌 ✏️ Mettre à jour un élément
@@ -76,7 +80,7 @@ export class EntityRepository<T extends ObjectLiteral> {
     }  */
 
 
-
+    console.log("🚀 update ~ data", data)
     //1️⃣ Filtrer les propriétés valides
     const cleanData = filterValidProperties(this.repo,data);
     console.log("🚀 cleandata", cleanData)
@@ -91,8 +95,10 @@ export class EntityRepository<T extends ObjectLiteral> {
     delete (data as Partial<T>).id;
     console.warn("❌ L'ID ne peut pas être modifié. il a été supprimé des données. traitement en cours...");
   } */
-    return this.repo.save({ ...entity, ...cleanData });
+   // return this.repo.save({ ...entity, ...cleanData });
    // return this.repo.save({ ...entity, ...data });
+    const entityUpdated = await CreateRelatedEntities(this.repo, { ...entity, ...cleanData });
+    return entityUpdated;
   }
 
   // 📌 ❌ Supprimer un élément
@@ -164,3 +170,70 @@ export class EntityRepository<T extends ObjectLiteral> {
   
 
 
+
+
+  /**
+   * Fonction générique pour créer ou mettre à jour une entité et ses relations.
+   * @param repo - Repository TypeORM de l'entité principale.
+   * @param data - Données entrantes, y compris les relations.
+   */
+  export async function CreateRelatedEntities<T extends ObjectLiteral>(
+    repo: Repository<T>,
+    data: DeepPartial<T>
+  ): Promise<T> {
+    // 📌 Récupérer les colonnes + relations
+    const entityMetadata: EntityMetadata = repo.metadata;
+    const validKeys = new Set([
+      ...entityMetadata.columns.map(col => col.propertyName),
+      ...entityMetadata.relations.map(rel => rel.propertyName)
+    ]);
+  
+    const updatedEntity: Partial<T> = {};
+  
+    // 📌 Parcourir les clés des données entrantes
+    for (const key of Object.keys(data)) {
+      if (!validKeys.has(key)) continue;
+  
+      const relation = entityMetadata.relations.find(rel => rel.propertyName === key);
+      // 📌 Si c'est une relation
+      if (relation) {
+        const relatedRepo = repo.manager.getRepository(relation.type as any);
+        const relationData = (data as Record<string, any>)[key];
+        // 📌 Si c'est un tableau, c'est une relation ManyToMany ou OneToMany
+        if (Array.isArray(relationData)) {
+          // 🔥 ManyToMany ou OneToMany : On récupère les entités existantes par ID
+          (updatedEntity as any)[key] = await Promise.all(
+            relationData.map(async (item: any) => {
+              if (typeof item === "number") {
+                return await relatedRepo.findOne({ where: { id: item } }); // Associe l'entité existante
+              } else {
+                return relatedRepo.create(item); // Crée une nouvelle entité si aucun ID
+              }
+            })
+          );
+        } else {
+          // 🔥 ManyToOne ou OneToOne : On récupère l'entité existante ou on la crée
+          (updatedEntity as any)[key] = typeof relationData === "number"
+            ? await relatedRepo.findOne({ where: { id: relationData } })
+            : relationData ? relatedRepo.create(relationData) : undefined;
+        }
+      } else {
+        // 🔥 Si ce n'est pas une relation, c'est une colonne normale
+        (updatedEntity as Record<string, any>)[key] = (data as Record<string, any>)[key];
+      }
+    }
+    
+    // 📌 Trouver l'entité existante par ID si elle existe 
+    // (pour la mise à jour) ou créer une nouvelle entité
+    const entityToUpdate = (data && typeof data === 'object' && 'id' in data) ? await repo.findOne({ where: { id: (data as any).id } }) : null;
+    
+    if (entityToUpdate) {
+      // 🔥 Mettre à jour l'entité existante avec les nouvelles données
+      return repo.save({ ...entityToUpdate, ...updatedEntity });
+    } else {
+      // 🔥 Créer une nouvelle entité
+      const newEntity = repo.create(updatedEntity as DeepPartial<T>);
+      return repo.save(newEntity);
+    }
+  }
+  

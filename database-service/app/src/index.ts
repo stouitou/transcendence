@@ -6,7 +6,9 @@ import { entityRoutes } from "./routes/entity.routes";
 import databases from "./plugins/databases";
 import { managerRoutes } from "./routes/manager.routes";
 
+import Seed from "./config/seed";
 
+  let isSeed = false;
 const start = async () => {
   try {
     const app = Fastify({ logger: true, ignoreTrailingSlash: true });   // ✅ On crée une instance de Fastify
@@ -20,6 +22,19 @@ const start = async () => {
       this.log.error(error)
       reply.status(409).send({ setErrorHandler: error }) // 409 Conflict @TODO: create errorhandling()
     })
+
+    //@TODO: A supprimer en production
+    app.get("/api/v2/database/seed", async (request, reply) => {
+      if (isSeed) {
+        return { message: "Seed already executed" };
+      }
+      const seedInstance = new Seed(app);
+      const users = await seedInstance.seedUsers();
+      const round = await seedInstance.seedRoundTournaments();
+      const tournaments = await seedInstance.seedTournaments();
+      isSeed = true;
+      return { users, round, tournaments };
+    });
 
     app.register(entityRoutes ,{prefix:"/api/v2/database"});
     app.register(managerRoutes ,{prefix:"/api/v2/database/manager"});
