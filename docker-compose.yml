@@ -9,6 +9,7 @@ services:
       - ./nginx/templates:/etc/nginx/templates
     depends_on:
       - user-management-service
+      - frontend-services
     ports:
       - "${BACKEND_SERVER_SSH_PORT}:443"
       - "${BACKEND_SERVER_PORT}:80"
@@ -68,7 +69,6 @@ services:
       - transcendence_network
     depends_on:
       - frontend-pong-module
-      - nginx
 
  #Pong-Moudle
   frontend-pong-module:

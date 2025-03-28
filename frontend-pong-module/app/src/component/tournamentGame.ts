@@ -1,30 +1,15 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Player } from '../entities/Player.js';
-import { Game } from '../entities/Game.js';
+import { Tournament } from '../entities/Tournament.js';
 
-@customElement('game-component')
-export class  oneVSone extends LitElement {
-// LitElement automatically create a shadow DOM
+@customElement('tournament-component')
+export class  TournamentGame extends LitElement {
   @property({ type: String }) gameContainerId: string = "gameWrapper";
 
   /* ATTRIBUTES */
   private _area: HTMLDivElement | null = null;
-  private _game!: Game;
-  static styles = css`
-    :host {
-      position: relative;
-      width: 100%;
-      height: 100%;
-    }
-    html {
-      margin: 0;
-      padding: 0;
-      border: 0;
-      width: 100%;
-      height: 100%;
-    }
-  `;
+  private _game!: Tournament;
 
   /* CONSTRUCTOR */
 	constructor () {
@@ -41,9 +26,6 @@ export class  oneVSone extends LitElement {
     this._area.style.height = "500px";
     this._area.style.overflow = "hidden";
     this._area.style.position = "absolute";
-    // this._area.style.top = "50vh";
-    // this._area.style.left = "50vw";
-    // this._area.style.transform = "translate(-50%, -50%)";
     this._area.style.margin = "0%";
     this._area.style.padding = "0%";
     this._area.style.border = "none";
@@ -51,35 +33,36 @@ export class  oneVSone extends LitElement {
 
     const player1 = new Player("First", this._area);
     const player2 = new Player("Second", this._area);
-    const players: Player[] = [player1, player2];
-
-    this._game = new Game(players, this._area);
-    this._game.launch();
+    const player3 = new Player("Three", this._area);
+    const player4 = new Player("Four", this._area);
+    const players: Player[] = [player1, player2, player3, player4];
+  
+    this._game = new Tournament(players, this._area);
   }
   
   render () {
-    return html`<div>Game content here</div>
+    return html`
     `;
   }
 
-  // static styles = css`
-
-  // .game {
-  //   display: flex;
-  //   flex-direction: column;
-  //   align-items: center;
-  //   justify-content: center;
-  //   position: relative; /* Assurez-vous que le positionnement est relatif */
-  //   width: 100%;
-  //   height: 50vh;
-  //   }
-  //   `;
+  static styles = css`
+  
+  .game {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    position: relative; /* Assurez-vous que le positionnement est relatif */
+    width: 100%;
+    height: 50vh;
+    }
+    `;
 }
 
 // Enregistrement du composant avec une balise personnalisée
-// customElements.define('game-component', OneVSone);
+// customElements.define('pong-game', PongGame);
 declare global {
   interface HTMLElementTagNameMap {
-	  'game-component': oneVSone;
+	  'tournament-component': TournamentGame;
   }
 }

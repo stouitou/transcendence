@@ -89,6 +89,13 @@ const pongGameScript = async () => {
     window.document.head.appendChild(script);
 };
 
+const pongTournamentScript = async () => {
+	const script = document.createElement('script');
+	script.type = 'module';
+	script.src = 'https://localhost:4433/frontend-pong-module/app/src/component/tournamentGame.ts';
+    window.document.head.appendChild(script);
+};
+
 function renderGame(container: HTMLElement) {
     // Clear container if needed
     clearContainer(container);
@@ -99,8 +106,7 @@ function renderGame(container: HTMLElement) {
     // Create game wrapper div
     const gameWrapper = document.createElement("div");
     gameWrapper.id = "gameWrapper";
-    gameWrapper.className = "flex flex-col items-center justify-center space-y-4";
-    console.log(gameWrapper);
+    gameWrapper.className = "flex flex-col items-center justify-center space-y-4 min-w-[700px] min-h-[500px] bg-black";
 
     // Append game wrapper to container
     container.appendChild(gameWrapper);
@@ -142,7 +148,13 @@ function renderGame(container: HTMLElement) {
 
     startTournamentButton.addEventListener("click", () => {
         if (typeof renderTournament === "function") {
-            renderTournament(container);
+            // renderTournament(container);
+            pongTournamentScript();
+            const gameComponent = document.createElement("tournament-component");
+            container.appendChild(gameComponent);
+            startButton.remove();
+            startMultiplayerButton.remove();
+            startTournamentButton.remove();
         } else {
             console.error("renderTournament function is not defined!");
         }
@@ -159,9 +171,10 @@ function renderGame(container: HTMLElement) {
 
 function renderTournament(container: HTMLElement) {
     // Clear container if needed
-    while (container.firstChild) {
-        container.removeChild(container.firstChild);
-    }
+    clearContainer(container);
+    // while (container.firstChild) {
+    //     container.removeChild(container.firstChild);
+    // }
 
     // Create tournament wrapper div
     const tournamentWrapper = document.createElement("div");
@@ -200,7 +213,6 @@ function renderTournament(container: HTMLElement) {
     // Append tournament wrapper to container
     container.appendChild(tournamentWrapper);
 }
-
 
 function renderInfo(container: HTMLElement) {
     const heading = document.createElement('h2');
