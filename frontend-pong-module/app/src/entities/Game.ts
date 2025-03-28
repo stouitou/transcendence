@@ -55,6 +55,7 @@ export class	Game {
 
 	/* METHODS */
 	public async launch () : Promise<void> {
+		
 		this._versus.display();
 		await this._countdown.start();
 		this._board.display();

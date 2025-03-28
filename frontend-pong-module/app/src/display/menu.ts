@@ -57,6 +57,9 @@ export class menu {
 			this._spaceButtons += this._heightButton;
 		
 			this._button.addEventListener("click", (event) => {
+				const buttons: HTMLButtonElement[] = Array.from(document.querySelectorAll("button"));
+				this._outline.remove();
+				buttons.forEach(button => button.remove());
 				const target = event.target as HTMLButtonElement;
 				this.center(target);
 			})
@@ -73,7 +76,17 @@ export class menu {
 		switch (target.textContent)
 		{
 			case '1V1' :
-				console.log("Center: 1V1");
+				this.oneVSone();
+				
 		}
+	}
+
+	public oneVSone()
+	{
+		const menu: string[] = ["Local", "Distant"];
+
+		this.displayMenu(menu);
+		this.displayButton(menu);
+		console.log("Center: 1V1");
 	}
 }
