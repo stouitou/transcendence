@@ -42,6 +42,9 @@ export class  oneVSone extends LitElement {
     this._area.style.height = "500px";
     this._area.style.overflow = "hidden";
     this._area.style.position = "absolute";
+    // this._area.style.top = "50vh";
+    // this._area.style.left = "50vw";
+    // this._area.style.transform = "translate(-50%, -50%)";
     this._area.style.margin = "0%";
     this._area.style.padding = "0%";
     this._area.style.border = "none";
@@ -65,18 +68,18 @@ export class  oneVSone extends LitElement {
     `;
   }
 
-//   static styles = css`
+  // static styles = css`
 
-//   .game {
-//     display: flex;
-//     flex-direction: column;
-//     align-items: center;
-//     justify-content: center;
-//     position: relative; /* Assurez-vous que le positionnement est relatif */
-//     width: 100%;
-//     height: 50vh;
-//     }
-//     `;
+  // .game {
+  //   display: flex;
+  //   flex-direction: column;
+  //   align-items: center;
+  //   justify-content: center;
+  //   position: relative; /* Assurez-vous que le positionnement est relatif */
+  //   width: 100%;
+  //   height: 50vh;
+  //   }
+  //   `;
 }
 
 // Enregistrement du composant avec une balise personnalisée

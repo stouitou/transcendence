@@ -92,11 +92,25 @@ const pongGameScript = async () => {
 function renderGame(container: HTMLElement) {
     // Clear container if needed
     clearContainer(container);
+    // while (container.firstChild) {
+    //     container.removeChild(container.firstChild);
+    // }
 
     // Create game wrapper div
     const gameWrapper = document.createElement("div");
     gameWrapper.id = "gameWrapper";
-    gameWrapper.className = "flex flex-col items-center justify-center space-y-4 w-[700px] h-[500px]";
+    gameWrapper.className = "flex flex-col items-center justify-center space-y-4";
+    console.log(gameWrapper);
+
+    // Append game wrapper to container
+    container.appendChild(gameWrapper);
+
+    // Create canvas element
+    // const canvas = document.createElement("canvas");
+    // canvas.id = "pongCanvas";
+    // canvas.width = 600;
+    // canvas.height = 500;
+    // canvas.className = "shadow-lg rounded-lg";
 
     // Create Start Game button
     const startButton = document.createElement("button");
@@ -115,9 +129,9 @@ function renderGame(container: HTMLElement) {
     startButton.addEventListener("click", () => {
         if (typeof startGame === "function") {
             pongGameScript();
-            const game = document.createElement("game-component");
-            // game.setAttribute("canvasId", "pongCanvas");
-            container.appendChild(game);
+            const gameComponent = document.createElement("game-component");
+            // gameComponent.setAttribute("canvasId", "pongCanvas");
+            container.appendChild(gameComponent);
             startButton.remove();
             startMultiplayerButton.remove();
             startTournamentButton.remove();
@@ -139,8 +153,8 @@ function renderGame(container: HTMLElement) {
     gameWrapper.appendChild(startMultiplayerButton);
     gameWrapper.appendChild(startTournamentButton);
 
-    // Append game wrapper to container
-    container.appendChild(gameWrapper);
+    // // Append game wrapper to container
+    // container.appendChild(gameWrapper);
 }
 
 function renderTournament(container: HTMLElement) {
