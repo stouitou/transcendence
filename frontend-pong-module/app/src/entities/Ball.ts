@@ -23,7 +23,7 @@ export class	Ball extends Display {
 	private				_right!: number;
 
 	/* CONSTRUCTOR */
-	constructor (canvas: HTMLDivElement) {
+	constructor (canvas: HTMLCanvasElement) {
 		super(canvas);
 
 		// Creates the ball object
@@ -38,7 +38,7 @@ export class	Ball extends Display {
 		this._element.style.padding = "0%";
 		this._element.style.border = "0%";
 		// this._element.style.display = "none";							// doesn't interact with other objects or text
-		this._canvas.appendChild(this._element);
+		// this._canvas.appendChild(this._element);
 
 		// Gives the ball a random direction and position
 		this._direction = new Direction(0, 0);

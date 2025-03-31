@@ -106,7 +106,7 @@ function renderGame(container: HTMLElement) {
     // Create game wrapper div
     const gameWrapper = document.createElement("div");
     gameWrapper.id = "gameWrapper";
-    gameWrapper.className = "flex flex-col items-center justify-center space-y-4 min-w-[700px] min-h-[500px] bg-black";
+    gameWrapper.className = "flex flex-col items-center justify-center space-y-4 min-w-[700px] min-h-[700px] bg-white";
 
     // Append game wrapper to container
     container.appendChild(gameWrapper);

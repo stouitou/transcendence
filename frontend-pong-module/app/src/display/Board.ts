@@ -21,7 +21,7 @@ export class	Board extends Display {
 	private readonly	_player3: Player | null = null;
 
 	/* CONSTRUCTOR */
-	constructor(players: Player[], canvas: HTMLDivElement) {
+	constructor(players: Player[], canvas: HTMLCanvasElement) {
 		super(canvas);
 
 		this._player1 = players[0];
@@ -80,8 +80,8 @@ export class	Board extends Display {
 	
 	/* METHODS */
 	public display () {
-		this._canvas.appendChild(this._right);
-		this._canvas.appendChild(this._left);
+		// this._canvas.appendChild(this._right);
+		// this._canvas.appendChild(this._left);
 	}
 
 	public score(ball: Ball) {

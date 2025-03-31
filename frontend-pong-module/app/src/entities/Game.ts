@@ -4,13 +4,12 @@ import { Countdown } from '../additional/Countdown.js';
 import { Pause } from '../additional/Pause.js';
 import { Player } from './Player.js';
 import { Versus } from '../display/Versus.js';
+import { Display } from '../display/Display.js';
 
 // export allows to use this class in another file
-export class	Game {
+export class	Game extends Display {
 
 	/* ATTRIBUTES */
-	 private readonly	_canvas: HTMLDivElement;
-
 	private readonly	_ball: Ball;
 	private readonly	_board: Board;
 	private readonly	_players: Player[];
@@ -29,9 +28,12 @@ export class	Game {
 	private				_rally: number = 0;
 
 	/* CONSTRUCTOR */
-	constructor(players: Player[], canvas: HTMLDivElement) {
+	constructor(players: Player[], canvas: HTMLCanvasElement) {
+		super(canvas);
+		this._context.fillStyle = "black";
+		this._context.fillRect(0, 0, canvas.width, canvas.height);
+
 		this._players = players;
-		this._canvas = canvas;
 		if (this._players.length > 2)
 			this._canvas.style.height = `${this._canvas.style.width}`;
 

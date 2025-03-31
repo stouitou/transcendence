@@ -13,7 +13,7 @@ export class	Countdown extends Display {
 	private readonly	_horizontal: number = 50;			// horizontal position in percentage
 
 	/* CONSTRUCTOR */
-	constructor (canvas: HTMLDivElement) {
+	constructor (canvas: HTMLCanvasElement) {
 		super(canvas);
 
 		this._element = document.createElement("div");
@@ -31,7 +31,7 @@ export class	Countdown extends Display {
 	/* METHODS */
 	public start () : Promise<void> {
 		return new Promise((resolve) => {
-			this._canvas.appendChild(this._element);
+			// this._canvas.appendChild(this._element);
 			for (let x = 1; x < this._countdown.length; x++) {
 				setTimeout(() => {
 					this._element.textContent = this._countdown[x];

@@ -9,7 +9,8 @@ export class  oneVSone extends LitElement {
   @property({ type: String }) gameContainerId: string = "gameWrapper";
 
   /* ATTRIBUTES */
-  private _area: HTMLDivElement | null = null;
+  private _container: HTMLDivElement | null = null;
+  private _area: HTMLCanvasElement | null = null;
   private _game!: Game;
   static styles = css`
     :host {
@@ -24,30 +25,46 @@ export class  oneVSone extends LitElement {
       width: 100%;
       height: 100%;
     }
+    header {
+      margin: 0;
+      padding: 2px;
+      border: block;
+      width: 100%;
+      height: 200px;
+    }
   `;
 
   /* CONSTRUCTOR */
 	constructor () {
     super();
+    console.log("Starting game...");
   }
 
   firstUpdated () {
-    this._area = window.document.getElementById(this.gameContainerId) as HTMLDivElement | null;
-    if (!this._area) {
+    this._container = window.document.getElementById(this.gameContainerId) as HTMLDivElement | null;
+    if (!this._container) {
       throw new Error("No game container found");
     }
 
-    this._area.style.width = "700px";
-    this._area.style.height = "500px";
-    this._area.style.overflow = "hidden";
-    this._area.style.position = "absolute";
-    // this._area.style.top = "50vh";
-    // this._area.style.left = "50vw";
-    // this._area.style.transform = "translate(-50%, -50%)";
-    this._area.style.margin = "0%";
-    this._area.style.padding = "0%";
-    this._area.style.border = "none";
-    this._area.style.background = "rgb(0, 0, 0)";
+    this._container.style.width = "700px";
+    this._container.style.height = "500px";
+    this._container.style.overflow = "hidden";
+    this._container.style.position = "absolute";
+    // this._container.style.top = "50vh";
+    // this._container.style.left = "50vw";
+    // this._container.style.transform = "translate(-50%, -50%)";
+    this._container.style.margin = "0%";
+    this._container.style.padding = "0%";
+    this._container.style.border = "none";
+    // this._container.style.background = "rgb(0, 0, 0)";
+    this._container.style.textAlign = "center";
+
+    this._area = document.createElement("canvas");
+    if (!this._area)
+        throw new Error("Impossible to create game area");
+    this._area.width = 700;
+    this._area.height = 500;
+    this._container.appendChild(this._area);
 
     const player1 = new Player("First", this._area);
     const player2 = new Player("Second", this._area);
