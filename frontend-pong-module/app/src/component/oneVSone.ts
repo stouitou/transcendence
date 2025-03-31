@@ -49,9 +49,9 @@ export class  oneVSone extends LitElement {
     
     // const players: Player[] = [player1, player2, player3];
 
-    const textButton: string[] = ["1V1", "Tournoi", "Multijoueur"];
+    // const textButton: string[] = ["1V1", "Tournoi", "Multijoueur"];
 
-    new menu(textButton);
+    new menu();
 
    // this._game = new Game(players, this._area);
     //this._game.launch();

@@ -10,12 +10,19 @@ export class menu {
 
 	private _spaceButtons!: number;
 
+	private _target!: HTMLButtonElement;
+
+	private _textButton: string[][] = [];
 	//private topButton: number = 50;
 
-    constructor (textButton: string[])
+    constructor ()//textButton: string[])
 	{	
-		this.displayMenu(textButton);
-		this.displayButton(textButton);
+		this._textButton[0] = ["1V1", "Tournoi", "Multijoueur", "Return"];
+		this._textButton[1] = ["Local", "Distant", "IA", "Return"];
+		this._textButton[2] = ["Name", "IA", "Return"];
+		const textButton: string[] = ["1V1", "Tournoi", "Multijoueur", "Return"];
+		
+		this.display(this._textButton[0]);
 	}
 
 	
@@ -37,56 +44,65 @@ export class menu {
 		document.body.appendChild(this._outline);
 	}
 
-	public displayButton(textButton: string[])
+	public displayButton(textButton: string[]) : Promise<void>
 	{
-		this._spaceButtons = window.innerHeight /  2 - this._heightMenu / 2 + this._heightButton * 0.2;
+		return new Promise((resolve) => {
+			this._spaceButtons = window.innerHeight /  2 - this._heightMenu / 2 + this._heightButton * 0.2;
 
-		for (let x = 0; x < textButton.length; x++)
-		{
-			this._button = document.createElement("button");
+			for (let x = 0; x < textButton.length; x++)
+			{
+				this._button = document.createElement("button");
 
-			this._button.style.position = "absolute";
-			this._button.style.backgroundColor = "rgb(255, 0, 0)";
-			this._button.style.top = `${this._spaceButtons}px`;
-			this._spaceButtons += (this._heightButton * 0.2);
-			this._button.style.width = `${this._widthButton}px `;
-			this._button.style.height = `${this._heightButton}px`;
-		
-			this._button.textContent = textButton[x];
-
-			this._spaceButtons += this._heightButton;
-		
-			this._button.addEventListener("click", (event) => {
-				const buttons: HTMLButtonElement[] = Array.from(document.querySelectorAll("button"));
-				this._outline.remove();
-				buttons.forEach(button => button.remove());
-				const target = event.target as HTMLButtonElement;
-				this.center(target);
-			})
-
-			document.body.appendChild(this._button);
+				this._button.style.position = "absolute";
+				this._button.style.backgroundColor = "rgb(255, 0, 0)";
+				this._button.style.top = `${this._spaceButtons}px`;
+				this._spaceButtons += (this._heightButton * 0.2);
+				this._button.style.width = `${this._widthButton}px `;
+				this._button.style.height = `${this._heightButton}px`;
 			
-		}
+				this._button.textContent = textButton[x];
+
+				this._spaceButtons += this._heightButton;
+
+				document.body.appendChild(this._button);
+
+				this._button.addEventListener("click", (event) => {
+					const buttons: HTMLButtonElement[] = Array.from(document.querySelectorAll("button"));
+					this._outline.remove();
+					buttons.forEach(button => button.remove());
+					this._target = event.target as HTMLButtonElement;
+					this.center();
+					resolve();
+				})
+			}
+		});
 	}
 
-	public center(target: HTMLButtonElement)
+	private async display(textButton: string[])
 	{
-		//const click = window.location.hash;
-		console.log("target: ", target);
-		switch (target.textContent)
+		this.displayMenu(textButton);
+		await this.displayButton(textButton);
+	}
+
+	public async center()
+	{
+		
+		switch (this._target.textContent)
 		{
 			case '1V1' :
-				this.oneVSone();
-				
+				await this.display(this._textButton[1]);
+				break;
+			case 'Local' :
+				this.localGame();
+				break;
+			case 'Return' :
+				await this.display(this._textButton[0]);
+				break;
 		}
 	}
 
-	public oneVSone()
+	public localGame()
 	{
-		const menu: string[] = ["Local", "Distant"];
-
-		this.displayMenu(menu);
-		this.displayButton(menu);
-		console.log("Center: 1V1");
+		
 	}
 }
