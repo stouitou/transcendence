@@ -93,7 +93,7 @@ export class menu {
 	}
 
 	//afficher les boutons custom
-	public displayButtonCustom(button: string, width: number, height: number) : Promise<void>
+	public displayButtonCustom(button: string, width: number, height: number, buttonWidth: number, buttonHeight: number) : Promise<void>
 	{
 		return new Promise((resolve) => {
 			//this._spaceButtons = window.innerHeight /  2 - this._heightMenu / 2 + this._heightButton * 0.2;
@@ -104,15 +104,15 @@ export class menu {
 
 				this._button.style.position = "absolute";
 				this._button.style.backgroundColor = "rgb(179, 95, 95)";
-				this._button.style.top =  `calc(${window.innerHeight /  2}px -${this._heightMenu / 2}px)`;
-				this._button.style.left = `calc(${window.innerWidth /  2}px - ${width / 2.3}px)`;
-				this._spaceButtons += (this._heightButton * 0.2);
-				this._button.style.width = `${this._widthButton}px`;
-				this._button.style.height = `${this._heightButton}px`;
+				this._button.style.top =  `${buttonHeight}px`;
+				this._button.style.left = `${buttonWidth}px`;
+				//this._spaceButtons += (this._heightButton * 0.2);
+				this._button.style.width = `${width}px`;
+				this._button.style.height = `${height}px`;
 			
 				this._button.textContent = button;
 
-				this._spaceButtons += this._heightButton;
+				//this._spaceButtons += this._heightButton;
 
 				document.body.appendChild(this._button);
 
@@ -152,7 +152,7 @@ export class menu {
 				this._button.style.position = "absolute";
 				this._button.style.backgroundColor = "rgb(179, 95, 95)";
 				this._button.style.top =  `calc(${window.innerHeight /  2}px -${this._heightMenu / 2}px)`;
-				this._button.style.left = `calc(${window.innerWidth /  2}px - ${300 / 2.5}px)`;
+				this._button.style.left = `calc(${window.innerWidth /  2}px - ${300 / 2.2}px)`;
 				this._spaceButtons += (this._heightButton * 0.2);
 				this._button.style.width = `${this._widthButton}px`;
 				this._button.style.height = `${this._heightButton}px`;
@@ -200,8 +200,8 @@ export class menu {
 
 	public localGame()
 	{
-		this.playerOrIA();
-		// this.displayMenuCustom(300, 50);
+		this.displayMenuCustom(300, 50);
+		this.displayButtonCustom("Test", 300, 50, 200, 3);
 		// this.displayButtonCustom("Player", 300, 50);
 		// this.displayButtonCustom("IA", 50, 50);
 
