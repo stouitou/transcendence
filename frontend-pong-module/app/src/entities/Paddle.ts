@@ -19,11 +19,9 @@ export class Paddle extends Display {
 	private _bottom!: number;
 	private _left!: number;
 	private _right!: number;
-	private _x!: number;
-	private _y!: number;
 
 	/* CONSTRUCTOR */
-	constructor(location: number = 1 | 2 | 3 | 4, canvas: HTMLCanvasElement) {
+	constructor(location: number = 1 | 2 | 3 | 4, canvas: HTMLDivElement) {
 		super(canvas);
 
 		this._location = location;
@@ -36,26 +34,17 @@ export class Paddle extends Display {
 		this._element.style.position = "absolute";
 		this._element.style.margin = "0%";
 		this._element.style.padding = "0%";
-
+		
 		if (location === 1 || location === 2) {
 			this._element.style.width = `${this._width}px`;
 			this._element.style.height = `${this._height}px`;
 			this._element.style.top = `calc(${this._canvas.offsetHeight} / 2 - ${this._height} / 2)px`;
-			this._y = 190;
-			
+
 			if (location === 1) {
 				this._element.style.right = "1%";
-				this._x = 675;
-				this._color = "red";
-				this._context.fillStyle = this._color;
-				this._context.fillRect(this._x, this._y, this._width, this._height);
 			}
 			else if (location === 2) {
 				this._element.style.left = "1%";
-				this._x = 5;
-				this._color = "green";
-				this._context.fillStyle = this._color;
-				this._context.fillRect(this._x, this._y, this._width, this._height);
 			}
 		}
 		else if (location === 3 || location === 4) {
@@ -71,7 +60,7 @@ export class Paddle extends Display {
 			}
 		}
 		// "Draws" the paddle in the game area
-		// this._canvas.appendChild(this._element);
+		this._canvas.appendChild(this._element);
 
 		this.updatePosition();
 
@@ -140,23 +129,12 @@ export class Paddle extends Display {
 		const	moveRigth = (this._keys['ArrowRight'] && this._location === 3);// || (this._keys['d'] && this._location === 4);
 		const	moveLeft = (this._keys['ArrowLeft'] && this._location === 3);// || (this._keys['a'] && this._location === 4);
 
-		console.log("move");
 		// Move subsequently
 		if (moveUp) {
 			this._element.style.top = `${Math.max(0, this._top - this._speed)}px`;
-			this._context.clearRect(this._x, this._y, this._width, this._height);
-			this._y -= this._speed;
-			this._context.fillStyle = this._color;
-			this._context.fillRect(this._x, this._y, this._width, this._height);
-			this._context.fillStyle = this._color;
-			this._context.fillRect(this._x, this._y, this._width, this._height);
 		}
 		if (moveDown) {
 			this._element.style.top = `${Math.min(this._canvas.offsetHeight - this._height, this._top + this._speed)}px`;
-			this._context.clearRect(this._x, this._y, this._width, this._height);
-			this._y += this._speed;
-			this._context.fillStyle = this._color;
-			this._context.fillRect(this._x, this._y, this._width, this._height);
 		}
 		if (moveLeft) {
 			this._element.style.left = `${Math.max(0, this._left - this._speed)}px`;

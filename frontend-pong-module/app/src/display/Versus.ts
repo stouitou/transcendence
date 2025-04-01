@@ -12,7 +12,7 @@ export class	Versus extends Display {
 	private readonly	_size: number = 70;					// size of the text in pixel
 
 	/* CONSTRUCTOR */
-	constructor (players: Player[], canvas: HTMLCanvasElement) {
+	constructor (players: Player[], canvas: HTMLDivElement) {
 		super(canvas);
 
 		this._right = document.createElement("div");
@@ -22,7 +22,7 @@ export class	Versus extends Display {
 		this._right.style.fontSize = `${this._size}px`;
 		this._right.style.top = "2%";
 		this._right.style.right = "2%";
-		this._right.style.position = "absolute";
+		this._right.style.position = "absolutzzze";
 		
 		this._left = document.createElement("div");
 		this._left.textContent = players[1].name;
@@ -36,8 +36,8 @@ export class	Versus extends Display {
 
 	/* METHODS */
 	public display () {
-		// this._canvas.appendChild(this._right);
-		// this._canvas.appendChild(this._left);
+		this._canvas.appendChild(this._right);
+		this._canvas.appendChild(this._left);
 		setInterval(() => {
 			this._right.remove();
 			this._left.remove();

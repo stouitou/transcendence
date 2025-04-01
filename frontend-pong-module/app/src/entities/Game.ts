@@ -4,36 +4,34 @@ import { Countdown } from '../additional/Countdown.js';
 import { Pause } from '../additional/Pause.js';
 import { Player } from './Player.js';
 import { Versus } from '../display/Versus.js';
-import { Display } from '../display/Display.js';
 
 // export allows to use this class in another file
-export class	Game extends Display {
+export class	Game {
 
 	/* ATTRIBUTES */
+	private readonly	_canvas: HTMLDivElement;
+	
 	private readonly	_ball: Ball;
 	private readonly	_board: Board;
-	private readonly	_players: Player[];
+	private				_players: Player[];
 	//private readonly	_player1: Player;	// player on the right
 	//private readonly	_player2: Player;	// player on the left
 	private readonly	_countdown: Countdown;
 	private readonly	_versus: Versus;
 	private readonly	_pause: Pause;
-
+	
 	private				_pointsToWin: number = 100;
 	private				_winner: Player | null = null;
-
+	
 	private				_beginning: boolean = true;
 	private				_break: boolean = false;
-
+	
 	private				_rally: number = 0;
-
+	
 	/* CONSTRUCTOR */
-	constructor(players: Player[], canvas: HTMLCanvasElement) {
-		super(canvas);
-		this._context.fillStyle = "black";
-		this._context.fillRect(0, 0, canvas.width, canvas.height);
-
+	constructor(players: Player[], canvas: HTMLDivElement) {
 		this._players = players;
+		this._canvas = canvas;
 		if (this._players.length > 2)
 			this._canvas.style.height = `${this._canvas.style.width}`;
 

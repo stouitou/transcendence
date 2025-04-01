@@ -3,9 +3,9 @@ import { Paddle } from "./Paddle.js";
 export class Player {
 
 	/* ATTIBUTES */
-	private readonly 	_area: HTMLCanvasElement;
+	private readonly 	_area: HTMLDivElement;
 
-	private readonly 	_name: string;
+	private				_name: string;
 	private				_id: number;
 	private				_paddle!: Paddle;
 
@@ -15,7 +15,7 @@ export class Player {
 	private				_lastScore: number;
 
 	/* CONSTRUCTOR */
-	constructor (name: string, canvas: HTMLCanvasElement) {
+	constructor (name: string, canvas: HTMLDivElement) {
 		this._area = canvas;
 
 		this._name = name;

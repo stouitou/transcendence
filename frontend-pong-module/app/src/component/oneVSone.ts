@@ -2,6 +2,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Player } from '../entities/Player.js';
 import { Game } from '../entities/Game.js';
+import { Match } from '../tests/Match.js';
 
 @customElement('game-component')
 export class  oneVSone extends LitElement {
@@ -9,9 +10,10 @@ export class  oneVSone extends LitElement {
   @property({ type: String }) gameContainerId: string = "gameWrapper";
 
   /* ATTRIBUTES */
-  private _container: HTMLDivElement | null = null;
-  private _area: HTMLCanvasElement | null = null;
+  private _area!: HTMLDivElement;
+  private _field: HTMLCanvasElement | null = null;
   private _game!: Game;
+  // private _game!: Match;
   static styles = css`
     :host {
       position: relative;
@@ -25,55 +27,114 @@ export class  oneVSone extends LitElement {
       width: 100%;
       height: 100%;
     }
-    header {
-      margin: 0;
-      padding: 2px;
-      border: block;
-      width: 100%;
-      height: 200px;
-    }
   `;
 
   /* CONSTRUCTOR */
 	constructor () {
     super();
-    console.log("Starting game...");
   }
 
   firstUpdated () {
-    this._container = window.document.getElementById(this.gameContainerId) as HTMLDivElement | null;
-    if (!this._container) {
+    this._area = window.document.getElementById(this.gameContainerId) as HTMLDivElement;
+    if (!this._area) {
       throw new Error("No game container found");
     }
 
-    this._container.style.width = "700px";
-    this._container.style.height = "500px";
-    this._container.style.overflow = "hidden";
-    this._container.style.position = "absolute";
-    // this._container.style.top = "50vh";
-    // this._container.style.left = "50vw";
-    // this._container.style.transform = "translate(-50%, -50%)";
-    this._container.style.margin = "0%";
-    this._container.style.padding = "0%";
-    this._container.style.border = "none";
-    // this._container.style.background = "rgb(0, 0, 0)";
-    this._container.style.textAlign = "center";
+    // this._area.style.width = "700px";
+    // this._area.style.height = "500px";
+    this._area.style.overflow = "hidden";
+    this._area.style.position = "absolute";
+    // this._area.style.top = "50vh";
+    // this._area.style.left = "50vw";
+    // this._area.style.transform = "translate(-50%, -50%)";
+    this._area.style.margin = "0%";
+    this._area.style.padding = "0%";
+    this._area.style.border = "none";
 
-    this._area = document.createElement("canvas");
-    if (!this._area)
-        throw new Error("Impossible to create game area");
-    this._area.width = 700;
-    this._area.height = 500;
-    this._container.appendChild(this._area);
+    this._field = document.createElement('canvas');
+    this._field.width = 700;
+    this._field.height = 500;
+    this._area.appendChild(this._field);
 
-    const player1 = new Player("First", this._area);
-    const player2 = new Player("Second", this._area);
-    const players: Player[] = [player1, player2];
-
-    this._game = new Game(players, this._area);
-    this._game.launch();
+    this.setupGame();
+    // this._game = new Match(this._field, 2);
   }
   
+  async setupGame () {
+    const name: string = await this.createPlayer();
+    // const player1 = new Player(name, this._area);
+    // const player2 = new Player("Second", this._area);
+    // const players: Player[] = [player1, player2];
+  
+    await this.createGame(name, 'guest');
+    this.launchGame();
+    // this._game.launch();
+  }
+
+  async createPlayer () : Promise<string> {
+      const url = 'https://localhost:4433/api/v2/database/myDb/table/user/id/1';
+
+      try {
+        const response = await fetch(url);
+        const data = await response.json();
+        // const name: string = "Default";
+        const name = data.data.name;
+        if (!name) {
+          throw new Error("No name found");
+        }
+        return (name);
+      }
+      catch (error) {
+        return ("Player1");
+      }
+  }
+
+  async createGame (player1: string, player2: string) : Promise<void> {
+    const url = 'https://localhost:4433/api/v2/database/myDb/table/game';
+    const body = {
+      players: [player1, player2],
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+    }
+    catch (error) {
+      console.log("Error");
+    }
+    const players: Player[] = [new Player(player1, this._area), new Player(player2, this._area)];
+    this._game = new Game(players, this._area);
+  }
+
+  async launchGame () {
+    const url = 'https://localhost:4433/api/v2/database/myDb/table/game/id/1';
+    const body = {
+      state: 'running',
+    };
+
+    try {
+      const response = await fetch(url, {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify(body),
+      });
+      const data = await response.json();
+      console.log(data);
+    }
+    catch (error) {
+      console.log("Error");
+    }
+    this._game.launch();
+  }
+
   render () {
     return html`<div>Game content here</div>
     `;

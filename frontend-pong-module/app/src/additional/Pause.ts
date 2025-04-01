@@ -9,12 +9,12 @@ export class	Pause extends Display {
 	private readonly	_width: number = 17;				// width in pixel
 	private readonly	_height: number = 50;				// height in pixel
 	private readonly	_color: string = "rgb(255, 0, 0)";	//	color of the symbol
-	private readonly	_opacity: number = 0.5;				// opacity of the symbol
+	private readonly	_opacity: number = 0.2;				// opacity of the symbol
 	private readonly	_vertical:  number = 5;				// vertical position in percentage
 	private readonly	_horizontal:  number = 47;			// horizontal position in percentage
 
 	/* CONSTRUCTOR */
-	constructor (canvas: HTMLCanvasElement) {
+	constructor (canvas: HTMLDivElement) {
 		super(canvas);
 
 		this._left = document.createElement("div");
@@ -26,7 +26,7 @@ export class	Pause extends Display {
 		this._left.style.left = `${this._horizontal}%`;		// horizontal position from the left
 		this._left.style.position = "absolute";
 		this._left.style.display = "none";
-		// this._canvas.appendChild(this._left);
+		this._canvas.appendChild(this._left);
 
 		this._right = document.createElement("div");
 		this._right.style.width = `${this._width}px`;
@@ -37,7 +37,7 @@ export class	Pause extends Display {
 		this._right.style.right = `${this._horizontal}%`;	// horizontal position from the right
 		this._right.style.position = "absolute";
 		this._right.style.display = "none";
-		// this._canvas.appendChild(this._right);
+		this._canvas.appendChild(this._right);
 	}
 
 	/* GETTERS */
