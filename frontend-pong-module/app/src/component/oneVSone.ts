@@ -11,9 +11,9 @@ export class  oneVSone extends LitElement {
 
   /* ATTRIBUTES */
   private _area!: HTMLDivElement;
-  private _field: HTMLCanvasElement | null = null;
-  private _game!: Game;
-  // private _game!: Match;
+  private _field!: HTMLCanvasElement;
+  // private _game!: Game;
+  private _game!: Match;
   static styles = css`
     :host {
       position: relative;
@@ -51,24 +51,14 @@ export class  oneVSone extends LitElement {
     this._area.style.padding = "0%";
     this._area.style.border = "none";
 
-    this._field = document.createElement('canvas');
-    this._field.width = 700;
-    this._field.height = 500;
-    this._area.appendChild(this._field);
-
     this.setupGame();
-    // this._game = new Match(this._field, 2);
   }
   
   async setupGame () {
     const name: string = await this.createPlayer();
-    // const player1 = new Player(name, this._area);
-    // const player2 = new Player("Second", this._area);
-    // const players: Player[] = [player1, player2];
   
     await this.createGame(name, 'guest');
     this.launchGame();
-    // this._game.launch();
   }
 
   async createPlayer () : Promise<string> {
@@ -77,7 +67,6 @@ export class  oneVSone extends LitElement {
       try {
         const response = await fetch(url);
         const data = await response.json();
-        // const name: string = "Default";
         const name = data.data.name;
         if (!name) {
           throw new Error("No name found");
@@ -109,7 +98,8 @@ export class  oneVSone extends LitElement {
       console.log("Error");
     }
     const players: Player[] = [new Player(player1, this._area), new Player(player2, this._area)];
-    this._game = new Game(players, this._area);
+    // this._game = new Game(players, this._area);
+    this._game = new Match(players, this._area);
   }
 
   async launchGame () {
@@ -136,7 +126,7 @@ export class  oneVSone extends LitElement {
   }
 
   render () {
-    return html`<div>Game content here</div>
+    return html`
     `;
   }
 

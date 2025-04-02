@@ -14,8 +14,6 @@ export class	Game {
 	private readonly	_ball: Ball;
 	private readonly	_board: Board;
 	private				_players: Player[];
-	//private readonly	_player1: Player;	// player on the right
-	//private readonly	_player2: Player;	// player on the left
 	private readonly	_countdown: Countdown;
 	private readonly	_versus: Versus;
 	private readonly	_pause: Pause;

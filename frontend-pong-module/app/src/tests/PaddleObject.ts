@@ -1,4 +1,5 @@
 import { Object } from "./Object.ts"
+import { BallObject } from "./BallObject.ts";
 
 export class	PaddleObject extends Object {
 
@@ -6,7 +7,7 @@ export class	PaddleObject extends Object {
 	private readonly	_width: number = 20;
 	private readonly	_height: number = 120;
 
-	private readonly	_speed: number = 5;
+	private readonly	_speed: number = 3;
 	private				_moveUp: boolean = false;
 	private				_moveDown: boolean = false;
 	
@@ -15,6 +16,10 @@ export class	PaddleObject extends Object {
 	private				_x!: number;
 	private				_y!: number;
 
+	private				_top!: number;
+	private				_bottom!: number;
+	private				_left: number;
+	private				_right: number;
 
 	constructor (canvas: HTMLCanvasElement, location: number) {
 		super(canvas);
@@ -27,6 +32,11 @@ export class	PaddleObject extends Object {
 		else if (this._location === 1) {
 			this._x = 5;
 		}
+
+		this._top = this._y;
+		this._bottom = this._y + this._height;
+		this._left = this._x;
+		this._right = this._x + this._width;
 
 		this.eventListener();
 	}
@@ -55,6 +65,10 @@ export class	PaddleObject extends Object {
 		return this._moveDown ;
 	}
 
+	get location () {
+		return this._location ;
+	}
+
 	get x () {
 		return this._x ;
 	}
@@ -63,11 +77,38 @@ export class	PaddleObject extends Object {
 		return this._y ;
 	}
 
+	get top () {
+		return this._top ;
+	}
+
+	get bottom () {
+		return this._bottom ;
+	}
+
+	get left () {
+		return this._left ;
+	}
+
+	get right () {
+		return this._right ;
+	}
+
 	move () {
 		this.update();
 		this.draw();
 	}
 	
+	collision (ball: BallObject) {
+		if (ball.x + ball.radius >= this._left &&
+			ball.x - ball.radius <= this._right &&
+			ball.y + ball.radius >= this._top &&
+			ball.y - ball.radius <= this._bottom) {
+				ball.bounce(this);
+				return (true);
+			}
+		return (false);
+	}
+
 	private draw () {
 		this._field.fillStyle = this._color;
 		this._field.beginPath();
@@ -75,21 +116,29 @@ export class	PaddleObject extends Object {
 	}
 
 	private update () {
-		if (this._moveUp)
-			this._x -= this._speed;
-		if (this._moveDown)
-			this._x += this._speed;
+		if (this._moveUp && this._top > 0)
+			this._y -= this._speed;
+		if (this._moveDown && this._bottom < this._fieldHeight)
+			this._y += this._speed;
+		this._top = this._y;
+		this._bottom = this._y + this._height;
 	}
 
 	private eventListener () {
 		if (this._location === 0) {
 			document.addEventListener('keydown', (event) => {
 				if (event.key === 'ArrowUp') {
-					console.log("arrow up");
 					this._moveUp = true;
 				}
 				if (event.key === 'ArrowDown')
 					this._moveDown = true;
+			})
+			document.addEventListener('keyup', (event) => {
+				if (event.key === 'ArrowUp') {
+					this._moveUp = false;
+				}
+				if (event.key === 'ArrowDown')
+					this._moveDown = false;
 			})
 		}
 		else if (this._location === 1) {
@@ -98,6 +147,12 @@ export class	PaddleObject extends Object {
 					this._moveUp = true;
 				if (event.key === 'x')
 					this._moveDown = true;
+			})
+			document.addEventListener('keyup', (event) => {
+				if (event.key === 's')
+					this._moveUp = false;
+				if (event.key === 'x')
+					this._moveDown = false;
 			})
 		}
 	}

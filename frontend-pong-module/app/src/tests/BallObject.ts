@@ -1,5 +1,6 @@
 import { Object } from "./Object.ts";
 import { Direction } from "../entities/Direction";
+import { PaddleObject } from "./PaddleObject.ts";
 
 export class	BallObject extends Object {
 
@@ -7,12 +8,17 @@ export class	BallObject extends Object {
 	private readonly	_diameter: number = 30;
 	private readonly	_radius: number = this._diameter / 2;
 
-	private readonly	_speed: number = 8;
+	private readonly	_speed: number = 4;
 	private				_direction!: Direction;
+	private				_rebound: boolean = false;
 
 	private				_x!: number;
 	private				_y!: number;
 
+	private				_top!: number;
+	private				_bottom!: number;
+	private				_left!: number;
+	private				_right!: number;
 
 	constructor (canvas: HTMLCanvasElement) {
 		super(canvas);
@@ -39,6 +45,10 @@ export class	BallObject extends Object {
 		return this._direction ;
 	}
 
+	get rebound () {
+		return this._rebound ;
+	}
+
 	get x () {
 		return this._x ;
 	}
@@ -47,28 +57,72 @@ export class	BallObject extends Object {
 		return this._y ;
 	}
 
+	get top () {
+		return this._top ;
+	}
+
+	get bottom () {
+		return this._bottom ;
+	}
+
+	get left () {
+		return this._left ;
+	}
+
+	get right () {
+		return this._right ;
+	}
+
 	spawn () {
 		this._x = (this._fieldWidth / 2);
 		this._y = (33 + ((Math.random() * 100) / 3)) / 100 * this._fieldHeight;
 		
 		// Ramdomize direction
-		const add = Math.random() * 30;
+		const add: number = Math.random() * 30;
 		
-		let	x = Math.sin((45 + add) * Math.PI / 180);	// compute x direction depending on an angle between 45 and 75 degrees
-		let	y = Math.cos((45 + add) * Math.PI / 180);	// compute y direction depending on an angle between 45 and 75 degrees
+		let	x: number = Math.sin((45 + add) * Math.PI / 180);	// compute x direction depending on an angle between 45 and 75 degrees
+		let	y: number = Math.cos((45 + add) * Math.PI / 180);	// compute y direction depending on an angle between 45 and 75 degrees
 		
-		let base = Math.round(Math.random());	// random integer between 0 and 1
-		if (base === 0)
+		const base: number = Math.random() * 4;	// random integer between 0 and 4
+		if (base < 2)
 			x *= -1;
-		base = Math.round(Math.random());
-		if (base === 0)
+		if (base >= 1 && base < 3)
 			y *= -1;
 		this._direction = new Direction(x, y);
 	}
-	
+
 	move () {
 		this.updatePosition();
 		this.draw();
+	}
+
+	bounce (paddle: PaddleObject) {
+		this._rebound = true;
+
+		this._direction.x *= -1;	
+
+		if (paddle.location === 0 || paddle.location === 1) {
+			// Formula for the rebound : θrebound ​= θmax ​× (2 × ((yimpact ​− ypaddle) / paddle height)​)
+			const impact: number = 2 * ((this._y - (paddle.y + (paddle.height / 2))) / paddle.height);
+			const angle = ((55 * Math.PI / 180) * impact) + (5 * Math.PI / 180);	// get an angle between 5 and 60 degrees
+			this._direction.x = Math.cos(angle) * Math.sign(this._direction.x);
+			this._direction.y = Math.sin(angle);
+		}
+		else {
+			const impact: number = 2 * ((this._y - (paddle.y + (paddle.height / 2))) / paddle.height);
+			const angle: number = ((5 * Math.PI / 180) * impact) + (55 * Math.PI / 180);	// get an angle between 5 and 60 degrees
+			this._direction.x = Math.sin(angle) * Math.sign(this._direction.x);
+			this._direction.y = -Math.cos(angle);
+		}
+	}
+
+	out () {
+		if (this._right < 0 || this._left > this._fieldWidth ||
+			this._bottom < 0 || this._top > this._fieldHeight) {
+			this._rebound = false;
+			return true;
+			}
+		return false;
 	}
 
 	private draw () {
@@ -79,7 +133,15 @@ export class	BallObject extends Object {
 	}
 
 	private updatePosition () {
-		this._x += this._direction.x;
-		this._y += this._direction.y;
+		let	speed: number = this._speed;
+		if (!this._rebound)
+			speed /= 2;
+
+		this._x += this._direction.x * speed;
+		this._y += this._direction.y * speed;
+		this._top = this._y - this._radius;
+		this._bottom = this._y + this._radius;
+		this._left = this._x - this._radius;
+		this._right = this._x + this._radius;
 	}
 }
