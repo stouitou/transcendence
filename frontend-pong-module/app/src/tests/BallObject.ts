@@ -1,6 +1,7 @@
 import { Object } from "./Object.ts";
 import { Direction } from "../entities/Direction";
 import { PaddleObject } from "./PaddleObject.ts";
+import { Player } from "./Player.ts";
 
 export class	BallObject extends Object {
 
@@ -8,7 +9,7 @@ export class	BallObject extends Object {
 	private readonly	_diameter: number = 30;
 	private readonly	_radius: number = this._diameter / 2;
 
-	private readonly	_speed: number = 4;
+	private readonly	_speed: number = 8;
 	private				_direction!: Direction;
 	private				_rebound: boolean = false;
 
@@ -116,12 +117,21 @@ export class	BallObject extends Object {
 		}
 	}
 
-	out () {
-		if (this._right < 0 || this._left > this._fieldWidth ||
-			this._bottom < 0 || this._top > this._fieldHeight) {
+	out (players: Player[]) {
+		if (this._right < 0) {
+			players[0].score();
 			this._rebound = false;
 			return true;
-			}
+		}
+		else if (this._left > this._fieldWidth) {
+			players[1].score();
+			this._rebound = false;
+			return true;
+		}
+		else if (this._bottom < 0 || this._top > this._fieldHeight){
+			this._rebound = false;
+			return true;
+		}
 		return false;
 	}
 

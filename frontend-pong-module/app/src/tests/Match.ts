@@ -1,4 +1,4 @@
-import { Player } from "../entities/Player";
+import { Player } from "./Player";
 import { BallObject } from "./BallObject";
 import { PaddleObject } from "./PaddleObject";
 
@@ -6,7 +6,7 @@ export class	Match {
 
 	private readonly	_players: Player[];;
 
-	private readonly	_score: HTMLDivElement;
+	private				_score!: HTMLDivElement;
 	private readonly	_field: CanvasRenderingContext2D;
 	private readonly	_width: number;
 	private readonly	_height: number;
@@ -15,7 +15,7 @@ export class	Match {
 	private readonly	_ball: BallObject;
 	private readonly	_paddles: PaddleObject[] = [];
 
-	private readonly	_pointsToWin: number = 100;
+	private readonly	_pointsToWin: number = 2;
 	private				_winner: Player | null = null;	
 
 	private				_break: boolean = false;
@@ -23,33 +23,15 @@ export class	Match {
 	constructor (players: Player[], container: HTMLDivElement) {
 		this._players = players;
 
-		this._score = document.createElement('div');
-		this._score.style.position = 'relative';
-		this._score.style.width = '700px';
-		this._score.style.height = 'auto';
-		this._score.style.minHeight = '100px';
-		this._score.style.top = '0';
-		this._score.style.margin = '0px';
+		this.createScore();
 		container.appendChild(this._score);
 
-		const	canvas: HTMLCanvasElement = document.createElement('canvas');
-		canvas.style.position = 'relative';
-		canvas.style.margin = '0';
-		canvas.style.padding = '0';
-		canvas.style.border = 'none';
-		canvas.style.top = '0';
-		canvas.style.verticalAlign = 'top';
-		canvas.width = 700;
-		if (this._players.length === 2)
-			canvas.height = 500;
-		else if (this._players.length > 2)
-			canvas.height = 700;
-		container.appendChild(canvas);
-
+		const canvas: HTMLCanvasElement = this.createField()!;
 		this._field = canvas.getContext('2d')!;
 		this._width = canvas.width;
 		this._height = canvas.height;
-		
+		container.appendChild(canvas);
+
 		this._ball = new BallObject(canvas);
 		for (let i = 0; i < this._players.length; i++)
 			this._paddles[i] = new PaddleObject(canvas, i);
@@ -98,37 +80,77 @@ export class	Match {
 	get break () {
 		return this._break;
 	}
-	
-	async launch () : Promise<void> {
+
+	private createScore () {
+		this._score = document.createElement('div');
+
+		this._score.style.position = 'relative';
+		this._score.style.width = '100%';
+		this._score.style.height = 'auto';
+		this._score.style.minHeight = '100px';
+		this._score.style.display = 'flex';
+		this._score.style.alignItems = 'center';
+		this._score.style.top = '0';
+		this._score.style.margin = '0px';
+		this._score.style.backgroundColor = 'rgb(0, 0, 0)';
+		this._score.style.borderRadius = '20px';
+		this._score.style.border = 'none';
+		this._score.style.boxShadow = 'inset 0 0 0 3px rgb(255, 0, 0)';
+		this._score.style.color = 'rgb(255, 0, 0)';
+		this._score.style.textAlign = 'center';
+		this._score.style.fontSize = '40px';
+		this._score.style.fontFamily = 'system-ui';
+	}
+
+	private createField () {
+		const	canvas: HTMLCanvasElement = document.createElement('canvas');
+
+		canvas.style.position = 'relative';
+		canvas.style.margin = '0';
+		canvas.style.padding = '0';
+		canvas.style.border = 'none';
+		canvas.style.top = '0';
+		canvas.style.verticalAlign = 'top';
+		canvas.width = 700;
+		if (this._players.length === 2)
+			canvas.height = 500;
+		else if (this._players.length > 2)
+			canvas.height = 700;
+
+		return canvas;
+	}
+
+	private async launch () : Promise<void> {
 		this.displayScore();
 		await this.displayCountdown();
 
 		return new Promise((resolve) => {
 			const	loop = () => {
-				this._players.forEach((player) => {
-					if (player.score === this._pointsToWin) {
+				for (const player of this._players) {
+					if (player.points === this._pointsToWin) {
 						this._winner = player;
 						resolve();
-					}
-				})
-		
-				if (!this._break) {
-					this.run();
-
-					this._paddles.forEach((paddle => paddle.collision(this._ball)))
-
-					if (!this._players[2] && this._ball.y + this._ball.radius >= this._height ||
-						!this._players[3] && this._ball.y - this._ball.radius <= 0) {
-						this._ball.direction.y *= -1;
-					}
-
-					else if (this._ball.out()) {
-						this._ball.spawn();
+						return ;
 					}
 				}
-				requestAnimationFrame(loop);
-			}
-
+				
+				if (!this._break) {
+					this.run();
+					
+					this._paddles.forEach((paddle => paddle.collision(this._ball)))
+					
+					if (!this._players[2] && this._ball.y + this._ball.radius >= this._height ||
+						!this._players[3] && this._ball.y - this._ball.radius <= 0) {
+							this._ball.direction.y *= -1;
+						}
+						
+						else if (this._ball.out(this._players)) {
+							this._ball.spawn();
+						}
+					}
+					requestAnimationFrame(loop);
+				}
+				
 			loop();
 		});
 	}
@@ -145,7 +167,10 @@ export class	Match {
 	}
 
 	private displayScore () {
-		this._score.style.width = '700px';
+		this._score.style.position = 'relative';
+		this._score.style.display = 'flex';
+		this._score.style.alignItems = 'center';
+		this._score.style.width = '100%';
 		this._score.style.height = 'auto';
 		this._score.style.minHeight = '100px';
 		this._score.style.top = '0';
@@ -153,11 +178,36 @@ export class	Match {
 		this._score.style.backgroundColor = 'rgb(0, 0, 0)';
 		this._score.style.borderRadius = '20px';
 		this._score.style.border = 'none';
-		this._score.style.boxShadow = 'inset 0 0 0 3px rgb(0, 255, 0)';
+		this._score.style.boxShadow = 'inset 0 0 0 3px rgb(255, 0, 0)';
 		this._score.style.color = 'rgb(255, 0, 0)';
 		this._score.style.textAlign = 'center';
-		this._score.style.fontSize = '30px';
+		this._score.style.fontSize = '40px';
 		this._score.style.fontFamily = 'system-ui';
+
+		this._players.forEach((player) => { 
+			player.display = document.createElement('div');
+			const	name: HTMLParagraphElement = document.createElement('p');
+			name.textContent = player.name;
+			name.style.margin = '10px';
+			const	score: HTMLParagraphElement = document.createElement('p');
+			score.textContent = `${player.points}`;
+			score.style.margin = '10px';
+			if (player.location === 0) {
+				name.style.color = 'rgb(255, 0, 0)';
+				name.style.order = '1';
+				score.style.color = 'rgb(255, 0, 0)';
+				score.style.order = '0';
+			}
+			else if (player.location === 1) {
+				name.style.color = 'rgb(255, 0, 0)';
+				name.style.order = '0';
+				score.style.color = 'rgb(255, 0, 0)';
+				score.style.order = '1';
+			}
+			player.display.appendChild(name);
+			player.display.appendChild(score);
+			this._score.appendChild(player.display);
+		});
 	}
 
 	private displayVersus () {

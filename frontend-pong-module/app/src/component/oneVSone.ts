@@ -1,6 +1,7 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { Player } from '../entities/Player.js';
+import { Player } from '../tests/Player.js';
+// import { Player } from '../entities/Player.js';
 import { Game } from '../entities/Game.js';
 import { Match } from '../tests/Match.js';
 
@@ -97,7 +98,8 @@ export class  oneVSone extends LitElement {
     catch (error) {
       console.log("Error");
     }
-    const players: Player[] = [new Player(player1, this._area), new Player(player2, this._area)];
+    const players: Player[] = [new Player(player1, 0), new Player(player2, 1)];
+    // const players: Player[] = [new Player(player1, this._area), new Player(player2, this._area)];
     // this._game = new Game(players, this._area);
     this._game = new Match(players, this._area);
   }
@@ -122,7 +124,7 @@ export class  oneVSone extends LitElement {
     catch (error) {
       console.log("Error");
     }
-    this._game.launch();
+    // this._game.launch();
   }
 
   render () {
