@@ -1,3 +1,12 @@
+enum Size {
+	Width = 0,
+	Height = 1,
+	WidthOffset = 2,
+	HeightOffset = 3,
+	PoliceText = 4,
+	StringText = 5
+}
+
 export class menu {
 	private _outline!: HTMLElement;
 	private _button!: HTMLButtonElement;
@@ -14,18 +23,24 @@ export class menu {
 	private _checkbox!: HTMLInputElement;
 	private _label!: HTMLLabelElement;
 
+	private _container!: HTMLDivElement;
+
 	private _textButton: string[][] = [];
+	
 	//private topButton: number = 50;
 
     constructor ()//textButton: string[])
 	{	
+		
 		this._textButton[0] = ["1V1", "Tournoi", "Multijoueur", "Return"];
 		this._textButton[1] = ["Local", "Distant", "IA", "Return"];
 		this._textButton[2] = ["Name", "IA", "Return"];
-		
+
 		this.display(this._textButton[0]);
 	}
 
+	
+	
 	//afficher un rectangle selon le nombres de boutons prevue
 	public displayMenu(textButton: string[])
 	{
@@ -94,33 +109,7 @@ export class menu {
 		document.body.appendChild(this._outline);
 	}
 
-	//afficher les boutons custom
-	public displayButtonCustom(button: string, width: number, height: number, buttonWidth: number, buttonHeight: number) : Promise<void>
-	{
-		return new Promise((resolve) => {
-				this._button = document.createElement("button");
 
-				this._button.style.position = "absolute";
-				this._button.style.backgroundColor = "rgb(179, 95, 95)";
-				this._button.style.top =  `calc(${window.innerHeight /  2}px - ${buttonHeight / 2}px + ${height}px)`;
-				this._button.style.left = `calc(${window.innerWidth /  2}px - ${buttonWidth / 2}px + ${width}px)`;
-				this._button.style.width = `${buttonWidth}px`;
-				this._button.style.height = `${buttonHeight}px`;
-			
-				this._button.textContent = button;
-
-				document.body.appendChild(this._button);
-
-				this._button.addEventListener("click", (event) => {
-					const buttons: HTMLButtonElement[] = Array.from(document.querySelectorAll("button"));
-					this._outline.remove();
-					buttons.forEach(button => button.remove());
-					this._target = event.target as HTMLButtonElement;
-					this.center();
-					resolve();
-				})
-		});
-	}
 
 	private async display(textButton: string[])
 	{
@@ -145,59 +134,48 @@ export class menu {
 		}
 	}
 
-	private SmallCheckboxCustom(width: number, height: number, boxWidth: number, boxHeight: number) : Promise<void>
+	private SmallCheckboxCustom(width: number, height: number, boxWidth: number, boxHeight: number)
 	{
-		return new Promise((resolve) => {
-			this._checkbox = document.createElement("input");
-			this._label = document.createElement("label");
-			
-			this._checkbox.style.position = "absolute";
-			this._checkbox.style.margin = "0";
-			this._checkbox.type = "checkbox";
-	        this._checkbox.id = "smallCheckbox";
-	        this._checkbox.style.width = `${boxWidth}px`;
-	        this._checkbox.style.height = `${boxHeight}px`;
-			this._checkbox.style.top = `calc(${window.innerHeight /  2}px - ${boxHeight / 2}px + ${height}px)`;
-			this._checkbox.style.left = `calc(${window.innerWidth /  2}px - ${boxWidth / 2}px + ${width}px)`;
+		this._checkbox = document.createElement("input");
+		this._label = document.createElement("label");
+		
+		this._checkbox.style.position = "absolute";
+		this._checkbox.style.margin = "0";
+		this._checkbox.type = "checkbox";
+	    this._checkbox.id = "smallCheckbox";
+	    this._checkbox.style.width = `${boxWidth}px`;
+	    this._checkbox.style.height = `${boxHeight}px`;
+		this._checkbox.style.top = `calc(${window.innerHeight /  2}px - ${boxHeight / 2}px + ${height}px)`;
+		this._checkbox.style.left = `calc(${window.innerWidth /  2}px - ${boxWidth / 2}px + ${width}px)`;
 
-			this._label.style.position = "absolute";
-			this._label.htmlFor = "smallCheckbox";
-			this._label.textContent = "IA";
-			//this._label.style.fontSize = "20px";
-			this._label.style.width = `${boxWidth}px`;
-	        this._label.style.height = `${boxHeight}px`;
-			this._label.style.top = `calc(${window.innerHeight /  2}px - ${boxHeight / 2}px + ${height}px)`;
-			this._label.style.left = `calc(${window.innerWidth /  2}px - ${boxWidth / 2}px + ${width}px - ${boxHeight}px)`;
+		this._label.style.position = "absolute";
+		this._label.htmlFor = "smallCheckbox";
+		this._label.textContent = "IA";
+		this._label.style.width = `${boxWidth}px`;
+	    this._label.style.height = `${boxHeight}px`;
+		this._label.style.top = `calc(${window.innerHeight /  2}px - ${boxHeight / 2}px + ${height}px)`;
+		this._label.style.left = `calc(${window.innerWidth /  2}px - ${boxWidth / 2}px + ${width}px - ${boxHeight}px)`;
 
-			document.body.appendChild(this._checkbox);
-			document.body.appendChild(this._label);
-
-			this._checkbox.addEventListener("change", (event) => { //l ancien n est pas enlever juste un nouveau est mis dessus donc a revoir
-				//const buttons: Ht[] = Array.from(document.querySelectorAll("button"));
-				//this._outline.remove();
-				//buttons.forEach(button => button.remove());
-				if (this._checkbox.checked) {
-					//this._outline.remove();
-					this.displayButtonCustom("IA", -40, 0, 180, 40); }
-				else {
-					this.DropdownMenu(); }
-				//this._target = event.target as HTMLButtonElement;
-				resolve();
-		})
-		})
+		document.body.appendChild(this._checkbox);
+		document.body.appendChild(this._label);			
 	}
 
-	public DropdownMenu()
+	
+	public DropdownMenu(width: number, height: number, boxWidth: number, boxHeight: number)
 	{
-		const container: HTMLDivElement = document.createElement("div");
-		container.style.position = "relative";
-		container.style.display = "inline-block";
+		this._container = document.createElement("div");
+		this._container.style.position = "relative";
+		this._container.style.display = "inline-block";
+		this._container.style.position = "absolute";
+
+		this._container.style.top = `calc(${window.innerHeight /  2}px - ${boxHeight / 2}px + ${height}px)`;
+		this._container.style.left = `calc(${window.innerWidth /  2}px - ${boxWidth / 2}px + ${width}px)`;
 	  
 		// Création du bouton
 		const button: HTMLButtonElement = document.createElement("button");
 		button.textContent = "Menu";
-		button.style.padding = "8px 16px";
-		button.style.cursor = "pointer";
+		button.style.height = `${boxHeight}px`;
+		button.style.width = `${boxWidth}px`;
 	  
 		// Création du menu (liste)
 		const menu: HTMLUListElement = document.createElement("ul");
@@ -213,11 +191,13 @@ export class menu {
 		menu.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
 	  
 		// Création des items du menu
-		const items: string[] = ["Option1", "Option2", "Option3"];
+		const items: string[] = ["Facile", "Moyen", "HARD"];
 		items.forEach(itemText => {
 		  const li: HTMLLIElement = document.createElement("li");
 		  li.textContent = itemText;
-		  li.style.padding = "8px 12px";
+		  li.style.width = `${boxWidth}px`;
+		  li.style.height = `${boxHeight}px`;
+		  //li.style.padding = `${boxHeight}px ${boxWidth}px`;
 		  li.style.cursor = "pointer";
 	  
 		  // Ajout d'effets au survol
@@ -239,17 +219,91 @@ export class menu {
 		});
 	  
 		// Regroupement des éléments
-		container.appendChild(button);
-		container.appendChild(menu);
-		document.body.appendChild(container);
+		this._container.appendChild(button);
+		this._container.appendChild(menu);
+		document.body.appendChild(this._container);
 	  
 		console.log("Menu déroulant créé");
 	}
 
-	public async localGame()
+	public createTextInputCustom(...tab: (string | number)[])
 	{
+		const input: HTMLInputElement = document.createElement("input");
+
+		input.type = "text";
+		input.style.position = "absolute";
+		input.placeholder = "Pseudo de l'invite";
+	
+		const button: HTMLButtonElement = document.createElement("button");
+		button.textContent = "Valider";
+		// button.style.margin = "0px";
+		// button.style.padding = "0px";
+		input.style.height = `${tab[Size.Height]}px`;
+		input.style.width = `${tab[Size.Width]}px`;
+		input.style.top = `calc(${window.innerHeight /  2}px - ${Number(tab[Size.Height]) / 2}px + ${tab[Size.HeightOffset]}px)`;
+		input.style.left = `calc(${window.innerWidth /  2}px - ${Number(tab[Size.Width]) / 2}px + ${tab[Size.WidthOffset]}px)`;
+
+		button.addEventListener("click", () => {
+			console.log("Text: ", input.value);
+		});
+
+		document.body.appendChild(input);
+		document.body.appendChild(button);
+	}
+
+	
+	//afficher les boutons custom
+	public displayButtonCustom(...tab: (string | number)[]) : Promise<void>
+	{
+		return new Promise((resolve) => {
+				console.log(tab[0]);
+				this._button = document.createElement("button");
+
+				this._button.style.position = "absolute";
+				this._button.style.fontFamily = `${tab[Size.PoliceText]}`;
+				this._button.style.backgroundColor = "rgb(179, 95, 95)";
+				this._button.style.top =  `calc(${window.innerHeight /  2}px - ${Number(tab[Size.Height]) / 2}px + ${tab[Size.HeightOffset]}px)`;
+				this._button.style.left = `calc(${window.innerWidth /  2}px - ${Number(tab[Size.Width])  / 2}px + ${tab[Size.WidthOffset]}px)`;
+				this._button.style.width = `${tab[Size.Width]}px`;
+				this._button.style.height = `${tab[Size.Height]}px`;
+				this._button.textContent = String(tab[Size.StringText]);
+
+				document.body.appendChild(this._button);
+
+				this._button.addEventListener("click", (event) => {
+					const buttons: HTMLButtonElement[] = Array.from(document.querySelectorAll("button"));
+					this._outline.remove();
+					buttons.forEach(button => button.remove());
+					this._target = event.target as HTMLButtonElement;
+					this.center();
+					resolve();
+				})
+		});
+	}
+
+	//Width, Height, WidthOffset, HeightOffset, PoliceText, StringText
+	public async localGame() : Promise<void>
+	{
+		return new Promise((resolve) => {
 		this.displayMenuCustom(270, 50);
-		this.displayButtonCustom("Player", -40, 0, 180, 40);
-		await this.SmallCheckboxCustom(110, 0, 20, 20);		
+		this.createTextInputCustom(140, 20, -60, 0);
+		this.displayButtonCustom(30, 30, 35, 0,  "Courier", "Ok");
+		//this.displayButtonCustom("Player", -40, 0, 180, 40);
+		this.SmallCheckboxCustom(110, 0, 20, 20);
+	
+		this._checkbox.addEventListener("change", () => {
+			if (this._checkbox.checked) {
+				this._button.remove();
+				this.DropdownMenu(-40, 0, 180, 40);
+				 }
+			else {
+				this._container.remove();
+				this.displayButtonCustom(30, 30, 35, 0,  "Courier", "Ok");
+				this.createTextInputCustom(140, 20, -60, 0);
+				//this.displayButtonCustom("Player", -40, 0, 180, 40);
+				 }
+			resolve();
+	})
+})
 	}
 }
