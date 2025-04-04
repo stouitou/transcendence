@@ -1,6 +1,6 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { Player } from '../entities/Player.js';
+import { Player } from '../tests/Player.js';
 import { Tournament } from '../entities/Tournament.js';
 
 @customElement('tournament-component')

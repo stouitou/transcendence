@@ -1,5 +1,5 @@
 import { Display } from "./Display.js";
-import { Player } from "../entities/Player.js";
+import { Player } from "../tests/Player.js";
 
 export class	Versus extends Display {
 

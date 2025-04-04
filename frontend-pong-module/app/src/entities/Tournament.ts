@@ -1,21 +1,39 @@
 import { Player } from "./Player.js";
-import { Game } from "./Game.js";
+import { Match } from "./Match.js";
 
 export class Tournament {
 
-	private readonly	_canvas: HTMLDivElement;
+	private readonly	_container: HTMLDivElement;
 
 	private readonly	_players: Player[];
 
 	private				_round: Player[] = [];
-	private				_match: Map<number, Player[] | null> = new Map();
-	private				_game!: Game;
-	private				_nextMatch: HTMLDivElement | null = null;
+	private				_groups: Map<number, Player[] | null> = new Map();
+	private				_chart: HTMLDivElement = document.createElement('div');
 
 	/* CONSTRUCTOR */
-	public constructor(players: Player[], canvas: HTMLDivElement) {
+	public constructor(players: Player[], container: HTMLDivElement) {
+		this._container = container;
 		this._players = players;
-		this._canvas = canvas;
+		if (this._players.length % 2 != 0) {
+			this._players.push(new Player('Bot', 0, true));
+		}
+
+		this._chart.style.position = 'absolute';
+		this._chart.style.width = '100%';
+		this._chart.style.height = 'auto';
+		this._chart.style.display = 'grid';
+		this._chart.style.gridTemplateColumns = 'auto';
+		this._chart.style.placeItems = 'center';
+		this._chart.style.font = 'system-ui';
+		this._chart.style.color = 'rgb(255, 0, 0)';
+		this._chart.style.fontSize = '50px';
+		this._chart.style.fontWeight = 'bold';
+		this._chart.style.textAlign = 'center';
+		this._chart.style.top = '0';
+		this._chart.style.left = '0';
+		this._chart.innerHTML = "Tournament<br>";
+		this._container.appendChild(this._chart);
 
 		this.randomize();
 		
@@ -36,125 +54,114 @@ export class Tournament {
 
 	private createMatch () {
 		let	index = 0;
+		if (this._round.length % 2 != 0 && this._round.length > 1)
+			this._round.push(new Player('Bot', 0, true));
 		for (let i = 0; i < this._round.length; i++) {
-			if (!this._match.has(index))
-				this._match.set(index, [this._round[i]]);
-			else if (this._match.get(index)?.length === 1) {
-				this._match.get(index)?.push(this._round[i]);
+			if (!this._groups.has(index)) {
+				this._groups.set(index, [this._round[i]]);
+				this._round[i].location = 0;
+			}
+			else if (this._groups.get(index)?.length === 1) {
+				this._groups.get(index)?.push(this._round[i]);
+				this._round[i].location = 1;
 				index++;
 			}
 		}
 	}
 
 	private async launchGame (nofMatch: number) {
-		await this.showNextMatch();
+		console.log('players in round: ', this._round);
+		await this.showRound();
 
 		this._round.length = 0;
 		let i: number = 0;
 		let	j = 0;
 
-		while (i <= nofMatch) {
-			const game = this._match.get(i);
-			if (game && game.length === 2) {
-            	this._game = new Game(game, this._canvas);
-				await this._game.launch();
-				document.body.innerHTML = ''; //a revoir, remet la page a 0
-				this._round[j] = game[0].lastWin ? game[0] : game[1];
-				j++;
-			}
-			else if (game) {
-				this._round[j] = game[0];
-				j++;
+		while (i < nofMatch) {
+			const game = this._groups.get(i);
+			if (game) {
+				const match: Match = new Match(game, this._container);
+				await match.launch();
+				this._container.innerHTML = '';	// TODO: a revoir, remet la page a 0
+				if (match.winner && !match.winner.bot) {
+					this._round[j] = game[0].lastWin ? game[0] : game[1];
+					j++;
+				}
 			}
 			i++;
 		}
 
-		this._match.clear();
-		if (this._round.length === 3) {
-			this.threePlayers();
-			return ;
-		}
-		else if (this._round.length === 1)
+		this._groups.clear();
+		if (this._round.length === 1)
 			return ;
 		this.createMatch();
 		this.launchGame(Math.round(this._round.length / 2));
 	}
 
-	private threePlayers () {
-		let	array: number[][] = [[0, 0], [0, 0], [0, 0]];
-		let FLAG: boolean = false;
-		let FLAG1: boolean = false;
-
-		const loop = async (x: number, y: number) => {
-			this._game = new Game(this._round[y], this._round[x], this._canvas);
-			await this._game.launch();
-			array[x][0] += this._round[x].lastWin ? 1 : 0;
-			array[x][1] += this._round[x].lastScore;
-
-			array[y][0] += this._round[y].lastWin ? 1 : 0;
-			array[y][1] += this._round[y].lastScore;
-
-			document.body.innerHTML = ''; //a revoir, remet la page a 0
-			if (FLAG == false) {
-				FLAG = true;
-				await loop(1, 2);
-			}
-			if (FLAG1 == false) {
-				FLAG1 = true;
-				await loop(0, 2);
-			}
-		}
-		loop(0, 1);
-	}
-
-	private showNextMatch() : Promise<void>
+	private showRound () : Promise<void>
     {
         return new Promise((resolve) => {
-			const keys = Array.from(this._match.keys()); // Liste des clés
-			let i: number = 0;
-			let tab: string[] = ["Next match:" + "<br>"];
-			let game = this._match.get(i);
 
-			while (i < keys.length) {
-				if (game) {
-					if (game[1])
-						tab[i + 1] = tab[i] + game[0].name + " VS " + game[1].name + "<br>";
-					else
-						tab[i + 1] = tab[i] + game[0].name + "<br>";
-				}
-				i++;
-				game = this._match.get(i);
+			for (let i = 0; i < this._round.length / 2; i++) {
+				setTimeout(() => {
+					const	game = this._groups.get(i);
+					if (game) {
+						this.showMatch(game);
+					}
+				}, i * 800);
 			}
-			//if (game)
-			//    tab = tab + game[0].name;
-			this._nextMatch = document.createElement('div');
 
-			this._nextMatch.innerHTML = tab[0];
-			this._nextMatch.style.font = `30px`;
-			this._nextMatch.style.color = 'rgba(41, 112, 97, 0.57)';
-			this._nextMatch.style.fontSize = `50px`;
-			//this._nextMatch.style.opacity = ${this._opacity};
-			this._nextMatch.style.top = '50%';
-			this._nextMatch.style.left = '50%';
-			this._nextMatch.style.position = 'absolute';
-			this._nextMatch.style.transform = 'translate(-50%, -50%)';
-			
-			document.body.appendChild(this._nextMatch);
-			for (let x = 1; x < i + 1; x++) {
-				setTimeout(() => { 
-					const nextMatch = document.createElement('div');
-					if (this._nextMatch)
-						this._nextMatch.innerHTML = tab[x]
-						document.body.appendChild(nextMatch);
-					}, x * 800); 
-			}
 			document.addEventListener('keydown', (event) => {
 				if (event.key === "Enter") {
-					if (this._nextMatch)
-						this._nextMatch.innerHTML = "";
+					this._chart.style.display = 'none';
 					resolve();
 				}
 			});
         });
+	}
+
+	private showMatch (game: Player[]) {
+		this._chart.style.display = 'block';
+
+		const match = document.createElement('div');
+		const player1 = document.createElement('div');
+		const player2 = document.createElement('div');
+
+		match.style.position = 'relative';
+		match.style.width = '200px';
+		match.style.height = 'auto';
+		match.style.margin = '20px';
+		match.style.font = 'system-ui';
+		match.style.color = 'rgb(255, 0, 0)';
+		match.style.fontSize = '20px';
+		match.style.fontWeight = 'bold';
+		match.style.textAlign = 'center';
+		match.style.display = 'block';
+
+		player1.style.position = 'relative';
+		player1.style.width = '200px';
+		player1.style.height = '50%';
+		player1.style.margin = '2px';
+		player1.style.padding = '5px';
+		player1.style.top = '0';
+		player1.style.left = '0';
+		player1.style.backgroundColor = 'rgb(0, 0, 0)';
+		player1.style.clipPath = 'polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%)';
+		player1.textContent = `${game[0].name}`;
+		
+		player2.style.position = 'relative';
+		player2.style.width = '100%';
+		player2.style.height = '50%';
+		player2.style.margin = '5px';
+		player2.style.padding = '5px';
+		player2.style.top = '0';
+		player2.style.left = '0';
+		player2.style.backgroundColor = 'rgb(0, 0, 0)';
+		player2.style.clipPath = 'polygon(0% 50%, 10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%)';
+		player2.textContent = `${game[1].name}`;
+
+		match.appendChild(player1);
+		match.appendChild(player2);
+		this._chart.appendChild(match);
 	}
 }

@@ -115,7 +115,7 @@ services:
     depends_on:
       - frontend-pong-module
 
- #Pong-Moudle
+ #Pong-Module
   frontend-pong-module:
     build:
       context: ./frontend-pong-module

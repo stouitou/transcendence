@@ -1,6 +1,6 @@
 import { Player } from "./Player";
-import { BallObject } from "./BallObject";
-import { PaddleObject } from "./PaddleObject";
+import { Ball } from "./Ball";
+import { Paddle } from "./Paddle";
 
 export class	Match {
 
@@ -12,8 +12,8 @@ export class	Match {
 	private readonly	_height: number;
 	private readonly	_color: string = 'rgb(0, 0, 0)';
 
-	private readonly	_ball: BallObject;
-	private readonly	_paddles: PaddleObject[] = [];
+	private readonly	_ball: Ball;
+	private readonly	_paddles: Paddle[] = [];
 
 	private readonly	_pointsToWin: number = 2;
 	private				_winner: Player | null = null;	
@@ -22,23 +22,22 @@ export class	Match {
 
 	constructor (players: Player[], container: HTMLDivElement) {
 		this._players = players;
-
+		this._players.forEach((player, index) => player.points = 0);
 		this.createScore();
 		container.appendChild(this._score);
 
 		const canvas: HTMLCanvasElement = this.createField()!;
+		canvas.style.background = 'rgb(0, 0, 0)';
 		this._field = canvas.getContext('2d')!;
 		this._width = canvas.width;
 		this._height = canvas.height;
 		container.appendChild(canvas);
 
-		this._ball = new BallObject(canvas);
+		this._ball = new Ball(canvas);
 		for (let i = 0; i < this._players.length; i++)
-			this._paddles[i] = new PaddleObject(canvas, i);
+			this._paddles[i] = new Paddle(canvas, i, players[i].bot);
 
 		this.eventListener();
-
-		this.launch();
 	}
 
 	get players () {
@@ -72,15 +71,51 @@ export class	Match {
 	get pointsToWin () {
 		return this._pointsToWin;
 	}
-
+	
 	get winner () {
 		return this._winner;
 	}
-
+	
 	get break () {
 		return this._break;
 	}
+	
+	public async launch () : Promise<void> {
+		this.displayScore();
+		await this.displayCountdown();
 
+		return new Promise((resolve) => {
+			const	loop = () => {
+				for (const player of this._players) {
+					if (player.points === this._pointsToWin) {
+						player.lastWin = true;
+						this._winner = player;
+						resolve();
+						return ;
+					}
+				}
+				
+				if (!this._break) {
+					this.run();
+					
+					this._paddles.forEach((paddle => paddle.collision(this._ball)))
+					
+					if (!this._players[2] && this._ball.y + this._ball.radius >= this._height ||
+						!this._players[3] && this._ball.y - this._ball.radius <= 0) {
+							this._ball.direction.y *= -1;
+						}
+						
+						else if (this._ball.out(this._players)) {
+							this._ball.spawn();
+						}
+					}
+					requestAnimationFrame(loop);
+				}
+				
+			loop();
+		});
+	}
+		
 	private createScore () {
 		this._score = document.createElement('div');
 
@@ -120,41 +155,6 @@ export class	Match {
 		return canvas;
 	}
 
-	private async launch () : Promise<void> {
-		this.displayScore();
-		await this.displayCountdown();
-
-		return new Promise((resolve) => {
-			const	loop = () => {
-				for (const player of this._players) {
-					if (player.points === this._pointsToWin) {
-						this._winner = player;
-						resolve();
-						return ;
-					}
-				}
-				
-				if (!this._break) {
-					this.run();
-					
-					this._paddles.forEach((paddle => paddle.collision(this._ball)))
-					
-					if (!this._players[2] && this._ball.y + this._ball.radius >= this._height ||
-						!this._players[3] && this._ball.y - this._ball.radius <= 0) {
-							this._ball.direction.y *= -1;
-						}
-						
-						else if (this._ball.out(this._players)) {
-							this._ball.spawn();
-						}
-					}
-					requestAnimationFrame(loop);
-				}
-				
-			loop();
-		});
-	}
-		
 	private run () {
 
 		this._field.clearRect(0, 0, this._width, this._height);
@@ -163,7 +163,12 @@ export class	Match {
 		this._field.fillRect(0, 0, this._width, this._height);
 
 		this._ball.move();
-		this._paddles.forEach((paddle) => paddle.move());
+		this._paddles.forEach((paddle) => {
+			if (!paddle.bot)
+				paddle.move();
+			else
+				paddle.launchBot(this._ball);
+		});
 	}
 
 	private displayScore () {

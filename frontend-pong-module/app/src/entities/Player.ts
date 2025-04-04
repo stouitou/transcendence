@@ -1,92 +1,77 @@
-import { Paddle } from "./Paddle.js";
+export class	Player {
 
-export class Player {
+	private readonly	_name: string;
+	private				_points: number = 0;
+	private				_location: number;
 
-	/* ATTIBUTES */
-	private readonly 	_area: HTMLDivElement;
+	private readonly	_bot: boolean;
 
-	private				_name: string;
-	private				_id: number;
-	private				_paddle!: Paddle;
+	private				_display!: HTMLDivElement;
 
-	private 			_score: number;
-	// private				_lastOpponent: Player | null = null;
-	private				_lastWin: boolean;
-	private				_lastScore: number;
+	private				_lastWin!: boolean;
 
-	/* CONSTRUCTOR */
-	constructor (name: string, canvas: HTMLDivElement) {
-		this._area = canvas;
-
+	constructor (name: string, location: number, bot: boolean) {
 		this._name = name;
-		this._id = -1;
-		this._score = 0;
-		this._lastWin = false;
-		this._lastScore = 0;
+		this._location = location;
+		this._bot = bot;
 	}
 
-	/* GETTERS */
-	public get name () {
+	get name () {
 		return this._name;
 	}
+
+	get points () {
+		return this._points;
+	}
 	
-	public get id () {
-		return this._id;
-	}	
+	get location () {
+		return this._location;
+	}
 	
-	public get paddle () : Paddle {
-		return this._paddle;
+	get bot () {
+		return this._bot;
+	}
+	
+	get display () {
+		return this._display;
+	}
+	
+	get lastWin () {
+		return this._lastWin;
 	}
 
-	public get score() {
-		return this._score;
-	}		
-	
-	public get lastWin () {
-		return this._lastWin;
-	}	
-	
-	public get lastScore() {
-		return this._lastScore;
-	}		
-	
-	/* SETTERS */
-	public set id (id: number) {
-		this._id = id;
-	}	
+	set points (points: number) {
+		this._points = points;
+	}
 
-	public set paddle (location: number) {
-		this._paddle = new Paddle(location, this._area);
-	}	
+	set location (location: number) {
+		this._location = location;
+	}
 
-	// public set lastOpponent (lastOpponent: Player) {
-	// 	this._lastOpponent = lastOpponent;
-	// }	
-
-	public set lastWin (lastWin: boolean) {
+	set lastWin (lastWin: boolean) {
 		this._lastWin = lastWin;
-	}	
+	}
 
-	public set score (score: number) {
-		this._score = score;
-	}	
+	set display (display: HTMLDivElement) {
+		this._display = display;
+		this._display.style.position = 'relative';
+		this._display.style.display = 'flex';
+		this._display.style.alignItems = 'space-between';
+		this._display.style.width = '50%';
+		this._display.style.height = 'auto';
+		this._display.style.margin = '5px';
+		this._display.style.justifyContent = 'space-between';
+		if (this._location === 0) {
+			this._display.style.order = '1';
+		}
+		else if (this._location === 1) {
+			this._display.style.order = '0';
+		}
+	}
 
-	public set lastScore (score: number) {
-		this._lastScore = score;
-	}	
-
-	/* METHODS */
-	public incrementScore () {
-        this._score += 1;
-    }
-
-	public setInfoEndGame (pointsToWin: number) {
-		// this._lastOpponent = lastOpponent;
-		if (this._score === pointsToWin)
-			this._lastWin = true;
-		else
-			this._lastWin = false;
-		this._lastScore = this._score;
-		this._score = 0;
+	score () {
+		this._points++;
+		const score: HTMLParagraphElement = this._display.lastElementChild as HTMLParagraphElement;
+		score.textContent = `${this._points}`;
 	}
 }

@@ -1,9 +1,8 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { Player } from '../tests/Player.js';
-// import { Player } from '../entities/Player.js';
-import { Game } from '../entities/Game.js';
-import { Match } from '../tests/Match.js';
+import { Player } from '../entities/Player.js';
+import { Match } from '../entities/Match.js';
+import { Tournament } from '../entities/Tournament.js';
 
 @customElement('game-component')
 export class  oneVSone extends LitElement {
@@ -12,9 +11,8 @@ export class  oneVSone extends LitElement {
 
   /* ATTRIBUTES */
   private _area!: HTMLDivElement;
-  private _field!: HTMLCanvasElement;
-  // private _game!: Game;
-  private _game!: Match;
+  private _game!: Tournament;
+  // private _game!: Match;
   static styles = css`
     :host {
       position: relative;
@@ -36,18 +34,10 @@ export class  oneVSone extends LitElement {
   }
 
   firstUpdated () {
-    this._area = window.document.getElementById(this.gameContainerId) as HTMLDivElement;
-    if (!this._area) {
-      throw new Error("No game container found");
-    }
+    this._area = window.document.getElementById(this.gameContainerId)! as HTMLDivElement;
 
-    // this._area.style.width = "700px";
-    // this._area.style.height = "500px";
-    this._area.style.overflow = "hidden";
     this._area.style.position = "absolute";
-    // this._area.style.top = "50vh";
-    // this._area.style.left = "50vw";
-    // this._area.style.transform = "translate(-50%, -50%)";
+    this._area.style.overflow = "hidden";
     this._area.style.margin = "0%";
     this._area.style.padding = "0%";
     this._area.style.border = "none";
@@ -55,27 +45,27 @@ export class  oneVSone extends LitElement {
     this.setupGame();
   }
   
-  async setupGame () {
+  private async setupGame () {
     const name: string = await this.createPlayer();
   
-    await this.createGame(name, 'guest');
-    this.launchGame();
+    await this.createGame(name, 'Guest');
+    // await this.addToHistory();
   }
 
-  async createPlayer () : Promise<string> {
+  private async createPlayer () : Promise<string> {
       const url = 'https://localhost:4433/api/v2/database/myDb/table/user/id/1';
 
       try {
         const response = await fetch(url);
         const data = await response.json();
-        const name = data.data.name;
+        const name = data.data.name!;
         if (!name) {
           throw new Error("No name found");
         }
         return (name);
       }
       catch (error) {
-        return ("Player1");
+        return ("Host");
       }
   }
 
@@ -83,6 +73,7 @@ export class  oneVSone extends LitElement {
     const url = 'https://localhost:4433/api/v2/database/myDb/table/game';
     const body = {
       players: [player1, player2],
+      state: 'running',
     };
 
     try {
@@ -94,60 +85,71 @@ export class  oneVSone extends LitElement {
         body: JSON.stringify(body),
       });
       const data = await response.json();
+      const players: Player[] = [new Player(player1, 0, false), new Player(player2, 1, false), new Player('player3', 2, false), new Player('player4', 3, false), new Player('player5', 4, false)];
+      this._game = new Tournament(players, this._area);
+      // const players: Player[] = [new Player(player1, 0, false), new Player(player2, 1, true)];
+      // this._game = new Match(players, this._area);
+      // await this._game.launch();
     }
     catch (error) {
       console.log("Error");
     }
-    const players: Player[] = [new Player(player1, 0), new Player(player2, 1)];
-    // const players: Player[] = [new Player(player1, this._area), new Player(player2, this._area)];
-    // this._game = new Game(players, this._area);
-    this._game = new Match(players, this._area);
   }
 
-  async launchGame () {
-    const url = 'https://localhost:4433/api/v2/database/myDb/table/game/id/1';
-    const body = {
-      state: 'running',
-    };
+  // private async addToHistory () : Promise<void> {
+  //   const url = 'https://localhost:4433/api/v2/database/myDb/table/gameHistory';
+  //   const body = {
+  //     player1: this._game.players[0].name,
+  //     player2: this._game.players[1].name,
+  //     score1: this._game.players[0].points,
+  //     score2: this._game.players[1].points,
+  //     winner: this._game.winner,
+  //   }
+  //   try {
+  //     const response = await fetch(url, {
+  //       method: 'POST',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(body),
+  //     });
+  //     const data = await response.json();
+  //     console.log("history: ", data);
+  //   }
+  //   catch (error) {
+  //     console.log("Error");
+  //   }
+  // }
 
-    try {
-      const response = await fetch(url, {
-        method: 'PUT',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify(body),
-      });
-      const data = await response.json();
-      console.log(data);
-    }
-    catch (error) {
-      console.log("Error");
-    }
-    // this._game.launch();
-  }
+  // private async launchGame () {
+  //   const url = 'https://localhost:4433/api/v2/database/myDb/table/game/id/1';
+  //   const body = {
+  //     state: 'running',
+  //   };
+
+  //   try {
+  //     const response = await fetch(url, {
+  //       method: 'PUT',
+  //       headers: {
+  //         'Content-Type': 'application/json',
+  //       },
+  //       body: JSON.stringify(body),
+  //     });
+  //     const data = await response.json();
+  //     console.log(data);
+  //   }
+  //   catch (error) {
+  //     console.log("Error");
+  //   }
+  // }
 
   render () {
     return html`
     `;
   }
-
-  // static styles = css`
-
-  // .game {
-  //   display: flex;
-  //   flex-direction: column;
-  //   align-items: center;
-  //   justify-content: center;
-  //   position: relative; /* Assurez-vous que le positionnement est relatif */
-  //   width: 100%;
-  //   height: 50vh;
-  //   }
-  //   `;
 }
 
 // Enregistrement du composant avec une balise personnalisée
-// customElements.define('game-component', OneVSone);
 declare global {
   interface HTMLElementTagNameMap {
 	  'game-component': oneVSone;

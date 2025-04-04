@@ -1,161 +1,181 @@
-import { Ball } from "./Ball.js";
-import { Display } from "../display/Display.js";
+import { Object } from "./Object.ts"
+import { Ball } from "./Ball.ts";
 
-// export allows to use this class in another file
-export class Paddle extends Display {
+export class	Paddle extends Object {
 
-	/* ATTRIBUTES */
-	private readonly _element: HTMLDivElement;
-	private readonly _width: number = 20;
-	private readonly _height: number = 120;
-	private readonly _color: string = "rgb(255, 0, 0)";
+	private readonly	_color: string = 'rgb(255, 0, 0)';
+	private readonly	_width: number = 20;
+	private readonly	_height: number = 120;
 
-	private readonly _speed: number = 5;
-	private _keys: { [key: string]: boolean } = {};
-	private readonly _location: number;
+	private readonly	_speed: number = 3;
+	private readonly	_bot: boolean;
+	private				_moveUp: boolean = false;
+	private				_moveDown: boolean = false;
+	
+	private readonly	_location: number;
 
-	// Fetch current coordinates
-	private _top!: number;
-	private _bottom!: number;
-	private _left!: number;
-	private _right!: number;
+	private				_x!: number;
+	private				_y!: number;
 
-	/* CONSTRUCTOR */
-	constructor(location: number = 1 | 2 | 3 | 4, canvas: HTMLDivElement) {
+	private				_top!: number;
+	private				_bottom!: number;
+	private				_left: number;
+	private				_right: number;
+
+	constructor (canvas: HTMLCanvasElement, location: number, bot: boolean) {
 		super(canvas);
 
 		this._location = location;
-
-		// Creates the paddle object
-		this._element = document.createElement("div");
-		// Gives the paddle all its values
-		
-		this._element.style.backgroundColor = `${this._color}`;
-		this._element.style.position = "absolute";
-		this._element.style.margin = "0%";
-		this._element.style.padding = "0%";
-		
-		if (location === 1 || location === 2) {
-			this._element.style.width = `${this._width}px`;
-			this._element.style.height = `${this._height}px`;
-			this._element.style.top = `calc(${this._canvas.offsetHeight} / 2 - ${this._height} / 2)px`;
-
-			if (location === 1) {
-				this._element.style.right = "1%";
-			}
-			else if (location === 2) {
-				this._element.style.left = "1%";
-			}
+		this._y = (this._fieldHeight / 2) - (this._height / 2);
+		if (this._location === 0) {
+			this._x = this._fieldWidth - 5 - this._width;
 		}
-		else if (location === 3 || location === 4) {
-			this._element.style.width = `${this._height}px`;
-			this._element.style.height = `${this._width}px`;
-			this._element.style.left = `calc(${this._canvas.offsetWidth} / 2 - ${this._width} / 2)px`;
-
-			if (location === 3) {
-				this._element.style.bottom = "1%"; 
-			}
-			else if (location === 4) {
-				this._element.style.top = "1%";
-			}
-		}
-		// "Draws" the paddle in the game area
-		this._canvas.appendChild(this._element);
-
-		this.updatePosition();
-
-		this.eventListeners();
-	}
-
-	/* GETTERS */
-	public get element() {
-		return this._element;
-	};
-
-	public get width() {
-		return this._width;
-	};
-
-	public get height() {
-		return this._height;
-	};
-
-	public get top() {
-		return this._top;
-	};
-
-	public get bottom() {
-		return this._bottom;
-	};
-
-	public get left() {
-		return this._left;
-	};
-
-	public get right() {
-		return this._right;
-	};
-
-	public get keys() {
-		return this._keys;
-	};
-
-	public get location() {
-		return this._location;
-	};
-
-	/* METHODS */
-	// Update current position
-	public updatePosition() {
-		if (this._location === 1 || this._location === 2) {
-			this._top = this._element.offsetTop;
-			this._bottom = this._top + this._height;
-			this._left = this._element.offsetLeft;
-			this._right = this._left + this._width;
-		}
-		else {
-			this._top = this._element.offsetTop;
-			this._bottom = this._top + this._width;
-			this._left = this._element.offsetLeft;
-			this._right = this._left + this._height;
+		else if (this._location === 1) {
+			this._x = 5;
 		}
 
-	}
+		this._bot = bot;
 
-	public move() {
-		// Fetch the x value of the top of the paddle, and the keys that are being pressed
-		const	moveUp = (this._keys['ArrowUp'] && this._location === 1) || (this._keys['s'] && this._location === 2);
-		const	moveDown = (this._keys['ArrowDown'] && this._location === 1) || (this._keys['x'] && this._location === 2);
-		const	moveRigth = (this._keys['ArrowRight'] && this._location === 3);// || (this._keys['d'] && this._location === 4);
-		const	moveLeft = (this._keys['ArrowLeft'] && this._location === 3);// || (this._keys['a'] && this._location === 4);
+		this._top = this._y;
+		this._bottom = this._y + this._height;
+		this._left = this._x;
+		this._right = this._x + this._width;
 
-		// Move subsequently
-		if (moveUp) {
-			this._element.style.top = `${Math.max(0, this._top - this._speed)}px`;
-		}
-		if (moveDown) {
-			this._element.style.top = `${Math.min(this._canvas.offsetHeight - this._height, this._top + this._speed)}px`;
-		}
-		if (moveLeft) {
-			this._element.style.left = `${Math.max(0, this._left - this._speed)}px`;
-		}
-		if (moveRigth) {
-			this._element.style.left = `${Math.min(this._canvas.offsetWidth - this._height, this._left + this._speed)}px`;
+		if (!this._bot) {
+			this.eventListener();
 		}
 	}
 
-	public collision(ball: Ball) {
-		if (ball.right >= this._left &&
-			ball.left <= this._right &&
-			ball.bottom >= this._top &&
-			ball.top <= this._bottom) {
-				ball.bounce(this); 
+	get color () {
+		return this._color ;
+	}
+
+	get width () {
+		return this._width ;
+	}
+
+	get height () {
+		return this._height ;
+	}
+
+	get speed () {
+		return this._speed ;
+	}
+
+	get bot () {
+		return this._bot ;
+	}
+
+	get moveUp () {
+		return this._moveUp ;
+	}
+
+	get moveDown () {
+		return this._moveDown ;
+	}
+
+	get location () {
+		return this._location ;
+	}
+
+	get x () {
+		return this._x ;
+	}
+
+	get y () {
+		return this._y ;
+	}
+
+	get top () {
+		return this._top ;
+	}
+
+	get bottom () {
+		return this._bottom ;
+	}
+
+	get left () {
+		return this._left ;
+	}
+
+	get right () {
+		return this._right ;
+	}
+
+	move () {
+		this.update();
+		this.draw();
+	}
+	
+	collision (ball: Ball) {
+		if (ball.x + ball.radius >= this._left &&
+			ball.x - ball.radius <= this._right &&
+			ball.y + ball.radius >= this._top &&
+			ball.y - ball.radius <= this._bottom) {
+				ball.bounce(this);
 				return (true);
 			}
+		return (false);
 	}
 
-	private eventListeners() {
-		document.addEventListener('keydown', (event) => this._keys[event.key] = true);
-		document.addEventListener('keyup', (event) => this._keys[event.key] = false);
+	launchBot (ball: Ball) {
+		if (this._y + (this._height / 2) > ball.y) {
+			this._moveUp = true;
+			this._moveDown = false;
+		}
+		else {
+			this._moveUp = false;
+			this._moveDown = true;
+		}
+		this.update();
+		this.draw();
+	}
+
+	private draw () {
+		this._field.fillStyle = this._color;
+		this._field.beginPath();
+		this._field.fillRect(this._x, this._y, this._width, this._height);
+	}
+
+	private update () {
+		if (this._moveUp && this._top > 0)
+			this._y -= this._speed;
+		if (this._moveDown && this._bottom < this._fieldHeight)
+			this._y += this._speed;
+		this._top = this._y;
+		this._bottom = this._y + this._height;
+	}
+
+	private eventListener () {
+		if (this._location === 0) {
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'ArrowUp') {
+					this._moveUp = true;
+				}
+				if (event.key === 'ArrowDown')
+					this._moveDown = true;
+			})
+			document.addEventListener('keyup', (event) => {
+				if (event.key === 'ArrowUp') {
+					this._moveUp = false;
+				}
+				if (event.key === 'ArrowDown')
+					this._moveDown = false;
+			})
+		}
+		else if (this._location === 1) {
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 's')
+					this._moveUp = true;
+				if (event.key === 'x')
+					this._moveDown = true;
+			})
+			document.addEventListener('keyup', (event) => {
+				if (event.key === 's')
+					this._moveUp = false;
+				if (event.key === 'x')
+					this._moveDown = false;
+			})
+		}
 	}
 }
