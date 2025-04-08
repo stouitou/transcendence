@@ -2,7 +2,6 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Player } from '../entities/Player.js';
 import { Match } from '../entities/Match.js';
-import { Tournament } from '../entities/Tournament.js';
 
 @customElement('game-component')
 export class  oneVSone extends LitElement {
@@ -11,8 +10,7 @@ export class  oneVSone extends LitElement {
 
   /* ATTRIBUTES */
   private _area!: HTMLDivElement;
-  private _game!: Tournament;
-  // private _game!: Match;
+  private _game!: Match;
   static styles = css`
     :host {
       position: relative;
@@ -36,7 +34,8 @@ export class  oneVSone extends LitElement {
   firstUpdated () {
     this._area = window.document.getElementById(this.gameContainerId)! as HTMLDivElement;
 
-    this._area.style.position = "absolute";
+    // this._area.style.position = "absolute";
+    this._area.style.position = "relative";
     this._area.style.overflow = "hidden";
     this._area.style.margin = "0%";
     this._area.style.padding = "0%";
@@ -85,11 +84,9 @@ export class  oneVSone extends LitElement {
         body: JSON.stringify(body),
       });
       const data = await response.json();
-      const players: Player[] = [new Player(player1, 0, false), new Player(player2, 1, false), new Player('player3', 2, false), new Player('player4', 3, false), new Player('player5', 4, false)];
-      this._game = new Tournament(players, this._area);
-      // const players: Player[] = [new Player(player1, 0, false), new Player(player2, 1, true)];
-      // this._game = new Match(players, this._area);
-      // await this._game.launch();
+      const players: Player[] = [new Player(player1, 0, false), new Player(player2, 1, true)];
+      this._game = new Match(players, this._area);
+      await this._game.launch();
     }
     catch (error) {
       console.log("Error");

@@ -4,6 +4,7 @@ import { Paddle } from "./Paddle";
 
 export class	Match {
 
+	private				_gameWrapper: HTMLDivElement;
 	private readonly	_players: Player[];;
 
 	private				_score!: HTMLDivElement;
@@ -21,17 +22,18 @@ export class	Match {
 	private				_break: boolean = false;
 
 	constructor (players: Player[], container: HTMLDivElement) {
+		this._gameWrapper = container;
 		this._players = players;
 		this._players.forEach((player, index) => player.points = 0);
 		this.createScore();
-		container.appendChild(this._score);
+		this._gameWrapper.appendChild(this._score);
 
 		const canvas: HTMLCanvasElement = this.createField()!;
 		canvas.style.background = 'rgb(0, 0, 0)';
 		this._field = canvas.getContext('2d')!;
 		this._width = canvas.width;
 		this._height = canvas.height;
-		container.appendChild(canvas);
+		this._gameWrapper.appendChild(canvas);
 
 		this._ball = new Ball(canvas);
 		for (let i = 0; i < this._players.length; i++)
@@ -81,15 +83,19 @@ export class	Match {
 	}
 	
 	public async launch () : Promise<void> {
+		await this.startGame();
 		this.displayScore();
 		await this.displayCountdown();
 
 		return new Promise((resolve) => {
-			const	loop = () => {
+			const loop = async () => {
 				for (const player of this._players) {
 					if (player.points === this._pointsToWin) {
 						player.lastWin = true;
 						this._winner = player;
+						await this.congratulate(player);
+						this._gameWrapper.removeChild(this._score);
+						this._gameWrapper.removeChild(this._field.canvas);
 						resolve();
 						return ;
 					}
@@ -153,6 +159,50 @@ export class	Match {
 			canvas.height = 700;
 
 		return canvas;
+	}
+
+	private async startGame () : Promise<void> {
+
+		return new Promise((resolve) => {
+			const	alert: HTMLDivElement = document.createElement('div');
+			alert.style.position = 'absolute';
+			alert.style.minWidth = '250px';
+			alert.style.top = '50%';
+			alert.style.left = '50%';
+			alert.style.borderRadius = '5px';
+			alert.style.transform = 'translate(-50%, -50%)';
+			alert.style.backgroundColor = 'rgb(255, 0, 0)';
+			alert.style.color = 'rgb(0, 0, 0)';
+			alert.style.padding = '10px';
+			alert.style.fontSize = '20px';
+			alert.style.fontFamily = 'system-ui';
+			alert.style.textAlign = 'center';
+			alert.style.lineHeight = '1';
+			alert.style.whiteSpace = 'pre-line';
+			alert.textContent = `${this._players[0].name}\nvs\n${this._players[1].name}\n`;
+			
+			const	button: HTMLButtonElement = document.createElement('button');
+			button.textContent = 'Start';
+			button.style.minWidth = '50%';
+			button.style.marginTop = '20px';
+			button.style.backgroundColor = 'rgb(0, 0, 0)';
+			button.style.color = 'rgb(255, 0, 0)';
+			button.style.border = '1px solid rgb(0, 255, 0)';
+			button.style.borderRadius = '5px';
+			button.style.padding = '5px';
+			button.style.fontSize = '20px';
+			button.style.fontWeight = 'bold';
+			button.style.fontFamily = 'system-ui';
+			button.style.cursor = 'pointer';
+			button.addEventListener('click', () => {
+				alert.removeChild(button);
+				this._gameWrapper.removeChild(alert);
+				resolve();
+			}
+			);
+			alert.appendChild(button);
+			this._gameWrapper.appendChild(alert);
+		});
 	}
 
 	private run () {
@@ -224,9 +274,9 @@ export class	Match {
 		this._field.fillStyle = 'rgb(255, 0, 0)';
 		this._field.textBaseline = 'middle';
 		this._field.textAlign = 'right';
-		this._field.fillText('player1', this._width - 30, this._height / 2 - 60);
+		this._field.fillText(`${this._players[0].name}`, this._width - 30, this._height / 2 - 60);
 		this._field.textAlign = 'left';
-		this._field.fillText('player2', 30, this._height / 2 + 60);
+		this._field.fillText(`${this._players[1].name}`, 30, this._height / 2 + 60);
 	}
 
 	private async displayCountdown () : Promise<void> {
@@ -259,6 +309,33 @@ export class	Match {
 		this.field.fillRect(this._width / 2 - space / 2 - barWidth, this._height - 5 - barHeight, barWidth, barHeight);
 		this.field.fillRect(this._width / 2 + space / 2, this._height - 5 - barHeight, barWidth, barHeight);
 	}
+
+	private async congratulate (player: Player) : Promise<void> {
+		return new Promise((resolve) => {
+			const	alert: HTMLDivElement = document.createElement('div');
+
+			alert.style.position = 'absolute';
+			alert.style.minWidth = '250px';
+			alert.style.top = '50%';
+			alert.style.borderRadius = '5px';
+			alert.style.left = '50%';
+			alert.style.transform = 'translate(-50%, -50%)';
+			alert.style.backgroundColor = 'rgb(255, 0, 0)';
+			alert.style.color = 'rgb(0, 0, 0)';
+			alert.style.padding = '10px';
+			alert.style.fontSize = '20px';
+			alert.style.fontFamily = 'system-ui';
+			alert.style.textAlign = 'center';
+			alert.style.lineHeight = '1.2';
+			alert.style.whiteSpace = 'pre-line';
+			alert.textContent = `Congratulations\n${player.name} !\n`;
+			this._gameWrapper.appendChild(alert);
+			setTimeout(() => {
+				this._gameWrapper.removeChild(alert);
+				resolve();
+			}, 4000);
+		});
+	}	
 
 	private eventListener () {
 		document.addEventListener('keydown', (event) => {

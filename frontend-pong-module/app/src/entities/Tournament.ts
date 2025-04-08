@@ -19,12 +19,14 @@ export class Tournament {
 			this._players.push(new Player('Bot', 0, true));
 		}
 
+		this._container.style.height = '100%';
 		this._chart.style.position = 'absolute';
 		this._chart.style.width = '100%';
-		this._chart.style.height = 'auto';
+		this._chart.style.height = '100%';
 		this._chart.style.display = 'grid';
-		this._chart.style.gridTemplateColumns = 'auto';
+		this._chart.style.gridTemplateColumns = `${this._container.offsetWidth}px`;
 		this._chart.style.placeItems = 'center';
+		this._chart.style.justifyContent = 'center';
 		this._chart.style.font = 'system-ui';
 		this._chart.style.color = 'rgb(255, 0, 0)';
 		this._chart.style.fontSize = '50px';
@@ -38,6 +40,7 @@ export class Tournament {
 		this.randomize();
 		
 		this.createMatch();
+		this._container.style.gridTemplateRows = `${this._round.length / 2}fr`;
 
 		this.launchGame(Math.round(this._round.length / 2));
 	}
@@ -70,7 +73,6 @@ export class Tournament {
 	}
 
 	private async launchGame (nofMatch: number) {
-		console.log('players in round: ', this._round);
 		await this.showRound();
 
 		this._round.length = 0;
@@ -82,7 +84,6 @@ export class Tournament {
 			if (game) {
 				const match: Match = new Match(game, this._container);
 				await match.launch();
-				this._container.innerHTML = '';	// TODO: a revoir, remet la page a 0
 				if (match.winner && !match.winner.bot) {
 					this._round[j] = game[0].lastWin ? game[0] : game[1];
 					j++;
@@ -101,26 +102,35 @@ export class Tournament {
 	private showRound () : Promise<void>
     {
         return new Promise((resolve) => {
-
+			const	nbOfColumns = getComputedStyle(this._chart).gridTemplateColumns.split(' ').length;
+	
 			for (let i = 0; i < this._round.length / 2; i++) {
 				setTimeout(() => {
 					const	game = this._groups.get(i);
 					if (game) {
-						this.showMatch(game);
+						this.showMatch(game, nbOfColumns, i + 1);
 					}
 				}, i * 800);
 			}
-
+			
 			document.addEventListener('keydown', (event) => {
 				if (event.key === "Enter") {
 					this._chart.style.display = 'none';
+					const	nbOfColumns = [...getComputedStyle(this._chart).gridTemplateColumns.split(' '), '1fr'].join(' ');
+					// this._chart.style.gridTemplateColumns = `${nbOfColumns}`;
+					const	columnSize = this._container.offsetWidth / (nbOfColumns.split(' ').length);
+					this._chart.style.gridTemplateColumns = `${columnSize}px`;
+					for (let i = 0; i < nbOfColumns.split(' ').length - 1; i++) {
+						this._chart.style.gridTemplateColumns += ` ${columnSize}px`;
+					}
+					console.log('in add event listener, gridTemplateColumn = ', this._chart.style.gridTemplateColumns);
 					resolve();
 				}
 			});
         });
 	}
 
-	private showMatch (game: Player[]) {
+	private showMatch (game: Player[], column: number, row: number) {
 		this._chart.style.display = 'block';
 
 		const match = document.createElement('div');
@@ -130,16 +140,17 @@ export class Tournament {
 		match.style.position = 'relative';
 		match.style.width = '200px';
 		match.style.height = 'auto';
-		match.style.margin = '20px';
+		match.style.gridColumn = `${column}`;
+		match.style.gridRow = `${row}`;
+		match.style.margin = '20px auto';
 		match.style.font = 'system-ui';
 		match.style.color = 'rgb(255, 0, 0)';
 		match.style.fontSize = '20px';
 		match.style.fontWeight = 'bold';
 		match.style.textAlign = 'center';
-		match.style.display = 'block';
 
 		player1.style.position = 'relative';
-		player1.style.width = '200px';
+		player1.style.width = '100%';
 		player1.style.height = '50%';
 		player1.style.margin = '2px';
 		player1.style.padding = '5px';
@@ -148,7 +159,7 @@ export class Tournament {
 		player1.style.backgroundColor = 'rgb(0, 0, 0)';
 		player1.style.clipPath = 'polygon(10% 0%, 90% 0%, 100% 50%, 90% 100%, 10% 100%, 0% 50%)';
 		player1.textContent = `${game[0].name}`;
-		
+
 		player2.style.position = 'relative';
 		player2.style.width = '100%';
 		player2.style.height = '50%';
