@@ -5,7 +5,7 @@ import { Paddle } from "./Paddle";
 export class	Match {
 
 	private				_gameWrapper: HTMLDivElement;
-	private readonly	_players: Player[];;
+	private readonly	_players: Player[];
 
 	private				_score!: HTMLDivElement;
 	private readonly	_field: CanvasRenderingContext2D;
