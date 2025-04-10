@@ -35,7 +35,7 @@ export class menu {
 	{	
 		
 		this._textButton[0] = ["1V1", "Tournoi", "Multijoueur", "Return"];
-		this._textButton[1] = ["Local", "Distant", "IA", "Return"];
+		this._textButton[1] = ["Local", "Distant", "Return"];
 		this._textButton[2] = ["Name", "IA", "Return"];
 
 		this.display(this._textButton[0]);
@@ -74,6 +74,7 @@ export class menu {
 				this._button.style.backgroundColor = "rgb(255, 0, 0)";
 				this._button.style.top = `${this._spaceButtons}px`;
 				this._spaceButtons += (this._heightButton * 0.2);
+				this._button.style.padding = "0px";
 				this._button.style.width = `${this._widthButton}px `;
 				this._button.style.height = `${this._heightButton}px`;
 			
@@ -145,24 +146,60 @@ export class menu {
 	public Tournoi() //trouver comment enlever le padding et recalculer pour tout bien psotionner
 	{
 		let std: string[] = ["3", "4", "5", "6", "7", "8"];
-		this.displayMenuCustom(400, 40 + (35 * this.n));
-		this.TextDisplayCustom(80, 20, -150, ((-20 * this.n)), "Arial", "Choose your number of players: ");
 	
-		this.DropdownMenu(std, 0, [80, 30, 115, ((-20 * this.n)), "Arial", "Nb Player"], (val) => {
+		console.log("Menu = ", 50 + (50 * this.n));
+		this.displayMenuCustom(400, 50 + (50 * this.n));
+
+		this.TextDisplayCustom(80, 25, -150, (-25 * this.n), "Arial", "Choose your number of players: ");
+		console.log("(-25 * this.n) = ",(-25 * this.n));
+
+		console.log("");
+		this.DropdownMenu(std, 0, [80, 30, 115, ((-25 * this.n)), "Arial", `${this.n}`], (val) => {
 			if (this.n != 0)
 				for (let x = 0; x < this._container.length; x++) {
 					this._container[x].remove(); }
 
+		this.n = Number(val) - 1;
+			
 			for (let i = 1; i < Number(val); i++) {
-				this.DropdownMenu(std, i, [220, 30, -80, (-20 * Number(val)) + (40 * i)  , "Arial", `${i} | Choose your opponent`], (val) => {}); }
+				let sup: number = 0
+				if (this.n != 2)
+					sup = 5 * (Number(val) - 2);
+				console.log("sup = ", sup);
+				console.log("(-20 * (Number(val))) = ", (-20 * (Number(val))), " + (50 * i) = ", 50 * i, "ALL = ", (-20 * (Number(val))) + (50 * i));
+				this.DropdownMenu(std, i, [220, 40, -80, (-20 * (Number(val)) - sup) + (50 * i)  , "Arial", `${i} | Choose your opponent`], (val) => {}); }
 
 			this._outline.remove();
 			this._texte.remove();
-			this.n = Number(val);
-
+			
 			this.Tournoi();
 		});
 	}
+
+	// public Tournoi() //trouver comment enlever le padding et recalculer pour tout bien psotionner
+	// {
+	// 	let std: string[] = ["3", "4", "5", "6", "7", "8"];
+	// 	this.displayMenuCustom(400, 50 + (50 * this.n));
+		
+	// 	this.TextDisplayCustom(80, 20, -150, (-20 * this.n), "Arial", "Choose your number of players: ");
+	// 	console.log("(-20 * this.n) = ",(-20 * this.n));
+	
+	// 	this.DropdownMenu(std, 0, [80, 30, 115, ((-20 * this.n)), "Arial", "Nb Player"], (val) => {
+	// 		if (this.n != 0)
+	// 			for (let x = 0; x < this._container.length; x++) {
+	// 				this._container[x].remove(); }
+
+	// 		for (let i = 1; i < Number(val); i++) {
+	// 			console.log("(-20 * (Number(val)) - 1) = ", (-20 * (Number(val))), " + (50 * i) = ", 50 * i, "ALL = ", (-20 * (Number(val))) + (50 * i));
+	// 			this.DropdownMenu(std, i, [220, 40, -80, (-20 * Number(val)) + (50 * i)  , "Arial", `${i} | Choose your opponent`], (val) => {}); }
+
+	// 		this._outline.remove();
+	// 		this._texte.remove();
+	// 		this.n = Number(val);
+
+	// 		this.Tournoi();
+	// 	});
+	// }
 
 	public TextDisplayCustom(...tab: (string | number)[])
 	{
@@ -172,6 +209,7 @@ export class menu {
 		this._texte.style.position = "absolute";
 		this._texte.style.width = `${tab[Size.Width]}`;
 		this._texte.style.height = `${tab[Size.Height]}`;
+		this._texte.style.padding = "0px";
 		this._texte.style.top = `calc(${window.innerHeight / 2}px - ${Number(tab[Size.Height]) / 2}px + ${tab[Size.HeightOffset]}px)`;
 		this._texte.style.left = `calc(${window.innerWidth / 2}px - ${Number(tab[Size.Width]) / 2}px + ${tab[Size.WidthOffset]}px)`;
 		console.log("this._texte.style.left : ", this._texte.style.left );
@@ -190,6 +228,7 @@ export class menu {
 		this._checkbox.style.margin = "0%";
 		this._checkbox.type = "checkbox";
 	    this._checkbox.id = "smallCheckbox";
+		this._checkbox.style.padding = "0px";
 	    this._checkbox.style.width = `${boxWidth}px`;
 	    this._checkbox.style.height = `${boxHeight}px`;
 		this._checkbox.style.top = `calc(${window.innerHeight / 2}px - ${boxHeight / 2}px + ${height}px)`;
@@ -198,6 +237,7 @@ export class menu {
 		this._label.style.position = "absolute";
 		this._label.htmlFor = "smallCheckbox";
 		this._label.textContent = "IA";
+		this._label.style.padding = "0px";
 		this._label.style.width = `${boxWidth}px`;
 	    this._label.style.height = `${boxHeight}px`;
 		this._label.style.top = `calc(${window.innerHeight /  2}px - ${boxHeight / 2}px + ${height}px)`;
@@ -226,6 +266,7 @@ export class menu {
 		button.textContent = String(tab[Size.StringText]);
 		button.style.height = `${tab[Size.Height]}px`;
 		button.style.width = `${tab[Size.Width]}px`;
+		button.style.padding = "0px";
 	  
 		// Création du menu (liste)
 		const menu: HTMLUListElement = document.createElement("ul");
@@ -236,6 +277,7 @@ export class menu {
 		menu.style.border = "none"
 		menu.style.top = "100%";
 		menu.style.left = "0";
+		menu.style.zIndex = "10";
 		menu.style.display = "none"; // Masqué par défaut
 		menu.style.background = "#fff";
 		menu.style.border = "1px solid #ccc";
@@ -280,32 +322,43 @@ export class menu {
 		this._container[i].appendChild(menu);
 		document.body.appendChild(this._container[i]);
 	  
-		console.log("Menu déroulant créé");
+		//console.log("Menu déroulant créé");
 	}
+
+	private _input!: HTMLInputElement;
+	//private _button: HTMLButtonElement;
 
 	public createTextInputCustom(...tab: (string | number)[])
 	{
-		const input: HTMLInputElement = document.createElement("input");
+		console.log("Je creer _input");
+		this._input = document.createElement("input");
 
-		input.type = "text";
-		input.style.position = "absolute";
-		input.placeholder = "Pseudo de l'invite";
+		this._input.type = "text";
+		this._input.style.position = "absolute";
+		this._input.placeholder = String(tab[Size.StringText]);
 	
-		const button: HTMLButtonElement = document.createElement("button");
-		button.textContent = "Valider";
+		this._button = document.createElement("button");
+		this._button.style.position = "absolute";
+		this._button.textContent = "Ok";
+		this._button.style.padding = "0px";
+		this._button.style.top = `calc(${window.innerHeight /  2}px - ${Number(tab[Size.Height]) / 2}px + ${tab[Size.HeightOffset]}px)`;
+		this._button.style.left = `calc(${window.innerWidth /  2}px - ${Number(tab[Size.Width]) / 2}px + ${tab[Size.WidthOffset]}px + ${Number(tab[Size.Width]) + 10}px)`;
+		
+
 		// button.style.margin = "0px";
 		// button.style.padding = "0px";
-		input.style.height = `${tab[Size.Height]}px`;
-		input.style.width = `${tab[Size.Width]}px`;
-		input.style.top = `calc(${window.innerHeight /  2}px - ${Number(tab[Size.Height]) / 2}px + ${tab[Size.HeightOffset]}px)`;
-		input.style.left = `calc(${window.innerWidth /  2}px - ${Number(tab[Size.Width]) / 2}px + ${tab[Size.WidthOffset]}px)`;
+		this._input.style.padding = "0px";
+		this._input.style.height = `${tab[Size.Height]}px`;
+		this._input.style.width = `${tab[Size.Width]}px`;
+		this._input.style.top = `calc(${window.innerHeight /  2}px - ${Number(tab[Size.Height]) / 2}px + ${tab[Size.HeightOffset]}px)`;
+		this._input.style.left = `calc(${window.innerWidth /  2}px - ${Number(tab[Size.Width]) / 2}px + ${tab[Size.WidthOffset]}px)`;
 
-		button.addEventListener("click", () => {
-			console.log("Text: ", input.value);
+		this._button.addEventListener("click", () => {
+			console.log("Text: ", this._input.value);
 		});
 
-		document.body.appendChild(input);
-		document.body.appendChild(button);
+		document.body.appendChild(this._input);
+		document.body.appendChild(this._button);
 	}
 
 	
@@ -318,6 +371,7 @@ export class menu {
 
 				this._button.style.position = "absolute";
 				this._button.style.fontFamily = `${tab[Size.PoliceText]}`;
+				this._button.style.padding = "0px";
 				this._button.style.backgroundColor = "rgb(179, 95, 95)";
 				this._button.style.top =  `calc(${window.innerHeight /  2}px - ${Number(tab[Size.Height]) / 2}px + ${tab[Size.HeightOffset]}px)`;
 				this._button.style.left = `calc(${window.innerWidth /  2}px - ${Number(tab[Size.Width])  / 2}px + ${tab[Size.WidthOffset]}px)`;
@@ -343,18 +397,21 @@ export class menu {
 	{
 		const std: string[] = ["Facile", "Moyen", "Hard"];
 		return new Promise((resolve) => {
-			this.createTextInputCustom(140, 20, -60, 0);
-			this.displayButtonCustom(30, 30, 35, 0,  "Courier", "Ok");
+			this.createTextInputCustom(140, 20, -60, 0, "Courier", "Pseudo de l'invite");
+			console.log(this._input);
+			//this.displayButtonCustom(30, 30, 35, 0,  "Courier", "Ok");
 			this.SmallCheckboxCustom(110, 0, 20, 20);
 			this.displayMenuCustom(270, 50);
 			
 			this._checkbox.addEventListener("change", () => {
 			if (this._checkbox.checked) {
+				this._input.remove();
 				this._button.remove();
-				//this.DropdownMenu(std, -40, 0, 180, 40);
 				 }
 			else {
-				//this._container.remove();
+				console.log(this._input);
+				this._input.remove();
+				this._button.remove();
 				this.displayButtonCustom(30, 30, 35, 0,  "Courier", "Ok");
 				this.createTextInputCustom(140, 20, -60, 0);
 				 }
