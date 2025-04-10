@@ -1,5 +1,6 @@
 import { Object } from "./Object.ts"
 import { Ball } from "./Ball.ts";
+import { Player } from "./Player.ts";
 
 export class	Paddle extends Object {
 
@@ -22,7 +23,7 @@ export class	Paddle extends Object {
 	private				_left: number;
 	private				_right: number;
 
-	constructor (canvas: HTMLCanvasElement, location: number, bot: boolean) {
+	constructor (canvas: HTMLCanvasElement, location: number, bot: string) {
 		super(canvas);
 
 		this._location = location;
@@ -34,7 +35,7 @@ export class	Paddle extends Object {
 			this._x = 5;
 		}
 
-		this._bot = bot;
+		this._bot = bot === 'bot' ? true : false;
 
 		this._top = this._y;
 		this._bottom = this._y + this._height;
@@ -102,7 +103,9 @@ export class	Paddle extends Object {
 		return this._right ;
 	}
 
-	move () {
+	move (player: Player, ball: Ball) {
+		if (player.role === 'bot')
+			this.followBall(ball);
 		this.update();
 		this.draw();
 	}
@@ -118,7 +121,7 @@ export class	Paddle extends Object {
 		return (false);
 	}
 
-	launchBot (ball: Ball) {
+	private followBall (ball: Ball) {
 		if (this._y + (this._height / 2) > ball.y) {
 			this._moveUp = true;
 			this._moveDown = false;
@@ -127,8 +130,6 @@ export class	Paddle extends Object {
 			this._moveUp = false;
 			this._moveDown = true;
 		}
-		this.update();
-		this.draw();
 	}
 
 	private draw () {

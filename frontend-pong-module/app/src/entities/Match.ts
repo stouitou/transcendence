@@ -1,49 +1,63 @@
 import { Player } from "./Player";
 import { Ball } from "./Ball";
 import { Paddle } from "./Paddle";
+import { Alert } from "./Alert";
 
 export class	Match {
 
-	private				_gameWrapper: HTMLDivElement;
-	private readonly	_players: Player[];;
+	private	readonly	_gameWrapper: HTMLDivElement;		// main container created in the frontend
+	private readonly	_players: Player[];					// array of players
 
-	private				_score!: HTMLDivElement;
-	private readonly	_field: CanvasRenderingContext2D;
-	private readonly	_width: number;
-	private readonly	_height: number;
-	private readonly	_color: string = 'rgb(0, 0, 0)';
+	private	readonly	_appendix: HTMLDivElement;			// appendix for the score
+	private readonly	_field: CanvasRenderingContext2D;	// field rendered by the canvas
+	private readonly	_width: number;						// width of the field
+	private readonly	_height: number;					// height of the field
+	private readonly	_color: string = 'rgb(0, 0, 0)';	// color of the field
 
 	private readonly	_ball: Ball;
 	private readonly	_paddles: Paddle[] = [];
 
-	private readonly	_pointsToWin: number = 2;
-	private				_winner: Player | null = null;	
+	private readonly	_pointsToWin: number = 2;			// number of points required to end the match
+	private				_winner: Player | null = null;		// winner of the match, while match is running, winner = null
 
-	private				_break: boolean = false;
+	private				_break: boolean = false;			// boolean to pause the game
 
 	constructor (players: Player[], container: HTMLDivElement) {
 		this._gameWrapper = container;
 		this._players = players;
-		this._players.forEach((player, index) => player.points = 0);
-		this.createScore();
-		this._gameWrapper.appendChild(this._score);
+		for (let i = 0; i < this._players.length; i++) {
+			this._players[i].location = i;
+			this._players[i].points = 0;
+			console.log(this._players[i]);
+		}
+		this._appendix = document.createElement('div');
+		this.appendixProperties();
+		this._gameWrapper.appendChild(this._appendix);
 
-		const canvas: HTMLCanvasElement = this.createField()!;
+		const canvas: HTMLCanvasElement = this.createCanvas()!;
 		canvas.style.background = 'rgb(0, 0, 0)';
-		this._field = canvas.getContext('2d')!;
+		this._field = canvas.getContext('2d') as CanvasRenderingContext2D;
 		this._width = canvas.width;
 		this._height = canvas.height;
 		this._gameWrapper.appendChild(canvas);
 
 		this._ball = new Ball(canvas);
 		for (let i = 0; i < this._players.length; i++)
-			this._paddles[i] = new Paddle(canvas, i, players[i].bot);
+			this._paddles[i] = new Paddle(canvas, i, players[i].role);
 
 		this.eventListener();
 	}
 
+	get gameWrapper () {
+		return this._gameWrapper;
+	}
+
 	get players () {
 		return this._players;
+	}
+
+	get appendix () {
+		return this._appendix;
 	}
 
 	get field () {
@@ -91,11 +105,9 @@ export class	Match {
 			const loop = async () => {
 				for (const player of this._players) {
 					if (player.points === this._pointsToWin) {
-						player.lastWin = true;
-						this._winner = player;
-						await this.congratulate(player);
-						this._gameWrapper.removeChild(this._score);
-						this._gameWrapper.removeChild(this._field.canvas);
+						await this.endGame(player);
+						this._gameWrapper.removeChild(this._appendix);
+						this._gameWrapper.removeChild(this._field.canvas);				
 						resolve();
 						return ;
 					}
@@ -122,28 +134,26 @@ export class	Match {
 		});
 	}
 		
-	private createScore () {
-		this._score = document.createElement('div');
-
-		this._score.style.position = 'relative';
-		this._score.style.width = '100%';
-		this._score.style.height = 'auto';
-		this._score.style.minHeight = '100px';
-		this._score.style.display = 'flex';
-		this._score.style.alignItems = 'center';
-		this._score.style.top = '0';
-		this._score.style.margin = '0px';
-		this._score.style.backgroundColor = 'rgb(0, 0, 0)';
-		this._score.style.borderRadius = '20px';
-		this._score.style.border = 'none';
-		this._score.style.boxShadow = 'inset 0 0 0 3px rgb(255, 0, 0)';
-		this._score.style.color = 'rgb(255, 0, 0)';
-		this._score.style.textAlign = 'center';
-		this._score.style.fontSize = '40px';
-		this._score.style.fontFamily = 'system-ui';
+	private appendixProperties () {
+		this._appendix.style.position = 'relative';
+		this._appendix.style.width = '100%';
+		this._appendix.style.height = 'auto';
+		this._appendix.style.minHeight = '100px';
+		this._appendix.style.display = 'flex';
+		this._appendix.style.alignItems = 'center';
+		this._appendix.style.top = '0';
+		this._appendix.style.margin = '0';
+		this._appendix.style.backgroundColor = 'rgb(0, 0, 0)';
+		this._appendix.style.borderRadius = '50% 50% 0 0';
+		this._appendix.style.border = 'none';
+		this._appendix.style.boxShadow = 'inset 0 0 0 3px rgb(255, 0, 0)';
+		this._appendix.style.color = 'rgb(255, 0, 0)';
+		this._appendix.style.textAlign = 'center';
+		this._appendix.style.fontSize = '40px';
+		this._appendix.style.fontFamily = 'system-ui';
 	}
 
-	private createField () {
+	private createCanvas () {
 		const	canvas: HTMLCanvasElement = document.createElement('canvas');
 
 		canvas.style.position = 'relative';
@@ -162,46 +172,25 @@ export class	Match {
 	}
 
 	private async startGame () : Promise<void> {
-
 		return new Promise((resolve) => {
-			const	alert: HTMLDivElement = document.createElement('div');
-			alert.style.position = 'absolute';
-			alert.style.minWidth = '250px';
-			alert.style.top = '50%';
-			alert.style.left = '50%';
-			alert.style.borderRadius = '5px';
-			alert.style.transform = 'translate(-50%, -50%)';
-			alert.style.backgroundColor = 'rgb(255, 0, 0)';
-			alert.style.color = 'rgb(0, 0, 0)';
-			alert.style.padding = '10px';
-			alert.style.fontSize = '20px';
-			alert.style.fontFamily = 'system-ui';
-			alert.style.textAlign = 'center';
-			alert.style.lineHeight = '1';
-			alert.style.whiteSpace = 'pre-line';
-			alert.textContent = `${this._players[0].name}\nvs\n${this._players[1].name}\n`;
+			const	alert: Alert = new Alert(`${this._players[0].name}\nvs\n${this._players[1].name}\n`);
 			
 			const	button: HTMLButtonElement = document.createElement('button');
-			button.textContent = 'Start';
 			button.style.minWidth = '50%';
 			button.style.marginTop = '20px';
-			button.style.backgroundColor = 'rgb(0, 0, 0)';
-			button.style.color = 'rgb(255, 0, 0)';
-			button.style.border = '1px solid rgb(0, 255, 0)';
+			button.style.border = '2px solid rgb(0, 0, 0)';
 			button.style.borderRadius = '5px';
 			button.style.padding = '5px';
-			button.style.fontSize = '20px';
-			button.style.fontWeight = 'bold';
-			button.style.fontFamily = 'system-ui';
 			button.style.cursor = 'pointer';
+			// style of the text in the button
+			button.classList.add('text-black', 'text-lg', 'font-bold', 'font-sans', 'transition-colors', 'hover:bg-black', 'hover:text-white');	// font-sans: fontFamily = 'system-ui'
+			button.textContent = 'Start';
 			button.addEventListener('click', () => {
-				alert.removeChild(button);
-				this._gameWrapper.removeChild(alert);
+				this._gameWrapper.removeChild(alert.element);
 				resolve();
-			}
-			);
-			alert.appendChild(button);
-			this._gameWrapper.appendChild(alert);
+			});
+			alert.element.appendChild(button);
+			this._gameWrapper.appendChild(alert.element);
 		});
 	}
 
@@ -213,34 +202,12 @@ export class	Match {
 		this._field.fillRect(0, 0, this._width, this._height);
 
 		this._ball.move();
-		this._paddles.forEach((paddle) => {
-			if (!paddle.bot)
-				paddle.move();
-			else
-				paddle.launchBot(this._ball);
-		});
+		for (let i = 0; i < this._paddles.length; i++)
+			this._paddles[i].move(this._players[i], this._ball);
 	}
 
 	private displayScore () {
-		this._score.style.position = 'relative';
-		this._score.style.display = 'flex';
-		this._score.style.alignItems = 'center';
-		this._score.style.width = '100%';
-		this._score.style.height = 'auto';
-		this._score.style.minHeight = '100px';
-		this._score.style.top = '0';
-		this._score.style.margin = '0px';
-		this._score.style.backgroundColor = 'rgb(0, 0, 0)';
-		this._score.style.borderRadius = '20px';
-		this._score.style.border = 'none';
-		this._score.style.boxShadow = 'inset 0 0 0 3px rgb(255, 0, 0)';
-		this._score.style.color = 'rgb(255, 0, 0)';
-		this._score.style.textAlign = 'center';
-		this._score.style.fontSize = '40px';
-		this._score.style.fontFamily = 'system-ui';
-
 		this._players.forEach((player) => { 
-			player.display = document.createElement('div');
 			const	name: HTMLParagraphElement = document.createElement('p');
 			name.textContent = player.name;
 			name.style.margin = '10px';
@@ -248,20 +215,22 @@ export class	Match {
 			score.textContent = `${player.points}`;
 			score.style.margin = '10px';
 			if (player.location === 0) {
+				player.display.style.order = '1';
 				name.style.color = 'rgb(255, 0, 0)';
-				name.style.order = '1';
 				score.style.color = 'rgb(255, 0, 0)';
+				name.style.order = '1';
 				score.style.order = '0';
 			}
 			else if (player.location === 1) {
+				player.display.style.order = '0';
 				name.style.color = 'rgb(255, 0, 0)';
-				name.style.order = '0';
 				score.style.color = 'rgb(255, 0, 0)';
+				name.style.order = '0';
 				score.style.order = '1';
 			}
 			player.display.appendChild(name);
 			player.display.appendChild(score);
-			this._score.appendChild(player.display);
+			this._appendix.appendChild(player.display);
 		});
 	}
 
@@ -281,7 +250,6 @@ export class	Match {
 
 	private async displayCountdown () : Promise<void> {
 		const	countdown: string[] = ['3', '2', '1', 'GO'];
-		const	color: string = 'rgb(255, 0, 0)';
 		
 		return new Promise ((resolve) => {
 			for (let i = 0; i < countdown.length; i++) {
@@ -290,12 +258,35 @@ export class	Match {
 					this._field.font = '80px system-ui';
 					this._field.textAlign = 'center';
 					this._field.textBaseline = 'middle';
-					this._field.fillStyle = color;
+					this._field.fillStyle = 'rgb(255, 0, 0)';
 					this._field.fillText(countdown[i], this._width / 2, this._height / 2);
 					if (i === countdown.length - 1)
 						resolve();
 				}, i * 1000);
 			}
+		});
+	}
+	
+	private async endGame (winner: Player) : Promise<void> {
+		winner.lastWin = true;
+		this._players.forEach((player) => {
+			if (player !== winner) {
+				player.lastWin = false;
+			}
+		});
+		this._winner = winner;
+		await this.congratulate(winner);
+	}
+	
+	private async congratulate (winner: Player) : Promise<void> {
+		return new Promise((resolve) => {
+			const	alert: Alert = new Alert(`Congratulations\n${winner.name} !\n`);
+			
+			this._gameWrapper.appendChild(alert.element);
+			setTimeout(() => {
+				this._gameWrapper.removeChild(alert.element);
+				resolve();
+			}, 4000);
 		});
 	}
 
@@ -308,33 +299,6 @@ export class	Match {
 		this._field.fillStyle = color;
 		this.field.fillRect(this._width / 2 - space / 2 - barWidth, this._height - 5 - barHeight, barWidth, barHeight);
 		this.field.fillRect(this._width / 2 + space / 2, this._height - 5 - barHeight, barWidth, barHeight);
-	}
-
-	private async congratulate (player: Player) : Promise<void> {
-		return new Promise((resolve) => {
-			const	alert: HTMLDivElement = document.createElement('div');
-
-			alert.style.position = 'absolute';
-			alert.style.minWidth = '250px';
-			alert.style.top = '50%';
-			alert.style.borderRadius = '5px';
-			alert.style.left = '50%';
-			alert.style.transform = 'translate(-50%, -50%)';
-			alert.style.backgroundColor = 'rgb(255, 0, 0)';
-			alert.style.color = 'rgb(0, 0, 0)';
-			alert.style.padding = '10px';
-			alert.style.fontSize = '20px';
-			alert.style.fontFamily = 'system-ui';
-			alert.style.textAlign = 'center';
-			alert.style.lineHeight = '1.2';
-			alert.style.whiteSpace = 'pre-line';
-			alert.textContent = `Congratulations\n${player.name} !\n`;
-			this._gameWrapper.appendChild(alert);
-			setTimeout(() => {
-				this._gameWrapper.removeChild(alert);
-				resolve();
-			}, 4000);
-		});
 	}	
 
 	private eventListener () {

@@ -1,23 +1,26 @@
-export class	Player {
+import { User } from "./User";
 
-	private readonly	_name: string;
+export class	Player extends User{
+
 	private				_points: number = 0;
-	private				_location: number;
+	private				_location: number = 0;
 
-	private readonly	_bot: boolean;
+	private				_display: HTMLDivElement;
 
-	private				_display!: HTMLDivElement;
+	private				_lastWin: boolean = false;
 
-	private				_lastWin!: boolean;
-
-	constructor (name: string, location: number, bot: boolean) {
-		this._name = name;
-		this._location = location;
-		this._bot = bot;
+	constructor (json: any) {
+		super(json);
+		this._display = document.createElement('div');
+		this.displayProperties();
 	}
 
-	get name () {
-		return this._name;
+	get lastWin () {
+		return this._lastWin;
+	}
+
+	set lastWin (lastWin: boolean) {
+		this._lastWin = lastWin;
 	}
 
 	get points () {
@@ -28,16 +31,8 @@ export class	Player {
 		return this._location;
 	}
 	
-	get bot () {
-		return this._bot;
-	}
-	
 	get display () {
 		return this._display;
-	}
-	
-	get lastWin () {
-		return this._lastWin;
 	}
 
 	set points (points: number) {
@@ -48,12 +43,7 @@ export class	Player {
 		this._location = location;
 	}
 
-	set lastWin (lastWin: boolean) {
-		this._lastWin = lastWin;
-	}
-
-	set display (display: HTMLDivElement) {
-		this._display = display;
+	private displayProperties () {
 		this._display.style.position = 'relative';
 		this._display.style.display = 'flex';
 		this._display.style.alignItems = 'space-between';
@@ -61,12 +51,6 @@ export class	Player {
 		this._display.style.height = 'auto';
 		this._display.style.margin = '5px';
 		this._display.style.justifyContent = 'space-between';
-		if (this._location === 0) {
-			this._display.style.order = '1';
-		}
-		else if (this._location === 1) {
-			this._display.style.order = '0';
-		}
 	}
 
 	score () {

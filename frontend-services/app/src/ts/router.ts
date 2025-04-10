@@ -85,7 +85,7 @@ export function renderHome(container: HTMLElement) {
 const pongGameScript = async () => {
 	const script = document.createElement('script');
 	script.type = 'module';
-	script.src = 'https://localhost:4433/frontend-pong-module/app/src/component/oneVSone.ts';
+	script.src = 'https://localhost:4433/frontend-pong-module/app/src/component/classic.ts';
     window.document.head.appendChild(script);
 };
 
@@ -129,7 +129,7 @@ function renderGame(container: HTMLElement) {
 
     const startTournamentButton = document.createElement("button");
     startTournamentButton.textContent = "Start Tournament";
-    startTournamentButton.className = "px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-green-600 transition";
+    startTournamentButton.className = "px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-purple-600 transition";
 
     // Add event listener to start game
     startButton.addEventListener("click", () => {

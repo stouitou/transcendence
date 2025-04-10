@@ -1,5 +1,8 @@
 import { Player } from "./Player.js";
 import { Match } from "./Match.js";
+import { createGameDatabase, updateStateGameDatabase } from "../utils/databaseGame.js";
+import { updateStateTournamentDatabase } from "../utils/databaseTournament.js";
+import { Bot } from "./Bot.js";
 
 export class Tournament {
 
@@ -8,41 +11,44 @@ export class Tournament {
 	private readonly	_players: Player[];
 
 	private				_round: Player[] = [];
-	private				_groups: Map<number, Player[] | null> = new Map();
-	private				_chart: HTMLDivElement = document.createElement('div');
+	private				_groups: Map<number, Player[] | null>;
+	private				_chart: HTMLDivElement;
 
 	/* CONSTRUCTOR */
 	public constructor(players: Player[], container: HTMLDivElement) {
 		this._container = container;
 		this._players = players;
 		if (this._players.length % 2 != 0) {
-			this._players.push(new Player('Bot', 0, true));
+			this._players.push(new Bot(1));
 		}
 
+		this._groups = new Map();
 		this._container.style.height = '100%';
+		this._chart = document.createElement('div');
+		this.chartProperties();
+		this._container.appendChild(this._chart);
+
+		this.randomize();
+		this.createMatch();
+		this.launchGame(Math.round(this._round.length / 2));
+	}
+	
+	private chartProperties () {
 		this._chart.style.position = 'absolute';
 		this._chart.style.width = '100%';
 		this._chart.style.height = '100%';
+		this._chart.style.top = '0';
+		this._chart.style.left = '0';
 		this._chart.style.display = 'grid';
-		this._chart.style.gridTemplateColumns = `${this._container.offsetWidth}px`;
+		this._chart.style.gridTemplateColumns = '1fr';
 		this._chart.style.placeItems = 'center';
 		this._chart.style.justifyContent = 'center';
 		this._chart.style.font = 'system-ui';
 		this._chart.style.color = 'rgb(255, 0, 0)';
-		this._chart.style.fontSize = '50px';
 		this._chart.style.fontWeight = 'bold';
 		this._chart.style.textAlign = 'center';
-		this._chart.style.top = '0';
-		this._chart.style.left = '0';
-		this._chart.innerHTML = "Tournament<br>";
-		this._container.appendChild(this._chart);
-
-		this.randomize();
-		
-		this.createMatch();
-		this._container.style.gridTemplateRows = `${this._round.length / 2}fr`;
-
-		this.launchGame(Math.round(this._round.length / 2));
+		this._chart.innerHTML = `<div style='font-size: 50px;'>Tournament<\div>
+								<div style='font-size: 15px;'>Press Enter to continue<\div>`;
 	}
 
 	private randomize () {
@@ -50,15 +56,16 @@ export class Tournament {
 		let	len = array.length;
 		while (array.length) {
 			let	index = Math.floor(Math.random() * len);
-			this._round.push(array.splice(index, 1)[0]);
+			this._round.push(array.splice(index, 1)[0]);	// splice create an array removing 1 element at index and returns that element
 			len--;
 		}
 	}
 
+	// Makes pairs of players in a map
 	private createMatch () {
 		let	index = 0;
 		if (this._round.length % 2 != 0 && this._round.length > 1)
-			this._round.push(new Player('Bot', 0, true));
+			this._round.push(new Bot(1));
 		for (let i = 0; i < this._round.length; i++) {
 			if (!this._groups.has(index)) {
 				this._groups.set(index, [this._round[i]]);
@@ -82,19 +89,22 @@ export class Tournament {
 		while (i < nofMatch) {
 			const game = this._groups.get(i);
 			if (game) {
+				createGameDatabase(game, 'tournament');
 				const match: Match = new Match(game, this._container);
 				await match.launch();
-				if (match.winner && !match.winner.bot) {
+				updateStateGameDatabase();
+				if (match.winner && match.winner.role != 'bot') {
 					this._round[j] = game[0].lastWin ? game[0] : game[1];
 					j++;
 				}
 			}
 			i++;
 		}
-
 		this._groups.clear();
-		if (this._round.length === 1)
+		if (this._round.length === 1) {
+			updateStateTournamentDatabase();
 			return ;
+		}
 		this.createMatch();
 		this.launchGame(Math.round(this._round.length / 2));
 	}
@@ -103,7 +113,7 @@ export class Tournament {
     {
         return new Promise((resolve) => {
 			const	nbOfColumns = getComputedStyle(this._chart).gridTemplateColumns.split(' ').length;
-	
+
 			for (let i = 0; i < this._round.length / 2; i++) {
 				setTimeout(() => {
 					const	game = this._groups.get(i);
@@ -123,7 +133,6 @@ export class Tournament {
 					for (let i = 0; i < nbOfColumns.split(' ').length - 1; i++) {
 						this._chart.style.gridTemplateColumns += ` ${columnSize}px`;
 					}
-					console.log('in add event listener, gridTemplateColumn = ', this._chart.style.gridTemplateColumns);
 					resolve();
 				}
 			});
