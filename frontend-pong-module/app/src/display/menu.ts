@@ -8,8 +8,12 @@ enum Size {
 }
 
 export class menu {
+	private n: number = 0;
+	//private _guestName!: string;
+
 	private _outline!: HTMLElement;
 	private _button!: HTMLButtonElement;
+	private _buttonMenu!: HTMLButtonElement;
 
 	private readonly _widthButton: number = 200;
 	private readonly _heightButton: number = 40;
@@ -27,13 +31,12 @@ export class menu {
 	private _texte!: HTMLDivElement;
 	private _li!: HTMLLIElement;
 
-	private _textButton: string[][] = [];
-	
-	//private topButton: number = 50;
+	private _input!: HTMLInputElement;
 
-    constructor ()//textButton: string[])
+	private _textButton: string[][] = [];
+
+    constructor ()
 	{	
-		
 		this._textButton[0] = ["1V1", "Tournoi", "Multijoueur", "Return"];
 		this._textButton[1] = ["Local", "Distant", "Return"];
 		this._textButton[2] = ["Name", "IA", "Return"];
@@ -43,6 +46,8 @@ export class menu {
 
 	
 	
+	/*** AFFICHE UN MENU + LES BOUTONS SELON LE TABLEAU DE STRING ENVOYER ***/
+
 	//afficher un rectangle selon le nombres de boutons prevue
 	public displayMenu(textButton: string[])
 	{
@@ -96,7 +101,10 @@ export class menu {
 		});
 	}
 
-		//afficher un rectangle selon les valeurs
+	/*** FONCTION CUSTOM QUI REVOI UN TAB STRING/NUMBER ***/
+	//Width, Height, WidthOffset, HeightOffset, PoliceText, StringText
+
+	//afficher un menu selon les valeurs
 	public displayMenuCustom(width: number, height: number)
 	{
 		this._outline = document.createElement("div");
@@ -113,94 +121,6 @@ export class menu {
 		document.body.appendChild(this._outline);
 	}
 
-
-
-	private async display(textButton: string[])
-	{
-		this.displayMenu(textButton);
-		await this.displayButton(textButton);
-	}
-
-	public async center()
-	{
-		
-		switch (this._target.textContent)
-		{
-			case '1V1' :
-				await this.display(this._textButton[1]);
-				break;
-			case 'Local' :
-				await this.localGame();
-				break;
-			case 'Tournoi' :
-				this.Tournoi();
-				break;
-			case 'Return' :
-				await this.display(this._textButton[0]);
-				break;
-		}
-	}
-
-	public n: number = 0;
-
-	public Tournoi() //trouver comment enlever le padding et recalculer pour tout bien psotionner
-	{
-		let std: string[] = ["3", "4", "5", "6", "7", "8"];
-	
-		console.log("Menu = ", 50 + (50 * this.n));
-		this.displayMenuCustom(400, 50 + (50 * this.n));
-
-		this.TextDisplayCustom(80, 25, -150, (-25 * this.n), "Arial", "Choose your number of players: ");
-		console.log("(-25 * this.n) = ",(-25 * this.n));
-
-		console.log("");
-		this.DropdownMenu(std, 0, [80, 30, 115, ((-25 * this.n)), "Arial", `${this.n}`], (val) => {
-			if (this.n != 0)
-				for (let x = 0; x < this._container.length; x++) {
-					this._container[x].remove(); }
-
-		this.n = Number(val) - 1;
-			
-			for (let i = 1; i < Number(val); i++) {
-				let sup: number = 0
-				if (this.n != 2)
-					sup = 5 * (Number(val) - 2);
-				console.log("sup = ", sup);
-				console.log("(-20 * (Number(val))) = ", (-20 * (Number(val))), " + (50 * i) = ", 50 * i, "ALL = ", (-20 * (Number(val))) + (50 * i));
-				this.DropdownMenu(std, i, [220, 40, -80, (-20 * (Number(val)) - sup) + (50 * i)  , "Arial", `${i} | Choose your opponent`], (val) => {}); }
-
-			this._outline.remove();
-			this._texte.remove();
-			
-			this.Tournoi();
-		});
-	}
-
-	// public Tournoi() //trouver comment enlever le padding et recalculer pour tout bien psotionner
-	// {
-	// 	let std: string[] = ["3", "4", "5", "6", "7", "8"];
-	// 	this.displayMenuCustom(400, 50 + (50 * this.n));
-		
-	// 	this.TextDisplayCustom(80, 20, -150, (-20 * this.n), "Arial", "Choose your number of players: ");
-	// 	console.log("(-20 * this.n) = ",(-20 * this.n));
-	
-	// 	this.DropdownMenu(std, 0, [80, 30, 115, ((-20 * this.n)), "Arial", "Nb Player"], (val) => {
-	// 		if (this.n != 0)
-	// 			for (let x = 0; x < this._container.length; x++) {
-	// 				this._container[x].remove(); }
-
-	// 		for (let i = 1; i < Number(val); i++) {
-	// 			console.log("(-20 * (Number(val)) - 1) = ", (-20 * (Number(val))), " + (50 * i) = ", 50 * i, "ALL = ", (-20 * (Number(val))) + (50 * i));
-	// 			this.DropdownMenu(std, i, [220, 40, -80, (-20 * Number(val)) + (50 * i)  , "Arial", `${i} | Choose your opponent`], (val) => {}); }
-
-	// 		this._outline.remove();
-	// 		this._texte.remove();
-	// 		this.n = Number(val);
-
-	// 		this.Tournoi();
-	// 	});
-	// }
-
 	public TextDisplayCustom(...tab: (string | number)[])
 	{
 		this._texte = document.createElement("div");
@@ -212,7 +132,6 @@ export class menu {
 		this._texte.style.padding = "0px";
 		this._texte.style.top = `calc(${window.innerHeight / 2}px - ${Number(tab[Size.Height]) / 2}px + ${tab[Size.HeightOffset]}px)`;
 		this._texte.style.left = `calc(${window.innerWidth / 2}px - ${Number(tab[Size.Width]) / 2}px + ${tab[Size.WidthOffset]}px)`;
-		console.log("this._texte.style.left : ", this._texte.style.left );
 		this._texte.style.fontSize = "20px";
 		this._texte.style.color = "black";
 
@@ -247,7 +166,7 @@ export class menu {
 		document.body.appendChild(this._label);			
 	}
 
-	
+	// creer un menu deroulant	
 	public  DropdownMenu(std: string[], i: number, tab: (string | number)[], onSelect: (value: string) => void)
 	{
 		this._container[i] = document.createElement("div");
@@ -262,11 +181,11 @@ export class menu {
 		this._container[i].style.left = `calc(${window.innerWidth /  2}px - ${Number(tab[Size.Width]) / 2}px + ${Number(tab[Size.WidthOffset])}px)`;
 	  
 		// Création du bouton
-		const button: HTMLButtonElement = document.createElement("button");
-		button.textContent = String(tab[Size.StringText]);
-		button.style.height = `${tab[Size.Height]}px`;
-		button.style.width = `${tab[Size.Width]}px`;
-		button.style.padding = "0px";
+		this._buttonMenu = document.createElement("button");
+		this._buttonMenu.textContent = String(tab[Size.StringText]);
+		this._buttonMenu.style.height = `${tab[Size.Height]}px`;
+		this._buttonMenu.style.width = `${tab[Size.Width]}px`;
+		this._buttonMenu.style.padding = "0px";
 	  
 		// Création du menu (liste)
 		const menu: HTMLUListElement = document.createElement("ul");
@@ -278,7 +197,7 @@ export class menu {
 		menu.style.top = "100%";
 		menu.style.left = "0";
 		menu.style.zIndex = "10";
-		menu.style.display = "none"; // Masqué par défaut
+		menu.style.display = "none";
 		menu.style.background = "#fff";
 		menu.style.border = "1px solid #ccc";
 		menu.style.boxShadow = "0px 4px 6px rgba(0, 0, 0, 0.1)";
@@ -293,7 +212,6 @@ export class menu {
 		  this._li.style.padding = "0px";
 		  this._li.style.margin = "0px";
 		  this._li.style.border = "none"
-		  //li.style.padding = `${boxHeight}px ${boxWidth}px`;
 		  this._li.style.cursor = "pointer";
 	  
 		  // Ajout d'effets au survol
@@ -303,8 +221,8 @@ export class menu {
 		  // Lorsqu'un item est cliqué, on log l'option et on masque le menu
 		  this._li.addEventListener("click", () => {
 			//console.log(`Élément sélectionné : ${itemText}`);
-			this._container[i].remove();
-			menu.style.display = "none";
+			//this._container[i].remove();
+		menu.style.display = "none";
 			console.log("Option du menu deroulant:",Number(itemText));
 			onSelect(itemText);
 		  });
@@ -313,24 +231,20 @@ export class menu {
 		});
 	  
 		// Ajout d'un écouteur sur le bouton pour basculer l'affichage du menu
-		button.addEventListener("click", () => {
-		  menu.style.display = (menu.style.display === "none") ? "block" : "none";
+		this._buttonMenu .addEventListener("click", () => {
+		menu.style.display = (menu.style.display === "none") ? "block" : "none";
 		});
 
 		// Regroupement des éléments
-		this._container[i].appendChild(button);
+		this._container[i].appendChild(this._buttonMenu );
 		this._container[i].appendChild(menu);
 		document.body.appendChild(this._container[i]);
-	  
-		//console.log("Menu déroulant créé");
 	}
 
-	private _input!: HTMLInputElement;
-	//private _button: HTMLButtonElement;
-
+	
+	//creer un champ input avec son bouton de validation
 	public createTextInputCustom(...tab: (string | number)[])
 	{
-		console.log("Je creer _input");
 		this._input = document.createElement("input");
 
 		this._input.type = "text";
@@ -344,29 +258,20 @@ export class menu {
 		this._button.style.top = `calc(${window.innerHeight /  2}px - ${Number(tab[Size.Height]) / 2}px + ${tab[Size.HeightOffset]}px)`;
 		this._button.style.left = `calc(${window.innerWidth /  2}px - ${Number(tab[Size.Width]) / 2}px + ${tab[Size.WidthOffset]}px + ${Number(tab[Size.Width]) + 10}px)`;
 		
-
-		// button.style.margin = "0px";
-		// button.style.padding = "0px";
 		this._input.style.padding = "0px";
 		this._input.style.height = `${tab[Size.Height]}px`;
 		this._input.style.width = `${tab[Size.Width]}px`;
 		this._input.style.top = `calc(${window.innerHeight /  2}px - ${Number(tab[Size.Height]) / 2}px + ${tab[Size.HeightOffset]}px)`;
-		this._input.style.left = `calc(${window.innerWidth /  2}px - ${Number(tab[Size.Width]) / 2}px + ${tab[Size.WidthOffset]}px)`;
-
-		this._button.addEventListener("click", () => {
-			console.log("Text: ", this._input.value);
-		});
+		this._input.style.left = `calc(${window.innerWidth /  2}px - ${Number(tab[Size.Width]) / 2}px + ${tab[Size.WidthOffset]}px)`;		
 
 		document.body.appendChild(this._input);
 		document.body.appendChild(this._button);
 	}
 
-	
 	//afficher les boutons custom
 	public displayButtonCustom(...tab: (string | number)[]) : Promise<void>
 	{
 		return new Promise((resolve) => {
-				console.log(tab[0]);
 				this._button = document.createElement("button");
 
 				this._button.style.position = "absolute";
@@ -390,33 +295,162 @@ export class menu {
 					resolve();
 				})
 		});
+	}	
+
+	/*** FONCTION CENTRAL ***/
+
+	private async display(textButton: string[])
+	{
+		this.displayMenu(textButton);
+		await this.displayButton(textButton);
 	}
 
-	//Width, Height, WidthOffset, HeightOffset, PoliceText, StringText
+	public async center()
+	{
+		switch (this._target.textContent)
+		{
+			case '1V1' :
+				await this.display(this._textButton[1]);
+				break;
+			case 'Local' :
+				await this.localGame();
+				break;
+			case 'Tournoi' :
+				this.Tournoi();
+				break;
+			case 'Return' :
+				await this.display(this._textButton[0]);
+				break;
+		}
+	}
+
+	private checkNameGuest(guestName: string)
+	{
+		if (this._texte && document.body.contains(this._texte)) {
+			this._texte.remove();
+		}
+		if (guestName === "")
+		{
+			this.TextDisplayCustom(200, 120, 0, 0, "Arial", "Your name is empty");
+			setTimeout(() => { this._texte.remove(); }, 2000);
+			return(false);
+		}
+		else if (guestName.length >= 10)
+		{
+			this.TextDisplayCustom(200, 120, 0, 0, "Arial", "10 caractere max");
+			setTimeout(() => { this._texte.remove(); }, 2000);
+			return(false);
+		}
+
+		return(true);
+	}
+
 	public async localGame() : Promise<void>
 	{
 		const std: string[] = ["Facile", "Moyen", "Hard"];
 		return new Promise((resolve) => {
 			this.createTextInputCustom(140, 20, -60, 0, "Courier", "Pseudo de l'invite");
-			console.log(this._input);
-			//this.displayButtonCustom(30, 30, 35, 0,  "Courier", "Ok");
 			this.SmallCheckboxCustom(110, 0, 20, 20);
 			this.displayMenuCustom(270, 50);
-			
+
+			this._button.addEventListener("click", () => {
+				console.log(this._input.value);
+				if (this.checkNameGuest(this._input.value))
+					console.log("Name du guest valide"); //lancer la fonction game ici
+			});		
+
 			this._checkbox.addEventListener("change", () => {
 			if (this._checkbox.checked) {
 				this._input.remove();
 				this._button.remove();
-				 }
+				this.DropdownMenu(std, 0, [150, 40, -50, 0 , "Arrial", "Choose your LVL"], (val) => {
+					
+					this._buttonMenu.textContent = String(val);
+				});
+			}
 			else {
-				console.log(this._input);
-				this._input.remove();
-				this._button.remove();
-				this.displayButtonCustom(30, 30, 35, 0,  "Courier", "Ok");
-				this.createTextInputCustom(140, 20, -60, 0);
-				 }
+				console.log("tet");
+				this._container[0].remove();
+				// this._input.remove();
+				// this._button.remove();
+				//this.displayButtonCustom(30, 30, 35, 0,  "Courier", "Ok");
+		
+				/* METRE UN VALIDE CUSTOM ET LE RETIRER DE createTextInputCustom*/
+				this.createTextInputCustom(140, 20, -60, 0, "Courier", "Pseudo de l'invite");
+			}
 			resolve();
 			})
+			//this.checkNameGuest();
+			
+			
+			
 		})
 	}
+
+	// public Tournoi()
+	// {
+	// 	let std: string[] = ["3", "4", "5", "6", "7", "8"];
+	
+	// 	console.log("Menu = ", 50 + (50 * this.n));
+	// 	this.displayMenuCustom(400, 50 + (50 * this.n));
+
+	// 	this.TextDisplayCustom(80, 25, -150, (-25 * this.n), "Arial", "Choose your number of players: ");
+	// 	console.log("(-25 * this.n) = ",(-25 * this.n));
+
+	// 	console.log("");
+	// 	this.DropdownMenu(std, 0, [80, 30, 115, ((-25 * this.n)), "Arial", `${this.n}`], (val) => {
+	// 		if (this.n != 0)
+	// 			for (let x = 0; x < this._container.length; x++) {
+	// 				this._container[x].remove(); }
+
+	// 	this.n = Number(val) - 1;
+			
+	// 		for (let i = 1; i < Number(val); i++) {
+	// 			let sup: number = 0
+	// 			if (this.n != 2)
+	// 				sup = 5 * (Number(val) - 2);
+	// 			// console.log("sup = ", sup);
+	// 			// console.log("(-20 * (Number(val))) = ", (-20 * (Number(val))), " + (50 * i) = ", 50 * i, "ALL = ", (-20 * (Number(val))) + (50 * i));
+	// 			this.DropdownMenu(std, i, [220, 40, -80, (-20 * (Number(val)) - sup) + (50 * i)  , "Arial", `${i} | Choose your opponent`], (val) => {}); }
+
+	// 		this._outline.remove();
+	// 		this._texte.remove();
+	// 		this._buttonMenu.remove();
+			
+	// 		this.Tournoi();
+	// 	});
+	// }
+	public Tournoi() //trouver comment enlever le padding et recalculer pour tout bien psotionner
+	{
+		let std: string[] = ["3", "4", "5", "6", "7", "8"];
+	
+		console.log("Menu = ", 50 + (50 * this.n));
+		this.displayMenuCustom(400, 50 + (50 * this.n));
+
+		this.TextDisplayCustom(80, 25, -150, (-25 * this.n), "Arial", "Choose your number of players: ");
+		console.log("(-25 * this.n) = ",(-25 * this.n));
+
+		console.log("");
+		this.DropdownMenu(std, 0, [80, 30, 115, ((-25 * this.n)), "Arial", `${this.n + 1}`], (val) => {
+			//if (this.n != 0)
+				for (let x = 0; x < this._container.length; x++) {
+					this._container[x].remove(); }
+
+		this.n = Number(val) - 1;
+			
+			for (let i = 1; i < Number(val); i++) {
+				let sup: number = 0
+				if (this.n != 2)
+					sup = 5 * (Number(val) - 2);
+				console.log("sup = ", sup);
+				console.log("(-20 * (Number(val))) = ", (-20 * (Number(val))), " + (50 * i) = ", 50 * i, "ALL = ", (-20 * (Number(val))) + (50 * i));
+				this.DropdownMenu(std, i, [220, 40, -80, (-20 * (Number(val)) - sup) + (50 * i)  , "Arial", `${i} | Choose your opponent`], (val) => {}); }
+
+			this._outline.remove();
+			this._texte.remove();
+			
+			this.Tournoi();
+		});
+	}
+
 }
