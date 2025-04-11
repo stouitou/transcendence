@@ -31,7 +31,12 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
   // - le nom de la table,
   // - les relations (nom des propriétés liées à d'autres tables)
   constructor() {
-    super("myDb", "user", ["authProviders","tournaments","games","friends"]);
+    super("myDb", "user", ["authProviders",
+      "tournaments",
+      "tournaments.rounds",
+      "tournaments.rounds.players",
+      "tournaments.rounds.games",
+      "games","friends"]);
   }
   //create
   create = async (user: Partial<User>): Promise<User> => {

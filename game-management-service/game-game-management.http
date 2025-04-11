@@ -41,14 +41,14 @@ POST https://localhost:4433/api/v2/database/myDb/table/gameHistory HTTP/1.1
 Content-Type: application/json
 
 {
-  "score1": 10,
+  "score1": 1,
   "player1": 1,
-  "score2": 5,
+  "score2": 20,
   "player2": 2,
-  "game": {"id":4}
+  "game": {"id":2}
 }
 ### mise a jour du state du game
-PUT https://localhost:4433/api/v2/database/myDb/table/game/id/4 HTTP/1.1
+PUT https://localhost:4433/api/v2/database/myDb/table/game/id/2 HTTP/1.1
 Content-Type: application/json
 
 {

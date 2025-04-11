@@ -5,6 +5,7 @@ import { AuthSchema } from "../schemas/auth.schema";
 import { User } from "@src/models/User.models";
 
 const redirectUrlAfterLoginSuccess = "https://localhost:4433/#profile";
+const redirectUrlAfterLoginError = "https://localhost:4433/login";
 async function authRoutes(app: FastifyInstance) {
 
   const authController = new AuthController(app);
@@ -104,7 +105,9 @@ async function authRoutes(app: FastifyInstance) {
       reply.redirect(redirectUrlAfterLoginSuccess);
     //  return  reply.send({ token: jwtToken });
     } catch (err) {
-      reply.send(err);
+      console.error(err);
+     reply.redirect(redirectUrlAfterLoginError);
+    // reply.send(err);
     }
   });
 }

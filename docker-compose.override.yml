@@ -102,14 +102,17 @@ services:
   #frontend_services:
   frontend-services:
     build:
-      context: ./frontend-services
+      # context: ./frontend-services
+      context: ./frontend-services-myframeworks
       dockerfile: ./Dockerfile
     container_name: frontend-services
     environment:
       - NODE_ENV=development
     volumes:
-      - ./frontend-services/app:/app
-      - ./frontend-services/app/node_modules:/app/node_modules
+    #  - ./frontend-services/app:/app
+    #  - ./frontend-services/app/node_modules:/app/node_modules
+      - ./frontend-services-myframeworks/app:/app
+      - ./frontend-services-myframeworks/app/node_modules:/app/node_modules
     networks:
       - transcendence_network
     depends_on:

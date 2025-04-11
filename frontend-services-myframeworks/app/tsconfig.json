@@ -1,0 +1,14 @@
+{
+  "compilerOptions": {
+    "target": "es6",
+    "module": "esnext",
+    "strict": true,
+    "esModuleInterop": true,
+    "outDir": "./dist/js",
+    "rootDir": "./src/ts"
+  },
+  "include": ["src/ts/**/*"],
+  "types": [
+    "babylonjs",
+],
+}
