@@ -68,7 +68,6 @@ services:
       - transcendence_network
     depends_on:
       - frontend-pong-module
-      - nginx
 
  #Pong-Moudle
   frontend-pong-module:
