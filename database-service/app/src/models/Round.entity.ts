@@ -37,5 +37,13 @@ export class Round {
   @ManyToOne(() => Tournaments, (tournaments) => tournaments.rounds, { nullable: true, onUpdate: 'CASCADE'/* , eager:true */ })
  // @JoinColumn()//Utile?
   tournaments: Tournaments;
+
+  //mode de la partie : local ou remote
+  @Column({ type: "text", default: "local" }) //local, remote
+  type: string;
+
+  //si local, les players sont un tableau de displaynames
+  @Column({ type: "simple-array", nullable:true }) 
+  local_players: string[];
 }
 

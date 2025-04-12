@@ -72,7 +72,7 @@ routerConfig.addRoute('/register', () => document.createElement('register-compon
 routerConfig.addRoute('/game-history', () => document.createElement('game-history-component'));
 routerConfig.addRoute('/game-setting', () => document.createElement('game-setting-component'));
 routerConfig.addRoute('/messages', () => document.createElement('chat-component'));
-routerConfig.addRoute('/test', () => document.createElement('main-app'));
+routerConfig.addRoute('/dashboard', () => document.createElement('dashboard-component'));
 
 
 

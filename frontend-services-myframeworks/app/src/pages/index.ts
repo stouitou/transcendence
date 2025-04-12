@@ -6,7 +6,7 @@ import { Register } from "./register";
 
 import { ChatComponent } from './chat-component.ts';
 import { TournamentHistory } from "./tounamentHistory-component.ts";
-import { MainApp } from "./dashboard-test-component.ts";
+import { Dashboard } from "./dashboard-test-component.ts";
 class HomeComponent extends HTMLElement {
 	connectedCallback() {
 	  this.innerHTML = `<h1>Welcome to the Home Page</h1>
@@ -49,5 +49,6 @@ if (!customElements.get('chat-component')) {
   customElements.define('chat-component', ChatComponent);
 }
 
-
-customElements.define('main-app', MainApp);
+if (!customElements.get('dashboard-component')) {
+	customElements.define('dashboard-component', Dashboard);
+}

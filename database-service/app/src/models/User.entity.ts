@@ -1,9 +1,10 @@
 import "reflect-metadata";
-import { Entity, PrimaryGeneratedColumn, Column, OneToMany, UpdateDateColumn, CreateDateColumn, ManyToMany, JoinTable } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToMany, UpdateDateColumn, CreateDateColumn, ManyToMany, JoinTable, OneToOne, JoinColumn } from "typeorm";
 import { AuthProvider } from "./AuthProvider.entity";
 import { Game } from "./Game.entity";
 import { Tournaments } from "./Tournament.entity";
 import { Round } from "./Round.entity";
+import { UserStats } from "./UserStat";
 @Entity()
 export class User {
   @PrimaryGeneratedColumn()
@@ -53,4 +54,8 @@ export class User {
 
   @UpdateDateColumn(/* { type: "timestamp" } */)
   updated_at: Date;
+
+   @OneToOne(() => UserStats, (stats)=>stats.user,{ /* nullable: true, */ onUpdate: 'CASCADE', eager:true })
+   @JoinColumn()
+   userStats: UserStats;
 }

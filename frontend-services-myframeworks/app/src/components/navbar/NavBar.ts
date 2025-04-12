@@ -94,6 +94,10 @@ export class NavBarComponent extends BaseComponent<{ theme: string,user: User | 
     <div class="max-w-screen-xl px-4 py-3 mx-auto">
         <div class="flex items-center">
             <ul id="subMenu" class="flex flex-row font-medium mt-0 space-x-8 text-sm">
+            
+                <li>
+                    <a href="/dashboard" class="nav-link">Dashboard</a>
+                </li>
                 <li>
                     <a href="/game-setting" class="nav-link">Setting</a>
                 </li>

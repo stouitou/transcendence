@@ -63,14 +63,11 @@ import { User } from "./tournament-test-composant";
 	  this.innerHTML = `
 	  
 		<div class="max-w-sm mx-auto p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
-  <h2 class="text-xl font-bold text-center mb-4 text-gray-800 dark:text-white">${this.dataChart.title}</h2>
+  <h2 class="chart-title text-xl font-bold text-center mb-4 text-gray-800 dark:text-white">${this.dataChart.title}</h2>
   <div class="relative w-64 h-64">
     <svg class="w-full h-full" viewBox="0 0 36 36">
       <!-- Les segments du donut seront ajoutés ici dynamiquement -->
     </svg>
-    <div class="absolute inset-0 flex items-center justify-center">
-      <span  class="donutLabel text-xl font-bold text-gray-800 dark:text-white">100%</span>
-    </div>
   </div>
   <div class="mt-4 text-center">
 	<span class="text-sm text-gray-600 dark:text-gray-400">légende :</span>
@@ -80,6 +77,10 @@ import { User } from "./tournament-test-composant";
 		<div class="w-4 h-4 ${item.color} rounded-full mr-2"></div>
 		<span class="text-sm text-gray-800 dark:text-white">${item.label}</span>
 	  </div>`).join('')}
+
+	<div>
+      <span  class="donutLabel text-xl font-bold text-gray-800 dark:text-white"></span>
+    </div>
 </div>
 	  `;
 
@@ -120,22 +121,47 @@ import { User } from "./tournament-test-composant";
 		let startAngle = 0;
 	
 		this.dataChart.dataset.forEach((segment) => {
+			    // Vérifier si le segment représente 100%
+				if (segment.value === this.total) {
+					const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
+					circle.setAttribute("cx", "18");
+					circle.setAttribute("cy", "18");
+					circle.setAttribute("r", "15");
+					circle.setAttribute("fill", segment.color);
+
+					circle.setAttribute("data-label", segment.label);
+					circle.setAttribute("data-value", segment.value.toString());
+					circle.setAttribute("data-color", segment.color);
+					this.attachEventOnSvg(circle);
+					this.svg.appendChild(circle);
+					return; // Pas besoin de continuer pour ce segment
+				  }
 		  const endAngle = startAngle + (segment.value / this.total) * 360;
 	
 		  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
 		  path.setAttribute("d", this.describeArc(18, 18, 15, startAngle, endAngle));
 		  path.setAttribute("fill", segment.color);
-		  //add on mouseover event
-/* 		  path.setAttribute("class", "donutSegment");
+		  //add on mouseover event on title
 		  path.setAttribute("data-label", segment.label);
 		  path.setAttribute("data-value", segment.value.toString());
 		  path.setAttribute("data-color", segment.color);
-		  path.addEventListener("mouseover", (e) => {
-			console.log('mouseover', e);
+		  this.attachEventOnSvg(path);
+		  this.svg.appendChild(path);
+	
+		  startAngle = endAngle;
+		});
+	
+	  //  this.label.textContent = `${this.total}%`;
+		//this.label.textContent = ``;
+	  }
+
+	  attachEventOnSvg(path: SVGPathElement) {
+		path.addEventListener("mouseover", (e) => {
 			const target = e.currentTarget as HTMLElement;
 			const label = target.getAttribute("data-label");
 			const value = target.getAttribute("data-value");
 			const color = target.getAttribute("data-color");
+		  
 			this.label.textContent = `${label}: ${value}`;
 			this.label.style.color = color || "#000";
 			this.label.style.backgroundColor = "#fff";
@@ -144,9 +170,34 @@ import { User } from "./tournament-test-composant";
 			this.label.style.position = "absolute";
 			this.label.style.zIndex = "10";
 			this.label.style.pointerEvents = "none";
-			this.label.style.transform = `translate(-50%, -50%)`;
-			this.label.style.left = `${e.clientX}px`;
-			this.label.style.top = `${e.clientY}px`;
+		  
+			// Positionner le label en fonction de la souris
+			const offsetX = 10; // Décalage horizontal
+			const offsetY = 10; // Décalage vertical
+			const mouseX = e.pageX;
+			const mouseY = e.pageY;
+		  
+			// Vérifier les limites de la fenêtre
+			const labelWidth = this.label.offsetWidth;
+			const labelHeight = this.label.offsetHeight;
+			const windowWidth = window.innerWidth;
+			const windowHeight = window.innerHeight;
+		  
+			let posX = mouseX + offsetX;
+			let posY = mouseY + offsetY;
+		  
+			// Ajuster si le label dépasse à droite
+			if (posX + labelWidth > windowWidth) {
+			  posX = mouseX - labelWidth - offsetX;
+			}
+		  
+			// Ajuster si le label dépasse en bas
+			if (posY + labelHeight > windowHeight) {
+			  posY = mouseY - labelHeight - offsetY;
+			}
+		  
+			this.label.style.left = `${posX}px`;
+			this.label.style.top = `${posY}px`;
 		  });
 		  path.addEventListener("mouseout", () => {
 			this.label.textContent = ``;
@@ -157,14 +208,6 @@ import { User } from "./tournament-test-composant";
 			this.label.style.zIndex = "0";
 			this.label.style.pointerEvents = "none";
 			this.label.style.transform = `translate(0, 0)`;
-		  });	 */	
-	
-		  this.svg.appendChild(path);
-	
-		  startAngle = endAngle;
-		});
-	
-	  //  this.label.textContent = `${this.total}%`;
-		this.label.textContent = ``;
-	  }
+		  });
+		}
 }

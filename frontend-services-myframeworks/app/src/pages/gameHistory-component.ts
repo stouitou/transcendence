@@ -64,7 +64,6 @@ export class GameHistory extends BaseComponent<{ user: User | null}> {
         </tbody>
     </table>
         </div>
-        <tournament-history-component></tournament-history-component>
 		`;
 		const tbody = document.querySelector('#table-game-history')
 		if (tbody) {
@@ -116,7 +115,7 @@ export class GameHistory extends BaseComponent<{ user: User | null}> {
 		<td class="px-6 py-4">
 			<div class="flex items-center">
 					<div class=${`h-2.5 w-2.5 rounded-full  ${victory === this.state.user?.id ? 'bg-green-500 ' : ''}`}></div>
-					<span>${victory === this.state.user?.id?"ME":`User-${victory}` }</span>
+					<span>${victory === this.state.user?.id?"ME":victory?`User-${victory}`:"" }</span>
 				
 			</div>
 		</td>

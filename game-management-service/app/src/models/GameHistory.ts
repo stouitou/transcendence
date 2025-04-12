@@ -10,6 +10,10 @@ export class GameHistory{
   game?: Game;
   created_at: Date;
   updated_at: Date;
+  //mode de la partie : local ou remote
+  type: string;
+  //si local, les players sont un tableau de displaynames
+  local_players: string[];
 
  
 	constructor(data: Partial<GameHistory>) {
@@ -18,6 +22,8 @@ export class GameHistory{
     this.score2 = 0;
     this.player1 = 0;
     this.player2 = 0;
+    this.type = "local";
+    this.local_players = [];
     //this.game = new Game({});
     Object.assign(this, data);
     this.created_at = new Date(data?.created_at?data.created_at:new Date());
