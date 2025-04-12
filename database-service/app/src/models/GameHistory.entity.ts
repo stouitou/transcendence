@@ -34,4 +34,12 @@ export class GameHistory {
 
   @UpdateDateColumn()
   updated_at: Date;
+
+  //mode de la partie : local ou remote
+  @Column({ type: "text", default: "local" }) //local, remote
+  type: string;
+
+  //si local, les players sont un tableau de displaynames
+  @Column({ type: "simple-array", nullable:true }) 
+  local_players: string[];
 }

@@ -47,9 +47,9 @@ export class GameController {
       return reply.status(400).send({ error: 'Invalid request body' });
     }
     const { ...requestBody } = request.body;
-    const { state } = requestBody;
+    const { state/* ,local_players */ } = requestBody; //@TODO : à revoir
 
-    const game = await this.gameRepository.update({id:gameId,state});
+    const game = await this.gameRepository.update({id:gameId,state/* ,local_players */});
     console.log("GameController updateGame ",game);
 
     if (!game) {

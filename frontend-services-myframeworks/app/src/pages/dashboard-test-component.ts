@@ -9,7 +9,7 @@ customElements.define('tournoi-detail', TournoiDetail);
 
 customElements.define('game-card', GameCard);
 customElements.define('donuts-chart',DonutsChart);
-export class MainApp extends BaseComponent<{ user: User | null,tournamentsData: Tournaments[]}> {
+export class Dashboard extends BaseComponent<{ user: User | null,tournamentsData: Tournaments[]}> {
 	constructor() {
 		super({ user: null, tournamentsData: [] });
 	  }
@@ -115,39 +115,183 @@ export class MainApp extends BaseComponent<{ user: User | null,tournamentsData: 
   
 	private renderDashboard() {
 	  this.innerHTML = `
-	  <div class="flex flex-row items-center justify-center">
-		<donuts-chart id="gameChart"></donuts-chart>
-		<donuts-chart id="tournamentChart"></donuts-chart>
-	</div>
-		<dashboard-tournois></dashboard-tournois>
+	  <div class="mx-auto p-6 text-center">
+		<div class="flex flex-row space-x-4">
+			<profile-component></profile-component>
+			<chat-component></chat-component>
+		</div>
+		<h2 class="text-2xl font-bold my-2">Game Stats</h2>
+		<div class="flex flex-row items-center justify-center bg-white rounded-lg shadow-md dark:bg-gray-800">
+			<donuts-chart id="gameChart"></donuts-chart>
+			<donuts-chart id="gameChartLocal"></donuts-chart>
+			<donuts-chart id="gameChartRemote"></donuts-chart>
+		</div>
+		<h2 class="text-2xl font-bold my-4">Tournament Stats</h2>
+		<div class="flex flex-row items-center justify-center bg-white rounded-lg shadow-md dark:bg-gray-800">
+			<donuts-chart id="tournamentChart"></donuts-chart>
+			<donuts-chart id="tournamentChartLocal"></donuts-chart>
+			<donuts-chart id="tournamentChartRemote"></donuts-chart>
+		</div>
+			<game-history-component></game-history-component>
+			<dashboard-tournois></dashboard-tournois>
+	  </div>
 	  `;
+	 
+	// recuperer les stats de l'utilisateur
+	const userStats = this.createDataSet(); 
 	  // Transmettre les données au composant dashboard-tournois
-	  const dashboard = this.querySelector('dashboard-tournois') as any;
+	   const dashboard = this.querySelector('dashboard-tournois') as any;
 	  dashboard.data = this.state.tournamentsData;
 
 	  const gameChart = this.querySelector('#gameChart') as any;
-	  gameChart.data ={
-		dataset: [
-			{ label: "lose", value: 10, color: "#f87171" }, // Rouge
-		{ label: "win", value: 9, color: "#60a5fa" }
-		],
-		title: "Game Chart",
-		legende: [
-			{label: "lose", color: "bg-red-500" },
-			{label: "win", color: "bg-blue-500" }],
-	};
+	  gameChart.data = userStats.gamePlayedTotalData;
+	  const gameChartLocal = this.querySelector('#gameChartLocal') as any;
+	  gameChartLocal.data = userStats.gamePlayedLocalData;
+	  console.log('gameChartLocal',  userStats.gamePlayedLocalData);
+	  const gameChartRemote = this.querySelector('#gameChartRemote') as any;
+	  gameChartRemote.data = userStats.gamePlayedRemoteData;
 
-	const tournamentChart = this.querySelector('#tournamentChart') as any;
-	tournamentChart.data ={
-		dataset: [
-			{ label: "lose", value: 10, color: "#f87171" }, // Rouge
-		{ label: "win", value: 10, color: "#60a5fa" }
-		],
-		title: "tournament Chart",
-		legende: [
-			{label: "lose", color: "bg-red-500" },
-			{label: "win", color: "bg-blue-500" }],
-	};
+	  const tournamentChart = this.querySelector('#tournamentChart') as any;
+	  tournamentChart.data = userStats.gamePlayedTournamentData;
+	  const gameChartTournamentLocal = this.querySelector('#tournamentChartLocal') as any;
+	  gameChartTournamentLocal.data = userStats.gamePlayedTournamentLocalData;
+	  const gameChartTournamentRemote = this.querySelector('#tournamentChartRemote') as any;
+	  gameChartTournamentRemote.data = userStats.gamePlayedTournamentRemoteData;
+
+
+	}
+
+	createDataSet() {
+		// Données reelles
+		//game_played
+		//recuperer les stats de l'utilisateur
+		const userStats = this.state.user?.userStats;
+		//cree un objet manipulable pour chaque type de jeu
+		const gamePlayedTotal = {
+			total: userStats?.total_game_played || 0,
+			win: userStats?.total_game_won || 0,
+			lose: userStats?.total_game_lost || 0,
+			draw: userStats?.total_game_draw || 0,
+		}
+		const gamePlayedLocal = {
+			total: userStats?.local_game_played || 0,
+			win: userStats?.local_game_won || 0,
+			lose: userStats?.local_game_lost || 0,
+			draw: userStats?.local_game_draw || 0,
+		}
+		const gamePlayedRemote = {
+			total: userStats?.remote_game_played || 0,
+			win: userStats?.remote_game_won || 0,
+			lose: userStats?.remote_game_lost || 0,
+			draw: userStats?.remote_game_draw || 0,
+		}
+		const gamePlayedTournament = {
+			total: userStats?.tournament_game_played || 0,
+			win: userStats?.tournament_game_won || 0,
+			lose: userStats?.tournament_game_lost || 0,
+			draw: userStats?.tournament_game_draw || 0,
+		}
+		const gamePlayedTournamentLocal = {
+			total: userStats?.tournament_local_game_played || 0,
+			win: userStats?.tournament_local_game_won || 0,
+			lose: userStats?.tournament_local_game_lost || 0,
+			draw: userStats?.tournament_local_game_draw || 0,
+		}
+		const gamePlayedTournamentRemote = {
+			total: userStats?.tournament_remote_game_played || 0,
+			win: userStats?.tournament_remote_game_won || 0,
+			lose: userStats?.tournament_remote_game_lost || 0,
+			draw: userStats?.tournament_remote_game_draw || 0,
+		}
+
+		// creation des objet Data pour les charts
+		const gamePlayedTotalData = {
+			title: "Game Played Total",
+			dataset:[
+				{ label: "lose", value: gamePlayedTotal.lose, color: "#f87171" }, // Rouge
+				{ label: "win", value: gamePlayedTotal.win, color: "#60a5fa" },
+				{ label: "draw", value: gamePlayedTotal.draw, color: "#fbbf24" }
+			],
+			legende: [
+				{label: "lose", color: "bg-red-500" },
+				{label: "win", color: "bg-blue-500" },
+				{label: "draw", color: "bg-yellow-500" }
+			]			
+		}
+		const gamePlayedLocalData = {
+			title: "Game Played Local",
+			dataset:[
+				{ label: "lose", value: gamePlayedLocal.lose, color: "#f87171" }, // Rouge
+				{ label: "win", value: gamePlayedLocal.win, color: "#60a5fa" },
+				{ label: "draw", value: gamePlayedLocal.draw, color: "#fbbf24" }
+			],
+			legende: [
+				{label: "lose", color: "bg-red-500" },
+				{label: "win", color: "bg-blue-500" },
+				{label: "draw", color: "bg-yellow-500" }
+			]			
+		}
+		const gamePlayedRemoteData = {
+			title: "Game Played Remote",
+			dataset:[
+				{ label: "lose", value: gamePlayedRemote.lose, color: "#f87171" }, // Rouge
+				{ label: "win", value: gamePlayedRemote.win, color: "#60a5fa" },
+				{ label: "draw", value: gamePlayedRemote.draw, color: "#fbbf24" }
+			],
+			legende: [
+				{label: "lose", color: "bg-red-500" },
+				{label: "win", color: "bg-blue-500" },
+				{label: "draw", color: "bg-yellow-500" }
+			]
+		}
+		const gamePlayedTournamentData = {
+			title: "Game Played Tournament",
+			dataset:[
+				{ label: "lose", value: gamePlayedTournament.lose, color: "#f87171" }, // Rouge
+				{ label: "win", value: gamePlayedTournament.win, color: "#60a5fa" },
+				{ label: "draw", value: gamePlayedTournament.draw, color: "#fbbf24" }
+			],
+			legende: [
+				{label: "lose", color: "bg-red-500" },
+				{label: "win", color: "bg-blue-500" },
+				{label: "draw", color: "bg-yellow-500" }
+			]
+		}
+		const gamePlayedTournamentLocalData = {
+			title: "Game Played Tournament Local",
+			dataset:[
+				{ label: "lose", value: gamePlayedTournamentLocal.lose, color: "#f87171" }, // Rouge
+				{ label: "win", value: gamePlayedTournamentLocal.win, color: "#60a5fa" },
+				{ label: "draw", value: gamePlayedTournamentLocal.draw, color: "#fbbf24" }
+			],
+			legende: [
+				{label: "lose", color: "bg-red-500" },
+				{label: "win", color: "bg-blue-500" },
+				{label: "draw", color: "bg-yellow-500" }
+			]
+		}
+		const gamePlayedTournamentRemoteData = {
+			title: "Game Played Tournament Remote",
+			dataset:[
+				{ label: "lose", value: gamePlayedTournamentRemote.lose, color: "#f87171" }, // Rouge
+				{ label: "win", value: gamePlayedTournamentRemote.win, color: "#60a5fa" },
+				{ label: "draw", value: gamePlayedTournamentRemote.draw, color: "#fbbf24" }
+			],
+			legende: [
+				{label: "lose", color: "bg-red-500" },
+				{label: "win", color: "bg-blue-500" },
+				{label: "draw", color: "bg-yellow-500" }
+			]
+		}
+
+		return {
+			gamePlayedTotalData,
+			gamePlayedLocalData,
+			gamePlayedRemoteData,
+			gamePlayedTournamentData,
+			gamePlayedTournamentLocalData,
+			gamePlayedTournamentRemoteData
+		}
 	}
   
   }

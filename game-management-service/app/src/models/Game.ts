@@ -13,6 +13,10 @@ export class Game{
   tournaments?: Tournaments;
   created_at: Date;
   updated_at: Date;
+  //mode de la partie : local ou remote
+  type: string;
+  //si local, les players sont un tableau de displaynames
+  local_players: string[];
 
  
 	constructor(data: Partial<Game>) {
@@ -22,6 +26,8 @@ export class Game{
     this.state = "en attente";
     this.mode = "normal";
     this.players = [];
+    this.type = "local";
+    this.local_players = [];
     Object.assign(this, data);
     this.created_at = new Date(data?.created_at?data.created_at:new Date());
 	  this.updated_at = new Date(data?.updated_at?data.updated_at:new Date());

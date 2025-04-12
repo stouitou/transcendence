@@ -12,6 +12,10 @@ export class Round{
   updated_at: Date;
   tournaments?: Partial<Tournaments>[];
   current: number;
+  //mode de la partie : local ou remote
+  type: string;
+  //si local, les players sont un tableau de displaynames
+  local_players: string[];
 
  
 	constructor(data: Partial<Round>) {
@@ -20,6 +24,8 @@ export class Round{
     this.games = [];
     this.state = "en attente";
     this.players = [];
+    this.type = "local";
+    this.local_players = [];
     Object.assign(this, data);
     this.created_at = new Date(data?.created_at?data.created_at:new Date());
 	  this.updated_at = new Date(data?.updated_at?data.updated_at:new Date());

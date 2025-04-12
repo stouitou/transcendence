@@ -68,6 +68,63 @@ Content-Type: application/json
     {"id": 32,"provider": "google", "provider_id": "12345", "user_id": 3 }
 ]
 }
+###
+PUT https://localhost:4433/api/v2/database/myDb/table/user/id/2?relations=userStats HTTP/1.1
+Content-Type: application/json
+
+{
+"userStats": {}
+}
+###
+POST https://localhost:4433/api/v2/database/myDb/table/UserStats HTTP/1.1
+Content-Type: application/json
+
+{
+"user":{"id":2}
+}
+###
+###
+PUT https://localhost:4433/api/v2/database/myDb/table/UserStats/id/1 HTTP/1.1
+Content-Type: application/json
+
+{
+      "total_game_played": 10,
+      "total_game_won": 5,
+      "total_game_lost": 3,
+      "total_game_draw": 2,
+
+      "local_game_played": 2,
+      "local_game_won": 2,
+      "local_game_lost": 0,
+      "local_game_draw": 0,
+
+      "remote_game_played": 8,
+      "remote_game_won": 3,
+      "remote_game_lost": 3,
+      "remote_game_draw": 2,
+
+      "tournament_game_played": 22,
+      "tournament_game_won": 10,
+      "tournament_game_lost": 9,
+      "tournament_game_draw": 3,
+
+      "tournament_local_game_played": 10,
+      "tournament_local_game_won": 5,
+      "tournament_local_game_lost": 5,
+      "tournament_local_game_draw": 0,
+
+      "tournament_remote_game_played": 12,
+      "tournament_remote_game_won": 5,
+      "tournament_remote_game_lost": 4,
+      "tournament_remote_game_draw": 3
+}
+###
+GET https://localhost:4433/api/v2/database/myDb/table/UserStats HTTP/1.1
+
+###
+
+GET  https://localhost:4433/api/v2/database/myDb/table/user/id/2?relations=userStats HTTP/1.1
+
 ### delete a new User
 DELETE https://localhost:4433/api/v2/database/myDb/table/user/id/2 HTTP/1.1
 
