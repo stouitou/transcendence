@@ -1,12 +1,13 @@
 import { BaseComponent } from "../frameworks/base-component";
-import { User, UserContext } from "../globalstate/GlobalState";
+import { User, UserContext, Tournaments,} from "../globalstate/GlobalState";
 import { DonutsChart } from "./charts-donuts-componenet";
-import { DashboardTournois, GameCard,  Tournaments, TournoiDetail } from "./tournament-test-composant";
+import { GameCardTest } from "./game-card-component";
+import { DashboardTournois, GameCard,  TournoiDetail } from "./tournament-test-composant";
 
 customElements.define('dashboard-tournois', DashboardTournois);
 
 customElements.define('tournoi-detail', TournoiDetail);
-
+customElements.define('game-card-component', GameCardTest);
 customElements.define('game-card', GameCard);
 customElements.define('donuts-chart',DonutsChart);
 export class Dashboard extends BaseComponent<{ user: User | null,tournamentsData: Tournaments[]}> {
@@ -116,6 +117,7 @@ export class Dashboard extends BaseComponent<{ user: User | null,tournamentsData
 	private renderDashboard() {
 	  this.innerHTML = `
 	  <div class="mx-auto p-6 text-center">
+		<!--<game-card-component></game-card-component>-->
 		<div class="flex flex-row space-x-4">
 			<profile-component></profile-component>
 			<chat-component></chat-component>

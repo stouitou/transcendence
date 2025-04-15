@@ -50,4 +50,17 @@
   .select-form-message{
     @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
   }
+
+
+  .game-card-container-background {/* max-w-sm mx-auto p-6 bg-gray-400 rounded-lg shadow-lg */
+    @apply  max-w-xl mx-auto bg-white  
+            bg-opacity-50 backdrop-blur-sm
+             shadow-lg rounded-lg p-6
+             border border-gray-300 dark:bg-transparent dark:border-gray-600
+             flex flex-col;
+  }
+  .game-card-container-row {
+    @apply  flex flex-row items-center justify-center;
+  }
+
 }

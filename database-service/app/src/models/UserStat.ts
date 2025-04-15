@@ -51,7 +51,7 @@ export class UserStats {
   tournament_local_game_lost: number;
   @Column({ type: "int", default: 0 }) //nombre de parties nulles en tournoi local
   tournament_local_game_draw: number;
-  
+
   @Column({ type: "int", default: 0 }) //nombre de parties jouées en tournoi remote
   tournament_remote_game_played: number;
   @Column({ type: "int", default: 0 }) //nombre de parties gagnées en tournoi remote
@@ -61,6 +61,8 @@ export class UserStats {
   @Column({ type: "int", default: 0 }) //nombre de parties nulles en tournoi remote
   tournament_remote_game_draw: number;
 
-  @OneToOne(() => User, (user) => user.userStats, { cascade: true, onDelete: 'CASCADE', onUpdate: 'CASCADE' })
+  @OneToOne(() => User, (user) => user.userStats, { /* cascade: true,  */onDelete: 'CASCADE', onUpdate: 'CASCADE' })
   user: User;
+/*   @ManyToOne(() => User, (user) => user.userStats, {onUpdate: 'CASCADE',  onDelete: "CASCADE" })
+  user: User; */
 }

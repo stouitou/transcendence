@@ -52,6 +52,20 @@ export class WsController {
             console.log("🔒 Message privé de", userId, "à", message.to, ":", message.message);
               wsService.sendToClient(message.to, JSON.stringify({ type: "private", from: userId, message: message.message }));
           }
+          else if (message.type === "game" && message.gameId) {
+            //const message ={ type: "game",  gameId: this.gameID ,  state: game.state }
+            wsService.broadcast(JSON.stringify({ ...message  }));
+
+          }
+          else if (message.type === "gameJoined" && message.gameId) {
+           /* { type: "gameJoined",  gameId: dataID , 
+            waitingPlayers: {id: this.state.user?.id, name: this.state.user?.name, avatar: this.state.user?.avatar},
+            state: "joined" }
+            */
+            wsService.broadcast(JSON.stringify({ ...message  }));
+
+
+          }
           else if (message.type === "logout"&& message.userId) {
             console.log("🔒logout from ", message.userId);
           //  wsService.removeClient(userId);

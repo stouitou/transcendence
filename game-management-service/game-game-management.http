@@ -4,14 +4,33 @@ GET  https://localhost:4433/api/game-management-service/games HTTP/1.1
 ### create a new game
 //optional (default value): "difficulty": 1
 //optional (default value): "state": "en attente"
-//optional (default value): "mode": "normal"
 //created_at and updated_at are automatically set
-POST  https://localhost:4433/api/game-management-service/games HTTP/1.1
-authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6ImphY2siLCJyb2xlIjoidXNlciIsImxldmVsIjoxLCJhdmF0YXIiOiJ1cGxvYWRzLzMtYXZhdGFydGVzdC5qcGciLCJjcmVhdGVkX2F0IjoiMjAyNS0wMy0xNFQxMTo0OToyMC40NDFaIiwidXBkYXRlZF9hdCI6IjIwMjUtMDMtMTdUMTA6NTc6MTAuMDAwWiIsImlhdCI6MTc0MjIyODQ5OSwiZXhwIjoxNzQyMjY0NDk5fQ.BLV-sRHswGUTP6ngiOtEM2ZSb0P3nRvN0hmgga72EHKDcjBLYUnSF8q83Spslasq506npkbWXC-39ztmjG1rQdaZHh6QtYsnP9zWGkc6qbbP3gfLDKI-41EbLQFTmlrMZOpdjk-UVNx95_mD1JH2tg2L4QvAE4CeELwYVpjlHuqgclSoA8Y4Ra7NdVdsHoE3gWg2Hex6GQX2JwEvX3Lk7u4f7St0Nspsw224fI9SZLB50qJUFB51iSwwSqXcVK3GyEuoWIKPJR-JtLjzTvU1LrYQbKsonluPTjwG9vsB8HDClUsv6UpG8CmrqaIKesPwKvL5rhRo-RwanMw8gmCDB5VbHQ0RScFIY6w7XJ6hP69_TgfmYTNhQWjZ2ORa8If2MGNE29hweIYoQeNtLudGmHMQPo6gHibLabdZ0K7wZWueCdXWFBd5t0ns2PhxWhes1Y7-r40QLz7KsigZwaGWjW52Te9wTVBb39lb6EVjHGepHs1QhneObWLfmQo0flM9ZN8fY-T9qbTLEH45ea7Ka2IAy0ivqappg7aD6NL3a4tn1HMbhqbaOeYXI6lOQiwICFis6PNSxJ4Uf09GXVkuluEmi2FlJcwDhDyj3XA5H9-mJsgUEjj2SQUfx0HLxH3bsi32XiOzQbTImTRkzq2Z_ejEqdsruIc3fRGd68YkjEQ
+///:type/:format/:mode
+POST  https://localhost:4433/api/game-management-service/games/remote/classic/normal HTTP/1.1
+authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6Ik5pemFyIiwicm9sZSI6InVzZXIiLCJsZXZlbCI6MSwiYXZhdGFyIjoiIiwiY3JlYXRlZF9hdCI6IjIwMjUtMDQtMTRUMDk6NDc6MTQuNDUxWiIsInVwZGF0ZWRfYXQiOiIyMDI1LTA0LTE0VDA5OjQ3OjE0LjQ1MVoiLCJ1c2VyU3RhdHMiOnsiaWQiOjIsInRvdGFsX2dhbWVfcGxheWVkIjoxMCwidG90YWxfZ2FtZV93b24iOjUsInRvdGFsX2dhbWVfbG9zdCI6NSwidG90YWxfZ2FtZV9kcmF3IjowLCJsb2NhbF9nYW1lX3BsYXllZCI6MCwibG9jYWxfZ2FtZV93b24iOjAsImxvY2FsX2dhbWVfbG9zdCI6MCwibG9jYWxfZ2FtZV9kcmF3IjowLCJyZW1vdGVfZ2FtZV9wbGF5ZWQiOjAsInJlbW90ZV9nYW1lX3dvbiI6MCwicmVtb3RlX2dhbWVfbG9zdCI6MCwicmVtb3RlX2dhbWVfZHJhdyI6MCwidG91cm5hbWVudF9nYW1lX3BsYXllZCI6MCwidG91cm5hbWVudF9nYW1lX3dvbiI6MCwidG91cm5hbWVudF9nYW1lX2xvc3QiOjAsInRvdXJuYW1lbnRfZ2FtZV9kcmF3IjowLCJ0b3VybmFtZW50X2xvY2FsX2dhbWVfcGxheWVkIjowLCJ0b3VybmFtZW50X2xvY2FsX2dhbWVfd29uIjowLCJ0b3VybmFtZW50X2xvY2FsX2dhbWVfbG9zdCI6MCwidG91cm5hbWVudF9sb2NhbF9nYW1lX2RyYXciOjAsInRvdXJuYW1lbnRfcmVtb3RlX2dhbWVfcGxheWVkIjowLCJ0b3VybmFtZW50X3JlbW90ZV9nYW1lX3dvbiI6MCwidG91cm5hbWVudF9yZW1vdGVfZ2FtZV9sb3N0IjowLCJ0b3VybmFtZW50X3JlbW90ZV9nYW1lX2RyYXciOjB9LCJpYXQiOjE3NDQ2MjQwNzQsImV4cCI6MTc0NDY2MDA3NH0.YoHgNt5CgT1crErTvs48zy30bBWh0U0bNbeyl0y7j9xC1_KMWgplAQAe3xKHbnE0Rp7lCjqWDc_7jYnOW_qhBGsppEHEPbXecupQeQEMRXlQ7nyIs59uAkXj5AmzdNUWgHbT5t6L1yXMqlEt-D6dLIfc2f5BKK-F4GmT1MpQzn_-Q-5QpKRi54XhcJPQeSXM4dLHCXF9r-3ZPxtyd7WlZRHvzFi7NvfuVxpxXPLG2zC8-Doqqu4vtReynyLENZWA58TR8A7rPcoHYdswVy8r_sAloQhmvcerEP9AYyePUsDgiq0iTQKURBiDFUunE3buA_A9QHrcPxpw6FcqwJ5m6BQJhWfsVMQ9kpSgZleMg2hIKi07ZEAVGfxeSpyHDDzvesRrO8oWQ0RNua9CY0ELPGaRrx7KJHSlAlExdnZgO2QgoAvoKNbgSgznr_I3arkaZ5OcdAf6tdb7GdFh8Bu-C4ia3fCCyOYwBYxiErZr7dBpG_aG2EJALl819FhHrwdQE3gSDoDxooWP9jQ6eYXHXTXyWcKlZkdcZOuN4AVeVUIBh7J1l9-0luKt5ZoHbxJHSayef-WNe3ACyyj7dQSvogdRgJ4-sUv_aMhET_kgFM8b-XOuz9pxzxT0FFbu1c9F3wY_ycJIBxxGvboiqGdHzAuGDn2uOELlja4k9l-vgEQ
 Content-Type: application/json
 
 {
-"players": [1, 2]
+"players": [3, 1],
+"gameHistory": {
+  "players": [
+    {
+      "type":"remote",
+      "avatar":null,
+      "display_name":"meTest",
+      "score":10,
+      "user":3
+      },
+     {
+      "type":"remote",
+      "avatar":null,
+      "display_name":"meTestPlayer2",
+      "score":1,
+      "user":1
+      }
+    ],
+    "winner":"meTest",
+}
 }
 ### Create a new local game 
 POST  https://localhost:4433/api/game-management-service/games HTTP/1.1
@@ -23,6 +42,16 @@ Content-Type: application/json
 "type": "local",
 "mode": "normal",
 "local_players": ["me", "bob"]
+}
+### Create a new remote game 
+POST  https://localhost:4433/api/game-management-service/games HTTP/1.1
+authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6ImphY2siLCJyb2xlIjoidXNlciIsImxldmVsIjoxLCJhdmF0YXIiOiJ1cGxvYWRzLzMtYXZhdGFydGVzdC5qcGciLCJjcmVhdGVkX2F0IjoiMjAyNS0wMy0xNFQxMTo0OToyMC40NDFaIiwidXBkYXRlZF9hdCI6IjIwMjUtMDMtMTdUMTA6NTc6MTAuMDAwWiIsImlhdCI6MTc0MjIyODQ5OSwiZXhwIjoxNzQyMjY0NDk5fQ.BLV-sRHswGUTP6ngiOtEM2ZSb0P3nRvN0hmgga72EHKDcjBLYUnSF8q83Spslasq506npkbWXC-39ztmjG1rQdaZHh6QtYsnP9zWGkc6qbbP3gfLDKI-41EbLQFTmlrMZOpdjk-UVNx95_mD1JH2tg2L4QvAE4CeELwYVpjlHuqgclSoA8Y4Ra7NdVdsHoE3gWg2Hex6GQX2JwEvX3Lk7u4f7St0Nspsw224fI9SZLB50qJUFB51iSwwSqXcVK3GyEuoWIKPJR-JtLjzTvU1LrYQbKsonluPTjwG9vsB8HDClUsv6UpG8CmrqaIKesPwKvL5rhRo-RwanMw8gmCDB5VbHQ0RScFIY6w7XJ6hP69_TgfmYTNhQWjZ2ORa8If2MGNE29hweIYoQeNtLudGmHMQPo6gHibLabdZ0K7wZWueCdXWFBd5t0ns2PhxWhes1Y7-r40QLz7KsigZwaGWjW52Te9wTVBb39lb6EVjHGepHs1QhneObWLfmQo0flM9ZN8fY-T9qbTLEH45ea7Ka2IAy0ivqappg7aD6NL3a4tn1HMbhqbaOeYXI6lOQiwICFis6PNSxJ4Uf09GXVkuluEmi2FlJcwDhDyj3XA5H9-mJsgUEjj2SQUfx0HLxH3bsi32XiOzQbTImTRkzq2Z_ejEqdsruIc3fRGd68YkjEQ
+Content-Type: application/json
+
+{
+"players": [1,2],
+"type": "remote",
+"mode": "normal"
 }
 
 ### Create a new game with a specific mode

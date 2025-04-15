@@ -215,7 +215,7 @@ export class EntityRepository<T extends ObjectLiteral> {
           // 🔥 ManyToOne ou OneToOne : On récupère l'entité existante ou on la crée
           (updatedEntity as any)[key] = typeof relationData === "number"
             ? await relatedRepo.findOne({ where: { id: relationData } })
-            : relationData ? relatedRepo.create(relationData) : undefined;
+            : relationData ? await relatedRepo.save(relatedRepo.create(relationData)) : undefined;
         }
       } else {
         // 🔥 Si ce n'est pas une relation, c'est une colonne normale

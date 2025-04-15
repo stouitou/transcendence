@@ -7,6 +7,7 @@ import fs  from 'node:fs';
 import { promisify } from 'util';
 import path from 'node:path';
 import { createWriteStream } from 'node:fs';
+import { UserStats } from '@src/models/User';
 const pump = promisify(pipeline);
 
 export type User = {
@@ -32,6 +33,37 @@ export type AutProvider = {
   user: User;
 }
 
+const helpersUpdateStats=( userStats: UserStats, addValue : Partial<UserStats>) => {
+  return {
+      id: userStats.id,
+      total_game_played: addValue.total_game_played? addValue.total_game_played + userStats.total_game_played: userStats.total_game_played,
+      total_game_won : addValue.total_game_won? addValue.total_game_won + userStats.total_game_won: userStats.total_game_won,
+      total_game_lost : addValue.total_game_lost? addValue.total_game_lost + userStats.total_game_lost: userStats.total_game_lost,
+      total_game_draw : addValue.total_game_draw? addValue.total_game_draw + userStats.total_game_draw: userStats.total_game_draw,
+      local_game_played : addValue.local_game_played? addValue.local_game_played + userStats.local_game_played: userStats.local_game_played,
+      local_game_won : addValue.local_game_won? addValue.local_game_won + userStats.local_game_won: userStats.local_game_won,
+      local_game_lost : addValue.local_game_lost? addValue.local_game_lost + userStats.local_game_lost: userStats.local_game_lost,
+      local_game_draw : addValue.local_game_draw? addValue.local_game_draw + userStats.local_game_draw: userStats.local_game_draw,
+      remote_game_played : addValue.remote_game_played? addValue.remote_game_played + userStats.remote_game_played: userStats.remote_game_played,
+      remote_game_won : addValue.remote_game_won? addValue.remote_game_won + userStats.remote_game_won: userStats.remote_game_won,
+      remote_game_lost : addValue.remote_game_lost? addValue.remote_game_lost + userStats.remote_game_lost: userStats.remote_game_lost,
+      remote_game_draw : addValue.remote_game_draw? addValue.remote_game_draw + userStats.remote_game_draw: userStats.remote_game_draw,
+      tournament_game_played : addValue.tournament_game_played? addValue.tournament_game_played + userStats.tournament_game_played: userStats.tournament_game_played,
+      tournament_game_won : addValue.tournament_game_won? addValue.tournament_game_won + userStats.tournament_game_won: userStats.tournament_game_won,
+      tournament_game_lost : addValue.tournament_game_lost? addValue.tournament_game_lost + userStats.tournament_game_lost: userStats.tournament_game_lost,
+      tournament_game_draw : addValue.tournament_game_draw? addValue.tournament_game_draw + userStats.tournament_game_draw: userStats.tournament_game_draw,
+      tournament_local_game_played : addValue.tournament_local_game_played? addValue.tournament_local_game_played + userStats.tournament_local_game_played: userStats.tournament_local_game_played,
+      tournament_local_game_won : addValue.tournament_local_game_won? addValue.tournament_local_game_won + userStats.tournament_local_game_won: userStats.tournament_local_game_won,
+      tournament_local_game_lost : addValue.tournament_local_game_lost? addValue.tournament_local_game_lost + userStats.tournament_local_game_lost: userStats.tournament_local_game_lost,
+      tournament_local_game_draw : addValue.tournament_local_game_draw? addValue.tournament_local_game_draw + userStats.tournament_local_game_draw: userStats.tournament_local_game_draw,
+      tournament_remote_game_played : addValue.tournament_remote_game_played? addValue.tournament_remote_game_played + userStats.tournament_remote_game_played: userStats.tournament_remote_game_played,
+      tournament_remote_game_won : addValue.tournament_remote_game_won? addValue.tournament_remote_game_won + userStats.tournament_remote_game_won: userStats.tournament_remote_game_won,
+      tournament_remote_game_lost : addValue.tournament_remote_game_lost? addValue.tournament_remote_game_lost + userStats.tournament_remote_game_lost: userStats.tournament_remote_game_lost,
+      tournament_remote_game_draw : addValue.tournament_remote_game_draw? addValue.tournament_remote_game_draw + userStats.tournament_remote_game_draw: userStats.tournament_remote_game_draw
+  };
+}
+
+
 interface UpdateUserBody extends User{}
 
 
@@ -42,6 +74,8 @@ export class UserController {
     this.createUser = this.createUser.bind(this);
     this.getUsers = this.getUsers.bind(this);
     this.getUserById = this.getUserById.bind(this);
+    this.getUserStatsById = this.getUserStatsById.bind(this);
+    this.updateStatsById = this.updateStatsById.bind(this);
     this.updateUser = this.updateUser.bind(this);
     this.updateMe = this.updateMe.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
@@ -92,6 +126,51 @@ export class UserController {
       return reply.status(404).send({ error: 'User not found' });
     }
     return reply.send(user);
+  }
+
+  async getUserStatsById(request:  FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+    const userId = Number(request.params.id);
+    const user = await this.userRepository.getById(userId);
+        if (!user) {
+      return reply.status(404).send({ error: 'User not found' });
+    }
+    return reply.send(user.userStats);
+  }
+
+  async updateStatsById(request:  FastifyRequest<{ Params: { id: string },Body:Partial<UserStats> }>, reply: FastifyReply) {
+    const userId = Number(request.params.id);
+    if (!userId) {
+      return reply.status(400).send({ error: "Invalid user id" });
+    }
+    if (!request.body) {
+      return reply.status(400).send({ error: "Invalid request body" });
+    }
+  
+    // Récupérer l'utilisateur et ses statistiques
+    const user = await this.userRepository.getById(userId);
+    if (!user) {
+      return reply.status(404).send({ error: "User not found" });
+    }
+  
+    const userStats = user.userStats;
+    if (!userStats) {
+      return reply.status(404).send({ error: "UserStats not found" });
+    }
+  
+    const {id,...requestBody } = request.body;
+    // Additionner les valeurs transmises aux valeurs existantes
+   
+      // Mettre à jour les statistiques de l'utilisateur
+    const userUpdated = await this.userRepository.update({
+      id: userId,
+      userStats: helpersUpdateStats(userStats, requestBody),
+    });
+  
+    if (!userUpdated) {
+      return reply.status(500).send({ error: "Failed to update user stats" });
+    }
+  
+    return reply.send(userUpdated);
   }
 
   async updateUser(request: FastifyRequest<{ Params: { id: string }, Body: UpdateUserBody }>, reply: FastifyReply) {

@@ -1,6 +1,7 @@
 import { AuthProvider } from "@src/models/AuthProvider.entity";
 import { Game } from "@src/models/Game.entity";
 import { GameHistory } from "@src/models/GameHistory.entity";
+import { Players } from "@src/models/RemotePlayers";
 import { Round } from "@src/models/Round.entity";
 import { Tournaments } from "@src/models/Tournament.entity";
 import { User } from "@src/models/User.entity";
@@ -21,7 +22,7 @@ static databasesConfigs: DatabasesConfigs = {
 	myDb: {
 	  type: "sqlite",
 	  database: "./data/myDb.sqlite",
-	  entities: [User, AuthProvider ,Game, GameHistory,Tournaments,Round,UserStats],// Entités TypeORM
+	  entities: [User, AuthProvider ,Game, GameHistory,Tournaments,Round,UserStats,Players],// Entités TypeORM
 	  synchronize: true,
 	  logging: false,
 	//  migrations: ["src/migrations/*.ts"], // npx typeorm migration:generate -n MigrationName && (npx typeorm migration:run || npx typeorm migration:revert)

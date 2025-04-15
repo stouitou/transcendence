@@ -8,6 +8,8 @@ import  { IParams } from "../repository/helpers";
 import { Game } from "../models/Game";
 import { IRepository } from "./Base/IRepository";
 import { BaseRepository } from "./Base/BaseRepository";
+import { User } from "@src/models/User";
+import { Players } from "@src/models/GameHistory";
 
 /**
  * GameRepository - Gestion des appels HTTP à la DB
@@ -156,5 +158,46 @@ class GameRepository extends BaseRepository<Game> implements IRepository<Game>  
     const data = await response.json();
     return data;
   }
+
+  addPlayer = async (gameId: number, playerId: number): Promise<Game | null> => {
+      //1- recuperer le game
+      const game = await this.getById(gameId);
+      if (!game) {
+        return null;
+      }
+      console.log("🔐 GameRepository.addPlayer()  --game--",game)
+      //2- recuperer les joueurs et en faire un tableau d'int avec les id des joueurs
+      const { players } = game;
+      const playersIds = players?(players as User[]).map((player: User) => player.id):[];
+      //3- verifier si le joueur est deja dans le game
+      if (playersIds.includes(playerId)) {
+        return game;
+      }
+      //4- ajouter le joueur
+      playersIds.push(playerId);
+      //5- mettre à jour le game
+  
+      const newPlayersHistory = {
+      type: "remote",
+      avatar: "",
+      display_name: "coucou",
+      score: 0,
+      user: playerId
+    }
+    
+    const gameHistoryPlayersIds = game.gameHistory?.players?(game.gameHistory.players as Players[]).map((player: Players) => {return{id:player.id}}):[];
+
+    const response = await fetch(`${this.URL}/id/${gameId}`, {
+        method: "PUT",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          players: playersIds,          
+          gameHistory: {...game.gameHistory,players:[...gameHistoryPlayersIds,newPlayersHistory]},
+        })
+      });
+      const data = await response.json();
+      return data.data;
+    }
+  
 }
 export default GameRepository;

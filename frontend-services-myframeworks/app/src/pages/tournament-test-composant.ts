@@ -1,3 +1,4 @@
+import { User } from "../globalstate/GlobalState";
 import { RoundAccordion } from "./round-Accordion-composant";
 
 export interface Tournaments {
@@ -23,7 +24,7 @@ export interface Tournaments {
 	current: number;
   }
   
-  export interface User {
+/*   export interface User {
 	id: number;
 	name: string;
 	avatar: string;
@@ -32,7 +33,7 @@ export interface Tournaments {
 	tournaments: Tournaments[] | null;
 	created_at: string;
 	updated_at: string;
-  }
+  } */
   
   export interface GameHistory {
 	id: number;

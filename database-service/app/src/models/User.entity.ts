@@ -55,7 +55,9 @@ export class User {
   @UpdateDateColumn(/* { type: "timestamp" } */)
   updated_at: Date;
 
-   @OneToOne(() => UserStats, (stats)=>stats.user,{ /* nullable: true, */ onUpdate: 'CASCADE', eager:true })
+   @OneToOne(() => UserStats, (stats)=>stats.user,{ cascade: true, onDelete: 'CASCADE', nullable:true,
+    onUpdate: 'CASCADE', eager:true })
+    //{ nullable: true, onUpdate: 'CASCADE', eager:true })
    @JoinColumn()
    userStats: UserStats;
 }

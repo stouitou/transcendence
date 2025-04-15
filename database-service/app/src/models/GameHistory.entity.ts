@@ -1,6 +1,7 @@
 import "reflect-metadata";
-import { Entity, PrimaryGeneratedColumn, Column, OneToOne, UpdateDateColumn, CreateDateColumn } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, OneToOne, UpdateDateColumn, CreateDateColumn, OneToMany } from "typeorm";
 import { Game } from "./Game.entity";
+import { Players } from "./RemotePlayers";
 
 @Entity()
 export class GameHistory {
@@ -39,7 +40,18 @@ export class GameHistory {
   @Column({ type: "text", default: "local" }) //local, remote
   type: string;
 
+  //is IA
+  @Column({ type: "boolean", default: false }) //true si IA //@TODO a voir
+  is_IA: boolean;
+
   //si local, les players sont un tableau de displaynames
   @Column({ type: "simple-array", nullable:true }) 
   local_players: string[];
+  //si remote, les players sont un tableau de User
+  @OneToMany(() => Players, (players) => players.gameHistory,{ cascade: true, onDelete: 'CASCADE', nullable:true,
+  onUpdate: 'CASCADE',eager:true })
+  players: Players[];
+
+  @Column({ type: "text", nullable: true })
+  winner: string;
 }
