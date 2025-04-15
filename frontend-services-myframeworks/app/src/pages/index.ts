@@ -20,7 +20,9 @@ class HomeComponent extends HTMLElement {
 	  this.innerHTML = `<h1>About Us</h1>`;
 	}
   }
-  
+  document.addEventListener('ws-games', (e: Event) => {
+	console.log('Global listener received ws-games event:', e);
+  });
   customElements.define('home-component', HomeComponent);
   customElements.define('about-component', AboutComponent);
 if (!customElements.get('game-history-component')) {

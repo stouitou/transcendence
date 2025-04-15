@@ -1,5 +1,14 @@
 import { fetchProfileData } from "../services/authService";
 import WebSocketService, {WebSocketsService, IWebSocketsService } from "./WebSocketService";
+export interface Players {
+  id?: number;
+  type: string;
+  is_IA:boolean,
+  avatar?:string,
+  display_name?:string,
+  score:number
+  user: User | number | null;
+}
 
 export interface GameHistory {
     id: number;
@@ -9,14 +18,20 @@ export interface GameHistory {
     player2: number;
     created_at: string;
     updated_at: string;
+    players?: Players[];
+    winner?: string | null;
 }
 
 export interface Game {
     id: number;
-    difficulty: string;
+    difficulty: number;
+    mode: string;
     state: string;
     gameHistory: GameHistory | null;
     created_at: string;
+    type: string;
+    //si local, les players sont un tableau de displaynames
+    local_players: string[];
    /*  updated_at: string; */
 }
 
@@ -86,7 +101,7 @@ export interface User {
     tournaments: Tournaments[] | null;
     created_at: string;
     updated_at: string;
-   userStats: UserStats;
+   userStats?: UserStats;
 }
 export interface Tournaments {
 	id: number;

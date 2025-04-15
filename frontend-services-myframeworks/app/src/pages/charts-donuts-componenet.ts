@@ -1,6 +1,5 @@
 import { BaseComponent } from "../frameworks/base-component";
-import { UserContext } from "../globalstate/GlobalState";
-import { User } from "./tournament-test-composant";
+import { User,UserContext } from "../globalstate/GlobalState";
 
  type DonutSegment = {
 	label: string;

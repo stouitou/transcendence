@@ -12,7 +12,7 @@ async function gameRoutes(app: FastifyInstance) {
    * onRequest : Hook qui est exécuté avant que Fastify ne commence à traiter la requête.
    * Il est utile pour les tâches qui doivent être effectuées pour chaque requête.
    */
-/*   app.addHook('onRequest', async (request, reply) => {
+  app.addHook('onRequest', async (request, reply) => {
     const authToken = request.cookies.authToken;
     if (authToken && !request.headers.authorization) {
       request.headers.authorization = `Bearer ${authToken}`;
@@ -56,7 +56,7 @@ async function gameRoutes(app: FastifyInstance) {
       console.error("🟥 userRoutes onRequest error",error)
       return reply.code(error.status).send({ error: error.message });
     }
-  }) */
+  })
 
   /**
    * preParsing : Hook qui est exécuté avant que Fastify ne commence à analyser le corps de la requête.
@@ -76,7 +76,13 @@ async function gameRoutes(app: FastifyInstance) {
   app.delete("/:id",/*  {schema: UserSchema.deleteGame}, */ gameController.deleteGame);
  // app.post("/query", {schema: UserSchema.requestQuery}, gameController.requestQuery);
   //pour tester les users
-  app.post("/"/* , {schema: UserSchema.createGame } */, gameController.createGame);
+  //app.post("/"/* , {schema: UserSchema.createGame } */, gameController.createGame);
+  // exemple de route pour créer un jeu avec des paramètres
+  //  "/local/classic/normal
+  //  "/remote/classic/normal"
+  //  "/remote/tournament/normal"
+  app.post("/:type/:format/:mode"/* , {schema: UserSchema.createGame } */, gameController.createGame);
+  app.put("/remote/:format/id/:id"/* , {schema: UserSchema.createGame } */, gameController.joinGameById);
 
 }
 

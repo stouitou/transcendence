@@ -17,6 +17,7 @@ export class Game{
   type: string;
   //si local, les players sont un tableau de displaynames
   local_players: string[];
+  format: string;
 
  
 	constructor(data: Partial<Game>) {
@@ -27,6 +28,7 @@ export class Game{
     this.mode = "normal";
     this.players = [];
     this.type = "local";
+    this.format = "classic";
     this.local_players = [];
     Object.assign(this, data);
     this.created_at = new Date(data?.created_at?data.created_at:new Date());
@@ -50,7 +52,9 @@ export type GameBody = {
   gameHistory?: GameHistory;
   difficulty: number;
   state: string;
-  mode: string;
+  mode: "normal" | "rapid" | "tournament";
+  type?: "local" | "remote";
+  format?: "classic" | "tournament";
   players: User[] | number[];
   tournaments?: Tournaments;
   created_at: Date;

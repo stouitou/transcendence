@@ -22,6 +22,10 @@ export class Tournaments {
   @Column({ type: "text", default: "en attente" }) //en attente, en cours, terminee
   state: string;
 
+  //max_players de la partie
+  @Column({ type: "int", default: 4 })
+  max_players: number;
+
   //chaque Tournoi a plusieurs joueurs
   @ManyToMany(() => User, (user) => user.tournaments, { cascade: true , onUpdate: 'CASCADE' , nullable: true  })
   @JoinColumn()

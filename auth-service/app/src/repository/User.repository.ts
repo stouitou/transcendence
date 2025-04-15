@@ -36,7 +36,8 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
       "tournaments.rounds",
       "tournaments.rounds.players",
       "tournaments.rounds.games",
-      "games","friends"]);
+      "games","games.gameHistory","games.gameHistory.players",
+      "friends"]);
   }
   //create
   create = async (user: Partial<User>): Promise<User> => {

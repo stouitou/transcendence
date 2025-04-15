@@ -80,7 +80,7 @@ POST https://localhost:4433/api/v2/database/myDb/table/UserStats HTTP/1.1
 Content-Type: application/json
 
 {
-"user":{"id":2}
+"user":{"id":1}
 }
 ###
 ###
@@ -123,7 +123,7 @@ GET https://localhost:4433/api/v2/database/myDb/table/UserStats HTTP/1.1
 
 ###
 
-GET  https://localhost:4433/api/v2/database/myDb/table/user/id/2?relations=userStats HTTP/1.1
+GET  https://localhost:4433/api/v2/database/myDb/table/user/id/4?relations=userStats HTTP/1.1
 
 ### delete a new User
 DELETE https://localhost:4433/api/v2/database/myDb/table/user/id/2 HTTP/1.1

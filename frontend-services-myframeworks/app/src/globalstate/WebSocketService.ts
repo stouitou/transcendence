@@ -4,6 +4,12 @@ export interface IWebSocketsService {
     setUserId: (userId: string) => void;
     setIsOnline: (users: string[]) => void;
     setPrivateMessages: (callback: (prevMessages: WebSocketPrivateReceivedMessage[]) => WebSocketPrivateReceivedMessage[]) => void;
+    setWsGames: (callback: (prevMessages: WebSocketGameReceivedMessage[]) => WebSocketGameReceivedMessage[]) => void;
+    wsGames: WebSocketGameReceivedMessage[];
+
+    setWsGamesJoined: (usersGamesJoined: WebSocketGameJoinedReceivedMessage[]) => void;
+    removeWsGamesJoined: (id: number) => void;
+    wsGamesJoined: WebSocketGameJoinedReceivedMessage[];
     privateMessages: WebSocketPrivateReceivedMessage[];
     sendMessage: (message: string) => void;
     sendLoginMessage: (id: string) => void;
@@ -20,7 +26,19 @@ export type WebSocketPrivateReceivedMessage = {
 	message: string,
 }
 
+export type WebSocketGameReceivedMessage = {
 
+	type: "game",
+	gameId: string,
+	state: string,
+}
+
+export type WebSocketGameJoinedReceivedMessage = {
+
+	type: "gameJoined",
+	gameId: string,
+	waitingPlayers: {id:string,avatar:string|null,name:string,state:string},
+}
 /**
  * Singleton pour gérer l'état global de l'application
  *  un singleton est un patron de conception qui garantit qu'une classe n'a qu'une seule instance
@@ -33,6 +51,8 @@ export class WebSocketsService {
     private _userId: string | null;
     private _isOnline: string[];
     private _privateMessages: WebSocketPrivateReceivedMessage[];
+    private _wsGames: WebSocketGameReceivedMessage[];
+    private _wsGamesJoined: WebSocketGameJoinedReceivedMessage[];
     //this._broadcastChannel = new BroadcastChannel('websocket-channel'); // Crée un canal de communication
   
     // Constructeur privé pour empêcher l'instanciation directe
@@ -44,6 +64,8 @@ export class WebSocketsService {
       this._userId = null;
       this._isOnline = [];
       this._privateMessages = [];
+      this._wsGames = [];
+      this._wsGamesJoined = [];
       this._firstLoadWs();
     }
 
@@ -104,6 +126,12 @@ export class WebSocketsService {
           case 'private':
             this.setPrivateMessages(data);
             break;
+          case 'game':
+            this.setWsGames(data);
+            break;
+          case 'gameJoined':
+            this.setWsGamesJoined(data);
+            break;
           default:
             console.warn('Unknown message type:', data.type);
         }
@@ -145,6 +173,12 @@ export class WebSocketsService {
     public get privateMessages() {
       return this._privateMessages;
     }
+    public get wsGames() {
+      return this._wsGames;
+    }
+    public get wsGamesJoined() {
+      return this._wsGamesJoined;
+    }
   
     /* SETTERS */
     public setUserId(userId: string) {
@@ -172,6 +206,42 @@ export class WebSocketsService {
         })
       );
        GlobalState.incrementNbMessages()
+    }
+
+    public setWsGames(wsGame: WebSocketGameReceivedMessage) {
+      this._wsGames = [...this._wsGames, wsGame];
+      document.dispatchEvent(
+        new CustomEvent('ws-games', {
+          bubbles: true,
+          composed: true,
+          detail: { wsGame },
+        })
+      );
+    }
+
+    public setWsGamesJoined(wsGameJoined: WebSocketGameJoinedReceivedMessage) {
+      this._wsGamesJoined = [... this._wsGamesJoined,wsGameJoined];
+      document.dispatchEvent(
+        new CustomEvent('ws-games-joined', {
+          bubbles: true,
+          composed: true,
+          detail: { wsGameJoined },
+        })
+      );
+    }
+    public removeWsGamesJoined(id: number) {
+      console.log('removeWsGamesJoined id', id);
+
+      const wsGameJoined = this._wsGamesJoined.filter((game) => Number(game.waitingPlayers.id) !== id).map((game) => game);
+      console.log('removeWsGamesJoined', wsGameJoined);
+      this._wsGamesJoined = wsGameJoined;
+      document.dispatchEvent(
+        new CustomEvent('ws-games-joined', {
+          bubbles: true,
+          composed: true,
+          detail: { wsGameJoined },
+        })
+      );
     }
 
 

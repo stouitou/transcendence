@@ -94,6 +94,8 @@ async function userRoutes(app: FastifyInstance) {
 
   app.get("/", {/* preHandler: [loggerMiddleware], *//* schema: UserSchema.getUsers */}, userController.getUsers);
   app.get("/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserById);
+  app.get("/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserStatsById);
+  app.put("/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.updateStatsById);
   app.put("/me",/*  {schema: UserSchema.updateUser}, */ userController.updateMe);
   app.put("/me/addFriend",/*  {schema: UserSchema.updateUser}, */ userController.addFriend);
   app.put("/me/removeFriend",/*  {schema: UserSchema.updateUser}, */ userController.removeFriend);

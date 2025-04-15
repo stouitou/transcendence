@@ -4,6 +4,7 @@ import { RawData, WebSocket } from "ws";
 
 // Gestion des utilisateurs connectés
 const clients = new Map<string, WebSocket>();
+const games = new Map<string, any>();
 
 export const wsService = {
 	clients,
@@ -66,5 +67,30 @@ export const wsService = {
 
 	getClients: () => {
 		return Array.from(clients.keys());
+	},
+
+	addGame: (id: string, game: any) => {
+        games.set(id, game);
+    },
+	// Mettre à jour l'ID d'un client
+	updateGameId: (oldId: string, newId: string) => {
+        if (games.has(oldId)) {
+            const game = games.get(oldId)!;
+            games.delete(oldId);
+            games.set(newId, game);
+        }
+    },
+	// Supprimer un client
+    removeGame: (id: string) => {
+        games.delete(id);
+        console.log(`❌ Game ${id} delete`);
+    },
+	getGames: () => {
+		return games;
+	},
+	getGamebyId: (id: string) => {
+		if (games.has(id)) {
+			return games.get(id);
+		}
 	}
 };

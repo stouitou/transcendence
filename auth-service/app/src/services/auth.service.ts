@@ -206,7 +206,9 @@ async registerWithOauthProvider(profile:any, provider: string) {
   // 3️⃣- si l'utilisateur existe déjà, le retourner
   if (existingUser) return existingUser;
   // 4️⃣- si l'utilisateur n'existe pas, le créer
-  const user = await  this.UserRepository.create({name , avatar , authProviders: [{provider: provider, provider_id}] });
+  const userData = new User({name , avatar , authProviders: [{provider: provider, provider_id}]});
+ // const user = await  this.UserRepository.create({name , avatar , authProviders: [{provider: provider, provider_id}] });
+  const user = await  this.UserRepository.create(userData);
   // 5️⃣- retourner l'utilisateur
   return user;
 }

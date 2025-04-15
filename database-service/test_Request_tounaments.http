@@ -161,3 +161,137 @@ Content-Type: application/json
 {
   "state": "terminee"
 }
+
+
+###
+PUT https://localhost:4433/api/v2/database/myDb/table/gameHistory/id/2 HTTP/1.1
+Content-Type: application/json
+
+{
+  "score1": 1,
+  "player1": 1,
+  "score2": 20,
+  "player2": 2,
+  "players": [
+    {
+      "type":"local",
+      "avatar":null,
+      "display_name":"meTest",
+      "score":1
+      },
+     {
+      "type":"local",
+      "avatar":null,
+      "display_name":"meTestPlayer2",
+      "score":1
+      }
+    ]
+}
+
+###
+GET  https://localhost:4433/api/v2/database/myDb/table/gameHistory/id/2 HTTP/1.1
+
+###
+GET  https://localhost:4433/api/v2/database/myDb/table/players/id/1?relations=gameHistory&relations=user HTTP/1.1
+
+###
+POST https://localhost:4433/api/v2/database/myDb/table/gameHistory HTTP/1.1
+Content-Type: application/json
+
+{
+  "game": {"id":3,"state":"terminee","type":"remote"},
+  "score1": 1,
+  "player1": 1,
+  "score2": 20,
+  "player2": 2,
+  "players": [
+    {
+      "type":"remote",
+      "avatar":null,
+      "display_name":"meTest",
+      "score":1,
+      "user":1
+      },
+     {
+      "type":"remote",
+      "avatar":null,
+      "display_name":"meTestPlayer2",
+      "score":1,
+      "user":2
+      }
+    ]
+}
+
+###
+GET  https://localhost:4433/api/v2/database/myDb/table/gameHistory/id/3 HTTP/1.1
+
+###
+GET  https://localhost:4433/api/v2/database/myDb/table/players/id/1?relations=gameHistory&relations=user HTTP/1.1
+
+###
+GET  https://localhost:4433/api/v2/database/myDb/table/user/id/1?relations=games&relations=games.gameHistory.players HTTP/1.1
+
+
+###
+POST https://localhost:4433/api/v2/database/myDb/table/gameHistory HTTP/1.1
+Content-Type: application/json
+
+{
+  "game": {"id":1,"state":"terminee","type":"local"},
+  "score1": 1,
+  "player1": 1,
+  "score2": 20,
+  "player2": 2,
+  "players": [
+    {
+      "type":"local",
+      "avatar":"https://localhost:4433/uploads/1-avatartest.jpg",
+      "display_name":"i'm player1",
+      "score":1
+      },
+     {
+      "type":"local",
+      "avatar":"https://localhost:4433/uploads/1-avatartest.jpg",
+      "display_name":"SuperKing",
+      "score":5
+      }
+    ],
+    "winner": "SuperKing"
+}
+
+###
+PUT https://localhost:4433/api/v2/database/myDb/table/gameHistory/id/9 HTTP/1.1
+Content-Type: application/json
+
+{
+  "score1": 1,
+  "player1": 1,
+  "score2": 20,
+  "player2": 2,
+    "winner": "nizar brigui"
+
+}
+
+###
+###
+POST https://localhost:4433/api/v2/database/myDb/table/gameHistory HTTP/1.1
+Content-Type: application/json
+
+{
+  "game": {"id":3,"state":"terminee","type":"remote"},
+  "score1": 0,
+  "player1": 1,
+  "score2": 5,
+  "player2": 2,
+  "players": [
+    {
+      "type":"remote",
+      "score":0
+      },
+     {
+      "type":"remote",
+      "score":5
+      }
+    ],
+    "winner": "nizar brigui"
+}

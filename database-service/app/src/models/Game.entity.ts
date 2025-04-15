@@ -18,6 +18,9 @@ export class Game {
   //difficulte de la partie
   @Column({ type: "int", default: 1 })
   difficulty: number;
+  //max_players de la partie
+  @Column({ type: "int", default: 4 })
+  max_players: number;
 
   //etat de la partie
   @Column({ type: "text", default: "en attente" }) //en attente, en cours, terminee
@@ -46,6 +49,10 @@ export class Game {
   //mode de la partie : local ou remote
   @Column({ type: "text", default: "local" }) //local, remote
   type: string;
+
+  //format de la partie : local ou remote
+  @Column({ type: "text", default: "classic" }) //classic, tournement
+  format: string;
 
   //si local, les players sont un tableau de displaynames
   @Column({ type: "simple-array", nullable:true}) 

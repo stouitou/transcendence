@@ -1,6 +1,15 @@
 
 import { Game } from "./Game";
-
+import { User } from "./User";
+export interface Players {
+  id: number;
+  gameHistory?: GameHistory;
+  type: string;
+  avatar?: string;
+  display_name?: string;
+  score: number;
+  user?: User;
+}
 export class GameHistory{
   id: number;
   score1: number;
@@ -14,6 +23,7 @@ export class GameHistory{
   type: string;
   //si local, les players sont un tableau de displaynames
   local_players: string[];
+  players?: Players[];
 
  
 	constructor(data: Partial<GameHistory>) {
@@ -24,10 +34,12 @@ export class GameHistory{
     this.player2 = 0;
     this.type = "local";
     this.local_players = [];
+    this.players = data?.players ? data.players : [];
     //this.game = new Game({});
     Object.assign(this, data);
     this.created_at = new Date(data?.created_at?data.created_at:new Date());
 	  this.updated_at = new Date(data?.updated_at?data.updated_at:new Date());
+
   }
 }
 
