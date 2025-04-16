@@ -191,14 +191,14 @@ export class GameController {
     if (!request.authenticatedUser){
       return reply.status(401).send({ error: 'Unauthorized' });
     }
-    const { id,avatar,display_name } = request.authenticatedUser;
+    const { id,avatar,name } = request.authenticatedUser;
     if (!id) {
       return reply.status(401).send({ error: 'Unauthorized' });
     }
     if (!gameId) {
       return reply.status(400).send({ error: 'Invalid user id' });
     }
-  const game = await this.gameRepository.addPlayer(gameId, id,display_name,avatar);
+  const game = await this.gameRepository.addPlayer(gameId, id,name!,avatar!);
   console.log("GameController joinGameById ",game);
 
   if (!game) {

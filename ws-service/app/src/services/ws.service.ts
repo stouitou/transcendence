@@ -106,6 +106,18 @@ export const wsService = {
 
 		if (games.has(gameId)) {
 			const game = games.get(gameId)!;
+			// Vérifier si le joueur est déjà dans la liste des joueurs en attente
+			const playerExists = game.waitingPlayers.some((player) => player.userId === waitingPlayers.userId);
+			if (playerExists) {
+				console.log(`Player ${waitingPlayers.userId} already in waitingPlayers`);
+				// Si le joueur existe déjà, on met a jour ses informations
+				const playerIndex = game.waitingPlayers.findIndex((player) => player.userId === waitingPlayers.userId);
+				game.waitingPlayers[playerIndex].state = waitingPlayers.state;
+				game.waitingPlayers[playerIndex].avatar = waitingPlayers.avatar;
+				game.waitingPlayers[playerIndex].name = waitingPlayers.name;
+				game.waitingPlayers[playerIndex].id = waitingPlayers.id;
+				return;
+			}
 			game.waitingPlayers.push(waitingPlayers);
 			games.set(gameId, game);
 		}else {

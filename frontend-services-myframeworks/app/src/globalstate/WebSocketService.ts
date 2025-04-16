@@ -23,6 +23,8 @@ export interface IWebSocketsService {
     setWsGames: (callback: (prevMessages: WebSocketGameReceivedMessage[]) => WebSocketGameReceivedMessage[]) => void;
     wsGames: WebSocketGameReceivedMessage[];
 
+   isUserInGamebyId(gameID:number, UserID:number): boolean;
+
     setWsGamesJoined: (usersGamesJoined: WebSocketGameJoinedReceivedMessage[]) => void;
     removeWsGamesJoined: (id: number) => void;
     wsGamesJoined: WebSocketGameJoinedReceivedMessage[];
@@ -323,5 +325,17 @@ export class WebSocketsService {
       const data = JSON.stringify({ type: "logout", userId:this.userId });
       this._ws.send(data);
   };
+
+  //
+  public isUserInGamebyId(gameID:number, UserID:number): boolean {
+    const game = this._wsGames.find((game) => Number(game.gameId) === gameID);
+    if (game) {
+      const waitingPlayer = game.waitingPlayers.find((player) => player.id === UserID);
+      console.log("isUserInGamebyId gameID, UserID", gameID, UserID);
+      console.log("isUserInGamebyId waitingPlayer", waitingPlayer);
+      return waitingPlayer? true : false;
+    }
+    return false;
+  }
 }
 export default WebSocketsService.getInstance();

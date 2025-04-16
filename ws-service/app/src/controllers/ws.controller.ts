@@ -56,7 +56,7 @@ export class WsController {
               wsService.sendToClient(message.to, JSON.stringify({ type: "private", from: userId, message: message.message }));
           }
           else if (message.type === "gameCreate" && message.gameId) {
-            const gameData = {gameId:message.gameId, state : "open", waitingPlayers:[{userId,id: id, name: message.name, avatar: message.avatar,state:"joined"}] };
+            const gameData = {gameId:message.gameId, state : "open", waitingPlayers:[{userId,id: id, name: message.name, avatar: message.avatar,state:"subscribe"}] };
             wsService.addGame(message.gameId, gameData);
             wsService.notifyIsGames();
 
@@ -66,7 +66,7 @@ export class WsController {
             waitingPlayers: {id: this.state.user?.id, name: this.state.user?.name, avatar: this.state.user?.avatar},
             state: "joined" }
             */
-            const waitingPlayers = { userId,id: id, name: message.name, avatar: message.avatar,state:message.state }; ;
+            const waitingPlayers = { userId,id: id, name: message.name, avatar: message.avatar,state:message.state };
             wsService.addWaitingPlayersToGame(Number(message.gameId), waitingPlayers);
             console.log("🔒games ",wsService.getGames());
             wsService.notifyIsGames();

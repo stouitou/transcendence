@@ -277,7 +277,8 @@ ${waitingPlayers?`
               </tr>
           </thead>
           <tbody id="join-game">
-            ${ waitingPlayers.map((player,index) => `
+            ${ waitingPlayers.map((player,index) => 
+              player.state !== 'subscribe' ? `
               <tr>
                   <td><p class="text-sm">${index + 1}</p></td>
                   <td><p>${player.name}</p></td>
@@ -286,7 +287,7 @@ ${waitingPlayers?`
                   <td>${!this.state.subscribe?`<button  data-id="${this.gameID}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">JoinGame</button>`:``}</td>
               </tr>
 
-            `).join('')}`: ''}
+            `:"").join('')}`: ''}
           </tbody>
         </table>
   </div>
@@ -371,7 +372,9 @@ export class JoinGameComponent extends BaseComponent<{ ws: IWebSocketsService | 
                   <td><p class="text-sm">${index + 1}</p></td>
                   <td><p>${game.gameId}</p></td>
                   <td><p>${game.state}</p></td>
-                  <td><button id="join-game-${game.gameId}" data-id="${game.gameId}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Join</button></td>
+                   <td><button id="join-game-${game.gameId}" data-id="${game.gameId}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                  ${!this.state.ws?.isUserInGamebyId(Number(game.gameId), this.state.user?.id!)?'Join':'view'}</button></td>
+                
               </tr>
             `).join(''): ''}
         `;
@@ -406,7 +409,11 @@ export class JoinGameComponent extends BaseComponent<{ ws: IWebSocketsService | 
                   <td><p class="text-sm">${index + 1}</p></td>
                   <td><p>${game.gameId}</p></td>
                   <td><p>${game.state}</p></td>
-                  <td><button id="join-game-${game.gameId}" data-id="${game.gameId}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Join</button></td>
+                  ${game.state === 'open' ?
+                   `
+                  <td><button id="join-game-${game.gameId}" data-id="${game.gameId}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">
+                  ${!this.state.ws?.isUserInGamebyId(Number(game.gameId), this.state.user?.id!)?'Join':'view'}</button></td>`
+                  : game.state}
               </tr>
             `).join(''): ''}
           </tbody>
@@ -425,10 +432,19 @@ export class JoinGameComponent extends BaseComponent<{ ws: IWebSocketsService | 
             const lobbyComponent = document.createElement('lobby-client-component') as LobyComponent;
             lobbyComponent.data = Number(dataID);
 
+            //user already in game?
+            const game = this.state.ws?.isUserInGamebyId(Number(dataID), this.state.user?.id!);
+            if (!game) {
+            const id = this.state.user?.id;
+         //   const waitingPlayers = { userId,id: id, name: message.name, avatar: message.avatar,state:message.state };
           const data = JSON.stringify({ type: "gameJoined",  gameId: dataID , 
-            waitingPlayers: {id: this.state.user?.id, name: this.state.user?.name, avatar: this.state.user?.avatar},
-             state: "joined" });          
+            name: this.state.user?.name,
+            avatar: this.state.user?.avatar,
+           // waitingPlayers: {id: this.state.user?.id, name: this.state.user?.name, avatar: this.state.user?.avatar},
+             state: "joined" });
+             console.log('JSON.parse(data)',JSON.parse(data));
           this.state.ws?.sendMessage(data);
+            }
             lobby.appendChild(lobbyComponent);
           }
         }
