@@ -63,4 +63,7 @@
     @apply  flex flex-row items-center justify-center;
   }
 
+  /* .btn-nav {
+    @apply 
+  } */
 }

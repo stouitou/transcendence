@@ -11,4 +11,3 @@ customElements.define('pong-game', PongComponent);
 if (!customElements.get('is-online-component')) {
   customElements.define('is-online-component', OnlineComponent);
 }
-
