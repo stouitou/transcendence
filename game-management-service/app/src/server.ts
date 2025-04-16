@@ -2,7 +2,7 @@ import Fastify from "fastify";
 import { JWT } from "./plugins/jwtPlugin";
 import { JwtPayload}  from "jsonwebtoken" //@todo type
 
-interface AuthenticatedUser { role: string; id?: number; name?: string; iat?: number; exp?: number; }
+interface AuthenticatedUser { role: string; id?: number; name?: string;display_name?:string;avatar?:string; iat?: number; exp?: number; }
 declare module 'fastify' {
   interface FastifyRequest {
 	authenticatedUser?: AuthenticatedUser;

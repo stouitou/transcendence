@@ -32,8 +32,9 @@ export class LobyComponent extends BaseComponent<{ ws: IWebSocketsService | null
        // Listen for private ws-game
       document.addEventListener('ws-games', async(e: Event) => {
        // this.handleWsGame();
+      // this.setWaitingPlayers();
+       await this. updatefetchGamebyId(this.gameID!);
        this.setWaitingPlayers();
-     //  await this. updatefetchGamebyId(this.gameID!);
         this.render();
       });
       // Listen for private ws-game
@@ -41,7 +42,7 @@ export class LobyComponent extends BaseComponent<{ ws: IWebSocketsService | null
         console.log('ws-games-joined event');
         this.setWaitingPlayers();
         await this. updatefetchGamebyId(this.gameID!);
-        this.render();
+     //   this.render();
       });
     }
     setSubscribe() {
@@ -61,13 +62,17 @@ export class LobyComponent extends BaseComponent<{ ws: IWebSocketsService | null
       async fetchGamebyId(gameID: number) {
         const result = await fetch(`https://localhost:4433/api/game-management-service/games/${gameID}`)
         if (result.ok) {
-          const game = await result.json();
+          const game:Game = await result.json();
           console.log('LobyComponent game:', game);
           this.state.game = game;
-          const data = JSON.stringify({ type: "game",  gameId: this.gameID ,  state: game.state });          
+          if (game.type === 'remote') {
+          const data = JSON.stringify({ type: "gameCreate",  gameId: this.gameID ,   name: this.state.user?.name, avatar: this.state.user?.avatar });  
+                 
           this.state.ws?.sendMessage(data);
-        
-        //  this.render();
+          }
+         // else {  
+            this.render();
+         // }
         } else {
           console.error('Error fetching game data:', result.statusText);
         }
@@ -77,6 +82,7 @@ export class LobyComponent extends BaseComponent<{ ws: IWebSocketsService | null
         if (result.ok) {
           const game = await result.json();
           this.state.game = game;
+          console.log('LobyComponent game:', game);
         } else {
           console.error('Error fetching game data:', result.statusText);
         }
@@ -168,9 +174,18 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
      // this.handleWsGame();
       this.render();
        // Listen for private ws-game
-      document.addEventListener('ws-games',(e: Event) => {
-        this.setWaitingPlayers();
+      document.addEventListener('ws-games',async (e: Event) => {
+        console.log('ws-games event',(e as CustomEvent).detail);
+        const wsGamesDetail = (e as CustomEvent).detail;
+        const wsGames = wsGamesDetail.wsGame;
+        console.log('ws-games event is: ',wsGames);
+        this.state.games = wsGames.filter((game:GameReceivedMessage) => Number(game.gameId) === this.gameID)[0];
+        console.log('ws-games event',this.state.games);
+        this.state.waitingPlayers = this.state.games.waitingPlayers;
+       // this.setWaitingPlayers();
   //      this.handleWsGame();
+
+      await this. updatefetchGamebyId(this.gameID!);
         this.render();
       });
    /*    document.addEventListener('ws-games-remove', async(e: Event) => {
@@ -179,11 +194,11 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
         this.handleWsGame();
       }); */
       // Listen for private ws-game
-      document.addEventListener('ws-games-joined',async  (e: Event) => {
+/*       document.addEventListener('ws-games-joined',async  (e: Event) => {
         this.setWaitingPlayers();
         await this. updatefetchGamebyId(this.gameID!);
         this.render();
-      });
+      }); */
     }
     setSubscribe() {
       this.state.subscribe = !this.state.subscribe;
@@ -265,10 +280,10 @@ ${waitingPlayers?`
             ${ waitingPlayers.map((player,index) => `
               <tr>
                   <td><p class="text-sm">${index + 1}</p></td>
-                  <td><p>${player.waitingPlayers.name}</p></td>
-                  <td><img src="${player.waitingPlayers.avatar?.startsWith('http') ? player.waitingPlayers.avatar : player.waitingPlayers.avatar ? `https://localhost:4433/${player.waitingPlayers.avatar}` : undefined}" alt="avatar" width="50" height="50"/></td>
+                  <td><p>${player.name}</p></td>
+                  <td><img src="${player.avatar?.startsWith('http') ? player.avatar : player.avatar ? `https://localhost:4433/${player.avatar}` : undefined}" alt="avatar" width="50" height="50"/></td>
                   <td><p>joined</p></td>
-                  <td>${!this.state.subscribe?`<button  data-id="${player.gameId}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">JoinGame</button>`:``}</td>
+                  <td>${!this.state.subscribe?`<button  data-id="${this.gameID}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">JoinGame</button>`:``}</td>
               </tr>
 
             `).join('')}`: ''}
@@ -295,10 +310,19 @@ ${waitingPlayers?`
       if (result.ok) {
         const game = await result.json();
         console.log('LobyComponent game:', game);
+        console.log('LobyComponent user:', this.state.user);
         this.setSubscribe();
        
         //update gameJoined by remove element
-        this.state.ws?.removeWsGamesJoined(this.state.user?.id!);
+    /*     this.state.ws?.setWsGamesJoined(gameId, {
+          gameId: gameId,
+          waitingPlayers: {id: this.state.user?.id, avatar: this.state.user?.avatar, name: this.state.user?.name, state: 'joined'},
+        }); */
+        const data = JSON.stringify({ type: "gameJoined",  gameId: gameId , 
+          waitingPlayers: {id: this.state.user?.id, name: this.state.user?.name, avatar: this.state.user?.avatar},
+           state: "subscribe" });          
+        this.state.ws?.sendMessage(data);
+        // this.state.ws?.removeWsGamesJoined(this.state.user?.id!);
         
         //fetch add user to game
         //this.render();
@@ -324,16 +348,39 @@ export class JoinGameComponent extends BaseComponent<{ ws: IWebSocketsService | 
       this.state.ws = UserContext().ws();
        this.state.user = UserContext().user();
       this.handleWsGame();
-     // this.render();
+      this.render();
        // Listen for private ws-game
        document.addEventListener('ws-games', (e: Event) => {
-        this.handleWsGame();
+
+        console.log('ws-games event',(e as CustomEvent).detail);
+        const wsGamesDetail = (e as CustomEvent).detail;
+        const wsGames = wsGamesDetail.wsGame;
+        console.log('ws-games event is: ',wsGames);
+        this.state.games = wsGames;
+        console.log('ws-games event',this.state.games);
+
+
+      //  this.handleWsGame();
+       const div = this.querySelector('#setGame');
+       if (!div) return;
+       const games =  this.state.games;
+       div.innerHTML = `
+            ${games? games?.map((game,index) => `
+
+              <tr>
+                  <td><p class="text-sm">${index + 1}</p></td>
+                  <td><p>${game.gameId}</p></td>
+                  <td><p>${game.state}</p></td>
+                  <td><button id="join-game-${game.gameId}" data-id="${game.gameId}" class="bg-blue-500 hover:bg-blue-700 text-white font-bold py-2 px-4 rounded">Join</button></td>
+              </tr>
+            `).join(''): ''}
+        `;
        // this.render();
       });
     }
     handleWsGame = () => {      
       this.state.games = this.state.ws?.wsGames?? null;
-      this.render();
+      //this.render();
     };
 
     render() {

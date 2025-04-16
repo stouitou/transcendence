@@ -159,7 +159,7 @@ class GameRepository extends BaseRepository<Game> implements IRepository<Game>  
     return data;
   }
 
-  addPlayer = async (gameId: number, playerId: number): Promise<Game | null> => {
+  addPlayer = async (gameId: number, playerId: number,display_name:string,avatar:string): Promise<Game | null> => {
       //1- recuperer le game
       const game = await this.getById(gameId);
       if (!game) {
@@ -179,8 +179,8 @@ class GameRepository extends BaseRepository<Game> implements IRepository<Game>  
   
       const newPlayersHistory = {
       type: "remote",
-      avatar: "",
-      display_name: "coucou",
+      avatar,
+      display_name,
       score: 0,
       user: playerId
     }

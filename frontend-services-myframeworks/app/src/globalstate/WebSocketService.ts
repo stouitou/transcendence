@@ -1,5 +1,21 @@
 import GlobalState from "./GlobalState";
+interface WaitingPlayers {
+  userId: string,
+  id: number | null,
+  name: string | null,
+  avatar: string | null,
+  state: string | null
 
+}
+interface WebSocketGame {
+  gameId : string,
+	state : string,
+	waitingPlayers:WaitingPlayers[]
+}
+interface WebSocketGames {
+	type : "games",
+	games:WebSocketGame[]
+}
 export interface IWebSocketsService {
     setUserId: (userId: string) => void;
     setIsOnline: (users: string[]) => void;
@@ -51,7 +67,7 @@ export class WebSocketsService {
     private _userId: string | null;
     private _isOnline: string[];
     private _privateMessages: WebSocketPrivateReceivedMessage[];
-    private _wsGames: WebSocketGameReceivedMessage[];
+    private _wsGames: WebSocketGame[];
     private _wsGamesJoined: WebSocketGameJoinedReceivedMessage[];
     //this._broadcastChannel = new BroadcastChannel('websocket-channel'); // Crée un canal de communication
   
@@ -115,7 +131,7 @@ export class WebSocketsService {
     private _handleMessage = (event: MessageEvent) => {
       try {
         const data = JSON.parse(event.data);
-        console.log('Received message:', data);
+        console.log('WebSocketService Received message:', data);
         switch (data.type) {
           case 'welcome':
             this.setUserId(data.userId);
@@ -126,12 +142,25 @@ export class WebSocketsService {
           case 'private':
             this.setPrivateMessages(data);
             break;
-          case 'game':
+          /* case 'game':
             this.setWsGames(data);
-            break;
+            break; */
           case 'gameJoined':
             this.setWsGamesJoined(data);
             break;
+          case 'test':
+              console.log('test', data);
+              this.setest(data);
+               break;
+          case 'games':
+            console.log('games', data);
+            //{ type:"games", games:state : string,	waitingPlayers:WaitingPlayers[] }
+            this.setWsGames((data as WebSocketGames).games);
+            break;
+          /* case 'gameAction':
+              console.log('test', data);
+              this.setest(data);
+              break; */
           default:
             console.warn('Unknown message type:', data.type);
         }
@@ -207,11 +236,30 @@ export class WebSocketsService {
       );
        GlobalState.incrementNbMessages()
     }
-
+/* 
     public setWsGames(wsGame: WebSocketGameReceivedMessage) {
       this._wsGames = [...this._wsGames, wsGame];
       document.dispatchEvent(
         new CustomEvent('ws-games', {
+          bubbles: true,
+          composed: true,
+          detail: { wsGame },
+        })
+      );
+    } */
+    public setWsGames(wsGame: WebSocketGame[]) {
+      this._wsGames = [...wsGame];
+      document.dispatchEvent(
+        new CustomEvent('ws-games', {
+          bubbles: true,
+          composed: true,
+          detail: { wsGame },
+        })
+      );
+    }
+    public setest(wsGame: WebSocketGameReceivedMessage) {
+      document.dispatchEvent(
+        new CustomEvent('test', {
           bubbles: true,
           composed: true,
           detail: { wsGame },

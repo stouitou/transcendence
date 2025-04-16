@@ -38,7 +38,7 @@ export class AuthService {
    * @param user
    * @returns
    */
-  generateToken(user: { id: number }) { //@TODO : changer le type de user et retourner un objet User complet
+  generateToken(user: { id: number,name:string,avatar?:string }) { //@TODO : changer le type de user et retourner un objet User complet
     return this.app.jwt.sign(
      // { id: user.id },
       { ...user },//on envoie tout l'objet user
@@ -106,7 +106,7 @@ export class AuthService {
   refreshToken(token: string) {
     try {
       const decoded = this.app.jwt.verify(token, "REFRESH_TOKEN_PUBLIC_KEY") as any;
-      return this.generateToken({ id: decoded.id });
+      return this.generateToken({ id: decoded.id,name:decoded.name, avatar:decoded.avatar });
     } catch (err) {
       throw new Error("Invalid token");
     }
@@ -127,7 +127,7 @@ export class AuthService {
     // 2- crypter le mot de passe
     const passwordHash = bcrypt.hashSync(password, 10);
     // 3- creer un nouvel utilisateur
-    const newuser = new User({name, authProviders: [{provider: "local", provider_id: email, password:passwordHash}]});
+    const newuser = new User({name,avatar:"noAvatar", authProviders: [{provider: "local", provider_id: email, password:passwordHash}]});
     
     // 4 - enregistrer le user dans la base de données
     const user = await this.UserRepository.create(newuser);
@@ -144,7 +144,7 @@ export class AuthService {
    * @param provider 
    * @returns 
    */
-  buildOauthProviderResponse(user: { id: number,role:string }): OauthProviderResponse {
+  buildOauthProviderResponse(user: { id: number,role:string,name:string,avatar:string }): OauthProviderResponse {
     const token = this.generateToken(user);
     return { user, token };
   }
@@ -160,7 +160,7 @@ export class AuthService {
     const user = await this.registerWithOauthProvider(profile, provider);
       if (user) {
         //on retourne le jwt
-        return this.buildOauthProviderResponse({ id: user.id ,role: user.role});
+        return this.buildOauthProviderResponse({ id: user.id ,role: user.role, name: user.name, avatar: user.avatar });
       }
     throw new Error("User already exists");
   }

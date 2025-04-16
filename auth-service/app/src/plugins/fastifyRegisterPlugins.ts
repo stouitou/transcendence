@@ -7,7 +7,7 @@ import { AuthService } from "../services/auth.service";
 import  ServicesPlugin  from "../plugins/services"; 
 import { registerAuthPlugin } from "./auth.plugin";
 
-interface AuthenticatedUser { role: string; id?: number; name?: string; }
+interface AuthenticatedUser { role: string; id?: number; name?: string; display_name?:string;avatar?:string }
 declare module 'fastify' {
    interface FastifyRequest {
     authenticatedUser?: AuthenticatedUser;

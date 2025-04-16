@@ -1,10 +1,21 @@
 import { FastifyRequest } from "fastify";
 import { get } from "http";
 import { RawData, WebSocket } from "ws";
-
+interface WaitingPlayers {
+		userId: string,
+		id: number | null,
+		name: string | null,
+		avatar: string | null,
+		state: string | null
+	
+}
+interface WebbSocketGame {
+	state : string,
+	waitingPlayers:WaitingPlayers[]
+}
 // Gestion des utilisateurs connectés
 const clients = new Map<string, WebSocket>();
-const games = new Map<string, any>();
+const games = new Map<number, WebbSocketGame>();
 
 export const wsService = {
 	clients,
@@ -69,28 +80,37 @@ export const wsService = {
 		return Array.from(clients.keys());
 	},
 
-	addGame: (id: string, game: any) => {
+	addGame: (id: number, game: any) => {
         games.set(id, game);
     },
-	// Mettre à jour l'ID d'un client
-	updateGameId: (oldId: string, newId: string) => {
-        if (games.has(oldId)) {
-            const game = games.get(oldId)!;
-            games.delete(oldId);
-            games.set(newId, game);
-        }
-    },
+
 	// Supprimer un client
-    removeGame: (id: string) => {
+    removeGame: (id: number) => {
         games.delete(id);
         console.log(`❌ Game ${id} delete`);
     },
 	getGames: () => {
-		return games;
+		return Array.from(games.values());
 	},
-	getGamebyId: (id: string) => {
+	notifyIsGames:()=>
+	{
+		const jsonMessage = JSON.stringify({ type:"games", games:wsService.getGames() });
+		wsService.broadcast(jsonMessage);
+	},
+	getGamebyId: (id: number) => {
 		if (games.has(id)) {
 			return games.get(id);
+		}
+	},
+	addWaitingPlayersToGame: (gameId: number, waitingPlayers:WaitingPlayers) => {
+
+		if (games.has(gameId)) {
+			const game = games.get(gameId)!;
+			game.waitingPlayers.push(waitingPlayers);
+			games.set(gameId, game);
+		}else {
+			console.log(`waitingPlayers  err`,waitingPlayers);
+			console.error(`Game ${gameId} not found`);
 		}
 	}
 };

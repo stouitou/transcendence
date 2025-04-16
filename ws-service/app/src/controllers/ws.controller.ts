@@ -1,6 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import { wsService } from '@src/services/ws.service';
 import { WebSocket } from "@fastify/websocket"
+import { console } from 'inspector';
 
 
 export class WsController {
@@ -9,6 +10,7 @@ export class WsController {
       console.log('req headers',req.headers)
       //1- get userId from cookie
       //const userId = req.authenticatedUser?.name || `Guest-${Date.now()}`;
+      const id = req.authenticatedUser?.id || null;
       const userId = req.authenticatedUser?.id?`User-${req.authenticatedUser?.id}` : `Guest-${Date.now()}`;
       
       //2- add client to wsService
@@ -18,6 +20,7 @@ export class WsController {
 
       //4- notify all clients      
      wsService.notifyIsOnline();
+     wsService.notifyIsGames();
 
 
 
@@ -52,9 +55,10 @@ export class WsController {
             console.log("🔒 Message privé de", userId, "à", message.to, ":", message.message);
               wsService.sendToClient(message.to, JSON.stringify({ type: "private", from: userId, message: message.message }));
           }
-          else if (message.type === "game" && message.gameId) {
-            //const message ={ type: "game",  gameId: this.gameID ,  state: game.state }
-            wsService.broadcast(JSON.stringify({ ...message  }));
+          else if (message.type === "gameCreate" && message.gameId) {
+            const gameData = {gameId:message.gameId, state : "open", waitingPlayers:[{userId,id: id, name: message.name, avatar: message.avatar,state:"joined"}] };
+            wsService.addGame(message.gameId, gameData);
+            wsService.notifyIsGames();
 
           }
           else if (message.type === "gameJoined" && message.gameId) {
@@ -62,7 +66,11 @@ export class WsController {
             waitingPlayers: {id: this.state.user?.id, name: this.state.user?.name, avatar: this.state.user?.avatar},
             state: "joined" }
             */
-            wsService.broadcast(JSON.stringify({ ...message  }));
+            const waitingPlayers = { userId,id: id, name: message.name, avatar: message.avatar,state:message.state }; ;
+            wsService.addWaitingPlayersToGame(Number(message.gameId), waitingPlayers);
+            console.log("🔒games ",wsService.getGames());
+            wsService.notifyIsGames();
+          //  wsService.broadcast(JSON.stringify({ ...message  }));
 
 
           }
