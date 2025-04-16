@@ -2,12 +2,17 @@ import { BaseComponent } from "../../frameworks/base-component.ts";
 import { User, UserContext } from "../../globalstate/GlobalState.ts";
 import { Logout } from "../button/logout-btn.ts";
 import { MessageBtn } from "../button/message-btn.ts";
+import { DropdownProfile } from "../DropdownProfile.ts";
 
 if (!customElements.get('logout-btn'))
 customElements.define('logout-btn', Logout);
 
 if (!customElements.get('msg-btn'))
 customElements.define('msg-btn', MessageBtn);
+if (!customElements.get('dropdown-porfile-component')) {
+  customElements.define('dropdown-porfile-component', DropdownProfile);
+}
+
 /**
  * Composant de barre de navigation
  */
@@ -32,11 +37,11 @@ export class NavBarComponent extends BaseComponent<{ theme: string,user: User | 
     const { user } = this.state;
       this.innerHTML = `
           <header class="relative z-10 py-5 ">
-            <div class="container mx-auto flex justify-between items-center px-7">
+            <div class="container mx-auto flex justify-between my-6">
                 <div class="main-title">
                     Plastic Pong Game
                 </div>
-                <nav class="flex space-x-6">
+                <nav class="flex space-x-6 ">
 
                 <!-- Theme Toggle -->
                    <div  id="theme-toggle"  class="flex h-7 w-14 rounded-full bg-gray-100 dark:bg-gray-900">
@@ -62,7 +67,7 @@ export class NavBarComponent extends BaseComponent<{ theme: string,user: User | 
                     </div>
                 <!-- End Theme Toggle -->
 
-                    <a href="/"  class="nav-link">
+                    <a href="/"  class=" nav-link">
                       Home	
                     </a>
                     <a href="/game" class="nav-link">
@@ -76,40 +81,34 @@ export class NavBarComponent extends BaseComponent<{ theme: string,user: User | 
                     <a href="/register" class="nav-link">
                       Register	
                     </a>`:``}
-
                     ${user && 0? `<a href="/profile" class="nav-link">
                       Profile	
                     </a>
                     <a href="/game-history" class="nav-link">
                       GameHistory	
                     </a>`:``}
+                   
+ <dropdown-porfile-component></dropdown-porfile-component>
 
-                    ${user ? `<logout-btn></logout-btn>` : ''}
                 </nav>
                 
             </div>
 
-             ${user ? `
-            <nav class="bg-gray-50 dark:bg-gray-700">
-    <div class="max-w-screen-xl px-4 py-3 mx-auto">
-        <div class="flex items-center">
-            <ul id="subMenu" class="flex flex-row font-medium mt-0 space-x-8 text-sm">
+             ${user && 0 ? `
+            <nav class=" flex justify-around  bg-gray-50 dark:bg-gray-700">
+    <div class="flex justify-center items-center m-3">
+        <div class="flex justify-center">
+            <ul id="subMenu" class="flex justify-center font-medium w-screen space-x-8 text-sm">
             
+                    <a href="/dashboard" class="btn nav-link">Dashboard</a>
+                    <a href="/game-setting" class="btn nav-link">Setting</a>
+                    <a href="/profile" class="btn nav-link">Profile</a>
+                    <a href="/game-history" class="btn nav-link">GameHistory</a>
                 <li>
-                    <a href="/dashboard" class="nav-link">Dashboard</a>
-                </li>
-                <li>
-                    <a href="/game-setting" class="nav-link">Setting</a>
-                </li>
-                <li>
-                    <a href="/profile" class="nav-link">Profile</a>
-                </li>
-                <li>
-                    <a href="/game-history" class="nav-link">GameHistory</a>
-                </li>
-                <li>
+                <logout-btn></logout-btn>
                     <msg-btn></msg-btn>
                 </li>
+                
             </ul>
         </div>
     </div>
