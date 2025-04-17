@@ -1,11 +1,67 @@
 import { Player } from "./Player.js";
 import { Match } from "./Match.js";
 import { createGameDatabase, updateStateGameDatabase } from "../utils/databaseGame.js";
-import { updateStateTournamentDatabase } from "../utils/databaseTournament.js";
 import { Bot } from "./Bot.js";
+import { User } from "../models/User.model.js";
+// import { updateStateTournamentDatabase } from "../utils/databaseTournament.js";
 
+// export interface GameHistory{
+// id: number;
+// score1: number;
+// score2: number;
+// player1: number;
+// player2: number;
+// game?: Game;
+// created_at: Date;
+// updated_at: Date;
+// }
+// interface  Tournaments {
+// 	id: number;
+// 	games?: Game[];
+// 	state?: string;
+// 	players?: User[]/*  | number[] */;
+// 	created_at: Date;
+// 	updated_at: Date;
+// 	rounds?: Round[];
+// 	currentRound?: number;
+// 	winner?: User | number;
+// }
+// interface  User {
+// 	id: number;
+// 	name?: string;
+// 	avatar?: string;
+// 	password?: string;
+// 	created_at: Date;
+// 	updated_at: Date;
+// 	role: string;
+// 	level?: number;
+// 	tournaments: Tournaments[];
+//   		games: Game[];
+// }
+// interface Game {
+// 	id: number;
+// 	gameHistory?: GameHistory;
+// 	difficulty: number;
+// 	state: string;
+// 	mode: string;
+// 	players: User[] | number[];
+// 	tournaments?: Tournaments;
+// 	created_at: Date;
+// 	updated_at: Date;
+// }
+// interface Round {
+// 	id: number;
+// 	games: Game[] | null; //[1, {gameHistory?: GameHistory,	difficulty: number,	state: string,	mode: string;}]
+// 	state?: string;
+// 	current: number;
+// 	players: User[] | null;
+// 	created_at: Date;
+// 	updated_at: Date;
+// 	tournaments: Tournaments | null;
+//   }
 export class Tournament {
 
+	private readonly	_id: number;
 	private readonly	_container: HTMLDivElement;
 
 	private readonly	_players: Player[];
@@ -14,8 +70,11 @@ export class Tournament {
 	private				_groups: Map<number, Player[] | null>;
 	private				_chart: HTMLDivElement;
 
+	private				_currentRound: number = 0;
+	
 	/* CONSTRUCTOR */
-	public constructor(players: Player[], container: HTMLDivElement) {
+	public constructor(id: number, players: Player[], container: HTMLDivElement) {
+		this._id = id;		
 		this._container = container;
 		this._players = players;
 		if (this._players.length % 2 != 0) {
@@ -30,6 +89,7 @@ export class Tournament {
 
 		this.randomize();
 		this.createMatch();
+		updateStateTournamentInDatabase(this._id, 'in progress');
 		this.launchGame(Math.round(this._round.length / 2));
 	}
 	
@@ -102,9 +162,12 @@ export class Tournament {
 		}
 		this._groups.clear();
 		if (this._round.length === 1) {
-			updateStateTournamentDatabase();
+			finishTournament(this._id, this._round[0]);
+			updateStateTournamentInDatabase(this._id, 'finish');
 			return ;
 		}
+		this._currentRound++;
+		incrementRoundTournamentInDatabase(this._id, this._currentRound);
 		this.createMatch();
 		this.launchGame(Math.round(this._round.length / 2));
 	}
@@ -185,3 +248,58 @@ export class Tournament {
 		this._chart.appendChild(match);
 	}
 }
+
+const updateStateTournamentInDatabase = async (id: number, state: string) => {
+	const body = { state: `${state}` };
+
+	updateTournamentInDatabase(id, body);
+}
+
+const incrementRoundTournamentInDatabase = async (id: number, current: number) => {
+	const body = { currentRound: current };
+
+	updateTournamentInDatabase(id, body);
+}
+
+const finishTournament = async (id: number, winner: Player) => {
+	const user: User = {
+		id: 0,
+		name: winner.name,
+		role: winner.role,
+		level: 0,
+	};
+	const body = { winner: user };
+	updateTournamentInDatabase(id, body);
+	updateStateTournamentInDatabase(id, 'finish');
+}
+
+const updateTournamentInDatabase = async (id: number, body: any) => {
+	const url = 'https://localhost:4433/api/game-management-service/tournaments/' + id;
+
+	console.log('In update tournament, body: ', body);
+	console.log('Body JSON:', JSON.stringify(body)); // doit être: {"currentRound":1}
+	try {
+		const reply = await fetch(url, {
+			method: 'PUT',
+			headers: {
+				'Content-Type': 'application/json',
+			},
+			body: JSON.stringify(body),
+		});
+		if (!reply.ok) {
+			console.error(`Server responded with status ${reply.status}`);
+			throw new Error("Failed to update tournament in database");
+		}
+		const updated = await reply.json();
+		console.log('Tournament updated in database:', updated);
+	}
+	catch (error) {
+		console.error('Error updating tournament in database:', error);
+		throw new Error("Failed to update tournament in database");
+	}
+}
+
+// const createRoundInDatabase = async (id: number, body: any) => {
+
+// }
+	

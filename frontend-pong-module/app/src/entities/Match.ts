@@ -25,25 +25,25 @@ export class	Match {
 	constructor (players: Player[], container: HTMLDivElement) {
 		this._gameWrapper = container;
 		this._players = players;
-		for (let i = 0; i < this._players.length; i++) {
-			this._players[i].location = i;
-			this._players[i].points = 0;
-			console.log(this._players[i]);
-		}
 		this._appendix = document.createElement('div');
 		this.appendixProperties();
 		this._gameWrapper.appendChild(this._appendix);
-
+		
 		const canvas: HTMLCanvasElement = this.createCanvas()!;
 		canvas.style.background = 'rgb(0, 0, 0)';
 		this._field = canvas.getContext('2d') as CanvasRenderingContext2D;
 		this._width = canvas.width;
 		this._height = canvas.height;
 		this._gameWrapper.appendChild(canvas);
-
+		
 		this._ball = new Ball(canvas);
-		for (let i = 0; i < this._players.length; i++)
-			this._paddles[i] = new Paddle(canvas, i, players[i].role);
+		for (let i = 0; i < this._players.length; i++) {
+			this._players[i].location = i;
+			this._players[i].points = 0;
+			this._players[i].paddle = new Paddle(canvas, this._players[i].location, this._players[i].role);
+		}
+		// for (let i = 0; i < this._players.length; i++)
+		// 	this._paddles[i] = new Paddle(canvas, i, players[i].role);
 
 		this.eventListener();
 	}
@@ -106,6 +106,7 @@ export class	Match {
 				for (const player of this._players) {
 					if (player.points === this._pointsToWin) {
 						await this.endGame(player);
+						this._players.forEach((player) => {player.display.innerHTML = '';});
 						this._gameWrapper.removeChild(this._appendix);
 						this._gameWrapper.removeChild(this._field.canvas);				
 						resolve();
@@ -116,7 +117,7 @@ export class	Match {
 				if (!this._break) {
 					this.run();
 					
-					this._paddles.forEach((paddle => paddle.collision(this._ball)))
+					this._players.forEach((player) => player.paddle!.collision(this._ball))
 					
 					if (!this._players[2] && this._ball.y + this._ball.radius >= this._height ||
 						!this._players[3] && this._ball.y - this._ball.radius <= 0) {
@@ -202,12 +203,13 @@ export class	Match {
 		this._field.fillRect(0, 0, this._width, this._height);
 
 		this._ball.move();
-		for (let i = 0; i < this._paddles.length; i++)
-			this._paddles[i].move(this._players[i], this._ball);
+		for (let i = 0; i < this._players.length; i++) {
+			this._players[i].paddle!.move(this._players[i], this._ball);
+		}
 	}
 
 	private displayScore () {
-		this._players.forEach((player) => { 
+		this._players.forEach((player) => {
 			const	name: HTMLParagraphElement = document.createElement('p');
 			name.textContent = player.name;
 			name.style.margin = '10px';

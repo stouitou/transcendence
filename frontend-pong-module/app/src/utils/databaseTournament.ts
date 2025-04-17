@@ -1,5 +1,5 @@
 export async function createTournamentDatabase (players: string[]) : Promise<void> {
-	console.log("players: ", players);
+	// console.log("In createTourmamentDatabase, players of the tournament: ", players);
 	const url = 'https://localhost:4433/api/v2/database/myDb/table/tournaments';
 	const body = {
 		players: players,

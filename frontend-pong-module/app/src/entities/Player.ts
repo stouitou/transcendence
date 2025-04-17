@@ -1,18 +1,36 @@
-import { User } from "./User";
+import { Paddle } from "./Paddle";
 
-export class	Player extends User{
+export class	Player{
 
-	private				_points: number = 0;
-	private				_location: number = 0;
+	protected readonly		_name: string;
+	protected readonly		_role: string;
 
-	private				_display: HTMLDivElement;
+	protected				_points: number = 0;
+	protected				_location: number = 0;
 
-	private				_lastWin: boolean = false;
+	protected				_display: HTMLDivElement;
+	protected				_paddle: Paddle | null = null;	
+
+	protected				_lastWin: boolean = false;
 
 	constructor (json: any) {
-		super(json);
+		this._name = json.name;
+		if (!this._name)
+			this._name = 'Host';
+		this._role = json.role;
+		if (!this._role)
+				this._role = 'user';
+
 		this._display = document.createElement('div');
 		this.displayProperties();
+	}
+
+	get name () {
+		return this._name;
+	}
+
+	get role () {
+		return this._role;
 	}
 
 	get lastWin () {
@@ -35,12 +53,20 @@ export class	Player extends User{
 		return this._display;
 	}
 
+	get paddle () : Paddle | null {
+		return this._paddle;
+	}
+
 	set points (points: number) {
 		this._points = points;
 	}
 
 	set location (location: number) {
 		this._location = location;
+	}
+
+	set paddle (paddle: Paddle) {
+		this._paddle = paddle;
 	}
 
 	private displayProperties () {

@@ -66,7 +66,7 @@ export class  classic extends LitElement {
   // Get the first player from the API
   // TODO For the moment, we get him with id 1, in the future, we will get him with the id of the user logged in
   private async createPlayer () : Promise<Player> {
-      const url: string = 'https://localhost:4433/api/v2/database/myDb/table/user/id/1';  // URL adress of the API
+      const url: string = 'https://localhost:4433/api/user/me';  // URL adress of the API
 
       try {
         const response = await fetch(url);      // send a GET request to the API, reuslt is Response type
@@ -93,7 +93,7 @@ export class  classic extends LitElement {
   }
 
   render () {
-    return html`
+    return `
     `;
   }
 }

@@ -1,7 +1,6 @@
 import { Player } from "../entities/Player";
 
 export async function createGameDatabase (players: Player[], mode: string) : Promise<void> {
-	console.log("players: ", players);
 	const url = 'https://localhost:4433/api/v2/database/myDb/table/game';
 	const body = {
 	  players: players,

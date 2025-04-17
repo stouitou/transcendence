@@ -5,7 +5,6 @@ import { fetchProfileData } from './fetchProfile';
 import { getState } from './state';
 import { renderRegister } from './register';             // your register screen
 import { renderLogin } from './login';
-
 import { createButton } from './button';
 import {startGame} from "./pong";
 import {
@@ -133,7 +132,7 @@ function renderGame(container: HTMLElement) {
 
     // Add event listener to start game
     startButton.addEventListener("click", () => {
-        if (typeof startGame === "function") {
+       // if (typeof startGame === "function") {
             pongGameScript();
             const gameComponent = document.createElement("game-component");
             // gameComponent.setAttribute("canvasId", "pongCanvas");
@@ -141,9 +140,9 @@ function renderGame(container: HTMLElement) {
             startButton.remove();
             startMultiplayerButton.remove();
             startTournamentButton.remove();
-        } else {
-            console.error("startGame function is not defined!");
-        }
+        //} else {
+          //  console.error("startGame function is not defined!");
+       // }
     });
 
     startTournamentButton.addEventListener("click", () => {
@@ -152,6 +151,7 @@ function renderGame(container: HTMLElement) {
             pongTournamentScript();
             const gameComponent = document.createElement("tournament-component");
             container.appendChild(gameComponent);
+            ( gameComponent as any).config = { id: 24 };
             startButton.remove();
             startMultiplayerButton.remove();
             startTournamentButton.remove();

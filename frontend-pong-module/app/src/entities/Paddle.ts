@@ -103,6 +103,14 @@ export class	Paddle extends Object {
 		return this._right ;
 	}
 
+	set moveUp (moveUp: boolean) {
+		this._moveUp = moveUp ;
+	}
+
+	set moveDown (moveDown: boolean) {
+		this._moveDown = moveDown ;
+	}
+
 	move (player: Player, ball: Ball) {
 		if (player.role === 'bot')
 			this.followBall(ball);
