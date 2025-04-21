@@ -1,4 +1,4 @@
-import { Player } from './entities/Player.js';
+import { Player } from './tests/Player.js';
 import { Tournament } from './entities/Tournament.js';
 
 const player1 = new Player("Olivier1");

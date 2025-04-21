@@ -7,7 +7,7 @@ import { router } from './router';
 document.addEventListener('DOMContentLoaded', () => {
     // Insert the header component.
     const headerElement = createHeader({
-        title: 'Plastic Pong Game',
+        title: 'the game',
         links: [
             { href: '#home', text: 'Home' },
             { href: '#game', text: 'Game' },
@@ -17,7 +17,8 @@ document.addEventListener('DOMContentLoaded', () => {
             { href: '#profile', text: 'Profile' }
         ]
     });
-    document.body.insertBefore(headerElement, document.body.firstChild);
+    document.body.prepend(headerElement);   // more simple and modern than insertBefore
+    // document.body.insertBefore(headerElement, document.body.firstChild);
 
     // Initialize routing on first load.
     router();

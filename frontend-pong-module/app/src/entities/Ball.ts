@@ -1,142 +1,157 @@
-import { Direction } from './Direction.js';
-import { Display } from '../display/Display.js';
-import { Paddle } from "./Paddle.js";
+import { Object } from "./Object.ts";
+import { Direction } from "./Direction.ts";
+import { Paddle } from "./Paddle.ts";
+import { Player } from "./Player.ts";
 
-// export allows to use this class in another file
-export class	Ball extends Display {
+export class	Ball extends Object {
 
-	/* ATTRIBUTES */
-	private readonly	_element: HTMLDivElement;
+	private	readonly	_color: string = 'rgb(255, 0, 0)';
 	private readonly	_diameter: number = 30;
 	private readonly	_radius: number = this._diameter / 2;
-	private readonly	_color: string = "rgb(0, 0, 0)";
 
-	// For the movement
 	private readonly	_speed: number = 8;
-	private readonly	_startingSpeed: number = 4;
-	private readonly	_direction: Direction;
+	private				_direction!: Direction;
+	private				_rebound: boolean = false;
 
-	// Fetch current coordinates
+	private				_x!: number;
+	private				_y!: number;
+
 	private				_top!: number;
 	private				_bottom!: number;
 	private				_left!: number;
 	private				_right!: number;
 
-	/* CONSTRUCTOR */
 	constructor (canvas: HTMLCanvasElement) {
 		super(canvas);
-
-		// Creates the ball object
-		this._element = document.createElement("div");
-		// Gives the ball basic values
-		this._element.style.width = `${this._diameter}px`;
-		this._element.style.height = `${this._diameter}px`;
-		this._element.style.backgroundColor = this._color;					// color of the ball
-		this._element.style.borderRadius = "50%";							// makes it round
-		this._element.style.position = "absolute";							// doesn't interact with other objects or text
-		this._element.style.marginTop = "0px";
-		this._element.style.marginLeft = "0px";
-		// this._element.style.display = "none";							// doesn't interact with other objects or text
-		this._gameContainer.appendChild(this._element);
-
-		// Gives the ball a random direction and position
-		this._direction = new Direction(0, 0);
 		this.spawn();
-
-		this.updatePosition();
 	}
-	
-	/* GETTERS */
-	public get element () {
-		return this._element;
+
+	get color () {
+		return this._color ;
 	}
-	
-	public get diameter () {
-		return this._diameter;
-	}	
-	
-	public get direction () {
-		return this._direction;
-	}	
 
-	public get speed () {
-		return this._speed;
-	}	
-
-	public get startingSpeed () {
-		return this._startingSpeed;
-	}	
-
-	public get top () {
-		return this._top;
-	}	
-	
-	public get bottom () {
-		return this._bottom;
-	}	
-	
-	public get left () {
-		return this._left;
-	}	
-	
-	public get right () {
-		return this._right;
-	}	
-
-	/* METHODS */
-	// Update current position
-	public updatePosition () {
-		this._top = this._element.offsetTop;
-		this._bottom = this._top + this._diameter;
-		this._left = this._element.offsetLeft;
-		this._right = this._left + this._diameter;
+	get diameter () {
+		return this._diameter ;
 	}
-	
-	public spawn () {
-		// Randomize position
-		const pos = (Math.random() * 100) / 3;
 
-		console.log(this._gameContainer);
-		console.log(this._canvas);
-		this._element.style.top = `${((0.33 * this._field.height) + (pos / 100 * this._field.height)) - this._radius}px`;	// random vertically (from 33% to 66% of the window)
-		this._element.style.left = `0px`;				// centered horizontally (15px is half the size of the ball)
-		// this._element.style.left = `${(0.5 * this._field.width) - this._radius}px`;				// centered horizontally (15px is half the size of the ball)
-		console.log("in spawn, ball left after 50%: ", this._element.style.left);
+	get radius () {
+		return this._radius ;
+	}
 
+	get speed () {
+		return this._speed ;
+	}
+
+	get direction () {
+		return this._direction ;
+	}
+
+	get rebound () {
+		return this._rebound ;
+	}
+
+	get x () {
+		return this._x ;
+	}
+
+	get y () {
+		return this._y ;
+	}
+
+	get top () {
+		return this._top ;
+	}
+
+	get bottom () {
+		return this._bottom ;
+	}
+
+	get left () {
+		return this._left ;
+	}
+
+	get right () {
+		return this._right ;
+	}
+
+	spawn () {
+		this._x = (this._fieldWidth / 2);
+		this._y = (33 + ((Math.random() * 100) / 3)) / 100 * this._fieldHeight;
+		
 		// Ramdomize direction
-		const add = Math.random() * 30;
-
-		this._direction.x = Math.sin((45 + add) * Math.PI / 180);	// compute x direction depending on an angle between 45 and 75 degrees
-		this._direction.y = Math.cos((45 + add) * Math.PI / 180);	// compute y direction depending on an angle between 45 and 75 degrees
-
-		let base = Math.round(Math.random());	// random integer between 0 and 1
-		if (base === 0)
-			this._direction.x *= -1;
-		base = Math.round(Math.random());
-		if (base === 0)
-			this._direction.y *= -1;
-		// if spawn up and direction down, do we need to manage differently ?
+		const add: number = Math.random() * 30;
+		
+		let	x: number = Math.sin((45 + add) * Math.PI / 180);	// compute x direction depending on an angle between 45 and 75 degrees
+		let	y: number = Math.cos((45 + add) * Math.PI / 180);	// compute y direction depending on an angle between 45 and 75 degrees
+		
+		const base: number = Math.random() * 4;	// random integer between 0 and 4
+		if (base < 2)
+			x *= -1;
+		if (base >= 1 && base < 3)
+			y *= -1;
+		this._direction = new Direction(x, y);
 	}
 
-	public move(speed: number) {
-		this._direction.normalize();
-		this._element.style.left = `${this._element.offsetLeft + (speed * this._direction.x)}px`
-		this._element.style.top = `${this._element.offsetTop + (speed * this._direction.y)}px`
+	move () {
+		this.updatePosition();
+		this.draw();
 	}
 
-	public bounce(paddle: Paddle) {
+	bounce (paddle: Paddle) {
+		this._rebound = true;
+
 		this._direction.x *= -1;	
 
-		// Position the ball outside of the paddle to avoid being blocked
-		if (this._left < paddle.right && this._left > paddle.left)
-			this._element.style.left = `${paddle.right}px`;
-		else if (this._right > paddle.left && this._right <paddle.right)
-			this._element.style.left = `calc(${paddle.left - this._diameter} - 1)px`;
+		if (paddle.location === 0 || paddle.location === 1) {
+			// Formula for the rebound : θrebound ​= θmax ​× (2 × ((yimpact ​− ypaddle) / paddle height)​)
+			const impact: number = 2 * ((this._y - (paddle.y + (paddle.height / 2))) / paddle.height);
+			const angle = ((55 * Math.PI / 180) * impact) + (5 * Math.PI / 180);	// get an angle between 5 and 60 degrees
+			this._direction.x = Math.cos(angle) * Math.sign(this._direction.x);
+			this._direction.y = Math.sin(angle);
+		}
+		else {
+			const impact: number = 2 * ((this._y - (paddle.y + (paddle.height / 2))) / paddle.height);
+			const angle: number = ((5 * Math.PI / 180) * impact) + (55 * Math.PI / 180);	// get an angle between 5 and 60 degrees
+			this._direction.x = Math.sin(angle) * Math.sign(this._direction.x);
+			this._direction.y = -Math.cos(angle);
+		}
+	}
 
-		// Formula for the rebound : θrebound ​= θmax ​× (2 × ((yimpact ​− ypaddle) / paddle height)​)
-		const impact: number = 2 * (((this._top + this._radius) - (paddle.top + (paddle.height / 2))) / paddle.height);
-		const angle = ((55 * Math.PI / 180) * impact) + (5 * Math.PI / 180);	// get an angle between 5 and 60 degrees
-		this._direction.x = Math.cos(angle) * Math.sign(this._direction.x);
-		this._direction.y = Math.sin(angle);
+	out (players: Player[]) {
+		if (this._right < 0) {
+			players[0].score();
+			this._rebound = false;
+			return true;
+		}
+		else if (this._left > this._fieldWidth) {
+			players[1].score();
+			this._rebound = false;
+			return true;
+		}
+		else if (this._bottom < 0 || this._top > this._fieldHeight){
+			this._rebound = false;
+			return true;
+		}
+		return false;
+	}
+
+	private draw () {
+		this._field.fillStyle = this._color;
+		this._field.beginPath();
+		this._field.arc(this._x, this._y, this._radius, 0, Math.PI * 2);
+		this._field.fill();
+	}
+
+	private updatePosition () {
+		let	speed: number = this._speed;
+		if (!this._rebound)
+			speed /= 2;
+
+		this._x += this._direction.x * speed;
+		this._y += this._direction.y * speed;
+		this._top = this._y - this._radius;
+		this._bottom = this._y + this._radius;
+		this._left = this._x - this._radius;
+		this._right = this._x + this._radius;
 	}
 }

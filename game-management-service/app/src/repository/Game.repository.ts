@@ -46,9 +46,9 @@ class GameRepository extends BaseRepository<Game> implements IRepository<Game>  
       }),
     });
     const data = await response.json();
-    console.log("🔐Gane.repository.ts GameRepository.create()  --data--",data)
+    console.log("🔐Game.repository.ts GameRepository.create()  --data--",data)
     const gameCreated = data.data;
-    console.log("🔐Gane.repository.ts GameRepository.create()  --gameCreated--",gameCreated)
+    console.log("🔐Game.repository.ts GameRepository.create()  --gameCreated--",gameCreated)
    // const gameCreated = User.fromJSON(data.data);
     if (!gameCreated) {
       throw new Error("User creation failed");

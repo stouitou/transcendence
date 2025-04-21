@@ -1,0 +1,33 @@
+import { User } from "../entities/User";
+
+export async function createRoundDatabase (players: User[], round: number) : Promise<void> {
+	const getTournaments = 'https://localhost:4433/api/v2/database/myDb/table/tournaments';
+
+	try {
+		const first = await fetch(getTournaments);
+		const tournaments = await first.json();
+		for (let i = 0; i < tournaments.data.length; i++) {
+			if (tournaments.data[i].state === "running") {
+				const url = 'https://localhost:4433/api/v2/database/myDb/table/tournament/id/' + tournaments.data[i].id;
+				const body = {
+				state: 'running',
+				current: round,
+				players: players,
+				tournaments: tournaments.data[i].id,
+				}
+
+	  			const response = await fetch(url, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+				body: JSON.stringify(body),
+				});
+			await response.json();
+			}
+		}
+	}
+	catch (error) {
+	  console.error("Error creating game in database");
+	}
+}

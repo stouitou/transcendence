@@ -3,9 +3,25 @@
 import { appendLoginButton, handleLogin, handleRegister, renderLogout } from './auth';
 import { fetchProfileData } from './fetchProfile';
 import { getState } from './state';
-
+import { renderRegister } from './register';             // your register screen
+import { renderLogin } from './login';
 import { createButton } from './button';
 import {startGame} from "./pong";
+import {
+    Engine,
+    Scene,
+    FreeCamera,
+    Camera,
+    Vector3,
+    HemisphericLight,
+    MeshBuilder,
+    StandardMaterial,
+    Color3,
+    Color4
+} from 'babylonjs';
+
+import { initBallsBackground } from './background'; // your path
+
 
 const user = {
     avatar: "grr", 
@@ -21,246 +37,144 @@ function clearContainer(container: HTMLElement) {
 }
 
 export function renderHome(container: HTMLElement) {
-    // Clear existing content
-    while (container.firstChild) {
-        container.removeChild(container.firstChild);
-    }
+    clearContainer(container);
+    // while (container.firstChild) {
+    //     container.removeChild(container.firstChild);
+    // }
 
-    // Create a hero section container
-    const heroSection = document.createElement('section');
-    heroSection.className = "relative w-full h-screen overflow-hidden bg-black";
-    container.appendChild(heroSection);
+    // Mark container as relative, so absolutely positioned elements anchor properly
+    container.classList.add('relative');
 
-    // Create the canvas
-    const canvas = document.createElement('canvas');
-    canvas.style.position = 'absolute';
-    canvas.style.top = '0';
-    canvas.style.left = '0';
-    canvas.width = heroSection.clientWidth;
-    canvas.height = heroSection.clientHeight;
-    heroSection.appendChild(canvas);
-
-    const ctx = canvas.getContext('2d');
-    if (!ctx) {
-        console.error('Could not get 2D context for canvas.');
-        return;
-    }
-
-    // Handle resizing
-    window.addEventListener('resize', () => {
-        canvas.width = heroSection.clientWidth;
-        canvas.height = heroSection.clientHeight;
+    const { engine, scene, camera, canvas } = initBallsBackground(container, {
+        numSpheres: 50,
+        sphereRadius: 1,
+        backgroundColor: new Color4(1, 1, 1, 1)
     });
 
-    // Track mouse for the fog effect
-    let mouseX = canvas.width / 2;
-    let mouseY = canvas.height / 2;
-    heroSection.addEventListener('mousemove', (e) => {
-        const rect = heroSection.getBoundingClientRect();
-        mouseX = e.clientX - rect.left;
-        mouseY = e.clientY - rect.top;
-    });
+    const overlay = document.createElement('div');
+    overlay.className = `
+    absolute top-0 left-0
+    w-full h-full
+    flex flex-col items-center justify-center
+    pointer-events-none
+    z-10
+  `;
+    container.appendChild(overlay);
 
-    // Particle interface
-    interface Particle {
-        x: number;
-        y: number;
-        vx: number;
-        vy: number;
-        size: number;
-    }
-
-    // Create an array of particles
-    const particles: Particle[] = createParticles(60, canvas.width, canvas.height);
-
-    // Animation loop
-    function animate() {
-        if (!ctx)
-            return;
-        // Clear the canvas fully
-        ctx.fillStyle = 'black';
-        ctx.fillRect(0, 0, canvas.width, canvas.height);
-
-        // Update and draw all particles
-        updateParticles(particles, canvas.width, canvas.height);
-        drawParticles(ctx, particles);
-
-        // Draw the fog effect around the mouse
-        drawFog(ctx, mouseX, mouseY, 80);
-
-        requestAnimationFrame(animate);
-    }
-    animate();
-
-    // Create a content container for heading, text, and a button
-    const content = document.createElement('div');
-    content.className = "relative z-10 flex flex-col items-center justify-center w-full h-full text-center text-white pointer-events-none";
-
-    const heading = document.createElement('h2');
-    heading.textContent = 'PONG GAME';
-    heading.className = "text-3xl md:text-5xl font-bold mb-4 pointer-events-auto";
-    content.appendChild(heading);
-
-    // Example button
-    const enterButton = document.createElement('button');
-    enterButton.textContent = "CLICK TO START PLAYING";
-    enterButton.className = "px-6 py-3 bg-white text-black rounded-md hover:bg-gray-300 transition-colors pointer-events-auto";
-    enterButton.addEventListener('click', () => {
+    // Example "Let's Start" button
+    const btn = document.createElement('button');
+    btn.textContent = 'Let’s play';
+    btn.className = `
+    px-10 py-3
+    font-archivo
+    text-black
+    border border-none
+    rounded-md
+    pointer-events-auto
+    transition-colors duration-300
+    hover:bg-black hover:text-white
+    focus:outline-none
+  `;
+    btn.addEventListener('click', () => {
         window.location.hash = '#login';
     });
-    content.appendChild(enterButton);
-
-    heroSection.appendChild(content);
-
-    // --- Helper Functions Below ---
-
-    // Creates an array of particles
-    function createParticles(count: number, width: number, height: number): Particle[] {
-        const arr: Particle[] = [];
-        for (let i = 0; i < count; i++) {
-            arr.push({
-                x: Math.random() * width,
-                y: Math.random() * height,
-                vx: (Math.random() - 0.5) * 5, // small random velocity
-                vy: (Math.random() - 0.5) * 5,
-                size: 2 + Math.random() * 4,     // random size
-            });
-        }
-        return arr;
-    }
-
-    /**
-     * Moves particles and bounces them off the edges, like a Pong ball.
-     */
-    function updateParticles(particles: Particle[], width: number, height: number) {
-        for (const p of particles) {
-            p.x += p.vx;
-            p.y += p.vy;
-
-            // Bounce horizontally
-            if (p.x < 0) {
-                p.x = 0;
-                p.vx *= -1; // reverse horizontal velocity
-            } else if (p.x > width) {
-                p.x = width;
-                p.vx *= -1;
-            }
-
-            // Bounce vertically
-            if (p.y < 0) {
-                p.y = 0;
-                p.vy *= -1; // reverse vertical velocity
-            } else if (p.y > height) {
-                p.y = height;
-                p.vy *= -1;
-            }
-        }
-    }
-
-    // Draws the particles as small, soft circles
-    function drawParticles(ctx: CanvasRenderingContext2D, particles: Particle[]) {
-        ctx.save();
-        ctx.fillStyle = 'white';
-        for (const p of particles) {
-            ctx.beginPath();
-            ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
-            ctx.fill();
-        }
-        ctx.restore();
-    }
-
-    /**
-     * Creates a foggy “window” effect around the mouse
-     * This version uses 'screen' blend for a hazy highlight
-     */
-    function drawFog(ctx: CanvasRenderingContext2D, mx: number, my: number, radius: number) {
-        const gradient = ctx.createRadialGradient(mx, my, 0, mx, my, radius);
-        gradient.addColorStop(0, 'rgba(255,255,255,0.15)');
-        gradient.addColorStop(0.7, 'rgba(255,255,255,0.02)');
-        gradient.addColorStop(1, 'rgba(255,255,255,0)');
-
-        ctx.save();
-        ctx.globalCompositeOperation = 'screen'; // or 'lighter'
-        ctx.fillStyle = gradient;
-        ctx.beginPath();
-        ctx.arc(mx, my, radius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.restore();
-
-        // Reset composite operation
-        ctx.globalCompositeOperation = 'source-over';
-    }
+    overlay.appendChild(btn);
 }
 
 const pongGameScript = async () => {
 	const script = document.createElement('script');
-    // const canvas = document.getElementById("pongCanvas");
 	script.type = 'module';
-	script.src = 'https://localhost:4433/frontend-pong-module/app/src/component/oneVSone.ts';
+	script.src = 'https://localhost:4433/frontend-pong-module/app/src/component/classic.ts';
+    window.document.head.appendChild(script);
+};
+
+const pongTournamentScript = async () => {
+	const script = document.createElement('script');
+	script.type = 'module';
+	script.src = 'https://localhost:4433/frontend-pong-module/app/src/component/tournamentGame.ts';
     window.document.head.appendChild(script);
 };
 
 function renderGame(container: HTMLElement) {
     // Clear container if needed
-    while (container.firstChild) {
-        container.removeChild(container.firstChild);
-    }
+    clearContainer(container);
+    // while (container.firstChild) {
+    //     container.removeChild(container.firstChild);
+    // }
 
     // Create game wrapper div
     const gameWrapper = document.createElement("div");
-    gameWrapper.className = "flex flex-col items-center justify-center space-y-4";
+    gameWrapper.id = "gameWrapper";
+    gameWrapper.className = "flex flex-col items-center justify-center space-y-4 min-w-[700px] min-h-[700px] bg-white";
+
+    // Append game wrapper to container
+    container.appendChild(gameWrapper);
 
     // Create canvas element
-    const canvas = document.createElement("canvas");
-    canvas.id = "pongCanvas";
-    canvas.width = 600;
-    canvas.height = 500;
-    canvas.className = "shadow-lg rounded-lg";
+    // const canvas = document.createElement("canvas");
+    // canvas.id = "pongCanvas";
+    // canvas.width = 600;
+    // canvas.height = 500;
+    // canvas.className = "shadow-lg rounded-lg";
 
     // Create Start Game button
     const startButton = document.createElement("button");
     startButton.textContent = "Start Game";
     startButton.className = "mt-4 px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-blue-600 transition";
     
+    const startMultiplayerButton = document.createElement("button");
+    startMultiplayerButton.textContent = "Start Multiplayer";
+    startMultiplayerButton.className = "px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-green-600 transition";
+
     const startTournamentButton = document.createElement("button");
     startTournamentButton.textContent = "Start Tournament";
-    startTournamentButton.className = "px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-green-600 transition";
+    startTournamentButton.className = "px-6 py-3 bg-blue-500 text-white rounded-lg shadow-md hover:bg-purple-600 transition";
 
     // Add event listener to start game
     startButton.addEventListener("click", () => {
-        if (typeof startGame === "function") {
-            const gameComponent = document.createElement("game-component");
-            gameComponent.setAttribute("canvasId", "pongCanvas");
-            container.appendChild(gameComponent);
+       // if (typeof startGame === "function") {
             pongGameScript();
+            const gameComponent = document.createElement("game-component");
+            // gameComponent.setAttribute("canvasId", "pongCanvas");
+            container.appendChild(gameComponent);
             startButton.remove();
+            startMultiplayerButton.remove();
             startTournamentButton.remove();
-        } else {
-            console.error("startGame function is not defined!");
-        }
+        //} else {
+          //  console.error("startGame function is not defined!");
+       // }
     });
 
     startTournamentButton.addEventListener("click", () => {
         if (typeof renderTournament === "function") {
-            renderTournament(container);
+            // renderTournament(container);
+            pongTournamentScript();
+            const gameComponent = document.createElement("tournament-component");
+            container.appendChild(gameComponent);
+            ( gameComponent as any).config = { id: 24 };
+            startButton.remove();
+            startMultiplayerButton.remove();
+            startTournamentButton.remove();
         } else {
             console.error("renderTournament function is not defined!");
         }
     })
     // Append elements to wrapper
-    gameWrapper.appendChild(canvas);
+    // gameWrapper.appendChild(canvas);
     gameWrapper.appendChild(startButton);
+    gameWrapper.appendChild(startMultiplayerButton);
     gameWrapper.appendChild(startTournamentButton);
 
-    // Append game wrapper to container
-    container.appendChild(gameWrapper);
+    // // Append game wrapper to container
+    // container.appendChild(gameWrapper);
 }
 
 function renderTournament(container: HTMLElement) {
     // Clear container if needed
-    while (container.firstChild) {
-        container.removeChild(container.firstChild);
-    }
+    clearContainer(container);
+    // while (container.firstChild) {
+    //     container.removeChild(container.firstChild);
+    // }
 
     // Create tournament wrapper div
     const tournamentWrapper = document.createElement("div");
@@ -299,218 +213,6 @@ function renderTournament(container: HTMLElement) {
     // Append tournament wrapper to container
     container.appendChild(tournamentWrapper);
 }
-
-
-function renderLogin(container: HTMLElement) {
-    // Clear container if needed.
-    while (container.firstChild) {
-        container.removeChild(container.firstChild);
-    }
-
-    // Create form element
-    const loginForm = document.createElement("form");
-    loginForm.className = "max-w-sm mx-auto p-6 bg-white rounded-lg shadow-lg";
-
-    // Create heading
-    const heading = document.createElement("h2");
-    heading.textContent = "Login";
-    heading.className = "text-3xl font-bold text-center mb-6 text-gray-800";
-    loginForm.appendChild(heading);
-
-    // Create Email label and input container
-    const emailLabel = document.createElement("label");
-    emailLabel.textContent = "Email:";
-    emailLabel.setAttribute("for", "email");
-    emailLabel.className = "block text-gray-700 mb-2";
-    loginForm.appendChild(emailLabel);
-
-    const emailInput = document.createElement("input");
-    emailInput.type = "email";
-    emailInput.id = "email";
-    emailInput.placeholder = "Enter your email";
-    emailInput.className =
-        "w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4";
-    loginForm.appendChild(emailInput);
-
-    // Create Password label and input container
-    const passwordLabel = document.createElement("label");
-    passwordLabel.textContent = "Password:";
-    passwordLabel.setAttribute("for", "password");
-    passwordLabel.className = "block text-gray-700 mb-2";
-    loginForm.appendChild(passwordLabel);
-
-    const passwordInput = document.createElement("input");
-    passwordInput.type = "password";
-    passwordInput.id = "password";
-    passwordInput.placeholder = "Enter your password";
-    passwordInput.className =
-        "w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-6";
-    loginForm.appendChild(passwordInput);
-
-    // Create login button
-    const loginButton = document.createElement("button");
-    loginButton.type = "submit";
-    loginButton.textContent = "Login";
-    loginButton.className =
-        "w-full bg-blue-500 text-white py-3 rounded-md hover:bg-blue-600 transition-colors";
-    loginForm.appendChild(loginButton);
-
-    // Optionally, add a submit event listener for the form.
-    loginForm.addEventListener("submit", async(e) => {
-        e.preventDefault();
-        // Process the login here, e.g., collect email and password values and send them to your server.
-        const email = emailInput.value;
-        const password = passwordInput.value;
-        console.log("Email:", email, "Password:", password?"Password is not empty (never show password in console please)":"Password is empty");
-        await handleLogin({ email, password });
-        // Insert your login handling logic...
-    });
-
-    const linkContainer = document.createElement("p");
-    linkContainer.className = "text-center mt-4";
-    
-    const link = document.createElement("a");
-    link.textContent = "Create here!";
-    link.href = "#";
-    link.className = "text-blue-500 hover:underline";
-    link.addEventListener("click", (e) => {
-        e.preventDefault();
-        history.pushState({}, "", "#register");
-        renderRegister(container); // Call renderRegister when the link is clicked
-    });
-    
-    linkContainer.appendChild(document.createTextNode("Don't have an account? "));
-    linkContainer.appendChild(link);
-
-    appendLoginButton(loginForm);
-
-    loginForm.appendChild(linkContainer);
-
-    container.appendChild(loginForm);
-}
-
-function renderRegister(container: HTMLElement) {
-    // Clear container if needed
-    while (container.firstChild) {
-        container.removeChild(container.firstChild);
-    }
-
-    // Create form element
-    const registerForm = document.createElement("form");
-    registerForm.className = "max-w-sm mx-auto p-6 bg-white rounded-lg shadow-lg";
-
-    // Create heading
-    const heading = document.createElement("h2");
-    heading.textContent = "Register";
-    heading.className = "text-3xl font-bold text-center mb-6 text-gray-800";
-    registerForm.appendChild(heading);
-
-    // Create Name label and input
-    const nameLabel = document.createElement("label");
-    nameLabel.textContent = "Name:";
-    nameLabel.setAttribute("for", "name");
-    nameLabel.className = "block text-gray-700 mb-2";
-    registerForm.appendChild(nameLabel);
-
-    const nameInput = document.createElement("input");
-    nameInput.type = "text";
-    nameInput.id = "name";
-    nameInput.placeholder = "Enter your name";
-    nameInput.className =
-        "w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4";
-    registerForm.appendChild(nameInput);
-
-    // Create Email label and input
-    const emailLabel = document.createElement("label");
-    emailLabel.textContent = "Email:";
-    emailLabel.setAttribute("for", "email");
-    emailLabel.className = "block text-gray-700 mb-2";
-    registerForm.appendChild(emailLabel);
-
-    const emailInput = document.createElement("input");
-    emailInput.type = "email";
-    emailInput.id = "email";
-    emailInput.placeholder = "Enter your email";
-    emailInput.className =
-        "w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4";
-    registerForm.appendChild(emailInput);
-
-    // Create Password label and input
-    const passwordLabel = document.createElement("label");
-    passwordLabel.textContent = "Password:";
-    passwordLabel.setAttribute("for", "password");
-    passwordLabel.className = "block text-gray-700 mb-2";
-    registerForm.appendChild(passwordLabel);
-
-    const passwordInput = document.createElement("input");
-    passwordInput.type = "password";
-    passwordInput.id = "password";
-    passwordInput.placeholder = "Enter your password";
-    passwordInput.className =
-        "w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-4";
-    registerForm.appendChild(passwordInput);
-
-    // Create Confirm Password label and input
-    const confirmPasswordLabel = document.createElement("label");
-    confirmPasswordLabel.textContent = "Confirm Password:";
-    confirmPasswordLabel.setAttribute("for", "confirm-password");
-    confirmPasswordLabel.className = "block text-gray-700 mb-2";
-    registerForm.appendChild(confirmPasswordLabel);
-
-    const confirmPasswordInput = document.createElement("input");
-    confirmPasswordInput.type = "password";
-    confirmPasswordInput.id = "confirm-password";
-    confirmPasswordInput.placeholder = "Confirm your password";
-    confirmPasswordInput.className =
-        "w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-blue-400 mb-6";
-    registerForm.appendChild(confirmPasswordInput);
-
-    // Create register button
-    const registerButton = document.createElement("button");
-    registerButton.type = "submit";
-    registerButton.textContent = "Register";
-    registerButton.className =
-        "w-full bg-blue-500 text-white py-3 rounded-md hover:bg-green-600 transition-colors";
-    registerForm.appendChild(registerButton);
-
-    // Handle form submission
-    registerForm.addEventListener("submit", (e) => {
-        e.preventDefault();
-        // Process registration here
-        const name = nameInput.value;
-        const email = emailInput.value;
-        const password = passwordInput.value;
-        const confirmPassword = confirmPasswordInput.value;
-
-        if (password !== confirmPassword) {
-            alert("Passwords do not match!");
-            return;
-        }
-
-        console.log("Name:", name, "Email:", email, "Password:", password?"Password is not empty (never show password in console please)":"Password is empty");
-        handleRegister({ name, email, password });
-        // Insert your registration handling logic...
-    });
-    const linkContainer = document.createElement("p");
-    linkContainer.className = "text-center mt-4";
-
-    const link = document.createElement("a");
-    link.textContent = "Login here!";
-    link.href = "#";
-    link.className = "text-blue-500 hover:underline";
-    link.addEventListener("click", (e) => {
-        e.preventDefault();
-        history.pushState({}, "", "#login");
-
-        renderLogin(container);
-    });
-
-    linkContainer.appendChild(document.createTextNode("Already have an account? "));
-    linkContainer.appendChild(link);
-    registerForm.appendChild(linkContainer);
-    container.appendChild(registerForm);
-}
-
 
 function renderInfo(container: HTMLElement) {
     const heading = document.createElement('h2');
@@ -605,8 +307,6 @@ function renderGameHistory(container: HTMLElement, username: string) {
     container.appendChild(listContainer);
 }
 
-
-
 function renderNotFound(container: HTMLElement) {
     const heading = document.createElement('h2');
     heading.textContent = '404';
@@ -621,7 +321,8 @@ function renderNotFound(container: HTMLElement) {
 // Main router function.
 export function router() {
     const mainElement = document.querySelector('main');
-    if (!mainElement) return;
+    if (!mainElement)
+        return ;
 
     const state = getState();
     clearContainer(mainElement);
