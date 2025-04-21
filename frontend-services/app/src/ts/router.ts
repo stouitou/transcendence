@@ -96,12 +96,27 @@ const pongTournamentScript = async () => {
     window.document.head.appendChild(script);
 };
 
+let savedHeader: HTMLElement | null = null;
+
 function renderGame(container: HTMLElement) {
     // Clear container if needed
-    clearContainer(container);
-    // while (container.firstChild) {
-    //     container.removeChild(container.firstChild);
-    // }
+    while (container.firstChild) {
+        container.removeChild(container.firstChild);
+    }
+    const header = document.querySelector("header");
+    if (header) {
+        savedHeader = header as HTMLElement;
+        header.parentElement?.removeChild(header);
+    }
+
+    // const header = container.querySelector('header, .header, h1');
+    // if (header) header.remove();
+
+    // initBallsBackground(container, {
+    //     numSpheres: 30,
+    //     sphereRadius: 1.2,
+    //     backgroundColor: new Color4(1, 1, 1, 1),
+    // });
 
     // Create game wrapper div
     const gameWrapper = document.createElement("div");
