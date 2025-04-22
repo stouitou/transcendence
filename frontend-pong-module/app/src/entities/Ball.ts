@@ -21,6 +21,8 @@ export class	Ball extends Object {
 	private				_left!: number;
 	private				_right!: number;
 
+	private				_lastHit: Player | null = null;
+
 	constructor (canvas: HTMLCanvasElement) {
 		super(canvas);
 		this.spawn();
@@ -99,6 +101,7 @@ export class	Ball extends Object {
 
 	bounce (paddle: Paddle) {
 		this._rebound = true;
+		this._lastHit = paddle.owner;
 
 		this._direction.x *= -1;	
 
@@ -118,20 +121,53 @@ export class	Ball extends Object {
 	}
 
 	out (players: Player[]) {
-		if (this._right < 0) {
-			players[0].score();
+		if (this._right < 0 || this._left > this._fieldWidth || this._bottom < 0 || this._top > this._fieldHeight) {
+			if (this._left > this._fieldWidth) {
+				if (this._lastHit === null || this._lastHit.location === 0) {
+					players[0].losePoint();
+				}
+				else if (this._lastHit)
+					this._lastHit.score();
+			}
+			else if (this._right < 0) {
+				if (this._lastHit === null || this._lastHit.location === 1) {
+					players[1].losePoint();
+				}
+				else if (this._lastHit)
+					this._lastHit.score();
+			}
+			else if (this._top > this._fieldHeight) {
+				if (this._lastHit === null || this._lastHit.location === 2) {
+					players[2].losePoint();
+				}
+				else if (this._lastHit)
+					this._lastHit.score();
+			}
+			else if (this._bottom < 0) {
+				if (this._lastHit === null || this._lastHit.location === 3) {
+					players[3].losePoint();
+				}
+				else if (this._lastHit)
+					this._lastHit.score();
+			}
+			this._lastHit = null;
 			this._rebound = false;
-			return true;
+			return true ;
 		}
-		else if (this._left > this._fieldWidth) {
-			players[1].score();
-			this._rebound = false;
-			return true;
-		}
-		else if (this._bottom < 0 || this._top > this._fieldHeight){
-			this._rebound = false;
-			return true;
-		}
+		// if (this._right < 0) {
+		// 	players[0].score();
+		// 	this._rebound = false;
+		// 	return true;
+		// }
+		// else if (this._left > this._fieldWidth) {
+		// 	players[1].score();
+		// 	this._rebound = false;
+		// 	return true;
+		// }
+		// else if (this._bottom < 0 || this._top > this._fieldHeight){
+		// 	this._rebound = false;
+		// 	return true;
+		// }
 		return false;
 	}
 

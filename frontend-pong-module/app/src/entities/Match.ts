@@ -40,7 +40,7 @@ export class	Match {
 		for (let i = 0; i < this._players.length; i++) {
 			this._players[i].location = i;
 			this._players[i].points = 0;
-			this._players[i].paddle = new Paddle(canvas, this._players[i].location, this._players[i].role);
+			this._players[i].paddle = new Paddle(canvas, this._players[i], this._players[i].location, this._players[i].role);
 		}
 		// for (let i = 0; i < this._players.length; i++)
 		// 	this._paddles[i] = new Paddle(canvas, i, players[i].role);
@@ -163,11 +163,11 @@ export class	Match {
 		canvas.style.border = 'none';
 		canvas.style.top = '0';
 		canvas.style.verticalAlign = 'top';
-		canvas.width = 700;
+		canvas.height = 500;
 		if (this._players.length === 2)
-			canvas.height = 500;
+			canvas.width = 700;
 		else if (this._players.length > 2)
-			canvas.height = 700;
+			canvas.width = 500;
 
 		return canvas;
 	}

@@ -55,7 +55,7 @@ export class  classic extends LitElement {
   private async setupGame () {
     try {
       const player: Player = await this.createPlayer();
-      await this.createGame([player, new Bot(1)]);
+      await this.createGame([new Bot(1), new Bot(1), new Bot(1), new Bot(1)]);
     // await this.addToHistory();
     }
     catch (error) {

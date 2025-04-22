@@ -4,6 +4,7 @@ import { Player } from "./Player.ts";
 
 export class	Paddle extends Object {
 
+	private readonly	_owner: Player;
 	private readonly	_color: string = 'rgb(255, 0, 0)';
 	private readonly	_width: number = 20;
 	private readonly	_height: number = 120;
@@ -12,6 +13,8 @@ export class	Paddle extends Object {
 	private readonly	_bot: boolean;
 	private				_moveUp: boolean = false;
 	private				_moveDown: boolean = false;
+	private				_moveLeft: boolean = false;
+	private				_moveRight: boolean =  false;
 	
 	private readonly	_location: number;
 
@@ -20,31 +23,50 @@ export class	Paddle extends Object {
 
 	private				_top!: number;
 	private				_bottom!: number;
-	private				_left: number;
-	private				_right: number;
+	private				_left!: number;
+	private				_right!: number;
 
-	constructor (canvas: HTMLCanvasElement, location: number, bot: string) {
+	constructor (canvas: HTMLCanvasElement, owner: Player, location: number, bot: string) {
 		super(canvas);
 
+		this._owner = owner;
 		this._location = location;
-		this._y = (this._fieldHeight / 2) - (this._height / 2);
-		if (this._location === 0) {
-			this._x = this._fieldWidth - 5 - this._width;
+		if (this._location === 0 || this._location === 1) {
+			this._y = (this._fieldHeight / 2) - (this._height / 2);
+			if (this._location === 0) {
+				this._x = this._fieldWidth - 5 - this._width;
+			}
+			else if (this._location === 1) {
+				this._x = 5;
+			}
+			this._top = this._y;
+			this._bottom = this._y + this._height;
+			this._left = this._x;
+			this._right = this._x + this._width;
 		}
-		else if (this._location === 1) {
-			this._x = 5;
+		else if (this._location === 2 || this._location === 3) {
+			this._x = (this._fieldWidth / 2) - (this._height / 2);
+			if (this._location === 2) {
+				this._y = this._fieldHeight - 5 - this._width;
+			}
+			else if (this._location === 3) {
+				this._y = 5;
+			}
+			this._top = this._y;
+			this._bottom = this._y + this._width;
+			this._left = this._x;
+			this._right = this._x + this._height;
 		}
+		this._bot = bot === 'bot' ? true : false;		
 
-		this._bot = bot === 'bot' ? true : false;
+		if (!this._bot && (this._location === 0 || this._location === 1))
+			this.eventListenerVertical();
+		else if (!this._bot && (this._location === 2 || this._location === 3))
+			this.eventListenerHorizontal();
+	}
 
-		this._top = this._y;
-		this._bottom = this._y + this._height;
-		this._left = this._x;
-		this._right = this._x + this._width;
-
-		if (!this._bot) {
-			this.eventListener();
-		}
+	get owner () {
+		return this._owner ;
 	}
 
 	get color () {
@@ -112,8 +134,11 @@ export class	Paddle extends Object {
 	}
 
 	move (player: Player, ball: Ball) {
-		if (player.role === 'bot')
-			this.followBall(ball);
+		if (player.role === 'bot') {
+			if (this._location === 0 || this._location === 1)
+				this.followBallVertical(ball);
+			else if (this._location === 2 || this._location === 3) 
+				this.followBallHorizontal(ball); }
 		this.update();
 		this.draw();
 	}
@@ -123,13 +148,14 @@ export class	Paddle extends Object {
 			ball.x - ball.radius <= this._right &&
 			ball.y + ball.radius >= this._top &&
 			ball.y - ball.radius <= this._bottom) {
+				console.log("location = ", this._location);
 				ball.bounce(this);
 				return (true);
 			}
 		return (false);
 	}
 
-	private followBall (ball: Ball) {
+	private followBallVertical (ball: Ball) {
 		if (this._y + (this._height / 2) > ball.y) {
 			this._moveUp = true;
 			this._moveDown = false;
@@ -140,10 +166,26 @@ export class	Paddle extends Object {
 		}
 	}
 
+	private followBallHorizontal (ball: Ball) {
+		if (this._x + (this._height / 2) > ball.x) {
+			this._moveLeft = true;
+			this._moveRight = false;
+		}
+		else {
+			this._moveLeft = false;
+			this._moveRight = true;
+		}
+	}
+
 	private draw () {
 		this._field.fillStyle = this._color;
 		this._field.beginPath();
-		this._field.fillRect(this._x, this._y, this._width, this._height);
+		if (this._location === 0 || this._location === 1) {
+			this._field.fillRect(this._x, this._y, this._width, this._height);
+		}
+		else if (this._location === 2 || this._location === 3) {
+			this._field.fillRect(this._x, this._y, this._height, this._width);
+		}
 	}
 
 	private update () {
@@ -151,11 +193,25 @@ export class	Paddle extends Object {
 			this._y -= this._speed;
 		if (this._moveDown && this._bottom < this._fieldHeight)
 			this._y += this._speed;
+
+		if (this._moveRight && this._right < this._fieldWidth)
+			this._x += this._speed;
+		if (this._moveLeft && this._left > 0)
+			this._x -= this._speed;
+		
+		this._left = this._x;
 		this._top = this._y;
-		this._bottom = this._y + this._height;
+		if (this._location === 0 || this._location === 1) {
+			this._bottom = this._y + this._height;
+			this._right = this._x + this._width;
+		}
+		if (this._location === 2 || this._location === 3) {
+			this._bottom = this._y + this._width ;
+			this._right = this._x + this._height;
+		}
 	}
 
-	private eventListener () {
+	private eventListenerVertical () {
 		if (this._location === 0) {
 			document.addEventListener('keydown', (event) => {
 				if (event.key === 'ArrowUp') {
@@ -184,6 +240,39 @@ export class	Paddle extends Object {
 					this._moveUp = false;
 				if (event.key === 'x')
 					this._moveDown = false;
+			})
+		}
+	}
+
+	private eventListenerHorizontal () {
+		if (this._location === 2) {
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'ArrowLeft') {
+					this._moveLeft = true;
+				}
+				if (event.key === 'ArrowRight')
+					this._moveRight = true;
+			})
+			document.addEventListener('keyup', (event) => {
+				if (event.key === 'ArrowLeft') {
+					this._moveLeft = false;
+				}
+				if (event.key === 'ArrowRight')
+					this._moveRight = false;
+			})
+		}
+		else if (this._location === 3) {
+			document.addEventListener('keydown', (event) => {
+				if (event.key === 'a')
+					this._moveLeft = true;
+				if (event.key === 'd')
+					this._moveRight = true;
+			})
+			document.addEventListener('keyup', (event) => {
+				if (event.key === 'a')
+					this._moveLeft = false;
+				if (event.key === 'd')
+					this._moveRight = false;
 			})
 		}
 	}

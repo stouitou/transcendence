@@ -84,4 +84,13 @@ export class	Player{
 		const score: HTMLParagraphElement = this._display.lastElementChild as HTMLParagraphElement;
 		score.textContent = `${this._points}`;
 	}
+
+	losePoint () {
+		if (this._points === 0)
+			return ;
+		this._points--;
+		const score: HTMLParagraphElement = this._display.lastElementChild as HTMLParagraphElement;
+		score.textContent = `${this._points}`;
+	}
+
 }
