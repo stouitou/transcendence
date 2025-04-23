@@ -1,9 +1,9 @@
-import { Object } from "./Object.ts"
+import { Object } from "./Object.ts";
 import { Ball } from "./Ball.ts";
 import { Player } from "./Player.ts";
+import * as Design from "./Design";
 
-export class	Paddle extends Object {
-
+export class Paddle extends Object {
 	private readonly	_owner: Player;
 
 	private readonly	_color: string = 'rgb(255, 0, 0)';
@@ -56,19 +56,11 @@ export class	Paddle extends Object {
 		}
 		if (this._owner.role !== 'bot')
 			this.eventListenerVertical();
-
-		// if (this._owner.role !== 'bot' && (this._owner.location === 0 || this._owner.location === 1))
-		// 	this.eventListenerVertical();
-		// else if (this._owner.role !== 'bot' && (this._owner.location === 2 || this._owner.location === 3))
-		// 	this.eventListenerHorizontal();
 	}
 
+	/* ---------- immutable props (values unchanged) ---------- */
 	get owner () {
 		return this._owner ;
-	}
-
-	get color () {
-		return this._color ;
 	}
 
 	get width () {
@@ -123,38 +115,32 @@ export class	Paddle extends Object {
 		this._moveDown = moveDown ;
 	}
 
+	/* ---------- main API ---------- */
 	move (player: Player, ball: Ball) {
 		if (player.role === 'bot') {
 			if (this._owner.location === 0 || this._owner.location === 1)
 				this.followBallVertical(ball);
 			else if (this._owner.location === 2 || this._owner.location === 3) 
-				this.followBallHorizontal(ball); }
+				this.followBallHorizontal(ball);
+			}
 		this.update();
 		this.draw();
 	}
-	
+
 	collision (ball: Ball) {
-		if (ball.x + ball.radius > this._left &&
+		if (
+			ball.x + ball.radius > this._left  &&
 			ball.x - ball.radius < this._right &&
-			ball.y + ball.radius > this._top &&
-			ball.y - ball.radius < this._bottom) {
-				ball.bounce(this);
-				return (true);
-			}
-		return (false);
+			ball.y + ball.radius > this._top   &&
+			ball.y - ball.radius < this._bottom
+		) {
+			ball.bounce(this);
+			return true;
+		}
+		return false;
 	}
 
-	private followBallVertical (ball: Ball) {
-		if (this._y + (this._height / 2) > ball.y) {
-			this._moveUp = true;
-			this._moveDown = false;
-		}
-		else {
-			this._moveUp = false;
-			this._moveDown = true;
-		}
-	}
-
+	/* ---------- internal ---------- */
 	private followBallHorizontal (ball: Ball) {
 		if (this._x + (this._height / 2) > ball.x) {
 			this._moveLeft = true;
@@ -166,14 +152,9 @@ export class	Paddle extends Object {
 		}
 	}
 
-	private draw () {
-		this._field.fillStyle = this._color;
-		this._field.beginPath();
-		if (this._owner.location === 0 || this._owner.location === 1) {
-			this._field.fillRect(this._x, this._y, this._width, this._height);
-		}
-		else if (this._owner.location === 2 || this._owner.location === 3) {
-			this._field.fillRect(this._x, this._y, this._height, this._width);
+	private followBallVertical (ball: Ball) {
+		if (this._y + (this._height / 2) > ball.y) {
+			this._moveUp = true;
 		}
 	}
 
@@ -259,69 +240,31 @@ export class	Paddle extends Object {
 				});
 				break ;
 		}
-	// 	}
-	// 	if (this._owner.location === 0) {
-	// 		document.addEventListener('keydown', (event) => {
-	// 			if (event.key === 'ArrowUp') {
-	// 				this._moveUp = true;
-	// 			}
-	// 			if (event.key === 'ArrowDown')
-	// 				this._moveDown = true;
-	// 		})
-	// 		document.addEventListener('keyup', (event) => {
-	// 			if (event.key === 'ArrowUp') {
-	// 				this._moveUp = false;
-	// 			}
-	// 			if (event.key === 'ArrowDown')
-	// 				this._moveDown = false;
-	// 		})
-	// 	}
-	// 	else if (this._owner.location === 1) {
-	// 		document.addEventListener('keydown', (event) => {
-	// 			if (event.key === 's')
-	// 				this._moveUp = true;
-	// 			if (event.key === 'x')
-	// 				this._moveDown = true;
-	// 		})
-	// 		document.addEventListener('keyup', (event) => {
-	// 			if (event.key === 's')
-	// 				this._moveUp = false;
-	// 			if (event.key === 'x')
-	// 				this._moveDown = false;
-	// 		})
-	// 	}
-	// }
+	}
 
-	// private eventListenerHorizontal () {
-	// 	if (this._owner.location === 2) {
-	// 		document.addEventListener('keydown', (event) => {
-	// 			if (event.key === 'ArrowLeft') {
-	// 				this._moveLeft = true;
-	// 			}
-	// 			if (event.key === 'ArrowRight')
-	// 				this._moveRight = true;
-	// 		})
-	// 		document.addEventListener('keyup', (event) => {
-	// 			if (event.key === 'ArrowLeft') {
-	// 				this._moveLeft = false;
-	// 			}
-	// 			if (event.key === 'ArrowRight')
-	// 				this._moveRight = false;
-	// 		})
-	// 	}
-	// 	else if (this._owner.location === 3) {
-	// 		document.addEventListener('keydown', (event) => {
-	// 			if (event.key === 'a')
-	// 				this._moveLeft = true;
-	// 			if (event.key === 'd')
-	// 				this._moveRight = true;
-	// 		})
-	// 		document.addEventListener('keyup', (event) => {
-	// 			if (event.key === 'a')
-	// 				this._moveLeft = false;
-	// 			if (event.key === 'd')
-	// 				this._moveRight = false;
-	// 		})
-	// 	}
+	/** DESIGN‑ONLY CHANGE: use rounded‑rect helper */
+	private draw() {
+		let height: number = 0;
+		let width: number = 0;
+
+		switch (this.owner.location) {
+			case 0:
+			case 1:
+				height = this._height;
+				width = this._width;
+				break;
+			case 2:
+			case 3:
+				height = this._width;
+				width = this._height;
+				break;
+		}
+		Design.drawPaddle(
+			this._field,
+			this._x,
+			this._y,
+			width,
+			height
+		);
 	}
 }
