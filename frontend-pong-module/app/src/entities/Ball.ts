@@ -103,21 +103,91 @@ export class	Ball extends Object {
 		this._rebound = true;
 		this._lastHit = paddle.owner;
 
-		this._direction.x *= -1;	
+		// Vecteur direction actuel de la balle
+		const v = { x: this._direction.x, y: this._direction.y };
 
-		if (paddle.location === 0 || paddle.location === 1) {
-			// Formula for the rebound : θrebound ​= θmax ​× (2 × ((yimpact ​− ypaddle) / paddle height)​)
-			const impact: number = 2 * ((this._y - (paddle.y + (paddle.height / 2))) / paddle.height);
-			const angle = ((55 * Math.PI / 180) * impact) + (5 * Math.PI / 180);	// get an angle between 5 and 60 degrees
-			this._direction.x = Math.cos(angle) * Math.sign(this._direction.x);
-			this._direction.y = Math.sin(angle);
+		// Normale du paddle
+		let n: { x: number, y: number };
+		if (paddle.owner.location === 0)       n = { x: 1, y: 0 };   // Left
+		else if (paddle.owner.location === 1)  n = { x: -1, y: 0 };  // Right
+		else if (paddle.owner.location === 2)  n = { x: 0, y: 1 };   // Top
+		else                             n = { x: 0, y: -1 };  // Bottom
+
+		// Dot product
+		const dot = v.x * n.x + v.y * n.y;
+
+		// Formule de réflexion vectorielle
+		this._direction.x = v.x - 2 * dot * n.x;
+		this._direction.y = v.y - 2 * dot * n.y;
+
+		// Maintenant, ajoute un peu d'angle selon le point d’impact sur le paddle
+		const tangent = { x: -n.y, y: n.x };
+		let impactRatio = 0;
+
+		if (n.x !== 0) {
+			// Paddle vertical : impact sur Y
+			impactRatio = (this._y - (paddle.y + paddle.height / 2)) / (paddle.height / 2);
+		} else {
+			// Paddle horizontal : impact sur X
+			impactRatio = (this._x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
 		}
-		else {
-			const impact: number = 2 * ((this._y - (paddle.y + (paddle.height / 2))) / paddle.height);
-			const angle: number = ((5 * Math.PI / 180) * impact) + (55 * Math.PI / 180);	// get an angle between 5 and 60 degrees
-			this._direction.x = Math.sin(angle) * Math.sign(this._direction.x);
-			this._direction.y = -Math.cos(angle);
-		}
+
+		// Clamp entre -1 et 1
+		impactRatio = Math.max(-1, Math.min(1, impactRatio));
+
+		// Ajoute une légère déviation angulaire tangentielle
+		const deviationStrength = 0.4; // plus petit = plus droit
+		this._direction.x += tangent.x * impactRatio * deviationStrength;
+		this._direction.y += tangent.y * impactRatio * deviationStrength;
+
+		// Normalise
+		const mag = Math.sqrt(this._direction.x ** 2 + this._direction.y ** 2);
+		this._direction.x /= mag;
+		this._direction.y /= mag;
+		// const	angleMin = 5 * Math.PI / 180;
+		// const	angleMax = 60 * Math.PI / 180;
+		// let		angle: number;
+		// let 	impact: number;
+
+		// switch (paddle.location) {
+		// 	case 0:
+		// 	case 1:
+		// 		console.log('paddle.location', paddle.location);
+		// 		impact = 2 * ((this._y - (paddle.y + (paddle.height / 2))) / paddle.height);
+		// 		angle = angleMin + ((angleMax - angleMin) * Math.abs(impact));	// get an angle between 5 and 60 degrees
+		// 		this._direction.x = Math.cos(angle) * (paddle.location === 0 ? 1 : -1);
+		// 		this._direction.y = Math.sin(angle) * Math.sign(impact);
+		// 		break ;
+
+		// 	case 2:
+		// 	case 3:
+		// 		impact = 2 * ((this._x - (paddle.x + (paddle.width / 2))) / paddle.width);
+		// 		angle = angleMin + ((angleMax - angleMin) * Math.abs(impact));
+		// 		this._direction.y = Math.cos(angle * (paddle.location === 2 ? 1 : -1));
+		// 		this._direction.x = Math.sin(angle) * Math.sign(impact);
+		// 		break ;
+		// }
+	// this._direction.x *= -1;	
+
+	// 	if (paddle.location === 0 || paddle.location === 1) {
+	// 		// Formula for the rebound : θrebound ​= θmax ​× (2 × ((yimpact ​− ypaddle) / paddle height)​)
+	// 		const impact: number = 2 * ((this._y - (paddle.y + (paddle.height / 2))) / paddle.height);
+	// 		const angle = ((55 * Math.PI / 180) * impact) + (5 * Math.PI / 180);	// get an angle between 5 and 60 degrees
+	// 		this._direction.x = Math.cos(angle) * Math.sign(this._direction.x);
+	// 		this._direction.y = Math.sin(angle);
+	// 	}
+	// 	else if (paddle.location === 2 || paddle.location === 3) {
+	// 		const impact: number = 2 * ((this._x - (paddle.x + (paddle.width / 2))) / paddle.width);
+	// 		const angle = ((55 * Math.PI / 180) * impact) + (5 * Math.PI / 180);
+	// 		this._direction.y = Math.cos(angle) * Math.sign(this._direction.y);
+	// 		this._direction.x = Math.sin(angle);
+	// 	}
+	// 	else {
+	// 		const impact: number = 2 * ((this._y - (paddle.y + (paddle.height / 2))) / paddle.height);
+	// 		const angle: number = ((5 * Math.PI / 180) * impact) + (55 * Math.PI / 180);	// get an angle between 5 and 60 degrees
+	// 		this._direction.x = Math.sin(angle) * Math.sign(this._direction.x);
+	// 		this._direction.y = -Math.cos(angle);
+	// 	}
 	}
 
 	out (players: Player[]) {

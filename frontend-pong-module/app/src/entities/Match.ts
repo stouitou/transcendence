@@ -40,10 +40,8 @@ export class	Match {
 		for (let i = 0; i < this._players.length; i++) {
 			this._players[i].location = i;
 			this._players[i].points = 0;
-			this._players[i].paddle = new Paddle(canvas, this._players[i], this._players[i].location, this._players[i].role);
+			this._players[i].paddle = new Paddle(canvas, this._players[i]);
 		}
-		// for (let i = 0; i < this._players.length; i++)
-		// 	this._paddles[i] = new Paddle(canvas, i, players[i].role);
 
 		this.eventListener();
 	}
