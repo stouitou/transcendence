@@ -115,53 +115,68 @@ export class Dashboard extends BaseComponent<{ user: User | null,tournamentsData
 	}
   
 	private renderDashboard() {
-	  this.innerHTML = `
-	  <div class="mx-auto p-6 text-center">
-		<!--<game-card-component></game-card-component>-->
-		<div class="flex flex-row space-x-4">
-			<profile-component></profile-component>
-			<chat-component></chat-component>
-		</div>
-		<h2 class="text-2xl font-bold my-2">Game Stats</h2>
-		<div class="flex flex-row items-center justify-center bg-white rounded-lg shadow-md dark:bg-gray-800">
-			<donuts-chart id="gameChart"></donuts-chart>
-			<donuts-chart id="gameChartLocal"></donuts-chart>
-			<donuts-chart id="gameChartRemote"></donuts-chart>
-		</div>
-		<h2 class="text-2xl font-bold my-4">Tournament Stats</h2>
-		<div class="flex flex-row items-center justify-center bg-white rounded-lg shadow-md dark:bg-gray-800">
-			<donuts-chart id="tournamentChart"></donuts-chart>
-			<donuts-chart id="tournamentChartLocal"></donuts-chart>
-			<donuts-chart id="tournamentChartRemote"></donuts-chart>
-		</div>
-			<game-history-component></game-history-component>
-			<dashboard-tournois></dashboard-tournois>
-	  </div>
-	  `;
-	 
-	// recuperer les stats de l'utilisateur
-	const userStats = this.createDataSet(); 
-	  // Transmettre les données au composant dashboard-tournois
-	   const dashboard = this.querySelector('dashboard-tournois') as any;
-	  dashboard.data = this.state.tournamentsData;
-
-	  const gameChart = this.querySelector('#gameChart') as any;
-	  gameChart.data = userStats.gamePlayedTotalData;
-	  const gameChartLocal = this.querySelector('#gameChartLocal') as any;
-	  gameChartLocal.data = userStats.gamePlayedLocalData;
-	  console.log('gameChartLocal',  userStats.gamePlayedLocalData);
-	  const gameChartRemote = this.querySelector('#gameChartRemote') as any;
-	  gameChartRemote.data = userStats.gamePlayedRemoteData;
-
-	  const tournamentChart = this.querySelector('#tournamentChart') as any;
-	  tournamentChart.data = userStats.gamePlayedTournamentData;
-	  const gameChartTournamentLocal = this.querySelector('#tournamentChartLocal') as any;
-	  gameChartTournamentLocal.data = userStats.gamePlayedTournamentLocalData;
-	  const gameChartTournamentRemote = this.querySelector('#tournamentChartRemote') as any;
-	  gameChartTournamentRemote.data = userStats.gamePlayedTournamentRemoteData;
-
-
-	}
+		this.innerHTML = `
+		  <div class="min-h-screen w-full px-6 py-10 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
+			<div class="max-w-7xl mx-auto space-y-10">
+			  
+			  <!-- Profile & Chat Row -->
+			  <div class="flex flex-col md:flex-row gap-6">
+				<profile-component class="flex-1"></profile-component>
+				<chat-component class="flex-1"></chat-component>
+			  </div>
+	  
+			  <!-- Game Stats Section -->
+			  <section>
+				<h2 class="text-2xl font-bold mb-4 text-center">Game Stats</h2>
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md">
+				  <donuts-chart id="gameChart"></donuts-chart>
+				  <donuts-chart id="gameChartLocal"></donuts-chart>
+				  <donuts-chart id="gameChartRemote"></donuts-chart>
+				</div>
+			  </section>
+	  
+			  <!-- Tournament Stats Section -->
+			  <section>
+				<h2 class="text-2xl font-bold mb-4 text-center">Tournament Stats</h2>
+				<div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md">
+				  <donuts-chart id="tournamentChart"></donuts-chart>
+				  <donuts-chart id="tournamentChartLocal"></donuts-chart>
+				  <donuts-chart id="tournamentChartRemote"></donuts-chart>
+				</div>
+			  </section>
+	  
+			  <!-- History + Dashboard -->
+			  <game-history-component></game-history-component>
+			  <dashboard-tournois></dashboard-tournois>
+			</div>
+		  </div>
+		`;
+	  
+		const userStats = this.createDataSet();
+	  
+		const dashboard = this.querySelector('dashboard-tournois') as any;
+		dashboard.data = this.state.tournamentsData;
+	  
+		const gameChart = this.querySelector('#gameChart') as any;
+		gameChart.data = userStats.gamePlayedTotalData;
+	  
+		const gameChartLocal = this.querySelector('#gameChartLocal') as any;
+		gameChartLocal.data = userStats.gamePlayedLocalData;
+	  
+		const gameChartRemote = this.querySelector('#gameChartRemote') as any;
+		gameChartRemote.data = userStats.gamePlayedRemoteData;
+	  
+		const tournamentChart = this.querySelector('#tournamentChart') as any;
+		tournamentChart.data = userStats.gamePlayedTournamentData;
+	  
+		const gameChartTournamentLocal = this.querySelector('#tournamentChartLocal') as any;
+		gameChartTournamentLocal.data = userStats.gamePlayedTournamentLocalData;
+	  
+		const gameChartTournamentRemote = this.querySelector('#tournamentChartRemote') as any;
+		gameChartTournamentRemote.data = userStats.gamePlayedTournamentRemoteData;
+	  }
+	  
+	
 
 	createDataSet() {
 		// Données reelles
