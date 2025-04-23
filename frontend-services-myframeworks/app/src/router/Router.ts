@@ -27,17 +27,27 @@ export class RouterConfig {
   }
 
   // Naviguer vers une route
-  public navigate(path: string) {
-    if (this._routes[path]) {
-      this.loadComponent(path);
-      window.history.pushState({ path }, '', path);
+  public navigate(href: string ,replace: boolean = false) {
+    const uri = new URL(href, window.location.origin); // Inclure l'origine pour éviter les erreurs
+    const pathWithQuery = uri.pathname + uri.search; // Inclure les query strings
+
+
+    if (this._routes[uri.pathname]) {
+        this.loadComponent(uri.pathname,uri.searchParams); // Charger le composant avec les query strings
+        if (replace) {
+          window.history.replaceState({ path: pathWithQuery}, '', href); // Remplacer l'état initial
+      } else {
+          window.history.pushState({ path: pathWithQuery }, '', href); // Ajouter un nouvel état
+      }
     } else {
-      console.error(`Route not found: ${path}`);
+      console.error(`Route not found: ${href}`);
     }
   }
 
   // Charger un composant
-  private loadComponent(path: string) {
+  private loadComponent(path: string,searchParams: URLSearchParams | null = null) {
+    console.log('Loading component for path:', path);
+    console.log('searchParams:', searchParams);
     const app = document.querySelector('router-view');
     if (!app) {
       console.error('<router-view> not found in the DOM');
@@ -52,6 +62,16 @@ export class RouterConfig {
 
     // Monter le nouveau composant
     const component = this._routes[path]();
+    if (!component) {
+      console.error(`Component not found for path: ${path}`);
+      return;
+    }
+    if (searchParams) {
+      // Passer les paramètres de recherche au composant
+      const params = Object.fromEntries(searchParams.entries());
+      (component as any).params = params;
+      console.log('params:', params);
+    }
     app.appendChild(component);
     this._currentComponent = component;
   }
@@ -59,13 +79,15 @@ export class RouterConfig {
   // Gérer les actions "Précédent" et "Suivant"
   public handlePopState(event: PopStateEvent) {
     const path = event.state?.path || '/';
-    this.loadComponent(path);
+    const uri = new URL(path, window.location.origin); // Inclure l'origine pour éviter les erreurs
+    this.loadComponent(path,uri.searchParams); // Charger le composant avec les query strings
   }
 }
 const routerConfig = RouterConfig.getInstance();
 routerConfig.addRoute('/', () => document.createElement('home-component'));
 routerConfig.addRoute('/about', () => document.createElement('about-component'));
-routerConfig.addRoute('/game', () => document.createElement('pong-game'));
+//routerConfig.addRoute('/game', () => document.createElement('pong-game'));
+routerConfig.addRoute('/game', () => document.createElement('game-component'));
 routerConfig.addRoute('/login', () => document.createElement('login-component'));
 routerConfig.addRoute('/profile', () => document.createElement('profile-component'));
 routerConfig.addRoute('/register', () => document.createElement('register-component'));
@@ -90,13 +112,20 @@ export class Router extends HTMLElement {
   }
   connectedCallback() {
     // Naviguer vers la route initiale
-    const initialPath = window.location.pathname;
-    this.routerConfig.navigate(initialPath);
+   // const initialPath = window.location.pathname;
+    const initialPath = window.location.href;
+    this.routerConfig.navigate(initialPath,true);
   }
 
   // Gérer les clics sur les liens de navigation
   private handleLinkClick(event: MouseEvent) {
-    const target = event.target as HTMLElement;
+    let target = event.target as HTMLElement;
+
+    // Remonter dans l'arbre DOM pour trouver la balise <a> parente
+    while (target && target.tagName !== 'A') {
+        target = target.parentElement as HTMLElement;
+    }
+
     if (target.tagName === 'A') {
       const href = (target as HTMLAnchorElement).getAttribute('href');
       if (href && !href.startsWith('http')) {

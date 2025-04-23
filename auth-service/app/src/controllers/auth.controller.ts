@@ -115,11 +115,11 @@ export class AuthController extends BaseController {
     if (!authHeader) return reply.status(401).send({ error: "No token provided" });
 
     try {
-      console.log("🔓 me authHeader",authHeader)
+     // console.log("🔓 me authHeader",authHeader)
 
       const token = authHeader.split(" ")[1];
       const decoded = this.app.jwt.verify(token,"ACCESS_TOKEN_PUBLIC_KEY") as any;
-      console.log("🟢 me decoded",decoded)
+     // console.log("🟢 me decoded",decoded)
 
       /**
        * debug token info
@@ -134,13 +134,13 @@ export class AuthController extends BaseController {
   
    //const result = await  UserRepository.getUserById(decoded.id);
    const result = await  this.UserRepository.getById(decoded.id);
-   console.log("🟢 me result",result)
+  // console.log("🟢 me result",result)
    if (!result) {
     return reply.status(401).send({ error: "Invalid token" });
   }
   //created_at
   //created_at
-   console.log("81 🟢 me result",result)  
+  // console.log("81 🟢 me result",result)  
    return reply.status(200).send(result);
     } catch (err) {
       console.error("🔴 me error",err)

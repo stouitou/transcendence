@@ -1,9 +1,9 @@
 import { FastifyInstance } from "fastify";
 import { WebSocket } from "@fastify/websocket"
 
-import  { AuthMiddleware } from "../middlewares/auth.middleware";
 import { FastifyRequest } from "fastify/types/request";
 import  {WsController}  from "../controllers/ws.controller";
+import  {WsGameController}  from "../controllers/ws.game.controller";
 
 
 
@@ -11,6 +11,7 @@ import  {WsController}  from "../controllers/ws.controller";
 
 async function wsRoutes(app: FastifyInstance) {
   const wsController = new WsController();
+  const wsGameController = new WsGameController();
 
 
   app.addHook('onRequest', async (request, reply) => {
@@ -60,6 +61,7 @@ async function wsRoutes(app: FastifyInstance) {
   })
 
   app.get('/', { websocket: true }, wsController.ws);
+  app.get('/wspong', { websocket: true }, wsGameController.ws);
   app.get('/broadcast', wsController.broadcastMessage);
   
 }

@@ -107,8 +107,18 @@ export class	Match {
 					if (player.points === this._pointsToWin) {
 						await this.endGame(player);
 						this._players.forEach((player) => {player.display.innerHTML = '';});
-						this._gameWrapper.removeChild(this._appendix);
-						this._gameWrapper.removeChild(this._field.canvas);				
+					//	this._gameWrapper.removeChild(this._appendix);
+					//	this._gameWrapper.removeChild(this._field.canvas);	
+					
+					// Create a new Action alert
+							const	alert: Alert = new Alert(`new Action //TODO !\n`);
+							this._gameWrapper.appendChild(alert.element);
+							setTimeout(() => {
+								this._gameWrapper.removeChild(alert.element);
+								resolve();
+							}, 4000);
+					// end Action alert
+
 						resolve();
 						return ;
 					}
@@ -163,7 +173,8 @@ export class	Match {
 		canvas.style.border = 'none';
 		canvas.style.top = '0';
 		canvas.style.verticalAlign = 'top';
-		canvas.width = 700;
+		//canvas.width = 700;
+		canvas.width = this._gameWrapper.clientWidth;
 		if (this._players.length === 2)
 			canvas.height = 500;
 		else if (this._players.length > 2)

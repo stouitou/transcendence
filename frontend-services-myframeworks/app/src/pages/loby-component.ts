@@ -100,6 +100,7 @@ export class LobyComponent extends BaseComponent<{ ws: IWebSocketsService | null
           <span class="text-sm "> server View</span>
         </h2>
         <div class="flex flex-col items-center">Game ID: ${this.gameID}</div>
+        <div class="flex flex-col items-center"><a href ="/game?id=${this.gameID}">join game</a></div>
         <div class="flex flex-col items-center">Game State: ${game?.state}</div>
         <div class="flex flex-col items-center">Game Difficulty: ${game?.difficulty}</div>
         <div class="flex flex-col items-center">Game Type: ${game?.type}</div>
