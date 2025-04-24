@@ -7,6 +7,7 @@ import { Register } from "./register";
 import { ChatComponent } from './chat-component.ts';
 import { TournamentHistory } from "./tounamentHistory-component.ts";
 import { Dashboard } from "./dashboard-test-component.ts";
+import { GameLobyComponent } from "./game-loby-componemt.ts";
 class HomeComponent extends HTMLElement {
 	connectedCallback() {
 	  this.innerHTML = `<h1>Welcome to the Home Page</h1>
@@ -53,4 +54,9 @@ if (!customElements.get('chat-component')) {
 
 if (!customElements.get('dashboard-component')) {
 	customElements.define('dashboard-component', Dashboard);
+}
+
+
+if (!customElements.get('game-loby-component')) {
+	customElements.define('game-loby-component', GameLobyComponent);
 }

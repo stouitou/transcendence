@@ -95,6 +95,7 @@ routerConfig.addRoute('/game-history', () => document.createElement('game-histor
 routerConfig.addRoute('/game-setting', () => document.createElement('game-setting-component'));
 routerConfig.addRoute('/messages', () => document.createElement('chat-component'));
 routerConfig.addRoute('/dashboard', () => document.createElement('dashboard-component'));
+routerConfig.addRoute('/game-loby', () => document.createElement('game-loby-component'));
 
 
 
@@ -126,7 +127,7 @@ export class Router extends HTMLElement {
         target = target.parentElement as HTMLElement;
     }
 
-    if (target.tagName === 'A') {
+    if (target && target.tagName === 'A') {
       const href = (target as HTMLAnchorElement).getAttribute('href');
       if (href && !href.startsWith('http')) {
         event.preventDefault(); // Empêcher le comportement par défaut

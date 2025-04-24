@@ -1,7 +1,8 @@
 import { BaseComponent } from "../frameworks/base-component.ts";
 import { Players, User, UserContext } from "../globalstate/GlobalState.ts";
+import { IWebSocketsService } from "../globalstate/WebSocketService.ts";
 import { fetchProfileData } from "../services/authService.ts";
-import { JoinGameComponent, LobyComponent } from "./loby-component.ts";
+import { JoinGameComponent, LobyComponent, LobyComponentClient } from "./loby-component.ts";
 
 
 if (!customElements.get('lobby-component'))
@@ -10,7 +11,7 @@ customElements.define('lobby-component', LobyComponent);
 if (!customElements.get('join-game-component'))
   customElements.define('join-game-component', JoinGameComponent);
 export class GameSetting extends BaseComponent<{ user: User | null; difficulty: number,type:string,format:string,mode:string,
-  max_players: number, players?: Players[] }> {
+  max_players: number, players?: Players[] ,ws?: IWebSocketsService | null}> {
   constructor() {
     super({ user: null, difficulty: 1,type:'local',format:'classic',mode:'normal', players:[{
     type: 'local',
@@ -20,7 +21,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     score: 0,
     user: null
     }],
-    max_players: 4 });
+    max_players: 4,ws:null });
   }
   handlePost = async (e: Event) => {
     e.preventDefault();
@@ -42,16 +43,23 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     });
     if (result.ok) {
       const data = await result.json();
-      console.log('Game created successfully:', data);
-
       //update user
         const updateUser = await fetchProfileData();
         UserContext().setUser(updateUser);
+
+        if (this.state.type === 'remote') {
+          const message = JSON.stringify({ type: "gameCreate",  gameId: data.id ,   name: this.state.user?.name, avatar: this.state.user?.avatar });  
+                 
+          this.state.ws?.sendMessage(message);
+          }
         //create lobby
-        const lobby = this.querySelector('#lobby') as HTMLElement;
+        const lobby = document.querySelector('#lobby') as HTMLElement;
         if (lobby) {
-          const lobbyComponent = document.createElement('lobby-component') as LobyComponent;
-          lobbyComponent.data = data.id;
+/*           const lobbyComponent = document.createElement('lobby-component') as LobyComponentClient;
+          lobbyComponent.data = data.id; */
+          const lobbyComponent = document.createElement('lobby-client-component') as LobyComponent;
+          lobbyComponent.data = Number( data.id);
+          lobby.setAttribute('data-type', "yes");
           lobby.appendChild(lobbyComponent);
         }
        
@@ -63,6 +71,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
   connectedCallback() {
     super.connectedCallback();
     this.state.user = UserContext().user();
+    this.state.ws = UserContext().ws();
     this.state.players![0].avatar = this.state.user?.avatar;
     this.state.players![0].display_name = this.state.user?.name;
     this.render();
@@ -160,8 +169,8 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
 
     this.innerHTML = `
     <div class="flex flex-row items-center justify-center">
-    <div id="joinGame"><join-game-component><join-game-component/></div>
-    <div id="lobby"></div>
+    
+
     <div class="flex flex-col items-center">
       <label for="difficulty" class="text-lg font-medium mb-4">Difficulté du jeu</label>
       <div class="relative w-64 h-8 bg-gray-300 rounded-full overflow-hidden">

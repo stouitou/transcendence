@@ -8,7 +8,11 @@ export default defineConfig({
     host: "0.0.0.0",
     watch: {
       usePolling: true // Pour Docker
-    }
+    },
+    allowedHosts: [
+      'localhost',
+      'bess-f4r1s3',
+    ]
   },
   publicDir: 'public',
   preview: {

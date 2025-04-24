@@ -26,7 +26,7 @@ export class LobyComponent extends BaseComponent<{ ws: IWebSocketsService | null
       super.connectedCallback();
       this.state.ws = UserContext().ws();
       this.state.user = UserContext().user();
-      this.fetchGamebyId(this.gameID!);
+      this.updatefetchGamebyId(this.gameID!);
      // this.handleWsGame();
       this.render();
        // Listen for private ws-game
@@ -59,24 +59,16 @@ export class LobyComponent extends BaseComponent<{ ws: IWebSocketsService | null
         console.log('game is set', gameID);
           this.gameID = gameID;
         }
-      async fetchGamebyId(gameID: number) {
+/*       async fetchGamebyId(gameID: number) {
         const result = await fetch(`https://localhost:4433/api/game-management-service/games/${gameID}`)
         if (result.ok) {
           const game:Game = await result.json();
-          console.log('LobyComponent game:', game);
-          this.state.game = game;
-          if (game.type === 'remote') {
-          const data = JSON.stringify({ type: "gameCreate",  gameId: this.gameID ,   name: this.state.user?.name, avatar: this.state.user?.avatar });  
-                 
-          this.state.ws?.sendMessage(data);
-          }
-         // else {  
-            this.render();
-         // }
+          this.state.game = game; 
+          this.render();
         } else {
           console.error('Error fetching game data:', result.statusText);
         }
-      }
+      } */
       async updatefetchGamebyId(gameID: number) {
         const result = await fetch(`https://localhost:4433/api/game-management-service/games/${gameID}`)
         if (result.ok) {
