@@ -55,7 +55,7 @@ export class Paddle extends Object {
 				break;
 		}
 		if (this._owner.role !== 'bot')
-			this.eventListenerVertical();
+			this.eventListener();
 	}
 
 	/* ---------- immutable props (values unchanged) ---------- */
@@ -155,6 +155,11 @@ export class Paddle extends Object {
 	private followBallVertical (ball: Ball) {
 		if (this._y + (this._height / 2) > ball.y) {
 			this._moveUp = true;
+			this._moveDown = false;
+		}
+		else {
+			this._moveDown = true;
+			this._moveUp = false;
 		}
 	}
 
@@ -181,7 +186,7 @@ export class Paddle extends Object {
 		}
 	}
 
-	private eventListenerVertical () {
+	private eventListener () {
 		switch (this._owner.location) {
 			case 0:
 				document.addEventListener('keydown', (event) => {
