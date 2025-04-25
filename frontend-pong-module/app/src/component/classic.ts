@@ -42,7 +42,6 @@ export class  classic extends LitElement {
     }
 
     // Redefine the gameWrapper properties to match with what we need
-    // this._area.style.position = "absolute";
     this._area.style.position = 'relative';
     this._area.style.overflow = 'hidden';
     this._area.style.margin = '0';
@@ -54,35 +53,14 @@ export class  classic extends LitElement {
   
   private async setupGame () {
     try {
-      const player: Player = await this.createPlayer();
-      await this.createGame([player, new Bot(1), new Bot(1), new Bot(1)]);
-    // await this.addToHistory();
+      const player: Player = new Player({name: 'Host', role: 'user', level: 1});
+      await this.createGame([player, new Bot(1)]);
+      // await this.createGame([player, new Bot(1), new Bot(1)]);
+      // await this.createGame([player, new Bot(1), new Bot(1), new Bot(1)]);
     }
     catch (error) {
       console.error('Error setting up game: ', error);
     }
-  }
-
-  // Get the first player from the API
-  // TODO For the moment, we get him with id 1, in the future, we will get him with the id of the user logged in
-  private async createPlayer () : Promise<Player> {
-      const url: string = 'https://localhost:4433/api/user/me';  // URL adress of the API
-
-      try {
-        const response = await fetch(url);      // send a GET request to the API, reuslt is Response type
-        if (!response.ok) {
-          console.warn(`Server responded with status ${response.status}`);
-          throw new Error("Failed to fetch user data");
-        }
-        const user = await response.json();     // parse the response to JSON
-        const player = new Player(user.data); // create a new player with the data from the API
-
-        return player;
-      }
-      catch (error) {
-        console.error('Error while creating player: ', error);
-        return new Player({name: 'Host', role: 'user', level: 1});                           // Backup value for the player if the API call fails
-      }
   }
 
   private async createGame (players: Player[]) : Promise<void> {
@@ -92,10 +70,6 @@ export class  classic extends LitElement {
     updateStateGameDatabase();
   }
 
-  render () {
-    return `
-    `;
-  }
 }
 
 // Save the component with a customize tagname

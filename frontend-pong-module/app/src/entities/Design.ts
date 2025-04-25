@@ -8,11 +8,8 @@
    • global pastel gradient + grain overlay
    ========================================================= */
 
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./Match";
 import { Player } from "./Player";
-
-/* ---------- constants ---------- */
-export const CANVAS_WIDTH  = 500;
-export const CANVAS_HEIGHT = 500;
 
 /* ---------- palette / fonts ---------- */
 export const DESIGN = {
@@ -75,7 +72,8 @@ export function createAppendix(): HTMLDivElement {
     const bar = document.createElement("div");
     Object.assign(bar.style, {
         width      : "100%",
-        display    : "flex",
+        display    : "grid",
+        gridRow     : "3",
         justifyContent : "center",
         gap        : "64px",
         padding    : "18px 0",

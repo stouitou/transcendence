@@ -5,12 +5,12 @@ import { Player } from "./Player.ts";
 import * as Design from "./Design";
 
 export class Ball extends Object {
-	private readonly _diameter = 30;
-	private readonly _radius   = this._diameter / 2;
-	private readonly _speed    = 8;
 
-	private _direction!: Direction;
-	private _rebound   = false;
+	private readonly	_diameter = 30;
+	private readonly	_radius   = this._diameter / 2;
+
+	private readonly	_speed    = 8;
+	private				_direction!: Direction;
 
 	private				_x!: number;
 	private				_y!: number;
@@ -20,6 +20,7 @@ export class Ball extends Object {
 	private				_left!: number;
 	private				_right!: number;
 
+	private				_rebound   = false;
 	private				_lastHit: Player | null = null;
 
 	constructor (canvas: HTMLCanvasElement) {
@@ -28,26 +29,28 @@ export class Ball extends Object {
 	}
 
 	/* ---------- getters ---------- */
-	get radius()   { return this._radius; }
-	get x()        { return this._x;      }
-	get y()        { return this._y;      }
-	get top()      { return this._top;    }
-	get bottom()   { return this._bottom; }
-	get left()     { return this._left;   }
-	get right()    { return this._right;  }
-	get direction(){ return this._direction; }
+	get diameter ()		{ return this._diameter ; }
+	get radius ()		{ return this._radius ; }
+	get speed ()		{ return this._speed ; }
+	get direction ()	{ return this._direction ; }
+	get x ()			{ return this._x ; }
+	get y ()			{ return this._y ; }
+	get top ()			{ return this._top ; }
+	get bottom ()		{ return this._bottom ; }
+	get left ()			{ return this._left ; }
+	get right ()		{ return this._right ; }
 
 	/* ---------- core behaviour ---------- */
 	spawn() {
 		this._x = this._fieldWidth  / 2;
 		this._y = (33 + (Math.random() * 100) / 3) / 100 * this._fieldHeight;
 
-		const add = Math.random() * 30;
-		let  vx   = Math.sin((45 + add) * Math.PI / 180);
-		let  vy   = Math.cos((45 + add) * Math.PI / 180);
-		const base = Math.random() * 4;
-		if (base < 2)                  vx *= -1;
-		if (base >= 1 && base < 3)     vy *= -1;
+		const	add = Math.random() * 30;
+		let		vx = Math.sin((45 + add) * Math.PI / 180);
+		let		vy = Math.cos((45 + add) * Math.PI / 180);
+		const	base = Math.random() * 4;
+		if (base < 2)				vx *= -1;
+		if (base >= 1 && base < 3)	vy *= -1;
 
 		this._direction = new Direction(vx, vy);
 	}
@@ -57,95 +60,47 @@ export class Ball extends Object {
 		this.draw();
 	}
 
-	bounce(paddle: Paddle) {
+	bounce(paddle: Paddle, side: string) {
+		console.log('collision on side: ', side);
+		console.log('direction before rebound: x = ', this._direction.x, ', y = ', this._direction.y);
 		this._rebound = true;
 		this._lastHit = paddle.owner;
 
-		// Vecteur direction actuel de la balle
-		const v = { x: this._direction.x, y: this._direction.y };
+		let	normal: { x: number, y: number } = { x: 0, y: 0};
+		switch (side) {
+			case 'left':	normal = { x: 1, y: 0 }; this._x = paddle.left - this._radius; break ;
+			case 'right':	normal = { x: -1, y: 0 }; this._x = paddle.right + this._radius; break ;
+			case 'top':		normal = { x: 0, y: 1 }; this._y = paddle.top - this._radius; break ;
+			case 'bottom':	normal = { x: 0, y: -1 }; this._y = paddle.bottom + this._radius; break ;
+		}
 
-		// Normale du paddle
-		let n: { x: number, y: number };
-		if (paddle.owner.location === 0)       n = { x: 1, y: 0 };   // Left
-		else if (paddle.owner.location === 1)  n = { x: -1, y: 0 };  // Right
-		else if (paddle.owner.location === 2)  n = { x: 0, y: 1 };   // Top
-		else                             n = { x: 0, y: -1 };  // Bottom
+		// Vectorial reflection formula
+		const	dot = (this._direction.x * normal.x) + (this._direction.y * normal.y);
+		this._direction.x = this._direction.x - (2 * dot * normal.x);
+		this._direction.y = this._direction.y - (2 * dot * normal.y);
 
-		// Dot product
-		const dot = v.x * n.x + v.y * n.y;
-
-		// Formule de réflexion vectorielle
-		this._direction.x = v.x - 2 * dot * n.x;
-		this._direction.y = v.y - 2 * dot * n.y;
-
-		// Maintenant, ajoute un peu d'angle selon le point d’impact sur le paddle
-		const tangent = { x: -n.y, y: n.x };
+		// Compute deviation depending on impact point
+		const	cross = { x: -normal.y, y: normal.x };
 		let impactRatio = 0;
 
-		if (n.x !== 0) {
+		if (normal.x !== 0) {
 			// Paddle vertical : impact sur Y
-			impactRatio = (this._y - (paddle.y + paddle.height / 2)) / (paddle.height / 2);
+				impactRatio = ((paddle.y + paddle.height / 2) - this._y) / (paddle.height / 2);
 		} else {
 			// Paddle horizontal : impact sur X
-			impactRatio = (this._x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
+				impactRatio = (this._x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
 		}
 
 		// Clamp entre -1 et 1
 		impactRatio = Math.max(-1, Math.min(1, impactRatio));
+		console.log('impact ratio: ', impactRatio);
 
 		// Ajoute une légère déviation angulaire tangentielle
-		const deviationStrength = 0.4; // plus petit = plus droit
-		this._direction.x += tangent.x * impactRatio * deviationStrength;
-		this._direction.y += tangent.y * impactRatio * deviationStrength;
-
-		// Normalise
-		const mag = Math.sqrt(this._direction.x ** 2 + this._direction.y ** 2);
-		this._direction.x /= mag;
-		this._direction.y /= mag;
-		// const	angleMin = 5 * Math.PI / 180;
-		// const	angleMax = 60 * Math.PI / 180;
-		// let		angle: number;
-		// let 	impact: number;
-
-		// switch (paddle.location) {
-		// 	case 0:
-		// 	case 1:
-		// 		console.log('paddle.location', paddle.location);
-		// 		impact = 2 * ((this._y - (paddle.y + (paddle.height / 2))) / paddle.height);
-		// 		angle = angleMin + ((angleMax - angleMin) * Math.abs(impact));	// get an angle between 5 and 60 degrees
-		// 		this._direction.x = Math.cos(angle) * (paddle.location === 0 ? 1 : -1);
-		// 		this._direction.y = Math.sin(angle) * Math.sign(impact);
-		// 		break ;
-
-		// 	case 2:
-		// 	case 3:
-		// 		impact = 2 * ((this._x - (paddle.x + (paddle.width / 2))) / paddle.width);
-		// 		angle = angleMin + ((angleMax - angleMin) * Math.abs(impact));
-		// 		this._direction.y = Math.cos(angle * (paddle.location === 2 ? 1 : -1));
-		// 		this._direction.x = Math.sin(angle) * Math.sign(impact);
-		// 		break ;
-		// }
-	// this._direction.x *= -1;	
-
-	// 	if (paddle.location === 0 || paddle.location === 1) {
-	// 		// Formula for the rebound : θrebound ​= θmax ​× (2 × ((yimpact ​− ypaddle) / paddle height)​)
-	// 		const impact: number = 2 * ((this._y - (paddle.y + (paddle.height / 2))) / paddle.height);
-	// 		const angle = ((55 * Math.PI / 180) * impact) + (5 * Math.PI / 180);	// get an angle between 5 and 60 degrees
-	// 		this._direction.x = Math.cos(angle) * Math.sign(this._direction.x);
-	// 		this._direction.y = Math.sin(angle);
-	// 	}
-	// 	else if (paddle.location === 2 || paddle.location === 3) {
-	// 		const impact: number = 2 * ((this._x - (paddle.x + (paddle.width / 2))) / paddle.width);
-	// 		const angle = ((55 * Math.PI / 180) * impact) + (5 * Math.PI / 180);
-	// 		this._direction.y = Math.cos(angle) * Math.sign(this._direction.y);
-	// 		this._direction.x = Math.sin(angle);
-	// 	}
-	// 	else {
-	// 		const impact: number = 2 * ((this._y - (paddle.y + (paddle.height / 2))) / paddle.height);
-	// 		const angle: number = ((5 * Math.PI / 180) * impact) + (55 * Math.PI / 180);	// get an angle between 5 and 60 degrees
-	// 		this._direction.x = Math.sin(angle) * Math.sign(this._direction.x);
-	// 		this._direction.y = -Math.cos(angle);
-	// 	}
+		const deviationStrength = 0.5; // plus petit = plus droit
+		this._direction.x += cross.x * impactRatio * deviationStrength;
+		this._direction.y += cross.y * impactRatio * deviationStrength;
+		this._direction.normalize();
+		console.log('direction after rebound: x = ', this._direction.x, ', y = ', this._direction.y);
 	}
 
 	out (players: Player[]) : boolean {
@@ -178,9 +133,25 @@ export class Ball extends Object {
 				else if (this._lastHit)
 					this._lastHit.score();
 			}
+			this._rebound = false;
+			this._lastHit = null;
 			return true ;
 		}
 		return false ;
+	}
+
+	/* ---------- internals ---------- */
+	private updatePosition() {
+		let	speed = this._speed;
+		if (!this._rebound)	speed /= 2;
+
+		this._x += this._direction.x * speed;
+		this._y += this._direction.y * speed;
+
+		this._top    = this._y - this._radius;
+		this._bottom = this._y + this._radius;
+		this._left   = this._x - this._radius;
+		this._right  = this._x + this._radius;
 	}
 
 	/* ---------- glossy draw ---------- */
@@ -210,19 +181,5 @@ export class Ball extends Object {
 		ctx.beginPath();
 		ctx.ellipse(x - r * 0.35, y - r * 0.35, r * 0.15, r * 0.10, 0, 0, Math.PI * 2);
 		ctx.fill();
-	}
-
-	/* ---------- internals ---------- */
-	private updatePosition() {
-		let v = this._speed;
-		if (!this._rebound) v /= 2;
-
-		this._x += this._direction.x * v;
-		this._y += this._direction.y * v;
-
-		this._top    = this._y - this._radius;
-		this._bottom = this._y + this._radius;
-		this._left   = this._x - this._radius;
-		this._right  = this._x + this._radius;
 	}
 }

@@ -6,7 +6,11 @@ import { Paddle } from "./Paddle";
 import { Alert } from "./Alert";
 import * as Design from "./Design";
 
+export let CANVAS_WIDTH  = 700;
+export let CANVAS_HEIGHT = 500;
+
 export class Match {
+
 	/* ---------- core state (unchanged) ---------- */
 	private readonly _gameWrapper: HTMLDivElement;
 	private readonly _players: Player[];
@@ -26,7 +30,7 @@ export class Match {
 	constructor(players: Player[], container: HTMLDivElement) {
 		this._gameWrapper = container;
 		this._players = players;
-		this._appendix = document.createElement('div');
+		// this._appendix = document.createElement('div');
 		this._appendix = Design.createAppendix();
 		this._gameWrapper.appendChild(this._appendix);
 		
@@ -77,8 +81,8 @@ export class Match {
 					else if (this._ball.out(this._players)) {
 						this._ball.spawn();
 					}
-					requestAnimationFrame(loop);
 				}
+				requestAnimationFrame(loop);
 			};
 			loop();
 		});
@@ -94,10 +98,9 @@ export class Match {
 		canvas.style.top = '0';
 		canvas.style.verticalAlign = 'top';
 		canvas.height = 500;
-		if (this._players.length === 2)
-			canvas.width = 700;
-		else if (this._players.length > 2)
-			canvas.width = 500;
+		if (this._players.length > 2)
+			CANVAS_WIDTH = 500;
+		canvas.width = CANVAS_WIDTH;
 
 		return canvas;
 	}
@@ -151,13 +154,25 @@ export class Match {
 			Design.animateScore(score);
 
 			if (player.location === 0) {
+				player.display.style.gridRow = "2";
 				player.display.style.order = "1";
 				name.style.order  = "1";
 				score.style.order = "0";
-			} else {
+			} else if (player.location === 1) {
+				player.display.style.gridRow = "2";
 				player.display.style.order = "0";
 				name.style.order  = "0";
 				score.style.order = "1";
+			} else if (player.location === 2) {
+				player.display.style.gridRow = "3";
+				player.display.style.order = "0";
+				name.style.order  = "0";
+				score.style.order = "1";
+			} else if (player.location === 3) {
+				player.display.style.gridRow = "1";
+				player.display.style.order = "0";
+				name.style.order  = "1";
+				score.style.order = "0";
 			}
 
 			player.display.appendChild(name);
@@ -170,7 +185,6 @@ export class Match {
 		const frames = ["3", "2", "1", "GO"];
 		return new Promise(resolve => {
 			frames.forEach((f, i) => {
-				console.log('f = ', f);
 				setTimeout(() => {
 					Design.drawCountdownFrame(this._field, f);
 					if (i === frames.length - 1) resolve();
@@ -205,7 +219,7 @@ export class Match {
 		document.addEventListener("keydown", e => {
 			if (e.key === " ") {
 				this._break = !this._break;
-				if (this._break) this.displayPause();
+				if (this._break)	this.displayPause();
 			}
 		});
 	}

@@ -58,62 +58,23 @@ export class Paddle extends Object {
 			this.eventListener();
 	}
 
-	/* ---------- immutable props (values unchanged) ---------- */
-	get owner () {
-		return this._owner ;
-	}
+	/* ---------- getters ---------- */
+	get owner () { return this._owner ; }
+	get width () { return this._width ; }
+	get height () { return this._height ; }
+	get speed () { return this._speed ; }
+	get moveUp () { return this._moveUp ; }
+	get moveDown () { return this._moveDown ; }
+	get x () { return this._x ; }
+	get y () { return this._y ; }
+	get top () { return this._top ; }
+	get bottom () { return this._bottom ; }
+	get left () { return this._left ; }
+	get right () { return this._right ; }
 
-	get width () {
-		return this._width ;
-	}
-
-	get height () {
-		return this._height ;
-	}
-
-	get speed () {
-		return this._speed ;
-	}
-
-	get moveUp () {
-		return this._moveUp ;
-	}
-
-	get moveDown () {
-		return this._moveDown ;
-	}
-
-	get x () {
-		return this._x ;
-	}
-
-	get y () {
-		return this._y ;
-	}
-
-	get top () {
-		return this._top ;
-	}
-
-	get bottom () {
-		return this._bottom ;
-	}
-
-	get left () {
-		return this._left ;
-	}
-
-	get right () {
-		return this._right ;
-	}
-
-	set moveUp (moveUp: boolean) {
-		this._moveUp = moveUp ;
-	}
-
-	set moveDown (moveDown: boolean) {
-		this._moveDown = moveDown ;
-	}
+	/* ---------- setters ---------- */
+	set moveUp (moveUp: boolean) { this._moveUp = moveUp; }
+	set moveDown (moveDown: boolean) { this._moveDown = moveDown; }
 
 	/* ---------- main API ---------- */
 	move (player: Player, ball: Ball) {
@@ -134,10 +95,28 @@ export class Paddle extends Object {
 			ball.y + ball.radius > this._top   &&
 			ball.y - ball.radius < this._bottom
 		) {
-			ball.bounce(this);
+			const	side: string = this.getSideCollision(ball);
+			ball.bounce(this, side);
 			return true;
 		}
 		return false;
+	}
+
+	private getSideCollision (ball: Ball) : string {
+		const dxLeft = Math.abs(ball.x - this._left);
+		const dxRight = Math.abs(ball.x - this._right);
+		const dyTop = Math.abs(ball.y - this._top);
+		const dyBottom = Math.abs(ball.y - this._bottom);
+
+		const minDist = Math.min(dxLeft, dxRight, dyTop, dyBottom);
+
+		switch (minDist) {
+			case dxLeft:	return 'left' ;
+			case dxRight:	return 'right' ;
+			case dyTop:		return 'top' ;
+			case dyBottom:	return 'bottom' ;
+		}
+		return 'left' ;
 	}
 
 	/* ---------- internal ---------- */
