@@ -2,6 +2,8 @@ import { Object } from "./Object.ts";
 import { Ball } from "./Ball.ts";
 import { Player } from "./Player.ts";
 import * as Design from "./Design";
+import { Position } from "../Interfaces/Position.interface.ts";
+import { Coordinates } from "../Interfaces/Coordinates.interface.ts";
 
 export class Paddle extends Object {
 	private readonly	_owner: Player;
@@ -15,47 +17,38 @@ export class Paddle extends Object {
 	private				_moveDown: boolean = false;
 	private				_moveLeft: boolean = false;
 	private				_moveRight: boolean =  false;
-	
-	private				_x!: number;
-	private				_y!: number;
 
-	private				_top!: number;
-	private				_bottom!: number;
-	private				_left!: number;
-	private				_right!: number;
+	private				_position: Position;
+	private				_coordinates!: Coordinates;
 
 	constructor (canvas: HTMLCanvasElement, owner: Player) {
 		super(canvas);
 
 		this._owner = owner;
+		let	x = 3;
+		let	y = 5;
 		switch (this._owner.location) {
 			case 0:
 			case 1:
-				this._y = (this._fieldHeight / 2) - (this._height / 2);
+				y = (this._fieldHeight / 2) - (this._height / 2);
 				if (this._owner.location === 0)
-					this._x = this._fieldWidth - 5 - this._width;
+					x = this._fieldWidth - 5 - this._width;
 				else if (this._owner.location === 1)
-					this._x = 5;
-				this._top = this._y;
-				this._bottom = this._y + this._height;
-				this._left = this._x;
-				this._right = this._x + this._width;
+					x = 5;
+				this._coordinates = { top: y, bottom: y + this._height, left: x, right: x + this._width };
 				break;
 			case 2:
 			case 3:
-				this._x = (this._fieldWidth / 2) - (this._height / 2);
+				x = (this._fieldWidth / 2) - (this._height / 2);
 				if (this._owner.location === 2)
-					this._y = this._fieldHeight - 5 - this._width;
+					y = this._fieldHeight - 5 - this._width;
 				else if (this._owner.location === 3)
-					this._y = 5;
-				this._top = this._y;
-				this._bottom = this._y + this._width;
-				this._left = this._x;
-				this._right = this._x + this._height;
+					y = 5;
+				this._coordinates = { top: y, bottom: y + this._width, left: x, right: x + this._height };
 				break;
 		}
-		if (this._owner.role !== 'bot')
-			this.eventListener();
+		this._position = { x: x, y: y};
+		console.log('position: ', this._position);
 	}
 
 	/* ---------- getters ---------- */
@@ -65,12 +58,8 @@ export class Paddle extends Object {
 	get speed () { return this._speed ; }
 	get moveUp () { return this._moveUp ; }
 	get moveDown () { return this._moveDown ; }
-	get x () { return this._x ; }
-	get y () { return this._y ; }
-	get top () { return this._top ; }
-	get bottom () { return this._bottom ; }
-	get left () { return this._left ; }
-	get right () { return this._right ; }
+	get	position () { return this._position ; }
+	get	coordinates () { return this._coordinates ; }
 
 	/* ---------- setters ---------- */
 	set moveUp (moveUp: boolean) { this._moveUp = moveUp; }
@@ -85,25 +74,25 @@ export class Paddle extends Object {
 				this.followBallHorizontal(ball);
 			}
 
-		if (this._moveUp && this._top > 0)
-			this._y -= this._speed;
-		if (this._moveDown && this._bottom < this._fieldHeight)
-			this._y += this._speed;
+		if (this._moveUp && this._coordinates.top > 0)
+			this._position.y -= this._speed;
+		if (this._moveDown && this._coordinates.bottom < this._fieldHeight)
+			this._position.y += this._speed;
 
-		if (this._moveRight && this._right < this._fieldWidth)
-			this._x += this._speed;
-		if (this._moveLeft && this._left > 0)
-			this._x -= this._speed;
+		if (this._moveRight && this._coordinates.right < this._fieldWidth)
+			this._position.x += this._speed;
+		if (this._moveLeft && this._coordinates.left > 0)
+			this._position.x -= this._speed;
 		
-		this._left = this._x;
-		this._top = this._y;
+		this._coordinates.left = this._position.x;
+		this._coordinates.top = this._position.y;
 		if (this._owner.location === 0 || this._owner.location === 1) {
-			this._bottom = this._y + this._height;
-			this._right = this._x + this._width;
+			this._coordinates.bottom = this._position.y + this._height;
+			this._coordinates.right = this._position.x + this._width;
 		}
 		if (this._owner.location === 2 || this._owner.location === 3) {
-			this._bottom = this._y + this._width ;
-			this._right = this._x + this._height;
+			this._coordinates.bottom = this._position.y + this._width ;
+			this._coordinates.right = this._position.x + this._height;
 		}
 	}
 
@@ -126,8 +115,8 @@ export class Paddle extends Object {
 		}
 		Design.drawPaddle(
 			this._field,
-			this._x,
-			this._y,
+			this._position.x,
+			this._position.y,
 			width,
 			height
 		);
@@ -135,10 +124,10 @@ export class Paddle extends Object {
 
 	collision (ball: Ball) {
 		if (
-			ball.x + ball.radius > this._left  &&
-			ball.x - ball.radius < this._right &&
-			ball.y + ball.radius > this._top   &&
-			ball.y - ball.radius < this._bottom
+			ball.position.x + ball.radius > this._coordinates.left  &&
+			ball.position.x - ball.radius < this._coordinates.right &&
+			ball.position.y + ball.radius > this._coordinates.top   &&
+			ball.position.y - ball.radius < this._coordinates.bottom
 		) {
 			const	side: string = this.getSideCollision(ball);
 			ball.bounce(this, side);
@@ -148,10 +137,10 @@ export class Paddle extends Object {
 	}
 
 	private getSideCollision (ball: Ball) : string {
-		const dxLeft = Math.abs(ball.x - this._left);
-		const dxRight = Math.abs(ball.x - this._right);
-		const dyTop = Math.abs(ball.y - this._top);
-		const dyBottom = Math.abs(ball.y - this._bottom);
+		const dxLeft = Math.abs(ball.position.x - this._coordinates.left);
+		const dxRight = Math.abs(ball.position.x - this._coordinates.right);
+		const dyTop = Math.abs(ball.position.y - this._coordinates.top);
+		const dyBottom = Math.abs(ball.position.y - this._coordinates.bottom);
 
 		const minDist = Math.min(dxLeft, dxRight, dyTop, dyBottom);
 
@@ -166,7 +155,7 @@ export class Paddle extends Object {
 
 	/* ---------- internal ---------- */
 	private followBallHorizontal (ball: Ball) {
-		if (this._x + (this._height / 2) > ball.x) {
+		if (this._position.x + (this._height / 2) > ball.position.x) {
 			this._moveLeft = true;
 			this._moveRight = false;
 		}
@@ -177,7 +166,7 @@ export class Paddle extends Object {
 	}
 
 	private followBallVertical (ball: Ball) {
-		if (this._y + (this._height / 2) > ball.y) {
+		if (this._position.y + (this._height / 2) > ball.position.y) {
 			this._moveUp = true;
 			this._moveDown = false;
 		}
@@ -187,64 +176,64 @@ export class Paddle extends Object {
 		}
 	}
 
-	private eventListener () {
-		switch (this._owner.location) {
-			case 0:
-				document.addEventListener('keydown', (event) => {
-					if (event.key === 'ArrowUp')
-						this._moveUp = true;
-					if (event.key === 'ArrowDown')
-						this._moveDown = true;
-				});
-				document.addEventListener('keyup', (event) => {
-					if (event.key === 'ArrowUp')
-						this._moveUp = false;
-					if (event.key === 'ArrowDown')
-						this._moveDown = false;
-				});
-				break ;
-			case 1:
-				document.addEventListener('keydown', (event) => {
-					if (event.key === 's')
-						this._moveUp = true;
-					if (event.key === 'x')
-						this._moveDown = true;
-				});
-				document.addEventListener('keyup', (event) => {
-					if (event.key === 's')
-						this._moveUp = false;
-					if (event.key === 'x')
-						this._moveDown = false;
-				});
-				break ;
-			case 2:
-				document.addEventListener('keydown', (event) => {
-					if (event.key === 'ArrowLeft')
-						this._moveLeft = true;
-					if (event.key === 'ArrowRight')
-						this._moveRight = true;
-				});
-				document.addEventListener('keyup', (event) => {
-					if (event.key === 'ArrowLeft')
-						this._moveLeft = false;
-					if (event.key === 'ArrowRight')
-						this._moveRight = false;
-				});
-				break ;
-			case 3:
-				document.addEventListener('keydown', (event) => {
-					if (event.key === 'a')
-						this._moveLeft = true;
-					if (event.key === 'd')
-						this._moveRight = true;
-				});
-				document.addEventListener('keyup', (event) => {
-					if (event.key === 'a')
-						this._moveLeft = false;
-					if (event.key === 'd')
-						this._moveRight = false;
-				});
-				break ;
-		}
-	}
+	// private eventListener () {
+	// 	switch (this._owner.location) {
+	// 		case 0:
+	// 			document.addEventListener('keydown', (event) => {
+	// 				if (event.key === 'ArrowUp')
+	// 					this._moveUp = true;
+	// 				if (event.key === 'ArrowDown')
+	// 					this._moveDown = true;
+	// 			});
+	// 			document.addEventListener('keyup', (event) => {
+	// 				if (event.key === 'ArrowUp')
+	// 					this._moveUp = false;
+	// 				if (event.key === 'ArrowDown')
+	// 					this._moveDown = false;
+	// 			});
+	// 			break ;
+	// 		case 1:
+	// 			document.addEventListener('keydown', (event) => {
+	// 				if (event.key === 's')
+	// 					this._moveUp = true;
+	// 				if (event.key === 'x')
+	// 					this._moveDown = true;
+	// 			});
+	// 			document.addEventListener('keyup', (event) => {
+	// 				if (event.key === 's')
+	// 					this._moveUp = false;
+	// 				if (event.key === 'x')
+	// 					this._moveDown = false;
+	// 			});
+	// 			break ;
+	// 		case 2:
+	// 			document.addEventListener('keydown', (event) => {
+	// 				if (event.key === 'ArrowLeft')
+	// 					this._moveLeft = true;
+	// 				if (event.key === 'ArrowRight')
+	// 					this._moveRight = true;
+	// 			});
+	// 			document.addEventListener('keyup', (event) => {
+	// 				if (event.key === 'ArrowLeft')
+	// 					this._moveLeft = false;
+	// 				if (event.key === 'ArrowRight')
+	// 					this._moveRight = false;
+	// 			});
+	// 			break ;
+	// 		case 3:
+	// 			document.addEventListener('keydown', (event) => {
+	// 				if (event.key === 'a')
+	// 					this._moveLeft = true;
+	// 				if (event.key === 'd')
+	// 					this._moveRight = true;
+	// 			});
+	// 			document.addEventListener('keyup', (event) => {
+	// 				if (event.key === 'a')
+	// 					this._moveLeft = false;
+	// 				if (event.key === 'd')
+	// 					this._moveRight = false;
+	// 			});
+	// 			break ;
+	// 	}
+	// }
 }

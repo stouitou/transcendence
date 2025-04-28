@@ -26,6 +26,7 @@ export class Match {
 
 	private readonly	_pointsToWin = 2;
 	private 			_winner: Player | null = null;
+
 	private 			_break = false;
 
 	constructor(container: HTMLDivElement) {
@@ -188,8 +189,8 @@ export class Match {
 
 		this._players.forEach((player) => player.paddle!.collision(this._ball))
 		
-		if (!this._players[2] && this._ball.y + this._ball.radius >= this._height ||
-			!this._players[3] && this._ball.y - this._ball.radius <= 0) {
+		if (!this._players[2] && this._ball.position.y + this._ball.radius >= this._height ||
+			!this._players[3] && this._ball.position.y - this._ball.radius <= 0) {
 				this._ball.direction.y *= -1;
 			}
 			else if (this._ball.out(this._players)) {
@@ -209,14 +210,6 @@ export class Match {
 			this._players[i].paddle?.draw();
 		}
 	}
-
-	// private run() {
-	// 	Design.drawBackground(this._field);
-	// 	this._ball.move();
-	// 	for (let i = 0; i < this._players.length; i++) {
-	// 		this._players[i].paddle!.move(this._players[i], this._ball);
-	// 	}
-	// }
 
 	private async endGame(winner: Player): Promise<void> {
 		winner.lastWin = true;
@@ -242,6 +235,15 @@ export class Match {
 				this._break = !this._break;
 				if (this._break)	Design.drawPauseIcon(this._field);
 			}
+		});
+
+		this._players.forEach((player) => {
+			document.addEventListener('keydown', (event) => {
+				player.keyPressed.add(event.key);
+			});
+			document.addEventListener('keyup', (event) => {
+				player.keyPressed.delete(event.key);
+			});
 		});
 	}
 }

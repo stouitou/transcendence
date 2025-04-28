@@ -3,24 +3,21 @@ import { Direction } from "./Direction.ts";
 import { Paddle } from "./Paddle.ts";
 import { Player } from "./Player.ts";
 import * as Design from "./Design";
+import { Position } from "../Interfaces/Position.interface.ts";
+import { Coordinates } from "../Interfaces/Coordinates.interface.ts";
 
 export class Ball extends Object {
 
-	private readonly	_diameter = 30;
-	private readonly	_radius   = this._diameter / 2;
+	private readonly	_radius   = 15;
 
 	private readonly	_speed    = 8;
+
 	private				_direction!: Direction;
-
-	private				_x!: number;
-	private				_y!: number;
-
-	private				_top!: number;
-	private				_bottom!: number;
-	private				_left!: number;
-	private				_right!: number;
+	private				_position!: Position;
+	private				_coordinates!: Coordinates;
 
 	private				_rebound   = false;
+
 	private				_lastHit: Player | null = null;
 
 	constructor (canvas: HTMLCanvasElement) {
@@ -29,21 +26,17 @@ export class Ball extends Object {
 	}
 
 	/* ---------- getters ---------- */
-	get diameter ()		{ return this._diameter ; }
 	get radius ()		{ return this._radius ; }
 	get speed ()		{ return this._speed ; }
 	get direction ()	{ return this._direction ; }
-	get x ()			{ return this._x ; }
-	get y ()			{ return this._y ; }
-	get top ()			{ return this._top ; }
-	get bottom ()		{ return this._bottom ; }
-	get left ()			{ return this._left ; }
-	get right ()		{ return this._right ; }
+	get	position ()		{ return this._position ; }
+	get	coordinates ()	{ return this._coordinates ; };
 
 	/* ---------- core behaviour ---------- */
 	spawn() {
-		this._x = this._fieldWidth  / 2;
-		this._y = (33 + (Math.random() * 100) / 3) / 100 * this._fieldHeight;
+		const	x = this._fieldWidth  / 2;
+		const	y = (33 + (Math.random() * 100) / 3) / 100 * this._fieldHeight;
+		this._position = { x: x, y: y };
 
 		const	add = Math.random() * 30;
 		let		vx = Math.sin((45 + add) * Math.PI / 180);
@@ -52,6 +45,7 @@ export class Ball extends Object {
 		if (base < 2)				vx *= -1;
 		if (base >= 1 && base < 3)	vy *= -1;
 
+		this._coordinates = { top: y - this._radius, bottom: y + this._radius, left: x - this._radius, right: x + this._radius };
 		this._direction = new Direction(vx, vy);
 	}
 
@@ -68,10 +62,10 @@ export class Ball extends Object {
 
 		let	normal: { x: number, y: number } = { x: 0, y: 0};
 		switch (side) {
-			case 'left':	normal = { x: 1, y: 0 }; this._x = paddle.left - this._radius; break ;
-			case 'right':	normal = { x: -1, y: 0 }; this._x = paddle.right + this._radius; break ;
-			case 'top':		normal = { x: 0, y: 1 }; this._y = paddle.top - this._radius; break ;
-			case 'bottom':	normal = { x: 0, y: -1 }; this._y = paddle.bottom + this._radius; break ;
+			case 'left':	normal = { x: 1, y: 0 }; this._position.x = paddle.coordinates.left - this._radius; break ;
+			case 'right':	normal = { x: -1, y: 0 }; this._position.x = paddle.coordinates.right + this._radius; break ;
+			case 'top':		normal = { x: 0, y: 1 }; this._position.y = paddle.coordinates.top - this._radius; break ;
+			case 'bottom':	normal = { x: 0, y: -1 }; this._position.y = paddle.coordinates.bottom + this._radius; break ;
 		}
 
 		// Vectorial reflection formula
@@ -85,10 +79,10 @@ export class Ball extends Object {
 
 		if (normal.x !== 0) {
 			// Paddle vertical : impact sur Y
-				impactRatio = ((paddle.y + paddle.height / 2) - this._y) / (paddle.height / 2);
+				impactRatio = ((paddle.position.y + paddle.height / 2) - this._position.y) / (paddle.height / 2);
 		} else {
 			// Paddle horizontal : impact sur X
-				impactRatio = (this._x - (paddle.x + paddle.width / 2)) / (paddle.width / 2);
+				impactRatio = (this._position.x - (paddle.position.x + paddle.width / 2)) / (paddle.width / 2);
 		}
 
 		// Clamp entre -1 et 1
@@ -104,29 +98,29 @@ export class Ball extends Object {
 	}
 
 	out (players: Player[]) : boolean {
-		if (this._right < 0 || this._left > this._fieldWidth || this._bottom < 0 || this._top > this._fieldHeight) {
-			if (this._left > this._fieldWidth) {
+		if (this._coordinates.right < 0 || this._coordinates.left > this._fieldWidth || this._coordinates.bottom < 0 || this._coordinates.top > this._fieldHeight) {
+			if (this._coordinates.left > this._fieldWidth) {
 				if (this._lastHit === null || this._lastHit.location === 0) {
 					players[0].losePoint();
 				}
 				else if (this._lastHit)
 					this._lastHit.score();
 			}
-			else if (this._right < 0) {
+			else if (this._coordinates.right < 0) {
 				if (this._lastHit === null || this._lastHit.location === 1) {
 					players[1].losePoint();
 				}
 				else if (this._lastHit)
 					this._lastHit.score();
 			}
-			else if (this._top > this._fieldHeight) {
+			else if (this._coordinates.top > this._fieldHeight) {
 				if (this._lastHit === null || this._lastHit.location === 2) {
 					players[2].losePoint();
 				}
 				else if (this._lastHit)
 					this._lastHit.score();
 			}
-			else if (this._bottom < 0) {
+			else if (this._coordinates.bottom < 0) {
 				if (this._lastHit === null || this._lastHit.location === 3) {
 					players[3].losePoint();
 				}
@@ -141,25 +135,25 @@ export class Ball extends Object {
 	}
 
 	/* ---------- internals ---------- */
-	public update () {
+	update () {
 		let	speed = this._speed;
 		if (!this._rebound)	speed /= 2;
 
-		this._x += this._direction.x * speed;
-		this._y += this._direction.y * speed;
+		this._position.x += this._direction.x * speed;
+		this._position.y += this._direction.y * speed;
 
-		this._top    = this._y - this._radius;
-		this._bottom = this._y + this._radius;
-		this._left   = this._x - this._radius;
-		this._right  = this._x + this._radius;
+		this._coordinates.top    = this._position.y - this._radius;
+		this._coordinates.bottom = this._position.y + this._radius;
+		this._coordinates.left   = this._position.x - this._radius;
+		this._coordinates.right  = this._position.x + this._radius;
 	}
 
 	/* ---------- glossy draw ---------- */
-	public draw() {
+	draw() {
 		const ctx = this._field;
 		const r   = this._radius;
-		const x   = this._x;
-		const y   = this._y;
+		const x   = this._position.x;
+		const y   = this._position.y;
 
 		/* Radial gradient for glossy depth */
 		const g = ctx.createRadialGradient(x - r * 0.4, y - r * 0.4, r * 0.1, x, y, r);
