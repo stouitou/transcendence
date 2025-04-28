@@ -77,15 +77,60 @@ export class Paddle extends Object {
 	set moveDown (moveDown: boolean) { this._moveDown = moveDown; }
 
 	/* ---------- main API ---------- */
-	move (player: Player, ball: Ball) {
-		if (player.role === 'bot') {
+	update (ball: Ball) {
+		if (this._owner.role === 'bot') {
 			if (this._owner.location === 0 || this._owner.location === 1)
 				this.followBallVertical(ball);
 			else if (this._owner.location === 2 || this._owner.location === 3) 
 				this.followBallHorizontal(ball);
 			}
-		this.update();
-		this.draw();
+
+		if (this._moveUp && this._top > 0)
+			this._y -= this._speed;
+		if (this._moveDown && this._bottom < this._fieldHeight)
+			this._y += this._speed;
+
+		if (this._moveRight && this._right < this._fieldWidth)
+			this._x += this._speed;
+		if (this._moveLeft && this._left > 0)
+			this._x -= this._speed;
+		
+		this._left = this._x;
+		this._top = this._y;
+		if (this._owner.location === 0 || this._owner.location === 1) {
+			this._bottom = this._y + this._height;
+			this._right = this._x + this._width;
+		}
+		if (this._owner.location === 2 || this._owner.location === 3) {
+			this._bottom = this._y + this._width ;
+			this._right = this._x + this._height;
+		}
+	}
+
+	/** DESIGN‑ONLY CHANGE: use rounded‑rect helper */
+	draw() {
+		let height: number = 0;
+		let width: number = 0;
+
+		switch (this.owner.location) {
+			case 0:
+			case 1:
+				height = this._height;
+				width = this._width;
+				break;
+			case 2:
+			case 3:
+				height = this._width;
+				width = this._height;
+				break;
+		}
+		Design.drawPaddle(
+			this._field,
+			this._x,
+			this._y,
+			width,
+			height
+		);
 	}
 
 	collision (ball: Ball) {
@@ -139,29 +184,6 @@ export class Paddle extends Object {
 		else {
 			this._moveDown = true;
 			this._moveUp = false;
-		}
-	}
-
-	private update () {
-		if (this._moveUp && this._top > 0)
-			this._y -= this._speed;
-		if (this._moveDown && this._bottom < this._fieldHeight)
-			this._y += this._speed;
-
-		if (this._moveRight && this._right < this._fieldWidth)
-			this._x += this._speed;
-		if (this._moveLeft && this._left > 0)
-			this._x -= this._speed;
-		
-		this._left = this._x;
-		this._top = this._y;
-		if (this._owner.location === 0 || this._owner.location === 1) {
-			this._bottom = this._y + this._height;
-			this._right = this._x + this._width;
-		}
-		if (this._owner.location === 2 || this._owner.location === 3) {
-			this._bottom = this._y + this._width ;
-			this._right = this._x + this._height;
 		}
 	}
 
@@ -224,31 +246,5 @@ export class Paddle extends Object {
 				});
 				break ;
 		}
-	}
-
-	/** DESIGN‑ONLY CHANGE: use rounded‑rect helper */
-	private draw() {
-		let height: number = 0;
-		let width: number = 0;
-
-		switch (this.owner.location) {
-			case 0:
-			case 1:
-				height = this._height;
-				width = this._width;
-				break;
-			case 2:
-			case 3:
-				height = this._width;
-				width = this._height;
-				break;
-		}
-		Design.drawPaddle(
-			this._field,
-			this._x,
-			this._y,
-			width,
-			height
-		);
 	}
 }

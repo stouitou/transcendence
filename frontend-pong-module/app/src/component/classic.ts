@@ -1,9 +1,8 @@
 import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
-import { Player } from '../entities/Player.js';
 import { Match } from '../entities/Match.js';
-import { createGameDatabase, updateStateGameDatabase } from '../utils/databaseGame.js';
 import { Bot } from '../entities/Bot.js';
+import { Real } from '../entities/Real.js';
 
 // Export 'game-component' as a tagname in HTML
 @customElement('game-component')
@@ -53,23 +52,15 @@ export class  classic extends LitElement {
   
   private async setupGame () {
     try {
-      const player: Player = new Player({name: 'Host', role: 'user', level: 1});
-      await this.createGame([player, new Bot(1)]);
-      // await this.createGame([player, new Bot(1), new Bot(1)]);
-      // await this.createGame([player, new Bot(1), new Bot(1), new Bot(1)]);
+      this._game = new Match(this._area);
+      this._game.addPlayer(new Real({name: 'Host', role: 'user', level: 1}));
+      this._game.addPlayer(new Bot(1));
+      await this._game.start();
     }
     catch (error) {
       console.error('Error setting up game: ', error);
     }
   }
-
-  private async createGame (players: Player[]) : Promise<void> {
-    createGameDatabase(players, 'classic');
-    this._game = new Match(players, this._area);
-    await this._game.launch();
-    updateStateGameDatabase();
-  }
-
 }
 
 // Save the component with a customize tagname

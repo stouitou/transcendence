@@ -19,55 +19,26 @@ export class	Player{
 			this._name = 'Host';
 		this._role = json.role;
 		if (!this._role)
-				this._role = 'user';
+			this._role = 'user';
 
 		this._display = document.createElement('div');
 		this.displayProperties();
 	}
 
-	get name () {
-		return this._name;
-	}
+	/* ---------- getters ---------- */
+	get name () { return this._name ; }
+	get role () { return this._role ; }
+	get lastWin () { return this._lastWin ; }
+	get points () { return this._points ; }
+	get location () { return this._location ; }
+	get display () { return this._display ; }
+	get paddle () : Paddle | null { return this._paddle ; }
 
-	get role () {
-		return this._role;
-	}
-
-	get lastWin () {
-		return this._lastWin;
-	}
-
-	set lastWin (lastWin: boolean) {
-		this._lastWin = lastWin;
-	}
-
-	get points () {
-		return this._points;
-	}
-	
-	get location () {
-		return this._location;
-	}
-	
-	get display () {
-		return this._display;
-	}
-
-	get paddle () : Paddle | null {
-		return this._paddle;
-	}
-
-	set points (points: number) {
-		this._points = points;
-	}
-
-	set location (location: number) {
-		this._location = location;
-	}
-
-	set paddle (paddle: Paddle) {
-		this._paddle = paddle;
-	}
+	/* ---------- setters ---------- */
+	set points (points: number) { this._points = points; }
+	set location (location: number) { this._location = location; }
+	set paddle (paddle: Paddle) { this._paddle = paddle; }
+	set lastWin (lastWin: boolean) { this._lastWin = lastWin; }
 
 	private displayProperties () {
 		this._display.style.position = 'relative';
@@ -92,5 +63,4 @@ export class	Player{
 		const score: HTMLParagraphElement = this._display.lastElementChild as HTMLParagraphElement;
 		score.textContent = `${this._points}`;
 	}
-
 }

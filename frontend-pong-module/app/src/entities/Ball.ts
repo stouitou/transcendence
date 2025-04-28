@@ -56,7 +56,7 @@ export class Ball extends Object {
 	}
 
 	move() {
-		this.updatePosition();
+		this.update();
 		this.draw();
 	}
 
@@ -141,7 +141,7 @@ export class Ball extends Object {
 	}
 
 	/* ---------- internals ---------- */
-	private updatePosition() {
+	public update () {
 		let	speed = this._speed;
 		if (!this._rebound)	speed /= 2;
 
@@ -155,7 +155,7 @@ export class Ball extends Object {
 	}
 
 	/* ---------- glossy draw ---------- */
-	private draw() {
+	public draw() {
 		const ctx = this._field;
 		const r   = this._radius;
 		const x   = this._x;

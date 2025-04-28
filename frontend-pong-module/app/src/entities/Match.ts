@@ -12,75 +12,59 @@ export let CANVAS_HEIGHT = 500;
 export class Match {
 
 	/* ---------- core state (unchanged) ---------- */
-	private readonly _gameWrapper: HTMLDivElement;
-	private readonly _players: Player[];
+	private readonly	_gameWrapper: HTMLDivElement;
 
-	private readonly _appendix: HTMLDivElement;
-	private readonly _field: CanvasRenderingContext2D;
-	private readonly _width: number;
-	private readonly _height: number;
-	private readonly _color: string = Design.DESIGN.fieldColor;
+	private readonly	_appendix: HTMLDivElement;
+	private readonly	_canvas: HTMLCanvasElement;
+	private readonly	_field: CanvasRenderingContext2D;
+	private readonly	_width: number;
+	private readonly	_height: number;
+	// private readonly	_color: string = Design.DESIGN.fieldColor;
 
-	private readonly _ball: Ball;
+	private				_ball!: Ball;
+	private				_players: Player[] = [];
 
-	private readonly _pointsToWin = 2;
-	private _winner: Player | null = null;
-	private _break = false;
+	private readonly	_pointsToWin = 2;
+	private 			_winner: Player | null = null;
+	private 			_break = false;
 
-	constructor(players: Player[], container: HTMLDivElement) {
+	constructor(container: HTMLDivElement) {
 		this._gameWrapper = container;
-		this._players = players;
-		// this._appendix = document.createElement('div');
 		this._appendix = Design.createAppendix();
 		this._gameWrapper.appendChild(this._appendix);
-		
-		const canvas: HTMLCanvasElement = this.createCanvas()!;
-		canvas.style.background = 'rgb(0, 0, 0)';
-		this._field = canvas.getContext('2d') as CanvasRenderingContext2D;
-		this._width = canvas.width;
-		this._height = canvas.height;
-		this._gameWrapper.appendChild(canvas);
-		
-		this._ball = new Ball(canvas);
-		for (let i = 0; i < this._players.length; i++) {
-			this._players[i].location = i;
-			this._players[i].points = 0;
-			this._players[i].paddle = new Paddle(canvas, this._players[i]);
-		}
+
+		this._canvas = this.createCanvas()!;
+		this._field = this._canvas.getContext('2d') as CanvasRenderingContext2D;
+		this._width = this._canvas.width;
+		this._height = this._canvas.height;
+		this._gameWrapper.appendChild(this._canvas);
 
 		this.eventListener();
 	}
 
 	/* ---------- public API ---------- */
-	public async launch(): Promise<void> {
-		await this.startGame();
-		this.displayScore();
-		await this.displayCountdown();
+	addPlayer (newPlayer: Player) {
+		this._players.push(newPlayer);
+	}
+
+	async start () : Promise<void> {
+		await this.setupGame();
+		await this.beforeGame();
+
 		return new Promise(resolve => {
 			const loop = async () => {
 				/* win check */
-				for (const p of this._players) {
-					if (p.points === this._pointsToWin) {
-						await this.endGame(p);
-					//	this._gameWrapper.removeChild(this._appendix);
-					//	this._gameWrapper.removeChild(this._field.canvas);
+				for (const player of this._players) {
+					if (player.points === this._pointsToWin) {
+						await this.endGame(player);
 						resolve();
 						return;
 					}
 				}
 
 				if (!this._break) {
-					this.run();
-					
-					this._players.forEach((player) => player.paddle!.collision(this._ball))
-					
-					if (!this._players[2] && this._ball.y + this._ball.radius >= this._height ||
-						!this._players[3] && this._ball.y - this._ball.radius <= 0) {
-							this._ball.direction.y *= -1;
-						}
-					else if (this._ball.out(this._players)) {
-						this._ball.spawn();
-					}
+					await this.update();
+					await this.render();
 				}
 				requestAnimationFrame(loop);
 			};
@@ -105,7 +89,22 @@ export class Match {
 		return canvas;
 	}
 
-	private async startGame () : Promise<void> {
+	private async setupGame () {
+		this._ball = new Ball(this._canvas);
+		for (let i = 0; i < this._players.length; i++) {
+			this._players[i].location = i;
+			this._players[i].points = 0;
+			this._players[i].paddle = new Paddle(this._canvas, this._players[i]);
+		}
+	}
+
+	private async beforeGame () {
+		await this.displayStartButton();
+		this.displayScore();
+		await this.displayCountdown();
+	}
+
+	private async displayStartButton () : Promise<void> {
 		return new Promise((resolve) => {
 			
 			const	button: HTMLButtonElement = document.createElement('button');
@@ -132,14 +131,6 @@ export class Match {
 		});
 	}
 
-	private run() {
-		Design.drawBackground(this._field);
-		this._ball.move();
-		for (let i = 0; i < this._players.length; i++) {
-			this._players[i].paddle!.move(this._players[i], this._ball);
-		}
-	}
-
 	private displayScore () {
 		this._players.forEach((player) => {
 			const	name: HTMLParagraphElement = document.createElement('p');
@@ -149,10 +140,10 @@ export class Match {
 			score.textContent = `${player.points}`;
 			name.style.margin = score.style.margin = "10px";
 			name.style.color  = score.style.color  = Design.DESIGN.accentColor;
-
+			
 			/* flip‑up animate each refresh */
 			Design.animateScore(score);
-
+			
 			if (player.location === 0) {
 				player.display.style.gridRow = "2";
 				player.display.style.order = "1";
@@ -174,13 +165,13 @@ export class Match {
 				name.style.order  = "1";
 				score.style.order = "0";
 			}
-
+			
 			player.display.appendChild(name);
 			player.display.appendChild(score);
 			this._appendix.appendChild(player.display);
 		});
 	}
-
+	
 	private async displayCountdown(): Promise<void> {
 		const frames = ["3", "2", "1", "GO"];
 		return new Promise(resolve => {
@@ -192,6 +183,40 @@ export class Match {
 			});
 		});
 	}
+
+	private async update () {
+
+		this._players.forEach((player) => player.paddle!.collision(this._ball))
+		
+		if (!this._players[2] && this._ball.y + this._ball.radius >= this._height ||
+			!this._players[3] && this._ball.y - this._ball.radius <= 0) {
+				this._ball.direction.y *= -1;
+			}
+			else if (this._ball.out(this._players)) {
+				this._ball.spawn();
+			}
+
+		this._ball.update();
+		for (let i = 0; i < this._players.length; i++) {
+			this._players[i].paddle?.update(this._ball);
+		}
+	}
+
+	private async render () {
+		Design.drawBackground(this._field);
+		this._ball.draw();
+		for (let i = 0; i < this._players.length; i++) {
+			this._players[i].paddle?.draw();
+		}
+	}
+
+	// private run() {
+	// 	Design.drawBackground(this._field);
+	// 	this._ball.move();
+	// 	for (let i = 0; i < this._players.length; i++) {
+	// 		this._players[i].paddle!.move(this._players[i], this._ball);
+	// 	}
+	// }
 
 	private async endGame(winner: Player): Promise<void> {
 		winner.lastWin = true;
@@ -211,15 +236,11 @@ export class Match {
 		});
 	}
 
-	private displayPause() {
-		Design.drawPauseIcon(this._field);
-	}
-
 	private eventListener() {
 		document.addEventListener("keydown", e => {
 			if (e.key === " ") {
 				this._break = !this._break;
-				if (this._break)	this.displayPause();
+				if (this._break)	Design.drawPauseIcon(this._field);
 			}
 		});
 	}

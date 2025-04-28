@@ -12,11 +12,6 @@ class	User {
 				this._role = 'user';
 	}
 
-	get name () {
-		return this._name;
-	}
-
-	get role () {
-		return this._role;
-	}
+	get name () { return this._name ; }
+	get role () { return this._role ; }
 }
