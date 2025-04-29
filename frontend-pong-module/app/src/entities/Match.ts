@@ -237,13 +237,11 @@ export class Match {
 			}
 		});
 
-		this._players.forEach((player) => {
-			document.addEventListener('keydown', (event) => {
-				player.keyPressed.add(event.key);
-			});
-			document.addEventListener('keyup', (event) => {
-				player.keyPressed.delete(event.key);
-			});
+		document.addEventListener('keydown', (event) => {
+			this._players.forEach((player) => { player.keyPressed.add(event.key); console.log('key pressed: ', player.keyPressed); });
+		});
+		document.addEventListener('keyup', (event) => {
+			this._players.forEach((player) => { player.keyPressed.delete(event.key); });
 		});
 	}
 }
