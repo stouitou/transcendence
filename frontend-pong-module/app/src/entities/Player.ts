@@ -36,6 +36,7 @@ export class	Player{
 	get points () { return this._points ; }
 	get location () { return this._location ; }
 	get keyPressed () { return this._keyPressed ; }
+	get direction (): string | null { return this._direction ; }
 	get display () { return this._display ; }
 	get paddle () : Paddle | null { return this._paddle ; }
 
@@ -43,8 +44,45 @@ export class	Player{
 	set points (points: number) { this._points = points; }
 	set location (location: number) { this._location = location; }
 	set paddle (paddle: Paddle) { this._paddle = paddle; }
-	set	direction (direction: string) { this._direction = direction; }
+	set	direction (direction: string | null) { this._direction = direction; }
 	set lastWin (lastWin: boolean) { this._lastWin = lastWin; }
+
+	move (ball: Ball) {
+		if (this.role === 'bot') {
+			switch (this._location) {
+				case 0:
+				case 1:
+					this.followBallVertical(ball);
+					break ;
+				case 2:
+				case 3:
+					this.followBallHorizontal(ball);
+					break ;
+			}
+			return ;
+		}
+
+		this._keyPressed.forEach((key) => {
+			switch (this._location) {
+				case 0:
+					if (key === 'ArrowUp')			this._direction = 'up';
+					else if (key === 'ArrowDown')	this._direction = 'down';
+					break ;
+				case 1:
+					if (key === 'a')				this._direction = 'up';
+					else if (key === 's')			this._direction = 'down';
+					break ;
+				case 2:
+					if (key === 'ArrowLeft')		this._direction = 'left';
+					else if (key === 'ArrowRight')	this._direction = 'right';
+					break ;
+				case 3:
+					if (key === 'a')				this._direction = 'left';
+					else if (key === 'd')			this._direction = 'right';
+					break ;	
+			}
+		});
+	}
 
 	score () {
 		this._points++;
@@ -69,4 +107,23 @@ export class	Player{
 		this._display.style.margin = '5px';
 		this._display.style.justifyContent = 'space-between';
 	}
+
+	private followBallHorizontal (ball: Ball) {
+		if (this._paddle && (this._paddle.position.x + (this._paddle.height / 2) > ball.position.x)) {
+			this._direction = 'left';
+		}
+		else if (this._paddle && (this._paddle.position.x + (this._paddle.height / 2) < ball.position.x)) {
+			this._direction = 'right';
+		}
+	}
+
+	private followBallVertical (ball: Ball) {
+		if (this._paddle && (this._paddle.position.y + (this._paddle.height / 2) > ball.position.y)) {
+			this._direction = 'up';
+		}
+		else if (this._paddle && (this._paddle.position.y + (this._paddle.height / 2) < ball.position.y)) {
+			this._direction = 'down';
+		}
+	}
+
 }

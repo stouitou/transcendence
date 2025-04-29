@@ -27,6 +27,13 @@ export class  classic extends LitElement {
       width: 100%;
       height: 100%;
     }
+    #gameWrapper {
+      position: relative;
+      overflow: hidden;
+      maging: 0;
+      padding: 0;
+      border: none;
+    }
   `;
 
   /* CONSTRUCTOR */
@@ -39,13 +46,6 @@ export class  classic extends LitElement {
     if (!this._area) {
       throw new Error('Game container not found');
     }
-
-    // Redefine the gameWrapper properties to match with what we need
-    this._area.style.position = 'relative';
-    this._area.style.overflow = 'hidden';
-    this._area.style.margin = '0';
-    this._area.style.padding = '0';
-    this._area.style.border = 'none';
 
     this.setupGame();
   }

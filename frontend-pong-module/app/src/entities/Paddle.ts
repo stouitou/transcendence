@@ -8,15 +8,11 @@ import { Coordinates } from "../Interfaces/Coordinates.interface.ts";
 export class Paddle extends Object {
 	private readonly	_owner: Player;
 
-	private readonly	_color: string = 'rgb(255, 0, 0)';
 	private readonly	_width: number = 20;
 	private readonly	_height: number = 120;
 
 	private readonly	_speed: number = 3;
-	private				_moveUp: boolean = false;
-	private				_moveDown: boolean = false;
-	private				_moveLeft: boolean = false;
-	private				_moveRight: boolean =  false;
+	// private				_direction: string | null = null;
 
 	private				_position: Position;
 	private				_coordinates!: Coordinates;
@@ -48,41 +44,35 @@ export class Paddle extends Object {
 				break;
 		}
 		this._position = { x: x, y: y};
-		console.log('position: ', this._position);
 	}
 
 	/* ---------- getters ---------- */
-	get owner () { return this._owner ; }
-	get width () { return this._width ; }
-	get height () { return this._height ; }
-	get speed () { return this._speed ; }
-	get moveUp () { return this._moveUp ; }
-	get moveDown () { return this._moveDown ; }
-	get	position () { return this._position ; }
-	get	coordinates () { return this._coordinates ; }
-
-	/* ---------- setters ---------- */
-	set moveUp (moveUp: boolean) { this._moveUp = moveUp; }
-	set moveDown (moveDown: boolean) { this._moveDown = moveDown; }
+	get owner ()		{ return this._owner ; }
+	get width ()		{ return this._width ; }
+	get height ()		{ return this._height ; }
+	get speed ()		{ return this._speed ; }
+	// get direction ()	{ return this._direction ; }
+	get	position ()		{ return this._position ; }
+	get	coordinates () 	{ return this._coordinates ; }
 
 	/* ---------- main API ---------- */
-	update (ball: Ball) {
-		if (this._owner.role === 'bot') {
-			if (this._owner.location === 0 || this._owner.location === 1)
-				this.followBallVertical(ball);
-			else if (this._owner.location === 2 || this._owner.location === 3) 
-				this.followBallHorizontal(ball);
+	update () {
+		if (this._owner.direction) {
+			switch (this._owner.direction) {
+				case 'up':
+					if (this._coordinates.top > 0)						this._position.y -= this._speed;
+					break ;
+				case 'down':
+					if (this._coordinates.bottom < this._fieldHeight)	this._position.y += this._speed;
+					break ;
+				case 'left':
+					if (this._coordinates.left > 0)						this._position.x -= this._speed;
+					break ;
+				case 'right':
+					if (this._coordinates.right < this._fieldWidth)		this._position.x += this._speed;
+					break ;
 			}
-
-		if (this._moveUp && this._coordinates.top > 0)
-			this._position.y -= this._speed;
-		if (this._moveDown && this._coordinates.bottom < this._fieldHeight)
-			this._position.y += this._speed;
-
-		if (this._moveRight && this._coordinates.right < this._fieldWidth)
-			this._position.x += this._speed;
-		if (this._moveLeft && this._coordinates.left > 0)
-			this._position.x -= this._speed;
+		}
 		
 		this._coordinates.left = this._position.x;
 		this._coordinates.top = this._position.y;
@@ -152,88 +142,4 @@ export class Paddle extends Object {
 		}
 		return 'left' ;
 	}
-
-	/* ---------- internal ---------- */
-	private followBallHorizontal (ball: Ball) {
-		if (this._position.x + (this._height / 2) > ball.position.x) {
-			this._moveLeft = true;
-			this._moveRight = false;
-		}
-		else {
-			this._moveLeft = false;
-			this._moveRight = true;
-		}
-	}
-
-	private followBallVertical (ball: Ball) {
-		if (this._position.y + (this._height / 2) > ball.position.y) {
-			this._moveUp = true;
-			this._moveDown = false;
-		}
-		else {
-			this._moveDown = true;
-			this._moveUp = false;
-		}
-	}
-
-	// private eventListener () {
-	// 	switch (this._owner.location) {
-	// 		case 0:
-	// 			document.addEventListener('keydown', (event) => {
-	// 				if (event.key === 'ArrowUp')
-	// 					this._moveUp = true;
-	// 				if (event.key === 'ArrowDown')
-	// 					this._moveDown = true;
-	// 			});
-	// 			document.addEventListener('keyup', (event) => {
-	// 				if (event.key === 'ArrowUp')
-	// 					this._moveUp = false;
-	// 				if (event.key === 'ArrowDown')
-	// 					this._moveDown = false;
-	// 			});
-	// 			break ;
-	// 		case 1:
-	// 			document.addEventListener('keydown', (event) => {
-	// 				if (event.key === 's')
-	// 					this._moveUp = true;
-	// 				if (event.key === 'x')
-	// 					this._moveDown = true;
-	// 			});
-	// 			document.addEventListener('keyup', (event) => {
-	// 				if (event.key === 's')
-	// 					this._moveUp = false;
-	// 				if (event.key === 'x')
-	// 					this._moveDown = false;
-	// 			});
-	// 			break ;
-	// 		case 2:
-	// 			document.addEventListener('keydown', (event) => {
-	// 				if (event.key === 'ArrowLeft')
-	// 					this._moveLeft = true;
-	// 				if (event.key === 'ArrowRight')
-	// 					this._moveRight = true;
-	// 			});
-	// 			document.addEventListener('keyup', (event) => {
-	// 				if (event.key === 'ArrowLeft')
-	// 					this._moveLeft = false;
-	// 				if (event.key === 'ArrowRight')
-	// 					this._moveRight = false;
-	// 			});
-	// 			break ;
-	// 		case 3:
-	// 			document.addEventListener('keydown', (event) => {
-	// 				if (event.key === 'a')
-	// 					this._moveLeft = true;
-	// 				if (event.key === 'd')
-	// 					this._moveRight = true;
-	// 			});
-	// 			document.addEventListener('keyup', (event) => {
-	// 				if (event.key === 'a')
-	// 					this._moveLeft = false;
-	// 				if (event.key === 'd')
-	// 					this._moveRight = false;
-	// 			});
-	// 			break ;
-	// 	}
-	// }
 }

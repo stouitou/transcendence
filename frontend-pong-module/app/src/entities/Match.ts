@@ -19,7 +19,6 @@ export class Match {
 	private readonly	_field: CanvasRenderingContext2D;
 	private readonly	_width: number;
 	private readonly	_height: number;
-	// private readonly	_color: string = Design.DESIGN.fieldColor;
 
 	private				_ball!: Ball;
 	private				_players: Player[] = [];
@@ -59,6 +58,7 @@ export class Match {
 					if (player.points === this._pointsToWin) {
 						await this.endGame(player);
 						resolve();
+						// TODO: Return lobby
 						return;
 					}
 				}
@@ -199,7 +199,8 @@ export class Match {
 
 		this._ball.update();
 		for (let i = 0; i < this._players.length; i++) {
-			this._players[i].paddle?.update(this._ball);
+			this._players[i].move(this._ball);
+			this._players[i].paddle?.update();
 		}
 	}
 
@@ -238,10 +239,10 @@ export class Match {
 		});
 
 		document.addEventListener('keydown', (event) => {
-			this._players.forEach((player) => { player.keyPressed.add(event.key); console.log('key pressed: ', player.keyPressed); });
+			this._players.forEach((player) => { player.keyPressed.add(event.key); player.direction = null });
 		});
 		document.addEventListener('keyup', (event) => {
-			this._players.forEach((player) => { player.keyPressed.delete(event.key); });
+			this._players.forEach((player) => { player.keyPressed.delete(event.key); player.direction = null });
 		});
 	}
 }
