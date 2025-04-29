@@ -60,39 +60,32 @@ export class Ball extends Object {
 		this._rebound = true;
 		this._lastHit = paddle.owner;
 
-		let	normal: { x: number, y: number } = { x: 0, y: 0};
-		switch (side) {
-			case 'left':	normal = { x: 1, y: 0 }; this._position.x = paddle.coordinates.left - this._radius; break ;
-			case 'right':	normal = { x: -1, y: 0 }; this._position.x = paddle.coordinates.right + this._radius; break ;
-			case 'top':		normal = { x: 0, y: 1 }; this._position.y = paddle.coordinates.top - this._radius; break ;
-			case 'bottom':	normal = { x: 0, y: -1 }; this._position.y = paddle.coordinates.bottom + this._radius; break ;
+		let	impactRatio = 0;
+		if (side === 'left' || side === 'right') {
+				impactRatio = (this._position.y - (paddle.position.y + paddle.height / 2)) / (paddle.height / 2);
+		}
+		else if (side === 'top' || side === 'bottom') {
+				impactRatio = ((this._position.x - (paddle.position.x + paddle.width / 2)) / (paddle.width / 2));
 		}
 
-		// Vectorial reflection formula
-		const	dot = (this._direction.x * normal.x) + (this._direction.y * normal.y);
-		this._direction.x = this._direction.x - (2 * dot * normal.x);
-		this._direction.y = this._direction.y - (2 * dot * normal.y);
-
-		// Compute deviation depending on impact point
-		const	cross = { x: -normal.y, y: normal.x };
-		let impactRatio = 0;
-
-		if (normal.x !== 0) {
-			// Paddle vertical : impact sur Y
-				impactRatio = ((paddle.position.y + paddle.height / 2) - this._position.y) / (paddle.height / 2);
-		} else {
-			// Paddle horizontal : impact sur X
-				impactRatio = (this._position.x - (paddle.position.x + paddle.width / 2)) / (paddle.width / 2);
-		}
-
-		// Clamp entre -1 et 1
 		impactRatio = Math.max(-1, Math.min(1, impactRatio));
 		console.log('impact ratio: ', impactRatio);
 
-		// Ajoute une légère déviation angulaire tangentielle
-		const deviationStrength = 0.5; // plus petit = plus droit
-		this._direction.x += cross.x * impactRatio * deviationStrength;
-		this._direction.y += cross.y * impactRatio * deviationStrength;
+		const	maxAngle = 60 * Math.PI / 180;
+		const	angle = impactRatio * maxAngle;
+
+		
+		if (side === 'left' || side === 'right') {
+			const	directionSign = (side === 'right') ? 1 : -1;
+			this._direction.x = Math.cos(angle) * directionSign;
+			this._direction.y = Math.sin(angle);
+		}
+		if (side === 'top' || side === 'bottom') {
+			const	directionSign = (side === 'bottom') ? 1 : -1;
+			this._direction.x = Math.sin(angle);
+			this._direction.y = Math.cos(angle) * directionSign;
+		}
+
 		this._direction.normalize();
 		console.log('direction after rebound: x = ', this._direction.x, ', y = ', this._direction.y);
 	}

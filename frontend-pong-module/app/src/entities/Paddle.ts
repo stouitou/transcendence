@@ -4,6 +4,7 @@ import { Player } from "./Player.ts";
 import * as Design from "./Design";
 import { Position } from "../Interfaces/Position.interface.ts";
 import { Coordinates } from "../Interfaces/Coordinates.interface.ts";
+import { Limits } from "../Interfaces/Limits.interface.ts";
 
 export class Paddle extends Object {
 	private readonly	_owner: Player;
@@ -11,14 +12,15 @@ export class Paddle extends Object {
 	private readonly	_width: number = 20;
 	private readonly	_height: number = 120;
 
+	private				_limits: Limits;
 	private readonly	_speed: number = 3;
-	// private				_direction: string | null = null;
 
 	private				_position: Position;
 	private				_coordinates!: Coordinates;
 
 	constructor (canvas: HTMLCanvasElement, owner: Player) {
 		super(canvas);
+		this._limits = { up: 0, down: this._fieldHeight, left: 0, right: this._fieldWidth };
 
 		this._owner = owner;
 		let	x = 3;
@@ -50,26 +52,28 @@ export class Paddle extends Object {
 	get owner ()		{ return this._owner ; }
 	get width ()		{ return this._width ; }
 	get height ()		{ return this._height ; }
+	get limits ()		{ return this._limits ; }
 	get speed ()		{ return this._speed ; }
-	// get direction ()	{ return this._direction ; }
 	get	position ()		{ return this._position ; }
 	get	coordinates () 	{ return this._coordinates ; }
+
+	set limits (limits: Limits)	{ this._limits = limits; }
 
 	/* ---------- main API ---------- */
 	update () {
 		if (this._owner.direction) {
 			switch (this._owner.direction) {
 				case 'up':
-					if (this._coordinates.top > 0)						this._position.y -= this._speed;
+					if (this._coordinates.top > this._limits.up)						this._position.y -= this._speed;
 					break ;
 				case 'down':
-					if (this._coordinates.bottom < this._fieldHeight)	this._position.y += this._speed;
+					if (this._coordinates.bottom < this._limits.down)	this._position.y += this._speed;
 					break ;
 				case 'left':
-					if (this._coordinates.left > 0)						this._position.x -= this._speed;
+					if (this._coordinates.left > this._limits.left)						this._position.x -= this._speed;
 					break ;
 				case 'right':
-					if (this._coordinates.right < this._fieldWidth)		this._position.x += this._speed;
+					if (this._coordinates.right < this._limits.right)		this._position.x += this._speed;
 					break ;
 			}
 		}

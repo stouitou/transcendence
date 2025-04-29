@@ -71,21 +71,22 @@ export const DESIGN = {
 export function createAppendix(): HTMLDivElement {
     const bar = document.createElement("div");
     Object.assign(bar.style, {
-        width      : "100%",
+        width      : "500px",
+        height     : "150px",
         display    : "grid",
-        gridRow     : "3",
+        gridTemplateColumns   : "100px 100px 100px",
+        gridTemplateRows      : "40px 40px 40px",
         justifyContent : "center",
-        gap        : "64px",
+        alignItems : "center",
         padding    : "18px 0",
-        fontFamily : DESIGN.fontFamily,
-        fontSize   : "20px",
+        fontSize   : "24px",
         fontWeight : "600",
         color      : DESIGN.accentColor,
-        borderBottomLeftRadius : "22px",
-        borderBottomRightRadius: "22px",
-        background : "rgba(255,255,255,0.10)",
+        borderTopLeftRadius : "260px",
+        borderTopRightRadius: "260px",
+        background : "rgb(13, 63, 119)",
         backdropFilter: "blur(10px)",
-        border     : "1px solid rgba(255,255,255,0.35)",
+        border     : "3px solid rgb(255, 0, 0)",
         boxShadow  : "0 8px 30px rgba(0,0,0,.08)",
     } as Partial<CSSStyleDeclaration>);
     return bar;

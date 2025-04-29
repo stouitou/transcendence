@@ -69,7 +69,7 @@ export class	Player{
 					else if (key === 'ArrowDown')	this._direction = 'down';
 					break ;
 				case 1:
-					if (key === 'a')				this._direction = 'up';
+					if (key === 'w')				this._direction = 'up';
 					else if (key === 's')			this._direction = 'down';
 					break ;
 				case 2:

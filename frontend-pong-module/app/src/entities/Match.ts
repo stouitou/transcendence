@@ -6,7 +6,7 @@ import { Paddle } from "./Paddle";
 import { Alert } from "./Alert";
 import * as Design from "./Design";
 
-export let CANVAS_WIDTH  = 700;
+export let CANVAS_WIDTH = 700;
 export let CANVAS_HEIGHT = 500;
 
 export class Match {
@@ -14,11 +14,11 @@ export class Match {
 	/* ---------- core state (unchanged) ---------- */
 	private readonly	_gameWrapper: HTMLDivElement;
 
-	private readonly	_appendix: HTMLDivElement;
-	private readonly	_canvas: HTMLCanvasElement;
-	private readonly	_field: CanvasRenderingContext2D;
-	private readonly	_width: number;
-	private readonly	_height: number;
+	private				_appendix: HTMLDivElement;
+	private				_canvas!: HTMLCanvasElement;
+	private				_field!: CanvasRenderingContext2D;
+	private				_width!: number;
+	private				_height!: number;
 
 	private				_ball!: Ball;
 	private				_players: Player[] = [];
@@ -33,12 +33,6 @@ export class Match {
 		this._appendix = Design.createAppendix();
 		this._gameWrapper.appendChild(this._appendix);
 
-		this._canvas = this.createCanvas()!;
-		this._field = this._canvas.getContext('2d') as CanvasRenderingContext2D;
-		this._width = this._canvas.width;
-		this._height = this._canvas.height;
-		this._gameWrapper.appendChild(this._canvas);
-
 		this.eventListener();
 	}
 
@@ -48,6 +42,7 @@ export class Match {
 	}
 
 	async start () : Promise<void> {
+		await this.createField();
 		await this.setupGame();
 		await this.beforeGame();
 
@@ -73,6 +68,15 @@ export class Match {
 		});
 	}
 
+	/* ---------- internals ---------- */
+	private async createField () {
+		this._canvas = this.createCanvas()!;
+		this._field = this._canvas.getContext('2d') as CanvasRenderingContext2D;
+		this._width = this._canvas.width;
+		this._height = this._canvas.height;
+		this._gameWrapper.appendChild(this._canvas);
+	}
+
 	private createCanvas () {
 		const	canvas: HTMLCanvasElement = document.createElement('canvas');
 
@@ -82,9 +86,11 @@ export class Match {
 		canvas.style.border = 'none';
 		canvas.style.top = '0';
 		canvas.style.verticalAlign = 'top';
-		canvas.height = 500;
+		canvas.height = CANVAS_HEIGHT;
 		if (this._players.length > 2)
 			CANVAS_WIDTH = 500;
+		console.log('canvas height: ', CANVAS_HEIGHT);
+		console.log('canvas width: ', CANVAS_WIDTH);
 		canvas.width = CANVAS_WIDTH;
 
 		return canvas;
@@ -134,42 +140,34 @@ export class Match {
 
 	private displayScore () {
 		this._players.forEach((player) => {
-			const	name: HTMLParagraphElement = document.createElement('p');
-			name.textContent = player.name;
-			name.style.margin = '10px';
-			const	score: HTMLParagraphElement = document.createElement('p');
-			score.textContent = `${player.points}`;
-			name.style.margin = score.style.margin = "10px";
-			name.style.color  = score.style.color  = Design.DESIGN.accentColor;
-			
-			/* flip‑up animate each refresh */
-			Design.animateScore(score);
-			
-			if (player.location === 0) {
-				player.display.style.gridRow = "2";
-				player.display.style.order = "1";
-				name.style.order  = "1";
-				score.style.order = "0";
-			} else if (player.location === 1) {
-				player.display.style.gridRow = "2";
-				player.display.style.order = "0";
-				name.style.order  = "0";
-				score.style.order = "1";
-			} else if (player.location === 2) {
-				player.display.style.gridRow = "3";
-				player.display.style.order = "0";
-				name.style.order  = "0";
-				score.style.order = "1";
-			} else if (player.location === 3) {
-				player.display.style.gridRow = "1";
-				player.display.style.order = "0";
-				name.style.order  = "1";
-				score.style.order = "0";
-			}
-			
-			player.display.appendChild(name);
-			player.display.appendChild(score);
-			this._appendix.appendChild(player.display);
+			const    name: HTMLParagraphElement = document.createElement('p');
+            name.textContent = player.name;
+            name.style.margin = '10px';
+            const    score: HTMLParagraphElement = document.createElement('p');
+            score.textContent = `${player.points}`;
+            name.style.margin = score.style.margin = "10px";
+            name.style.color  = score.style.color  = Design.DESIGN.accentColor;
+
+            /* flip‑up animate each refresh */
+            Design.animateScore(score);
+
+            if (player.location === 0) {
+                player.display.style.gridColumn = "3"
+                player.display.style.gridRow = "2";
+            } else if (player.location === 1) {
+                player.display.style.gridColumn = "1";
+                player.display.style.gridRow = "2";
+            } else if (player.location === 2) {
+                player.display.style.gridColumn = "2";
+                player.display.style.gridRow = "3";
+            } else if (player.location === 3) {
+                player.display.style.gridColumn = "2";
+                player.display.style.gridRow = "1";
+            }
+
+            player.display.appendChild(name);
+            player.display.appendChild(score);
+            this._appendix.appendChild(player.display);
 		});
 	}
 	
@@ -201,6 +199,7 @@ export class Match {
 		for (let i = 0; i < this._players.length; i++) {
 			this._players[i].move(this._ball);
 			this._players[i].paddle?.update();
+			this.defineLimits(this._players[i]);
 		}
 	}
 
@@ -228,6 +227,72 @@ export class Match {
 				resolve();
 			}, 4000);
 		});
+	}
+
+	private defineLimits (player: Player) {
+		switch (player.location) {
+			case 0:
+				if (this._players[3] && this._players[3].paddle) {
+					if (player.paddle && player.paddle.coordinates.top <= player.paddle.width + 5)
+						this._players[3].paddle.limits = { ...this._players[3].paddle.limits, right: player.paddle.coordinates.left };
+					else if (player.paddle)
+						this._players[3].paddle.limits = { ...this._players[3].paddle.limits, right: this._width };
+				}
+				if (this._players[2] && this._players[2].paddle) {
+					if (player.paddle && player.paddle.coordinates.bottom >= this._height - (player.paddle.width + 5)) {
+						this._players[2].paddle.limits = { ...this._players[2].paddle.limits, right: player.paddle.coordinates.left };
+						console.log('bottom: ',player.paddle.coordinates.bottom);
+					}
+					else if (player.paddle)
+						this._players[2].paddle.limits = { ...this._players[2].paddle.limits, right: this._width };
+				}
+				break ;
+			case 1:
+				if (this._players[3] && this._players[3].paddle) {
+					if (player.paddle && player.paddle.coordinates.top <= player.paddle.width + 5)
+						this._players[3].paddle.limits = { ...this._players[3].paddle.limits, left: player.paddle.coordinates.right };
+					else if (player.paddle)
+						this._players[3].paddle.limits = { ...this._players[3].paddle.limits, left: 0 };
+				}
+				if (this._players[2] && this._players[2].paddle) {
+					if (player.paddle && player.paddle.coordinates.bottom >= this._height - (player.paddle.width + 5)) {
+						this._players[2].paddle.limits = { ...this._players[2].paddle.limits, left: player.paddle.coordinates.right };
+					}
+					else if (player.paddle)
+						this._players[2].paddle.limits = { ...this._players[2].paddle.limits, left: 0 };
+				}
+				break ;
+			case 2:
+				if (this._players[1] && this._players[1].paddle) {
+					if (player.paddle && player.paddle.coordinates.left <= player.paddle.width + 5)
+						this._players[1].paddle.limits = { ...this._players[1].paddle.limits, down: player.paddle.coordinates.top };
+					else if (player.paddle)
+						this._players[1].paddle.limits = { ...this._players[1].paddle.limits, down: this._height };
+				}
+				if (this._players[0] && this._players[0].paddle) {
+					if (player.paddle && player.paddle.coordinates.right >= this._width - (player.paddle.width + 5)) {
+						this._players[0].paddle.limits = { ...this._players[0].paddle.limits, down: player.paddle.coordinates.top };
+					}
+					else if (player.paddle)
+						this._players[0].paddle.limits = { ...this._players[0].paddle.limits, down: this._height };
+				}
+				break ;
+			case 3:
+				if (this._players[1] && this._players[1].paddle) {
+					if (player.paddle && player.paddle.coordinates.left <= player.paddle.width + 5)
+						this._players[1].paddle.limits = { ...this._players[1].paddle.limits, up: player.paddle.coordinates.bottom };
+					else if (player.paddle)
+						this._players[1].paddle.limits = { ...this._players[1].paddle.limits, up: 0 };
+				}
+				if (this._players[0] && this._players[0].paddle) {
+					if (player.paddle && player.paddle.coordinates.right >= this._width - (player.paddle.width + 5)) {
+						this._players[0].paddle.limits = { ...this._players[0].paddle.limits, up: player.paddle.coordinates.bottom };
+					}
+					else if (player.paddle)
+						this._players[0].paddle.limits = { ...this._players[0].paddle.limits, up: 0 };
+				}
+				break ;
+		}
 	}
 
 	private eventListener() {
