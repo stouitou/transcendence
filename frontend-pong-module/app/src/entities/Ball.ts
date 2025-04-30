@@ -1,15 +1,16 @@
-import { Object } from "./Object.ts";
+import { Coordinates } from "../Interfaces/Coordinates.interface.ts";
 import { Direction } from "./Direction.ts";
+import { Ground } from "../Interfaces/Ground.interface.ts";
 import { Paddle } from "./Paddle.ts";
 import { Player } from "./Player.ts";
-import * as Design from "./Design";
 import { Position } from "../Interfaces/Position.interface.ts";
-import { Coordinates } from "../Interfaces/Coordinates.interface.ts";
+import * as Design from "./Design";
 
-export class Ball extends Object {
+export class Ball {
+
+	private readonly	_ground: Ground;
 
 	private readonly	_radius   = 15;
-
 	private readonly	_speed    = 8;
 
 	private				_direction!: Direction;
@@ -20,9 +21,8 @@ export class Ball extends Object {
 
 	private				_lastHit: Player | null = null;
 
-	constructor (canvas: HTMLCanvasElement) {
-		super(canvas);
-		this.spawn();
+	constructor (ground: Ground) {
+		this._ground = ground;
 	}
 
 	/* ---------- getters ---------- */
@@ -34,8 +34,8 @@ export class Ball extends Object {
 
 	/* ---------- core behaviour ---------- */
 	spawn() {
-		const	x = this._fieldWidth  / 2;
-		const	y = (33 + (Math.random() * 100) / 3) / 100 * this._fieldHeight;
+		const	x = this._ground.width  / 2;
+		const	y = (33 + (Math.random() * 100) / 3) / 100 * this._ground.height;
 		this._position = { x: x, y: y };
 
 		const	add = Math.random() * 30;
@@ -49,14 +49,7 @@ export class Ball extends Object {
 		this._direction = new Direction(vx, vy);
 	}
 
-	move() {
-		this.update();
-		this.draw();
-	}
-
 	bounce(paddle: Paddle, side: string) {
-		console.log('collision on side: ', side);
-		console.log('direction before rebound: x = ', this._direction.x, ', y = ', this._direction.y);
 		this._rebound = true;
 		this._lastHit = paddle.owner;
 
@@ -67,14 +60,11 @@ export class Ball extends Object {
 		else if (side === 'top' || side === 'bottom') {
 				impactRatio = ((this._position.x - (paddle.position.x + paddle.width / 2)) / (paddle.width / 2));
 		}
-
 		impactRatio = Math.max(-1, Math.min(1, impactRatio));
-		console.log('impact ratio: ', impactRatio);
 
 		const	maxAngle = 60 * Math.PI / 180;
 		const	angle = impactRatio * maxAngle;
 
-		
 		if (side === 'left' || side === 'right') {
 			const	directionSign = (side === 'right') ? 1 : -1;
 			this._direction.x = Math.cos(angle) * directionSign;
@@ -87,12 +77,11 @@ export class Ball extends Object {
 		}
 
 		this._direction.normalize();
-		console.log('direction after rebound: x = ', this._direction.x, ', y = ', this._direction.y);
 	}
 
 	out (players: Player[]) : boolean {
-		if (this._coordinates.right < 0 || this._coordinates.left > this._fieldWidth || this._coordinates.bottom < 0 || this._coordinates.top > this._fieldHeight) {
-			if (this._coordinates.left > this._fieldWidth) {
+		if (this._coordinates.right < 0 || this._coordinates.left > this._ground.width || this._coordinates.bottom < 0 || this._coordinates.top > this._ground.height) {
+			if (this._coordinates.left > this._ground.width) {
 				if (this._lastHit === null || this._lastHit.location === 0) {
 					players[0].losePoint();
 				}
@@ -106,7 +95,7 @@ export class Ball extends Object {
 				else if (this._lastHit)
 					this._lastHit.score();
 			}
-			else if (this._coordinates.top > this._fieldHeight) {
+			else if (this._coordinates.top > this._ground.height) {
 				if (this._lastHit === null || this._lastHit.location === 2) {
 					players[2].losePoint();
 				}
@@ -127,7 +116,6 @@ export class Ball extends Object {
 		return false ;
 	}
 
-	/* ---------- internals ---------- */
 	update () {
 		let	speed = this._speed;
 		if (!this._rebound)	speed /= 2;
@@ -143,7 +131,7 @@ export class Ball extends Object {
 
 	/* ---------- glossy draw ---------- */
 	draw() {
-		const ctx = this._field;
+		const ctx = this._ground.field;
 		const r   = this._radius;
 		const x   = this._position.x;
 		const y   = this._position.y;

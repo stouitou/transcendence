@@ -150,8 +150,10 @@ export class Tournament {
 			const game = this._groups.get(i);
 			if (game) {
 				createGameDatabase(game, 'tournament');
-				const match: Match = new Match(game, this._container);
-				await match.launch();
+				const match: Match = new Match(this._container);
+				match.addPlayer(game[0]);
+				match.addPlayer(game[1])
+				await match.start();
 				updateStateGameDatabase();
 				if (match.winner && match.winner.role != 'bot') {
 					this._round[j] = game[0].lastWin ? game[0] : game[1];

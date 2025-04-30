@@ -1,12 +1,13 @@
-import { Object } from "./Object.ts";
 import { Ball } from "./Ball.ts";
-import { Player } from "./Player.ts";
-import * as Design from "./Design";
-import { Position } from "../Interfaces/Position.interface.ts";
 import { Coordinates } from "../Interfaces/Coordinates.interface.ts";
+import { Ground } from "../Interfaces/Ground.interface.ts";
 import { Limits } from "../Interfaces/Limits.interface.ts";
+import { Player } from "./Player.ts";
+import { Position } from "../Interfaces/Position.interface.ts";
+import * as Design from "./Design";
 
-export class Paddle extends Object {
+export class Paddle {
+	private readonly	_ground: Ground;
 	private readonly	_owner: Player;
 
 	private readonly	_width: number = 20;
@@ -18,9 +19,9 @@ export class Paddle extends Object {
 	private				_position: Position;
 	private				_coordinates!: Coordinates;
 
-	constructor (canvas: HTMLCanvasElement, owner: Player) {
-		super(canvas);
-		this._limits = { up: 0, down: this._fieldHeight, left: 0, right: this._fieldWidth };
+	constructor (ground: Ground, owner: Player) {
+		this._ground = ground;
+		this._limits = { up: 0, down: this._ground.height, left: 0, right: this._ground.width };
 
 		this._owner = owner;
 		let	x = 3;
@@ -28,18 +29,18 @@ export class Paddle extends Object {
 		switch (this._owner.location) {
 			case 0:
 			case 1:
-				y = (this._fieldHeight / 2) - (this._height / 2);
+				y = (this._ground.height / 2) - (this._height / 2);
 				if (this._owner.location === 0)
-					x = this._fieldWidth - 5 - this._width;
+					x = this._ground.width - 5 - this._width;
 				else if (this._owner.location === 1)
 					x = 5;
 				this._coordinates = { top: y, bottom: y + this._height, left: x, right: x + this._width };
 				break;
 			case 2:
 			case 3:
-				x = (this._fieldWidth / 2) - (this._height / 2);
+				x = (this._ground.width / 2) - (this._height / 2);
 				if (this._owner.location === 2)
-					y = this._fieldHeight - 5 - this._width;
+					y = this._ground.height - 5 - this._width;
 				else if (this._owner.location === 3)
 					y = 5;
 				this._coordinates = { top: y, bottom: y + this._width, left: x, right: x + this._height };
@@ -57,6 +58,7 @@ export class Paddle extends Object {
 	get	position ()		{ return this._position ; }
 	get	coordinates () 	{ return this._coordinates ; }
 
+	/* ---------- setters ---------- */
 	set limits (limits: Limits)	{ this._limits = limits; }
 
 	/* ---------- main API ---------- */
@@ -108,7 +110,7 @@ export class Paddle extends Object {
 				break;
 		}
 		Design.drawPaddle(
-			this._field,
+			this._ground.field,
 			this._position.x,
 			this._position.y,
 			width,
@@ -130,6 +132,7 @@ export class Paddle extends Object {
 		return false;
 	}
 
+	/* ---------- internals ---------- */
 	private getSideCollision (ball: Ball) : string {
 		const dxLeft = Math.abs(ball.position.x - this._coordinates.left);
 		const dxRight = Math.abs(ball.position.x - this._coordinates.right);

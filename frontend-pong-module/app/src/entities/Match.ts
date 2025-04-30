@@ -1,9 +1,9 @@
-/* Match.ts – same game logic, modern design hooks only */
-
-import { Player } from "./Player";
-import { Ball } from "./Ball";
-import { Paddle } from "./Paddle";
 import { Alert } from "./Alert";
+import { Ball } from "./Ball";
+import { Ground } from "../Interfaces/Ground.interface";
+import { Limits } from "../Interfaces/Limits.interface";
+import { Paddle } from "./Paddle";
+import { Player } from "./Player";
 import * as Design from "./Design";
 
 export let CANVAS_WIDTH = 700;
@@ -14,37 +14,41 @@ export class Match {
 	/* ---------- core state (unchanged) ---------- */
 	private readonly	_gameWrapper: HTMLDivElement;
 
-	private				_appendix: HTMLDivElement;
-	private				_canvas!: HTMLCanvasElement;
-	private				_field!: CanvasRenderingContext2D;
-	private				_width!: number;
-	private				_height!: number;
+	private				_score: HTMLDivElement;
+	private				_ground!: Ground;
 
+	private				_players: Player[];
 	private				_ball!: Ball;
-	private				_players: Player[] = [];
+	private readonly	_pointsToWin = 10;
 
-	private readonly	_pointsToWin = 2;
 	private 			_winner: Player | null = null;
 
 	private 			_break = false;
 
 	constructor(container: HTMLDivElement) {
 		this._gameWrapper = container;
-		this._appendix = Design.createAppendix();
-		this._gameWrapper.appendChild(this._appendix);
+
+		this._score = Design.createAppendix();
+		this._gameWrapper.appendChild(this._score);
+
+		this._players = [];
 
 		this.eventListener();
 	}
 
+	/* ---------- getters ---------- */
+	get	winner ()	{ return this._winner ; }
+
 	/* ---------- public API ---------- */
 	addPlayer (newPlayer: Player) {
+		newPlayer.location = this._players.length;
+		newPlayer.points = 0;
 		this._players.push(newPlayer);
 	}
 
 	async start () : Promise<void> {
-		await this.createField();
 		await this.setupGame();
-		await this.beforeGame();
+		await this.launchGame();
 
 		return new Promise(resolve => {
 			const loop = async () => {
@@ -69,16 +73,8 @@ export class Match {
 	}
 
 	/* ---------- internals ---------- */
-	private async createField () {
-		this._canvas = this.createCanvas()!;
-		this._field = this._canvas.getContext('2d') as CanvasRenderingContext2D;
-		this._width = this._canvas.width;
-		this._height = this._canvas.height;
-		this._gameWrapper.appendChild(this._canvas);
-	}
-
-	private createCanvas () {
-		const	canvas: HTMLCanvasElement = document.createElement('canvas');
+	private async setupGame () {
+		const	canvas = document.createElement('canvas') as HTMLCanvasElement;
 
 		canvas.style.position = 'relative';
 		canvas.style.margin = '0';
@@ -89,53 +85,28 @@ export class Match {
 		canvas.height = CANVAS_HEIGHT;
 		if (this._players.length > 2)
 			CANVAS_WIDTH = 500;
-		console.log('canvas height: ', CANVAS_HEIGHT);
-		console.log('canvas width: ', CANVAS_WIDTH);
 		canvas.width = CANVAS_WIDTH;
 
-		return canvas;
-	}
+		this._ground = {
+			field: canvas.getContext('2d') as CanvasRenderingContext2D,
+			width: canvas.width,
+			height: canvas.height
+		}
 
-	private async setupGame () {
-		this._ball = new Ball(this._canvas);
+		this._gameWrapper.appendChild(canvas);
+		Design.drawBackground(this._ground.field);
+
+		this._ball = new Ball(this._ground);
 		for (let i = 0; i < this._players.length; i++) {
-			this._players[i].location = i;
-			this._players[i].points = 0;
-			this._players[i].paddle = new Paddle(this._canvas, this._players[i]);
+			this._players[i].paddle = new Paddle(this._ground, this._players[i]);
 		}
 	}
 
-	private async beforeGame () {
-		await this.displayStartButton();
+	private async launchGame () {
 		this.displayScore();
+		await this.displayStartButton();
 		await this.displayCountdown();
-	}
-
-	private async displayStartButton () : Promise<void> {
-		return new Promise((resolve) => {
-			
-			const	button: HTMLButtonElement = document.createElement('button');
-			button.style.minWidth = '50%';
-			button.style.marginTop = '20px';
-			button.style.border = '2px solid rgb(0, 0, 0)';
-			button.style.borderRadius = '5px';
-			button.style.padding = '5px';
-			button.style.cursor = 'pointer';
-			// style of the text in the button
-			button.classList.add('text-black', 'text-lg', 'font-bold', 'font-sans', 'transition-colors', 'hover:bg-black', 'hover:text-white');	// font-sans: fontFamily = 'system-ui'
-			button.textContent = 'Start';
-	/* ---------- internal helpers (design‑only edits) ---------- */
-			const alert = new Alert(`${this._players[0].name}\nvs\n${this._players[1].name}\n`);
-			const btn = document.createElement("button");
-			Design.styleStartButton(btn);
-			btn.textContent = "Start";
-			btn.onclick = () => {
-				this._gameWrapper.removeChild(alert.element);
-				resolve();
-			};
-			alert.element.appendChild(btn);
-			this._gameWrapper.appendChild(alert.element);
-		});
+		this._ball.spawn();
 	}
 
 	private displayScore () {
@@ -167,7 +138,34 @@ export class Match {
 
             player.display.appendChild(name);
             player.display.appendChild(score);
-            this._appendix.appendChild(player.display);
+            this._score.appendChild(player.display);
+		});
+	}
+
+	private async displayStartButton () : Promise<void> {
+		return new Promise((resolve) => {
+			
+			const	button: HTMLButtonElement = document.createElement('button');
+			button.style.minWidth = '50%';
+			button.style.marginTop = '20px';
+			button.style.border = '2px solid rgb(0, 0, 0)';
+			button.style.borderRadius = '5px';
+			button.style.padding = '5px';
+			button.style.cursor = 'pointer';
+			// style of the text in the button
+			button.classList.add('text-black', 'text-lg', 'font-bold', 'font-sans', 'transition-colors', 'hover:bg-black', 'hover:text-white');	// font-sans: fontFamily = 'system-ui'
+			button.textContent = 'Start';
+	/* ---------- internal helpers (design‑only edits) ---------- */
+			const alert = new Alert(`${this._players[0].name}\nvs\n${this._players[1].name}\n`);
+			const btn = document.createElement("button");
+			Design.styleStartButton(btn);
+			btn.textContent = "Start";
+			btn.onclick = () => {
+				this._gameWrapper.removeChild(alert.element);
+				resolve();
+			};
+			alert.element.appendChild(btn);
+			this._gameWrapper.appendChild(alert.element);
 		});
 	}
 	
@@ -176,7 +174,7 @@ export class Match {
 		return new Promise(resolve => {
 			frames.forEach((f, i) => {
 				setTimeout(() => {
-					Design.drawCountdownFrame(this._field, f);
+					Design.drawCountdownFrame(this._ground.field, f);
 					if (i === frames.length - 1) resolve();
 				}, i * 1000);
 			});
@@ -185,26 +183,30 @@ export class Match {
 
 	private async update () {
 
+		/* Check ball / paddle collision */
 		this._players.forEach((player) => player.paddle!.collision(this._ball))
-		
-		if (!this._players[2] && this._ball.position.y + this._ball.radius >= this._height ||
+
+		/* Check ball / wall collision */
+		if (!this._players[2] && this._ball.position.y + this._ball.radius >= this._ground.height ||
 			!this._players[3] && this._ball.position.y - this._ball.radius <= 0) {
 				this._ball.direction.y *= -1;
 			}
-			else if (this._ball.out(this._players)) {
-				this._ball.spawn();
-			}
+
+		/* Check ball out of the ground */
+		else if (this._ball.out(this._players)) {
+			this._ball.spawn();
+		}
 
 		this._ball.update();
 		for (let i = 0; i < this._players.length; i++) {
-			this._players[i].move(this._ball);
-			this._players[i].paddle?.update();
-			this.defineLimits(this._players[i]);
+			this._players[i].move(this._ball);		// check if direction key is pressed or need to move for bot
+			this._players[i].paddle?.update();		// update paddle coordinates consequently
+			this.defineLimits(this._players[i]);	// prevent paddles to overlap
 		}
 	}
 
 	private async render () {
-		Design.drawBackground(this._field);
+		Design.drawBackground(this._ground.field);
 		this._ball.draw();
 		for (let i = 0; i < this._players.length; i++) {
 			this._players[i].paddle?.draw();
@@ -230,81 +232,55 @@ export class Match {
 	}
 
 	private defineLimits (player: Player) {
+		const	paddle = player.paddle;
+		if (!paddle)
+			return ;
+		const	margin = paddle.width + 5;
+
 		switch (player.location) {
 			case 0:
-				if (this._players[3] && this._players[3].paddle) {
-					if (player.paddle && player.paddle.coordinates.top <= player.paddle.width + 5)
-						this._players[3].paddle.limits = { ...this._players[3].paddle.limits, right: player.paddle.coordinates.left };
-					else if (player.paddle)
-						this._players[3].paddle.limits = { ...this._players[3].paddle.limits, right: this._width };
-				}
-				if (this._players[2] && this._players[2].paddle) {
-					if (player.paddle && player.paddle.coordinates.bottom >= this._height - (player.paddle.width + 5)) {
-						this._players[2].paddle.limits = { ...this._players[2].paddle.limits, right: player.paddle.coordinates.left };
-						console.log('bottom: ',player.paddle.coordinates.bottom);
-					}
-					else if (player.paddle)
-						this._players[2].paddle.limits = { ...this._players[2].paddle.limits, right: this._width };
-				}
+				this.setPaddleLimits(3, 'right', paddle.coordinates.top <= margin, paddle.coordinates.left, this._ground.width)
+				this.setPaddleLimits(2, 'right', paddle.coordinates.bottom >= this._ground.height - margin, paddle.coordinates.left, this._ground.width)
 				break ;
 			case 1:
-				if (this._players[3] && this._players[3].paddle) {
-					if (player.paddle && player.paddle.coordinates.top <= player.paddle.width + 5)
-						this._players[3].paddle.limits = { ...this._players[3].paddle.limits, left: player.paddle.coordinates.right };
-					else if (player.paddle)
-						this._players[3].paddle.limits = { ...this._players[3].paddle.limits, left: 0 };
-				}
-				if (this._players[2] && this._players[2].paddle) {
-					if (player.paddle && player.paddle.coordinates.bottom >= this._height - (player.paddle.width + 5)) {
-						this._players[2].paddle.limits = { ...this._players[2].paddle.limits, left: player.paddle.coordinates.right };
-					}
-					else if (player.paddle)
-						this._players[2].paddle.limits = { ...this._players[2].paddle.limits, left: 0 };
-				}
+				this.setPaddleLimits(3, 'left', paddle.coordinates.top <= margin, paddle.coordinates.right, 0)
+				this.setPaddleLimits(2, 'left', paddle.coordinates.bottom >= this._ground.height - margin, paddle.coordinates.right, 0)
 				break ;
 			case 2:
-				if (this._players[1] && this._players[1].paddle) {
-					if (player.paddle && player.paddle.coordinates.left <= player.paddle.width + 5)
-						this._players[1].paddle.limits = { ...this._players[1].paddle.limits, down: player.paddle.coordinates.top };
-					else if (player.paddle)
-						this._players[1].paddle.limits = { ...this._players[1].paddle.limits, down: this._height };
-				}
-				if (this._players[0] && this._players[0].paddle) {
-					if (player.paddle && player.paddle.coordinates.right >= this._width - (player.paddle.width + 5)) {
-						this._players[0].paddle.limits = { ...this._players[0].paddle.limits, down: player.paddle.coordinates.top };
-					}
-					else if (player.paddle)
-						this._players[0].paddle.limits = { ...this._players[0].paddle.limits, down: this._height };
-				}
+				this.setPaddleLimits(1, 'down', paddle.coordinates.left <= margin, paddle.coordinates.top, this._ground.height)
+				this.setPaddleLimits(0, 'down', paddle.coordinates.right >= this._ground.width - margin, paddle.coordinates.top, this._ground.height)
 				break ;
 			case 3:
-				if (this._players[1] && this._players[1].paddle) {
-					if (player.paddle && player.paddle.coordinates.left <= player.paddle.width + 5)
-						this._players[1].paddle.limits = { ...this._players[1].paddle.limits, up: player.paddle.coordinates.bottom };
-					else if (player.paddle)
-						this._players[1].paddle.limits = { ...this._players[1].paddle.limits, up: 0 };
-				}
-				if (this._players[0] && this._players[0].paddle) {
-					if (player.paddle && player.paddle.coordinates.right >= this._width - (player.paddle.width + 5)) {
-						this._players[0].paddle.limits = { ...this._players[0].paddle.limits, up: player.paddle.coordinates.bottom };
-					}
-					else if (player.paddle)
-						this._players[0].paddle.limits = { ...this._players[0].paddle.limits, up: 0 };
-				}
+				this.setPaddleLimits(1, 'up', paddle.coordinates.left <= margin, paddle.coordinates.bottom, 0)
+				this.setPaddleLimits(0, 'up', paddle.coordinates.right >= this._ground.width - margin, paddle.coordinates.bottom, 0)
 				break ;
 		}
+	}
+
+	private setPaddleLimits (
+		playerIndex: number,
+		side: keyof Limits,
+		condition: boolean,
+		valueIfTrue: number,
+		valueIfFalse: number
+		) {
+		const	paddle = this._players[playerIndex]?.paddle;
+		if (!paddle)
+			return ;
+
+		paddle.limits = { ...paddle.limits, [side]: condition ? valueIfTrue : valueIfFalse};
 	}
 
 	private eventListener() {
 		document.addEventListener("keydown", e => {
 			if (e.key === " ") {
 				this._break = !this._break;
-				if (this._break)	Design.drawPauseIcon(this._field);
+				if (this._break)	Design.drawPauseIcon(this._ground.field);
 			}
 		});
 
 		document.addEventListener('keydown', (event) => {
-			this._players.forEach((player) => { player.keyPressed.add(event.key); player.direction = null });
+			this._players.forEach((player) => { player.keyPressed.add(event.key); });
 		});
 		document.addEventListener('keyup', (event) => {
 			this._players.forEach((player) => { player.keyPressed.delete(event.key); player.direction = null });
