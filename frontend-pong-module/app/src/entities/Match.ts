@@ -178,20 +178,20 @@ export class Match {
 	private async update () {
 
 		/* Check ball / paddle collision */
-		this._players.forEach((player) => player.paddle!.collision(this._ball))
+		// this._players.forEach((player) => player.paddle!.collision(this._ball))
 
 		/* Check ball / wall collision */
-		if (!this._players[2] && this._ball.position.y + this._ball.radius >= this._ground.height ||
-			!this._players[3] && this._ball.position.y - this._ball.radius <= 0) {
-				this._ball.direction.y *= -1;
-			}
+		if (!this._players[2] && this._ball.coordinates.bottom >= this._ground.height ||
+			!this._players[3] && this._ball.coordinates.top <= 0) {
+			this._ball.direction.y *= -1;
+		}
 
 		/* Check ball out of the ground */
 		else if (this._ball.out(this._players)) {
 			this._ball.spawn();
 		}
 
-		this._ball.update();
+		this._ball.update(this._players);
 		for (let i = 0; i < this._players.length; i++) {
 			this._players[i].move(this._ball);		// check if direction key is pressed or need to move for bot
 			this._players[i].paddle?.update();		// update paddle coordinates consequently

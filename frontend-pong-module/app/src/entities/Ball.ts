@@ -55,11 +55,11 @@ export class Ball {
 
 		let	impactRatio = 0;
 		if (side === 'left' || side === 'right') {
-				impactRatio = (this._position.y - (paddle.position.y + paddle.height / 2)) / (paddle.height / 2);
+			impactRatio = (this._position.y - (paddle.position.y + paddle.height / 2)) / (paddle.height / 2);
 		}
 		else if (side === 'top' || side === 'bottom') {
 				impactRatio = ((this._position.x - (paddle.position.x + paddle.width / 2)) / (paddle.width / 2));
-		}
+			}
 		impactRatio = Math.max(-1, Math.min(1, impactRatio));
 
 		const	maxAngle = 60 * Math.PI / 180;
@@ -75,7 +75,7 @@ export class Ball {
 			this._direction.x = Math.sin(angle);
 			this._direction.y = Math.cos(angle) * directionSign;
 		}
-
+		
 		this._direction.normalize();
 	}
 
@@ -116,12 +116,17 @@ export class Ball {
 		return false ;
 	}
 
-	update () {
+	update (players: Player[]) {
 		let	speed = this._speed;
-		if (!this._rebound)	speed /= 2;
+		if (!this._rebound)	{ speed /= 2; }
 
-		this._position.x += this._direction.x * speed;
-		this._position.y += this._direction.y * speed;
+		for (let i = 0; i < speed; i++) {
+			this._position.x += this._direction.x;
+			this._position.y += this._direction.y;
+			for (const player of players) {
+				if (player.paddle?.collision(this)) { break ; }
+			}
+		}
 
 		this._coordinates.top    = this._position.y - this._radius;
 		this._coordinates.bottom = this._position.y + this._radius;
