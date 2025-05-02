@@ -3,22 +3,26 @@ export class Alert {
 
 	constructor (message: string) {
 		this._element = document.createElement('div');
-		this._element.style.position = 'absolute';
-		this._element.style.minWidth = '250px';
-		this._element.style.top = '50%';
-		this._element.style.left = '50%';
-		this._element.style.transform = 'translate(-50%, -50%)';
-		this._element.style.borderRadius = '5px';
-		this._element.style.backgroundColor = 'rgb(255, 0, 0)';
-		this._element.style.padding = '10px';
-		this._element.style.zIndex = '1000';
 
-		this._element.style.color = 'rgb(0, 0, 0)';
-		this._element.style.fontFamily = 'system-ui';
-		this._element.style.fontSize = '20px';
-		this._element.style.textAlign = 'center';
-		this._element.style.lineHeight = '1';
-		this._element.style.whiteSpace = 'pre-line';
+		Object.assign(this._element.style, {
+			position: 'absolute',
+			minWidth: '150px',
+			maxWidth: '250px',
+			top: '50%',
+			left: '50%',
+			transform: 'translate(-50%, -50%)',
+			borderRadius: '5px',
+			backgroundColor: 'rgba(255, 0, 0, 0.9)',
+			padding: '8px',
+			zIndex: '1000',
+			color: 'black',
+			fontFamily: 'system-ui',
+			fontSize: '25px',
+			textAlign: 'center',
+			lineHeight: '0.8',
+			whiteSpace: 'pre-line',
+			overflowWrap: 'break-word',
+		});
 		this._element.textContent = message;
 	}
 

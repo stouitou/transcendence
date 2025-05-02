@@ -144,19 +144,14 @@ export class Match {
 	private async displayStartButton () : Promise<void> {
 		return new Promise((resolve) => {
 			
-			const	button: HTMLButtonElement = document.createElement('button');
-			button.style.minWidth = '50%';
-			button.style.marginTop = '20px';
-			button.style.border = '2px solid rgb(0, 0, 0)';
-			button.style.borderRadius = '5px';
-			button.style.padding = '5px';
-			button.style.cursor = 'pointer';
-			// style of the text in the button
-			button.classList.add('text-black', 'text-lg', 'font-bold', 'font-sans', 'transition-colors', 'hover:bg-black', 'hover:text-white');	// font-sans: fontFamily = 'system-ui'
-			button.textContent = 'Start';
 	/* ---------- internal helpers (design‑only edits) ---------- */
-			const alert = new Alert(`${this._players[0].name}\nvs\n${this._players[1].name}\n`);
-			const btn = document.createElement("button");
+			let	message = `${this._players[0].name}`;
+			for (let i = 1; i < this._players.length; i++) {
+				message += ` vs ${this._players[i].name}`;
+			}
+			message += '\n';
+			const	alert = new Alert(message);
+			const	btn = document.createElement("button");
 			Design.styleStartButton(btn);
 			btn.textContent = "Start";
 			btn.onclick = () => {

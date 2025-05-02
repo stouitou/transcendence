@@ -121,7 +121,9 @@ export function createGameCanvas(_: Player[]): HTMLCanvasElement {
 export function styleStartButton(btn: HTMLButtonElement) {
     Object.assign(btn.style, {
         minWidth   : "220px",
-        padding    : "14px 28px",
+        height     : "30px",
+        margin     : "5px",
+        padding    : "4px 28px",
         fontFamily : DESIGN.fontFamily,
         fontSize   : "22px",
         fontWeight : "600",
