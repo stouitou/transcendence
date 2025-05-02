@@ -14,7 +14,7 @@ export class Match {
 	/* ---------- core state (unchanged) ---------- */
 	private readonly	_gameWrapper: HTMLDivElement;
 
-	private				_score: HTMLDivElement;
+	private				_score!: HTMLDivElement;
 	private				_ground!: Ground;
 
 	private				_players: Player[];
@@ -27,9 +27,6 @@ export class Match {
 
 	constructor(container: HTMLDivElement) {
 		this._gameWrapper = container;
-
-		this._score = Design.createAppendix();
-		this._gameWrapper.appendChild(this._score);
 
 		this._players = [];
 
@@ -93,6 +90,9 @@ export class Match {
 			height: canvas.height
 		}
 
+		this._score = Design.createAppendix(this._players.length - 1);
+		this._gameWrapper.appendChild(this._score);
+
 		this._gameWrapper.appendChild(canvas);
 		Design.drawBackground(this._ground.field);
 
@@ -113,10 +113,9 @@ export class Match {
 		this._players.forEach((player) => {
 			const    name: HTMLParagraphElement = document.createElement('p');
             name.textContent = player.name;
-            name.style.margin = '10px';
             const    score: HTMLParagraphElement = document.createElement('p');
             score.textContent = `${player.points}`;
-            name.style.margin = score.style.margin = "10px";
+            name.style.margin = score.style.margin = '0';
             name.style.color  = score.style.color  = Design.DESIGN.accentColor;
 
             /* flip‑up animate each refresh */

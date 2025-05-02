@@ -68,17 +68,29 @@ export const DESIGN = {
 })();
 
 /* ---------- structure helpers ---------- */
-export function createAppendix(): HTMLDivElement {
+export function createAppendix(ratio: number): HTMLDivElement {
     const bar = document.createElement("div");
+    console.log('ratio = ', ratio);
+    const   height = ratio * 50;
+    const   middleRow = 50;
+    let     bottomRow = 0;
+    let     topRow = 0;
+    if (ratio > 1)
+        bottomRow = 50;
+    if (ratio > 2)
+        topRow = 50;
     Object.assign(bar.style, {
-        width      : "500px",
-        height     : "150px",
+        width      : `${CANVAS_WIDTH}px`,
+        height     : `${height}px`,
         display    : "grid",
-        gridTemplateColumns   : "100px 100px 100px",
-        gridTemplateRows      : "40px 40px 40px",
+        gridTemplateColumns   : "1fr 1fr 1fr",
+        gridTemplateRows      : `${topRow}px ${middleRow}px ${bottomRow}px`,
         justifyContent : "center",
+        justifyItems : "center",
         alignItems : "center",
-        padding    : "18px 0",
+        padding    : "0",
+        // padding    : "18px 0",
+        margin    : "0",
         fontSize   : "24px",
         fontWeight : "600",
         color      : DESIGN.accentColor,

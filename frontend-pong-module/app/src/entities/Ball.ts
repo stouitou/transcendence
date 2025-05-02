@@ -80,34 +80,34 @@ export class Ball {
 	}
 
 	out (players: Player[]) : boolean {
-		if (this._coordinates.right < 0 || this._coordinates.left > this._ground.width || this._coordinates.bottom < 0 || this._coordinates.top > this._ground.height) {
-			if (this._coordinates.left > this._ground.width) {
-				if (this._lastHit === null || this._lastHit.location === 0) {
-					players[0].losePoint();
-				}
-				else if (this._lastHit)
-					this._lastHit.score();
+		let	loserIndex: number | null = null;
+		let	side: 'right' | 'left' | 'bottom' | 'top' | null = null;
+
+		if (this._coordinates.left > this._ground.width) {
+			loserIndex = players.length > 2 ? 0 : null;
+			side = 'right';
+		}
+		else if (this._coordinates.right < 0) {
+			loserIndex = players.length > 2 ? 1 : null;
+			side = 'left';
+		}
+		else if (this._coordinates.top > this._ground.height) {
+			loserIndex = 2;
+			side = 'bottom';
+		}
+		else if (this._coordinates.bottom < 0) {
+			loserIndex = 3;
+			side = 'top';
+		}
+
+		if (side !== null) {
+			if (loserIndex !== null) {
+				if (this._lastHit === null || this._lastHit.location === loserIndex)	{ players[loserIndex].losePoint(); }
+				else	{ this._lastHit?.score(); }
 			}
-			else if (this._coordinates.right < 0) {
-				if (this._lastHit === null || this._lastHit.location === 1) {
-					players[1].losePoint();
-				}
-				else if (this._lastHit)
-					this._lastHit.score();
-			}
-			else if (this._coordinates.top > this._ground.height) {
-				if (this._lastHit === null || this._lastHit.location === 2) {
-					players[2].losePoint();
-				}
-				else if (this._lastHit)
-					this._lastHit.score();
-			}
-			else if (this._coordinates.bottom < 0) {
-				if (this._lastHit === null || this._lastHit.location === 3) {
-					players[3].losePoint();
-				}
-				else if (this._lastHit)
-					this._lastHit.score();
+			else {
+				const	winnerIndex = side === 'right' ? 1 : 0;
+				players[winnerIndex].score();
 			}
 			this._rebound = false;
 			this._lastHit = null;
