@@ -2,6 +2,7 @@ import { Alert } from "./Alert";
 import { Ball } from "./Ball";
 import { Ground } from "../Interfaces/Ground.interface";
 import { Limits } from "../Interfaces/Limits.interface";
+import { HistoriqueGame } from "../Interfaces/HistoriqueGame.interface";
 import { Paddle } from "./Paddle";
 import { Player } from "./Player";
 import * as Design from "./Design";
@@ -19,13 +20,18 @@ export class Match {
 
 	private				_players: Player[];
 	private				_ball!: Ball;
-	private readonly	_pointsToWin = 10;
+	private readonly	_pointsToWin = 5;
 
 	private 			_winner: Player | null = null;
 
 	private 			_break = false;
 
+	/****************Partie HistoriqueGame******************/
+	private				_historiqueGame: HistoriqueGame;
+	private				_maxBounceCountRound = 0;
+
 	constructor(container: HTMLDivElement) {
+		this._historiqueGame = { maxBounceCount: 0, mostGoalsConcededPlayer: 0, playerWithMostPointsLost: 0, totalBouncesPerPlayer: 0};
 		this._gameWrapper = container;
 
 		this._players = [];
@@ -55,6 +61,7 @@ export class Match {
 						await this.endGame(player);
 						resolve();
 						// TODO: Return lobby
+						this.displayHistoriqueGame();
 						return;
 					}
 				}
@@ -177,9 +184,6 @@ export class Match {
 
 	private async update () {
 
-		/* Check ball / paddle collision */
-		// this._players.forEach((player) => player.paddle!.collision(this._ball))
-
 		/* Check ball / wall collision */
 		if (!this._players[2] && this._ball.coordinates.bottom >= this._ground.height ||
 			!this._players[3] && this._ball.coordinates.top <= 0) {
@@ -187,7 +191,15 @@ export class Match {
 		}
 
 		/* Check ball out of the ground */
-		else if (this._ball.out(this._players)) {
+		const winner = this._ball.out(this._players);
+
+		if (winner) {
+			if (!this._historiqueGame.firstPointScorer)
+				this._historiqueGame.firstPointScorer = winner;
+
+			if (this._historiqueGame.maxBounceCount < this._ball.maxBounceCountRound) {
+				this._historiqueGame.maxBounceCount = this._ball.maxBounceCountRound;
+				this._ball.maxBounceCountRound = 0; }
 			this._ball.spawn();
 		}
 
@@ -280,4 +292,47 @@ export class Match {
 			this._players.forEach((player) => { player.keyPressed.delete(event.key); player.direction = null });
 		});
 	}
+
+	private displayHistoriqueGame()
+	{
+		const menuHistoriqueGame = document.createElement('div');
+		menuHistoriqueGame.style.position =  'absolute';
+		menuHistoriqueGame.style.width = '250px';
+		menuHistoriqueGame.style.height = '400px';
+		menuHistoriqueGame.style.backgroundColor = 'blue';
+		menuHistoriqueGame.style.display = 'flex';
+		menuHistoriqueGame.style.justifyContent = 'center';
+		menuHistoriqueGame.style.alignItems = 'center';
+		menuHistoriqueGame.style.color = 'white';
+		menuHistoriqueGame.style.fontSize = '15px';
+		menuHistoriqueGame.style.fontFamily = 'Arial';
+		menuHistoriqueGame.style.borderRadius = '8px';
+		menuHistoriqueGame.style.border = '5px solid rgb(255, 0, 0)';
+		menuHistoriqueGame.style.background = 'rgb(0, 0, 0)';
+		menuHistoriqueGame.style.color = 'rgb(255, 0, 0)';
+		menuHistoriqueGame.style.whiteSpace = 'pre-line';
+		let text: string = 'Le plus grand nombre de rebonds ' + this._historiqueGame.maxBounceCount + "\n\n";
+		let mostGoalsConcededPlayer: number = 0;
+		let playerWithMostPointsLost: number = 0;
+
+		for (let x: number = 0; x < this._players.length; x++)
+		{
+			console.log("this._players[x].historiqueGame.firstPointScorer ", this._players[x].historiqueGame.firstPointScorer?.name);
+			if (this._players[x].historiqueGame.mostGoalsConcededPlayer > this._players[mostGoalsConcededPlayer].historiqueGame.mostGoalsConcededPlayer)
+				mostGoalsConcededPlayer = x;
+			if (this._players[x].historiqueGame.playerWithMostPointsLost > this._players[playerWithMostPointsLost].historiqueGame.playerWithMostPointsLost)
+				playerWithMostPointsLost = x;
+			if (this._players[x].historiqueGame.firstPointScorer)
+				text += "Le premier joueur à avoir marqué un point est " + this._players[x].name + "\n\n";
+		}
+		text += " Le joueur qui s'est pris le plus de buts " + this._players[mostGoalsConcededPlayer].name + " avec " + this._players[mostGoalsConcededPlayer].historiqueGame.mostGoalsConcededPlayer + "\n\n";
+		text += "Le joueur ayant perdu le plus de points " + this._players[playerWithMostPointsLost].name + " avec " + this._players[playerWithMostPointsLost].historiqueGame.playerWithMostPointsLost + "\n\n";
+		
+		for (let x: number = 0; x < this._players.length; x++)
+		{
+			text += "Nombre de rebond de " + this._players[x].name + " est de " + this._players[x].historiqueGame.totalBouncesPerPlayer + "\n";
+		}
+		menuHistoriqueGame.textContent = text;
+		this._gameWrapper.appendChild(menuHistoriqueGame);
+		}
 }

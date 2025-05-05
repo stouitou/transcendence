@@ -1,5 +1,6 @@
 import { Ball } from "./Ball";
 import { Paddle } from "./Paddle";
+import { HistoriqueGame } from "../Interfaces/HistoriqueGame.interface";
 
 export abstract class	Player{
 
@@ -15,7 +16,10 @@ export abstract class	Player{
 	protected				_display: HTMLDivElement;
 	protected				_lastWin: boolean = false;
 
+	private				_historiqueGame: HistoriqueGame;
+
 	constructor (json: any) {
+		this._historiqueGame = { maxBounceCount: 0, mostGoalsConcededPlayer: 0, playerWithMostPointsLost: 0, totalBouncesPerPlayer: 0};
 		this._id = json.id;
 		this._name = json.name;
 		if (!this._name)
@@ -36,6 +40,7 @@ export abstract class	Player{
 	get keyPressed ()				{ return this._keyPressed ; }
 	get display ()					{ return this._display ; }
 	get lastWin ()					{ return this._lastWin ; }
+	get historiqueGame ()			{ return this._historiqueGame ; }
 
 	/* ---------- setters ---------- */
 	set paddle (paddle: Paddle)					{ this._paddle = paddle; }
@@ -43,6 +48,7 @@ export abstract class	Player{
 	set points (points: number)					{ this._points = points; }
 	set	direction (direction: string | null)	{ this._direction = direction; }
 	set lastWin (lastWin: boolean)				{ this._lastWin = lastWin; }
+	set historiqueGame (historiqueGame: HistoriqueGame)			{ this._historiqueGame = historiqueGame }
 
 	abstract move (ball: Ball) : void ;
 

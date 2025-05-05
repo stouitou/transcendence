@@ -21,6 +21,8 @@ export class Ball {
 
 	private				_lastHit: Player | null = null;
 
+	private				_maxBounceCountRound = 0;
+
 	constructor (ground: Ground) {
 		this._ground = ground;
 	}
@@ -31,7 +33,9 @@ export class Ball {
 	get direction ()	{ return this._direction ; }
 	get	position ()		{ return this._position ; }
 	get	coordinates ()	{ return this._coordinates ; };
+	get	maxBounceCountRound ()	{ return this._maxBounceCountRound ; };
 
+	set	maxBounceCountRound (nb: number)	{ this._maxBounceCountRound = nb; };
 	/* ---------- core behaviour ---------- */
 	spawn() {
 		const	x = this._ground.width  / 2;
@@ -102,7 +106,7 @@ export class Ball {
 		});
 	}
 
-	out (players: Player[]) : boolean {
+	out (players: Player[]) : Player | null {
 		let	loserIndex: number | null = null;
 		let	side: 'right' | 'left' | 'bottom' | 'top' | null = null;
 
@@ -124,19 +128,38 @@ export class Ball {
 		}
 
 		if (side !== null) {
+			let	winner: Player | null = null;
 			if (loserIndex !== null) {
-				if (this._lastHit === null || this._lastHit.location === loserIndex)	{ players[loserIndex].losePoint(); }
-				else	{ this._lastHit?.score(); }
+				if (this._lastHit === null || this._lastHit.location === loserIndex)	{ players[loserIndex].losePoint(); players[loserIndex].historiqueGame.playerWithMostPointsLost++;}
+				else	{ this._lastHit?.score(); winner = this._lastHit}
+				players[loserIndex].historiqueGame.mostGoalsConcededPlayer++;
 			}
 			else {
 				const	winnerIndex = side === 'right' ? 1 : 0;
 				players[winnerIndex].score();
+				winner = players[winnerIndex];
+				const	loserIndex = winnerIndex === 0 ? 1 : 0;
+				players[loserIndex].historiqueGame.mostGoalsConcededPlayer++;
 			}
 			this._rebound = false;
 			this._lastHit = null;
-			return true ;
+			return winner ;
 		}
-		return false ;
+		return null ;
+	}
+
+	firstPointScorer (players: Player[]) {
+		let scoreEmpty: boolean = true;
+
+		for (let x: number = 0; players.length > x; x++)
+		{
+			if (players[x].historiqueGame.firstPointScorer) //verifie si un player a deja etait enregistrer
+				return false;
+			else if (players[x].points != 0)
+				scoreEmpty = false;
+			
+		}
+		return scoreEmpty;
 	}
 
 	update (players: Player[]) {
@@ -147,7 +170,7 @@ export class Ball {
 			this._position.x += this._direction.x;
 			this._position.y += this._direction.y;
 			for (const player of players) {
-				if (player.paddle?.collision(this)) { this.setCoordinates(); break ; }
+				if (player.paddle?.collision(this)) { this.maxBounceCountRound++; this.setCoordinates(); break ; }
 			}
 		}
 		this.setCoordinates();
