@@ -23,7 +23,7 @@ export abstract class	Player{
 		this._id = json.id;
 		this._name = json.name;
 		if (!this._name)
-			this._name = 'Host';
+			this._name = this.setName();
 
 		this._points = 0;
 		this._display = document.createElement('div');
@@ -74,5 +74,54 @@ export abstract class	Player{
 		this._display.style.height = 'auto';
 		this._display.style.margin = '5px';
 		this._display.style.justifyContent = 'space-between';
+	}
+
+	private setName () : string {
+		const	names: string[] = [
+			'Alexandre',
+			'Jules',
+			'Enzo',
+			'Arthur',
+			'Thomas',
+			'Louis',
+			'Deborah',
+			'Amelie',
+			'Zoe',
+			'Dorian',
+			'Walid',
+			'Florent',
+			'Anastasia',
+			'Gregoire',
+			'Sophia',
+			'Timothee',
+			'Romain',
+			'Emma',
+			'Karine',
+			'Lucas',
+			'Fatima',
+			'Clement',
+			'Mohamed',
+			'Simon',
+			'Octave',
+			'Jose',
+			'Camille',
+			'Charles',
+			'Franck',
+			'Ludovic',
+			'Noe',
+			'Iris',
+			'Shaineze',
+			'Sami',
+			'Lea',
+			'Adrien',
+			'Theo',
+			'Charlie',
+			'Marine',
+			'Anne',
+		]
+		const	nameIndex = Math.random() * 30;
+		const	number = Math.random() * 100;
+
+		return names[Math.floor(nameIndex)] + '-' + Math.floor(number) ;
 	}
 }

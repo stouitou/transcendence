@@ -62,7 +62,6 @@ export class Ball {
 		console.log('Before bounce:');
 		console.log('  Ball position:', { x: this._position.x.toFixed(1), y: this._position.y.toFixed(1) });
 		console.log('  Ball direction:', { x: this._direction.x.toFixed(3), y: this._direction.y.toFixed(3) });
-		console.log('  Ball speed:', this._speed);
 		this._rebound = true;
 		this._lastHit = paddle.owner;
 		

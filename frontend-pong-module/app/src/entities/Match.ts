@@ -122,6 +122,8 @@ export class Match {
             name.textContent = player.name;
             const    score: HTMLParagraphElement = document.createElement('p');
             score.textContent = `${player.points}`;
+			score.style.padding = '0 15px';
+			name.style.padding = '0';
             name.style.margin = score.style.margin = '0';
             name.style.color  = score.style.color  = Design.DESIGN.accentColor;
 

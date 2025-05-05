@@ -7,7 +7,10 @@ export class	Bot extends Player {
 	private				_level: number;
 
 	constructor (level: number) {
-		super({name: 'Bot', role: 'bot'});
+		// this.setNames();
+		// console.log('hey');
+
+		super({name: null, role: 'bot'});
 		this._level = level;
 	}
 
