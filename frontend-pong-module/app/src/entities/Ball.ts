@@ -83,37 +83,73 @@ export class Ball {
 		if (this._coordinates.right < 0 || this._coordinates.left > this._ground.width || this._coordinates.bottom < 0 || this._coordinates.top > this._ground.height) {
 			if (this._coordinates.left > this._ground.width) {
 				if (this._lastHit === null || this._lastHit.location === 0) {
+					players[0].historiqueGame.playerWithMostPointsLost++;
+					console.log(players[0].name, "Lost Point");
 					players[0].losePoint();
 				}
 				else if (this._lastHit)
 					this._lastHit.score();
+				players[0].historiqueGame.mostGoalsConcededPlayer++;
+				if (this.firstPointScorer(players)){
+					players[0].historiqueGame.firstPointScorer = players[0];
+					console.log(players[0].name, "marque le premier point");}
+				console.log(players[0].name, "Ce prend 1 point");
 			}
 			else if (this._coordinates.right < 0) {
 				if (this._lastHit === null || this._lastHit.location === 1) {
+					players[1].historiqueGame.playerWithMostPointsLost++;
+					console.log(players[1].name, "Lost Point");
 					players[1].losePoint();
 				}
 				else if (this._lastHit)
 					this._lastHit.score();
+				players[1].historiqueGame.mostGoalsConcededPlayer++;
+				if (this.firstPointScorer(players)) {
+					players[1].historiqueGame.firstPointScorer = players[1];
+					console.log(players[0].name, "marque le premier point");}
+				console.log(players[1].name, "Ce prend 1 point");
 			}
 			else if (this._coordinates.top > this._ground.height) {
 				if (this._lastHit === null || this._lastHit.location === 2) {
+					players[2].historiqueGame.playerWithMostPointsLost++;
 					players[2].losePoint();
 				}
 				else if (this._lastHit)
 					this._lastHit.score();
+				players[2].historiqueGame.mostGoalsConcededPlayer++;
+				if (this.firstPointScorer(players))
+					players[2].historiqueGame.firstPointScorer = players[2];
 			}
 			else if (this._coordinates.bottom < 0) {
 				if (this._lastHit === null || this._lastHit.location === 3) {
+					players[3].historiqueGame.playerWithMostPointsLost++;
 					players[3].losePoint();
 				}
 				else if (this._lastHit)
 					this._lastHit.score();
+				players[3].historiqueGame.mostGoalsConcededPlayer++;
+				if (this.firstPointScorer(players))
+					players[3].historiqueGame.firstPointScorer = players[3];
 			}
 			this._rebound = false;
 			this._lastHit = null;
 			return true ;
 		}
 		return false ;
+	}
+
+	firstPointScorer (players: Player[]) {
+		let scoreEmpty: boolean = true;
+
+		for (let x: number = 0; players.length > x; x++)
+		{
+			if (players[x].historiqueGame.firstPointScorer) //verifie si un player a deja etait enregistrer
+				return false;
+			else if (players[x].points != 0)
+				scoreEmpty = false;
+			
+		}
+		return scoreEmpty;
 	}
 
 	update () {
