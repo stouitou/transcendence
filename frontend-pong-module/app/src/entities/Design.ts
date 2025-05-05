@@ -70,7 +70,6 @@ export const DESIGN = {
 /* ---------- structure helpers ---------- */
 export function createAppendix(ratio: number): HTMLDivElement {
     const bar = document.createElement("div");
-    console.log('ratio = ', ratio);
     const   height = ratio * 50;
     const   middleRow = 50;
     let     bottomRow = 0;

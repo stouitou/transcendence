@@ -120,10 +120,10 @@ export class Paddle {
 
 	collision (ball: Ball) {
 		if (
-			ball.position.x + ball.radius > this._coordinates.left  &&
-			ball.position.x - ball.radius < this._coordinates.right &&
-			ball.position.y + ball.radius > this._coordinates.top   &&
-			ball.position.y - ball.radius < this._coordinates.bottom
+			ball.coordinates.right > this._coordinates.left  &&
+			ball.coordinates.left < this._coordinates.right &&
+			ball.coordinates.bottom > this._coordinates.top   &&
+			ball.coordinates.top < this._coordinates.bottom
 		) {
 			const	side: string = this.getSideCollision(ball);
 			ball.bounce(this, side);

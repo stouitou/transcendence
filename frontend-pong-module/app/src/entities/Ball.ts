@@ -50,21 +50,32 @@ export class Ball {
 	}
 
 	bounce(paddle: Paddle, side: string) {
+		// if (this._lastHit === paddle.owner)	{ return ; }
+		console.log('--- bounce ---');
+		console.log('paddle right: ', paddle.coordinates.right);
+		console.log('ball left: ', this._coordinates.left);
+		console.log('Side:', side);
+		console.log('Before bounce:');
+		console.log('  Ball position:', { x: this._position.x.toFixed(1), y: this._position.y.toFixed(1) });
+		console.log('  Ball direction:', { x: this._direction.x.toFixed(3), y: this._direction.y.toFixed(3) });
+		console.log('  Ball speed:', this._speed);
 		this._rebound = true;
 		this._lastHit = paddle.owner;
-
+		
 		let	impactRatio = 0;
 		if (side === 'left' || side === 'right') {
 			impactRatio = (this._position.y - (paddle.position.y + paddle.height / 2)) / (paddle.height / 2);
 		}
 		else if (side === 'top' || side === 'bottom') {
-				impactRatio = ((this._position.x - (paddle.position.x + paddle.width / 2)) / (paddle.width / 2));
-			}
+			impactRatio = ((this._position.x - (paddle.position.x + paddle.width / 2)) / (paddle.width / 2));
+		}
 		impactRatio = Math.max(-1, Math.min(1, impactRatio));
-
+		console.log('Impact ratio:', impactRatio.toFixed(2));
+		
 		const	maxAngle = 60 * Math.PI / 180;
 		const	angle = impactRatio * maxAngle;
-
+		console.log('Angle (deg):', (angle * 180 / Math.PI).toFixed(1));
+		
 		if (side === 'left' || side === 'right') {
 			const	directionSign = (side === 'right') ? 1 : -1;
 			this._direction.x = Math.cos(angle) * directionSign;
@@ -77,6 +88,18 @@ export class Ball {
 		}
 		
 		this._direction.normalize();
+		console.log('New direction:', {
+			x: this._direction.x.toFixed(3),
+			y: this._direction.y.toFixed(3)
+		});
+		
+		const	offset = this._radius + 0.1;
+		this._position.x += this._direction.x * offset;
+		this._position.y += this._direction.y * offset;
+		console.log('Position after offset:', {
+			x: this._position.x.toFixed(1),
+			y: this._position.y.toFixed(1)
+		});
 	}
 
 	out (players: Player[]) : boolean {
@@ -124,14 +147,10 @@ export class Ball {
 			this._position.x += this._direction.x;
 			this._position.y += this._direction.y;
 			for (const player of players) {
-				if (player.paddle?.collision(this)) { break ; }
+				if (player.paddle?.collision(this)) { this.setCoordinates(); break ; }
 			}
 		}
-
-		this._coordinates.top    = this._position.y - this._radius;
-		this._coordinates.bottom = this._position.y + this._radius;
-		this._coordinates.left   = this._position.x - this._radius;
-		this._coordinates.right  = this._position.x + this._radius;
+		this.setCoordinates();
 	}
 
 	/* ---------- glossy draw ---------- */
@@ -161,5 +180,12 @@ export class Ball {
 		ctx.beginPath();
 		ctx.ellipse(x - r * 0.35, y - r * 0.35, r * 0.15, r * 0.10, 0, 0, Math.PI * 2);
 		ctx.fill();
+	}
+
+	setCoordinates () {
+		this._coordinates.top    = this._position.y - this._radius;
+		this._coordinates.bottom = this._position.y + this._radius;
+		this._coordinates.left   = this._position.x - this._radius;
+		this._coordinates.right  = this._position.x + this._radius;
 	}
 }
