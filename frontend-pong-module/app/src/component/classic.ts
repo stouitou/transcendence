@@ -53,14 +53,10 @@ export class  classic extends LitElement {
   private async setupGame () {
     try {
       this._game = new Match(this._area);
-      // this._game.addPlayer(new Real({name: 'Host', role: 'user', level: 1}));
-      // this._game.addPlayer(new Real({name: 'Host', role: 'user', level: 1}));
-      //  this._game.addPlayer(new Real({name: 'Host', role: 'user', level: 1}));
-      //this._game.addPlayer(new Real({name: 'Host', role: 'user', level: 1}));
       this._game.addPlayer(new Real({name: 'Host', role: 'user', level: 1}));
-
-      // this._game.addPlayer(new Bot(1));
+      this._game.addPlayer(new Bot(1));
       this._game.addPlayer(new Bot(2));
+      this._game.addPlayer(new Bot(3));
       await this._game.start();
     }
     catch (error) {

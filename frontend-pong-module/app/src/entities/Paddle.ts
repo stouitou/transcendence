@@ -126,7 +126,6 @@ export class Paddle {
 			ball.coordinates.top < this._coordinates.bottom
 		) {
 			this._owner.historiqueGame.totalBouncesPerPlayer++;
-			console.log(this._owner, " a ", this._owner.historiqueGame.totalBouncesPerPlayer, " rebond");
 			const	side: string = this.getSideCollision(ball);
 			ball.bounce(this, side);
 			return true;

@@ -106,7 +106,7 @@ export class Ball {
 		});
 	}
 
-	out (players: Player[]) : Player | null {
+	out (players: Player[]) : boolean {
 		let	loserIndex: number | null = null;
 		let	side: 'right' | 'left' | 'bottom' | 'top' | null = null;
 
@@ -128,24 +128,22 @@ export class Ball {
 		}
 
 		if (side !== null) {
-			let	winner: Player | null = null;
 			if (loserIndex !== null) {
 				if (this._lastHit === null || this._lastHit.location === loserIndex)	{ players[loserIndex].losePoint(); players[loserIndex].historiqueGame.playerWithMostPointsLost++;}
-				else	{ this._lastHit?.score(); winner = this._lastHit}
+				else	{ this._lastHit?.score();}
 				players[loserIndex].historiqueGame.mostGoalsConcededPlayer++;
 			}
 			else {
 				const	winnerIndex = side === 'right' ? 1 : 0;
 				players[winnerIndex].score();
-				winner = players[winnerIndex];
 				const	loserIndex = winnerIndex === 0 ? 1 : 0;
 				players[loserIndex].historiqueGame.mostGoalsConcededPlayer++;
 			}
 			this._rebound = false;
 			this._lastHit = null;
-			return winner ;
+			return true ;
 		}
-		return null ;
+		return false ;
 	}
 
 	firstPointScorer (players: Player[]) {

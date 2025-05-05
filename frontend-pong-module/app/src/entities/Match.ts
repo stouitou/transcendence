@@ -191,12 +191,12 @@ export class Match {
 		}
 
 		/* Check ball out of the ground */
-		const winner = this._ball.out(this._players);
-
-		if (winner) {
-			if (!this._historiqueGame.firstPointScorer)
-				this._historiqueGame.firstPointScorer = winner;
-
+		else if (this._ball.out(this._players)) {
+			if (!this._historiqueGame.firstPointScorer) {
+				this._players.forEach((player) => {
+					if (player.points === 1)	{ this._historiqueGame.firstPointScorer = player; console.log('first player to score: ', player); }
+				})
+			}
 			if (this._historiqueGame.maxBounceCount < this._ball.maxBounceCountRound) {
 				this._historiqueGame.maxBounceCount = this._ball.maxBounceCountRound;
 				this._ball.maxBounceCountRound = 0; }
