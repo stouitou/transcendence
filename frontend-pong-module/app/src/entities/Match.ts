@@ -15,12 +15,12 @@ export class Match {
 	/* ---------- core state (unchanged) ---------- */
 	private readonly	_gameWrapper: HTMLDivElement;
 
-	private				_score: HTMLDivElement;
+	private				_score!: HTMLDivElement;
 	private				_ground!: Ground;
 
 	private				_players: Player[];
 	private				_ball!: Ball;
-	private readonly	_pointsToWin = 2;
+	private readonly	_pointsToWin = 5;
 
 	private 			_winner: Player | null = null;
 
@@ -33,9 +33,6 @@ export class Match {
 	constructor(container: HTMLDivElement) {
 		this._historiqueGame = { maxBounceCount: 0, mostGoalsConcededPlayer: 0, playerWithMostPointsLost: 0, totalBouncesPerPlayer: 0};
 		this._gameWrapper = container;
-
-		this._score = Design.createAppendix();
-		this._gameWrapper.appendChild(this._score);
 
 		this._players = [];
 
@@ -100,6 +97,9 @@ export class Match {
 			height: canvas.height
 		}
 
+		this._score = Design.createAppendix(this._players.length - 1);
+		this._gameWrapper.appendChild(this._score);
+
 		this._gameWrapper.appendChild(canvas);
 		Design.drawBackground(this._ground.field);
 
@@ -120,10 +120,9 @@ export class Match {
 		this._players.forEach((player) => {
 			const    name: HTMLParagraphElement = document.createElement('p');
             name.textContent = player.name;
-            name.style.margin = '10px';
             const    score: HTMLParagraphElement = document.createElement('p');
             score.textContent = `${player.points}`;
-            name.style.margin = score.style.margin = "10px";
+            name.style.margin = score.style.margin = '0';
             name.style.color  = score.style.color  = Design.DESIGN.accentColor;
 
             /* flip‑up animate each refresh */
@@ -152,19 +151,14 @@ export class Match {
 	private async displayStartButton () : Promise<void> {
 		return new Promise((resolve) => {
 			
-			const	button: HTMLButtonElement = document.createElement('button');
-			button.style.minWidth = '50%';
-			button.style.marginTop = '20px';
-			button.style.border = '2px solid rgb(0, 0, 0)';
-			button.style.borderRadius = '5px';
-			button.style.padding = '5px';
-			button.style.cursor = 'pointer';
-			// style of the text in the button
-			button.classList.add('text-black', 'text-lg', 'font-bold', 'font-sans', 'transition-colors', 'hover:bg-black', 'hover:text-white');	// font-sans: fontFamily = 'system-ui'
-			button.textContent = 'Start';
 	/* ---------- internal helpers (design‑only edits) ---------- */
-			const alert = new Alert(`${this._players[0].name}\nvs\n${this._players[1].name}\n`);
-			const btn = document.createElement("button");
+			let	message = `${this._players[0].name}`;
+			for (let i = 1; i < this._players.length; i++) {
+				message += ` vs ${this._players[i].name}`;
+			}
+			message += '\n';
+			const	alert = new Alert(message);
+			const	btn = document.createElement("button");
 			Design.styleStartButton(btn);
 			btn.textContent = "Start";
 			btn.onclick = () => {
@@ -190,29 +184,26 @@ export class Match {
 
 	private async update () {
 
-		/* Check ball / paddle collision */
-		this._players.forEach((player) => {if(player.paddle!.collision(this._ball)) {this._maxBounceCountRound++;
-			console.log(this._maxBounceCountRound, "Nombre de rebond");
-		}} )
-		//console.log("_maxBounceCountRound =  ", this._maxBounceCountRound );
-
-		//console.log("this._historiqueGame.maxBounceCount  =  ", this._historiqueGame.maxBounceCount );
-
 		/* Check ball / wall collision */
-		if (!this._players[2] && this._ball.position.y + this._ball.radius >= this._ground.height ||
-			!this._players[3] && this._ball.position.y - this._ball.radius <= 0) {
-				this._ball.direction.y *= -1;
-			}
+		if (!this._players[2] && this._ball.coordinates.bottom >= this._ground.height ||
+			!this._players[3] && this._ball.coordinates.top <= 0) {
+			this._ball.direction.y *= -1;
+		}
 
 		/* Check ball out of the ground */
-		else if (this._ball.out(this._players)) {
-			if (this._historiqueGame.maxBounceCount < this._maxBounceCountRound) {
-				this._historiqueGame.maxBounceCount = this._maxBounceCountRound;
-				this._maxBounceCountRound = 0; }
+		const winner = this._ball.out(this._players);
+
+		if (winner) {
+			if (!this._historiqueGame.firstPointScorer)
+				this._historiqueGame.firstPointScorer = winner;
+
+			if (this._historiqueGame.maxBounceCount < this._ball.maxBounceCountRound) {
+				this._historiqueGame.maxBounceCount = this._ball.maxBounceCountRound;
+				this._ball.maxBounceCountRound = 0; }
 			this._ball.spawn();
 		}
 
-		this._ball.update();
+		this._ball.update(this._players);
 		for (let i = 0; i < this._players.length; i++) {
 			this._players[i].move(this._ball);		// check if direction key is pressed or need to move for bot
 			this._players[i].paddle?.update();		// update paddle coordinates consequently

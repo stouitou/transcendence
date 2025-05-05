@@ -28,18 +28,18 @@ export class	Bot extends Player {
 		if (!this._paddle)
 			return ;
 
-		const	ballPosition: Position = { x: ball.position.x, y: ball.position.y };
-		switch (this._level) {
-			case 1:
-			case 2:
-			case 3:
-		}
+		const	noise = (Math.random() - 0.5) * Math.pow(this._level, 4);
+		const	ballPosition: Position = { x: ball.position.x + noise, y: ball.position.y + noise };
 
 		if (this._level )
-		if (this._paddle.position.x + (this._paddle.height / 2) > ballPosition.x) {
+		if (this._paddle.position.x + (this._paddle.height / 2) > ballPosition.x &&
+			Math.abs(this._paddle.position.x + (this._paddle.height / 2) - ballPosition.x) > 8 &&
+			Math.abs(this._paddle.position.y + (this._paddle.height / 2) - ballPosition.y) > 10) {
 			this._direction = 'left';
 		}
-		else if (this._paddle.position.x + (this._paddle.height / 2) < ballPosition.x) {
+		else if (this._paddle.position.x + (this._paddle.height / 2) < ballPosition.x &&
+			Math.abs(this._paddle.position.x + (this._paddle.height / 2) - ballPosition.x) > 8 &&
+			Math.abs(this._paddle.position.y + (this._paddle.height / 2) - ballPosition.y) > 10) {
 			this._direction = 'right';
 		}
 	}
@@ -48,10 +48,17 @@ export class	Bot extends Player {
 		if (!this._paddle)
 			return ;
 
-		if (this._paddle.position.y + (this._paddle.height / 2) > ball.position.y) {
+		const	noise = (Math.random() - 0.5) * Math.pow(this._level, 4);
+		const	ballPosition: Position = { x: ball.position.x + noise, y: ball.position.y + noise };
+
+		if (this._paddle.position.y + (this._paddle.height / 2) > ballPosition.y &&
+			Math.abs(this._paddle.position.y + (this._paddle.height / 2) - ballPosition.y) > 8 &&
+			Math.abs(this._paddle.position.x + (this._paddle.height / 2) - ballPosition.x) > 10) {
 			this._direction = 'up';
 		}
-		else if (this._paddle.position.y + (this._paddle.height / 2) < ball.position.y) {
+		else if (this._paddle.position.y + (this._paddle.height / 2) < ballPosition.y &&
+			Math.abs(this._paddle.position.y + (this._paddle.height / 2) - ballPosition.y) > 8 &&
+			Math.abs(this._paddle.position.x + (this._paddle.height / 2) - ballPosition.x) > 10) {
 			this._direction = 'down';
 		}
 	}

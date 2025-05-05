@@ -16,7 +16,6 @@ export abstract class	Player{
 	protected				_display: HTMLDivElement;
 	protected				_lastWin: boolean = false;
 
-	/****************Partie HistoriqueGame******************/
 	private				_historiqueGame: HistoriqueGame;
 
 	constructor (json: any) {

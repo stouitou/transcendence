@@ -21,6 +21,8 @@ export class Ball {
 
 	private				_lastHit: Player | null = null;
 
+	private				_maxBounceCountRound = 0;
+
 	constructor (ground: Ground) {
 		this._ground = ground;
 	}
@@ -31,7 +33,9 @@ export class Ball {
 	get direction ()	{ return this._direction ; }
 	get	position ()		{ return this._position ; }
 	get	coordinates ()	{ return this._coordinates ; };
+	get	maxBounceCountRound ()	{ return this._maxBounceCountRound ; };
 
+	set	maxBounceCountRound (nb: number)	{ this._maxBounceCountRound = nb; };
 	/* ---------- core behaviour ---------- */
 	spawn() {
 		const	x = this._ground.width  / 2;
@@ -55,11 +59,11 @@ export class Ball {
 
 		let	impactRatio = 0;
 		if (side === 'left' || side === 'right') {
-				impactRatio = (this._position.y - (paddle.position.y + paddle.height / 2)) / (paddle.height / 2);
+			impactRatio = (this._position.y - (paddle.position.y + paddle.height / 2)) / (paddle.height / 2);
 		}
 		else if (side === 'top' || side === 'bottom') {
 				impactRatio = ((this._position.x - (paddle.position.x + paddle.width / 2)) / (paddle.width / 2));
-		}
+			}
 		impactRatio = Math.max(-1, Math.min(1, impactRatio));
 
 		const	maxAngle = 60 * Math.PI / 180;
@@ -75,67 +79,93 @@ export class Ball {
 			this._direction.x = Math.sin(angle);
 			this._direction.y = Math.cos(angle) * directionSign;
 		}
-
+		
 		this._direction.normalize();
 	}
 
-	out (players: Player[]) : boolean {
-		if (this._coordinates.right < 0 || this._coordinates.left > this._ground.width || this._coordinates.bottom < 0 || this._coordinates.top > this._ground.height) {
-			if (this._coordinates.left > this._ground.width) {
-				if (this._lastHit === null || this._lastHit.location === 0) {
-					players[0].historiqueGame.playerWithMostPointsLost++;
-					console.log(players[0].name, "Lost Point");
-					players[0].losePoint();
-				}
-				else if (this._lastHit)
-					this._lastHit.score();
-				players[0].historiqueGame.mostGoalsConcededPlayer++;
-				if (this.firstPointScorer(players)){
-					players[0].historiqueGame.firstPointScorer = players[0];
-					console.log(players[0].name, "marque le premier point");}
-				console.log(players[0].name, "Ce prend 1 point");
+	out (players: Player[]) : Player | null {
+// 		if (this._coordinates.right < 0 || this._coordinates.left > this._ground.width || this._coordinates.bottom < 0 || this._coordinates.top > this._ground.height) {
+// 			if (this._coordinates.left > this._ground.width) {
+// 				if (this._lastHit === null || this._lastHit.location === 0) {
+// 					console.log(players[0].name, "Lost Point");
+// 					players[0].losePoint();
+// 				}
+// 				else if (this._lastHit)
+// 					this._lastHit.score();
+// 				if (this.firstPointScorer(players)){
+// 					players[0].historiqueGame.firstPointScorer = players[0];
+// 					console.log(players[0].name, "marque le premier point");}
+// 				console.log(players[0].name, "Ce prend 1 point");
+// 			}
+// 			else if (this._coordinates.right < 0) {
+// 				if (this._lastHit === null || this._lastHit.location === 1) {
+// 					console.log(players[1].name, "Lost Point");
+// 					players[1].losePoint();
+// 				}
+// 				else if (this._lastHit)
+// 					this._lastHit.score();
+// 				if (this.firstPointScorer(players)) {
+// 					players[1].historiqueGame.firstPointScorer = players[1];
+// 					console.log(players[0].name, "marque le premier point");}
+// 				console.log(players[1].name, "Ce prend 1 point");
+// 			}
+// 			else if (this._coordinates.top > this._ground.height) {
+// 				if (this._lastHit === null || this._lastHit.location === 2) {
+// 					players[2].losePoint();
+// 				}
+// 				else if (this._lastHit)
+// 					this._lastHit.score();
+// 				if (this.firstPointScorer(players))
+// 					players[2].historiqueGame.firstPointScorer = players[2];
+// 			}
+// 			else if (this._coordinates.bottom < 0) {
+// 				if (this._lastHit === null || this._lastHit.location === 3) {
+// 					players[3].losePoint();
+// 				}
+// 				else if (this._lastHit)
+// 					this._lastHit.score();
+// 				if (this.firstPointScorer(players))
+// 					players[3].historiqueGame.firstPointScorer = players[3];
+// =======
+		let	loserIndex: number | null = null;
+		let	side: 'right' | 'left' | 'bottom' | 'top' | null = null;
+
+		if (this._coordinates.left > this._ground.width) {
+			loserIndex = players.length > 2 ? 0 : null;
+			side = 'right';
+		}
+		else if (this._coordinates.right < 0) {
+			loserIndex = players.length > 2 ? 1 : null;
+			side = 'left';
+		}
+		else if (this._coordinates.top > this._ground.height) {
+			loserIndex = 2;
+			side = 'bottom';
+		}
+		else if (this._coordinates.bottom < 0) {
+			loserIndex = 3;
+			side = 'top';
+		}
+
+		if (side !== null) {
+			let	winner: Player | null = null;
+			if (loserIndex !== null) {
+				if (this._lastHit === null || this._lastHit.location === loserIndex)	{ players[loserIndex].losePoint(); players[loserIndex].historiqueGame.playerWithMostPointsLost++;}
+				else	{ this._lastHit?.score(); winner = this._lastHit}
+				players[loserIndex].historiqueGame.mostGoalsConcededPlayer++;
 			}
-			else if (this._coordinates.right < 0) {
-				if (this._lastHit === null || this._lastHit.location === 1) {
-					players[1].historiqueGame.playerWithMostPointsLost++;
-					console.log(players[1].name, "Lost Point");
-					players[1].losePoint();
-				}
-				else if (this._lastHit)
-					this._lastHit.score();
-				players[1].historiqueGame.mostGoalsConcededPlayer++;
-				if (this.firstPointScorer(players)) {
-					players[1].historiqueGame.firstPointScorer = players[1];
-					console.log(players[0].name, "marque le premier point");}
-				console.log(players[1].name, "Ce prend 1 point");
-			}
-			else if (this._coordinates.top > this._ground.height) {
-				if (this._lastHit === null || this._lastHit.location === 2) {
-					players[2].historiqueGame.playerWithMostPointsLost++;
-					players[2].losePoint();
-				}
-				else if (this._lastHit)
-					this._lastHit.score();
-				players[2].historiqueGame.mostGoalsConcededPlayer++;
-				if (this.firstPointScorer(players))
-					players[2].historiqueGame.firstPointScorer = players[2];
-			}
-			else if (this._coordinates.bottom < 0) {
-				if (this._lastHit === null || this._lastHit.location === 3) {
-					players[3].historiqueGame.playerWithMostPointsLost++;
-					players[3].losePoint();
-				}
-				else if (this._lastHit)
-					this._lastHit.score();
-				players[3].historiqueGame.mostGoalsConcededPlayer++;
-				if (this.firstPointScorer(players))
-					players[3].historiqueGame.firstPointScorer = players[3];
+			else {
+				const	winnerIndex = side === 'right' ? 1 : 0;
+				players[winnerIndex].score();
+				winner = players[winnerIndex];
+				const	loserIndex = winnerIndex === 0 ? 1 : 0;
+				players[loserIndex].historiqueGame.mostGoalsConcededPlayer++;
 			}
 			this._rebound = false;
 			this._lastHit = null;
-			return true ;
+			return winner ;
 		}
-		return false ;
+		return null ;
 	}
 
 	firstPointScorer (players: Player[]) {
@@ -152,12 +182,17 @@ export class Ball {
 		return scoreEmpty;
 	}
 
-	update () {
+	update (players: Player[]) {
 		let	speed = this._speed;
-		if (!this._rebound)	speed /= 2;
+		if (!this._rebound)	{ speed /= 2; }
 
-		this._position.x += this._direction.x * speed;
-		this._position.y += this._direction.y * speed;
+		for (let i = 0; i < speed; i++) {
+			this._position.x += this._direction.x;
+			this._position.y += this._direction.y;
+			for (const player of players) {
+				if (player.paddle?.collision(this)) { this.maxBounceCountRound++; break ; }
+			}
+		}
 
 		this._coordinates.top    = this._position.y - this._radius;
 		this._coordinates.bottom = this._position.y + this._radius;
