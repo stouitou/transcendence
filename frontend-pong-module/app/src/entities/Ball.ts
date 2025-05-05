@@ -21,7 +21,8 @@ export class Ball {
 
 	private				_lastHit: Player | null = null;
 
-	private				_maxBounceCountRound = 0;
+	private				_maxBounceCountRound: number = 0;
+	private				_alreadyBouncedThisFrame: boolean = false;
 
 	constructor (ground: Ground) {
 		this._ground = ground;
@@ -56,8 +57,7 @@ export class Ball {
 	bounce(paddle: Paddle, side: string) {
 		// if (this._lastHit === paddle.owner)	{ return ; }
 		console.log('--- bounce ---');
-		console.log('paddle right: ', paddle.coordinates.right);
-		console.log('ball left: ', this._coordinates.left);
+		console.log('paddle:', paddle.owner);
 		console.log('Side:', side);
 		console.log('Before bounce:');
 		console.log('  Ball position:', { x: this._position.x.toFixed(1), y: this._position.y.toFixed(1) });
@@ -73,7 +73,7 @@ export class Ball {
 		else if (side === 'top' || side === 'bottom') {
 			impactRatio = ((this._position.x - (paddle.position.x + paddle.width / 2)) / (paddle.width / 2));
 		}
-		impactRatio = Math.max(-1, Math.min(1, impactRatio));
+		impactRatio = Math.max(-0.9, Math.min(0.9, impactRatio));
 		console.log('Impact ratio:', impactRatio.toFixed(2));
 		
 		const	maxAngle = 60 * Math.PI / 180;
@@ -161,6 +161,7 @@ export class Ball {
 	}
 
 	update (players: Player[]) {
+		this._alreadyBouncedThisFrame = false;
 		let	speed = this._speed;
 		if (!this._rebound)	{ speed /= 2; }
 
@@ -168,7 +169,7 @@ export class Ball {
 			this._position.x += this._direction.x;
 			this._position.y += this._direction.y;
 			for (const player of players) {
-				if (player.paddle?.collision(this)) { this.maxBounceCountRound++; this.setCoordinates(); break ; }
+				if (player.paddle?.collision(this)) { this._alreadyBouncedThisFrame = true; this.maxBounceCountRound++; this.setCoordinates(); break ; }
 			}
 		}
 		this.setCoordinates();

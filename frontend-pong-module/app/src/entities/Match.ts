@@ -194,7 +194,7 @@ export class Match {
 		else if (this._ball.out(this._players)) {
 			if (!this._historiqueGame.firstPointScorer) {
 				this._players.forEach((player) => {
-					if (player.points === 1)	{ this._historiqueGame.firstPointScorer = player; console.log('first player to score: ', player); }
+					if (player.points === 1)	{ this._historiqueGame.firstPointScorer = player; }
 				})
 			}
 			if (this._historiqueGame.maxBounceCount < this._ball.maxBounceCountRound) {
