@@ -1,15 +1,12 @@
-import { Position } from "../Interfaces/Position.interface";
 import { Ball } from "./Ball";
 import { Player } from "./Player";
+import { Position } from "../Interfaces/Position.interface";
 
 export class	Bot extends Player {
 
 	private				_level: number;
 
 	constructor (level: number) {
-		// this.setNames();
-		// console.log('hey');
-
 		super({name: null, role: 'bot'});
 		this._level = level;
 	}

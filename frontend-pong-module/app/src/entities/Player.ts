@@ -1,6 +1,6 @@
 import { Ball } from "./Ball";
-import { Paddle } from "./Paddle";
 import { HistoriqueGame } from "../Interfaces/HistoriqueGame.interface";
+import { Paddle } from "./Paddle";
 
 export abstract class	Player{
 
@@ -16,7 +16,7 @@ export abstract class	Player{
 	protected				_display: HTMLDivElement;
 	protected				_lastWin: boolean = false;
 
-	private				_historiqueGame: HistoriqueGame;
+	private					_historiqueGame: HistoriqueGame;
 
 	constructor (json: any) {
 		this._historiqueGame = { maxBounceCount: 0, mostGoalsConcededPlayer: 0, playerWithMostPointsLost: 0, totalBouncesPerPlayer: 0};
@@ -78,45 +78,19 @@ export abstract class	Player{
 
 	private setName () : string {
 		const	names: string[] = [
-			'Alexandre',
-			'Jules',
-			'Enzo',
-			'Arthur',
-			'Thomas',
-			'Louis',
-			'Deborah',
-			'Amelie',
-			'Zoe',
-			'Dorian',
-			'Walid',
-			'Florent',
-			'Anastasia',
-			'Gregoire',
-			'Sophia',
-			'Timothee',
-			'Romain',
-			'Emma',
-			'Karine',
-			'Lucas',
-			'Fatima',
-			'Clement',
-			'Mohamed',
-			'Simon',
-			'Octave',
-			'Jose',
-			'Camille',
-			'Charles',
-			'Franck',
-			'Ludovic',
-			'Noe',
-			'Iris',
-			'Shaineze',
-			'Sami',
-			'Lea',
-			'Adrien',
-			'Theo',
-			'Charlie',
-			'Marine',
+			'Alexandre', 'Jules', 'Enzo',
+			'Arthur', 'Thomas', 'Louis',
+			'Deborah', 'Amelie', 'Zoe',
+			'Dorian', 'Walid', 'Florent',
+			'Anastasia', 'Gregoire', 'Sophia',
+			'Timothee', 'Romain', 'Emma',
+			'Karine', 'Lucas', 'Fatima',
+			'Clement', 'Mohamed', 'Simon',
+			'Octave', 'Jose', 'Camille',
+			'Charles', 'Franck', 'Ludovic',
+			'Noe', 'Iris', 'Shaineze',
+			'Sami', 'Lea', 'Adrien',
+			'Theo', 'Charlie', 'Marine',
 			'Anne',
 		]
 		const	nameIndex = Math.random() * 30;
