@@ -140,14 +140,20 @@ export class Paddle {
 		const dyTop = Math.abs(ball.position.y - this._coordinates.top);
 		const dyBottom = Math.abs(ball.position.y - this._coordinates.bottom);
 
-		const minDist = Math.min(dxLeft, dxRight, dyTop, dyBottom);
+		const	possibleSides: { side: string, dist: number }[] = [];
 
-		switch (minDist) {
-			case dxLeft:	return 'left' ;
-			case dxRight:	return 'right' ;
-			case dyTop:		return 'top' ;
-			case dyBottom:	return 'bottom' ;
+		if (ball.direction.x > 0)	possibleSides.push( { side: 'left', dist: dxLeft });
+		if (ball.direction.x < 0)	possibleSides.push( { side: 'right', dist: dxRight });
+		if (ball.direction.y > 0)	possibleSides.push( { side: 'top', dist: dyTop });
+		if (ball.direction.y < 0)	possibleSides.push( { side: 'bottom', dist: dyBottom });
+
+		if (possibleSides.length === 0)	return 'left' ;
+
+		let	best = possibleSides[0];
+		for (const side of possibleSides) {
+			if (side.dist < best.dist)	best = side;
 		}
-		return 'left' ;
+
+		return best.side ;
 	}
 }
