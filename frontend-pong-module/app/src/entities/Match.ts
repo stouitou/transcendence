@@ -120,12 +120,15 @@ export class Match {
 		this._players.forEach((player) => {
 			const    name: HTMLParagraphElement = document.createElement('p');
             name.textContent = player.name;
+			name.classList.add('score-cell');
             const    score: HTMLParagraphElement = document.createElement('p');
             score.textContent = `${player.points}`;
+			score.classList.add('score-cell');
 			score.style.padding = '0 15px';
 			name.style.padding = '0';
             name.style.margin = score.style.margin = '0';
             name.style.color  = score.style.color  = Design.DESIGN.accentColor;
+			name.style.lineHeight = score.style.lineHeight = '24px';
 
             /* flip‑up animate each refresh */
             Design.animateScore(score);

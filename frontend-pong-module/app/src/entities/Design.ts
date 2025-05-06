@@ -79,26 +79,27 @@ export function createAppendix(ratio: number): HTMLDivElement {
     if (ratio > 2)
         topRow = 50;
     Object.assign(bar.style, {
-        width      : `${CANVAS_WIDTH}px`,
-        height     : `${height}px`,
-        display    : "grid",
-        gridTemplateColumns   : "1fr 1fr 1fr",
-        gridTemplateRows      : `${topRow}px ${middleRow}px ${bottomRow}px`,
-        justifyContent : "center",
-        justifyItems : "center",
-        alignItems : "center",
-        padding    : "0",
-        // padding    : "18px 0",
-        margin    : "0",
-        fontSize   : "24px",
-        fontWeight : "600",
-        color      : DESIGN.accentColor,
-        borderTopLeftRadius : "260px",
-        borderTopRightRadius: "260px",
-        background : "rgb(13, 63, 119)",
-        backdropFilter: "blur(10px)",
-        border     : "3px solid rgb(255, 0, 0)",
-        boxShadow  : "0 8px 30px rgba(0,0,0,.08)",
+        width                   : `${CANVAS_WIDTH}px`,
+        height                  : `${height}px`,
+        display                 : "grid",
+        gridTemplateColumns     : "1fr 1fr 1fr",
+        gridTemplateRows        : `${topRow}px ${middleRow}px ${bottomRow}px`,
+        justifyContent          : "center",
+        justifyItems            : "center",
+        alignItems              : "center",
+        padding                 : "0",
+        // padding              : "18px 0",
+        margin                  : "0",
+        fontSize                : "24px",
+        fontWeight              : "600",
+        color                   : DESIGN.accentColor,
+        boSizing                : "border-box",
+        borderTopLeftRadius     : "260px",
+        borderTopRightRadius    : "260px",
+        background              : "rgb(13, 63, 119)",
+        backdropFilter          : "blur(10px)",
+        border                  : "3px solid rgb(255, 0, 0)",
+        boxShadow               : "0 8px 30px rgba(0,0,0,.08)",
     } as Partial<CSSStyleDeclaration>);
     return bar;
 }
@@ -228,3 +229,15 @@ export function drawBall(
     ctx.ellipse(x-r*0.35, y-r*0.35, r*0.15, r*0.10, 0, 0, Math.PI*2);
     ctx.fill();
 }
+
+export const   style = document.createElement('style');
+style.textContent = `
+    .score-cell {
+        text-align: center;
+        white-space: nowrap;
+        overflow: visible;
+        text-overflow: clip;
+        max-width: 100px;
+    }
+`;
+document.head.appendChild(style);

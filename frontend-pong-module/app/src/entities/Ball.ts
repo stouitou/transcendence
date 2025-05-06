@@ -38,7 +38,7 @@ export class Ball {
 
 	set	maxBounceCountRound (nb: number)	{ this._maxBounceCountRound = nb; };
 	/* ---------- core behaviour ---------- */
-	spawn() {
+	spawn () {
 		const	x = this._ground.width  / 2;
 		const	y = (33 + (Math.random() * 100) / 3) / 100 * this._ground.height;
 		this._position = { x: x, y: y };
@@ -54,14 +54,8 @@ export class Ball {
 		this._direction = new Direction(vx, vy);
 	}
 
-	bounce(paddle: Paddle, side: string) {
+	bounce (paddle: Paddle, side: string) {
 		// if (this._lastHit === paddle.owner)	{ return ; }
-		console.log('--- bounce ---');
-		console.log('paddle:', paddle.owner);
-		console.log('Side:', side);
-		console.log('Before bounce:');
-		console.log('  Ball position:', { x: this._position.x.toFixed(1), y: this._position.y.toFixed(1) });
-		console.log('  Ball direction:', { x: this._direction.x.toFixed(3), y: this._direction.y.toFixed(3) });
 		this._rebound = true;
 		this._lastHit = paddle.owner;
 		
@@ -73,11 +67,9 @@ export class Ball {
 			impactRatio = ((this._position.x - (paddle.position.x + paddle.width / 2)) / (paddle.width / 2));
 		}
 		impactRatio = Math.max(-0.9, Math.min(0.9, impactRatio));
-		console.log('Impact ratio:', impactRatio.toFixed(2));
 		
 		const	maxAngle = 60 * Math.PI / 180;
 		const	angle = impactRatio * maxAngle;
-		console.log('Angle (deg):', (angle * 180 / Math.PI).toFixed(1));
 		
 		if (side === 'left' || side === 'right') {
 			const	directionSign = (side === 'right') ? 1 : -1;
@@ -91,18 +83,10 @@ export class Ball {
 		}
 		
 		this._direction.normalize();
-		console.log('New direction:', {
-			x: this._direction.x.toFixed(3),
-			y: this._direction.y.toFixed(3)
-		});
 		
 		const	offset = this._radius + 0.1;
 		this._position.x += this._direction.x * offset;
 		this._position.y += this._direction.y * offset;
-		console.log('Position after offset:', {
-			x: this._position.x.toFixed(1),
-			y: this._position.y.toFixed(1)
-		});
 	}
 
 	out (players: Player[]) : boolean {
