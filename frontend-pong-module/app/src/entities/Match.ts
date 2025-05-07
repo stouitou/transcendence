@@ -20,7 +20,7 @@ export class Match {
 
 	private				_players: Player[];
 	private				_ball!: Ball;
-	private readonly	_pointsToWin = 5;
+	private readonly	_pointsToWin = 10;
 
 	private 			_winner: Player | null = null;
 
@@ -121,14 +121,11 @@ export class Match {
 			const    name: HTMLParagraphElement = document.createElement('p');
             name.textContent = player.name;
 			name.classList.add('score-cell');
+			name.style.padding = '0';
             const    score: HTMLParagraphElement = document.createElement('p');
             score.textContent = `${player.points}`;
 			score.classList.add('score-cell');
-			score.style.padding = '0 15px';
-			name.style.padding = '0';
-            name.style.margin = score.style.margin = '0';
-            name.style.color  = score.style.color  = Design.DESIGN.accentColor;
-			name.style.lineHeight = score.style.lineHeight = '24px';
+			score.style.padding = '0 20px';
 
             /* flip‑up animate each refresh */
             Design.animateScore(score);

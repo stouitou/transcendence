@@ -70,7 +70,7 @@ export abstract class	Player{
 		this._display.style.position = 'relative';
 		this._display.style.display = 'flex';
 		this._display.style.alignItems = 'space-between';
-		this._display.style.width = '50%';
+		this._display.style.width = '80%';
 		this._display.style.height = 'auto';
 		this._display.style.margin = '5px';
 		this._display.style.justifyContent = 'space-between';
