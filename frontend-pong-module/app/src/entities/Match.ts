@@ -188,15 +188,20 @@ export class Match {
 	}
 
 	private async update () {
+		this._ball.alreadyBouncedThisFrame = false;
 
 		/* Check ball / wall collision */
 		if (!this._players[2] && this._ball.coordinates.bottom >= this._ground.height ||
 			!this._players[3] && this._ball.coordinates.top <= 0) {
+			this._ball.alreadyBouncedThisFrame = true;
 			this._ball.direction.y *= -1;
+			const	offset = this._ball.radius + 0.1;
+			this._ball.position.x += this._ball.direction.x * offset;
+			this._ball.position.y += this._ball.direction.y * offset;
 		}
 
 		/* Check ball out of the ground */
-		else if (this._ball.out(this._players)) {
+		if (this._ball.out(this._players)) {
 			if (!this._historiqueGame.firstPointScorer) {
 				this._players.forEach((player) => {
 					if (player.points === 1)	{ this._historiqueGame.firstPointScorer = player; }

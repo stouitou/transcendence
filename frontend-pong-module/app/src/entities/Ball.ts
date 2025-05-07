@@ -33,10 +33,11 @@ export class Ball {
 	get speed ()		{ return this._speed ; }
 	get direction ()	{ return this._direction ; }
 	get	position ()		{ return this._position ; }
-	get	coordinates ()	{ return this._coordinates ; };
-	get	maxBounceCountRound ()	{ return this._maxBounceCountRound ; };
+	get	coordinates ()	{ return this._coordinates ; }
+	get	maxBounceCountRound ()	{ return this._maxBounceCountRound ; }
 
-	set	maxBounceCountRound (nb: number)	{ this._maxBounceCountRound = nb; };
+	set	maxBounceCountRound (nb: number)			{ this._maxBounceCountRound = nb; }
+	set	alreadyBouncedThisFrame (value: boolean)	{ this._alreadyBouncedThisFrame = value; }
 	/* ---------- core behaviour ---------- */
 	spawn () {
 		const	x = this._ground.width  / 2;
@@ -144,7 +145,6 @@ export class Ball {
 	}
 
 	update (players: Player[]) {
-		this._alreadyBouncedThisFrame = false;
 		let	speed = this._speed;
 		if (!this._rebound)	{ speed /= 2; }
 
