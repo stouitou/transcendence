@@ -51,21 +51,28 @@ export class Ball {
 		if (base < 2)				vx *= -1;
 		if (base >= 1 && base < 3)	vy *= -1;
 
-		this._coordinates = { top: y - this._radius, bottom: y + this._radius, left: x - this._radius, right: x + this._radius };
+		this._coordinates = {
+			top: y - this._radius,
+			bottom: y + this._radius,
+			left: x - this._radius,
+			right: x + this._radius,
+			center: { x: x, y: y }
+		};
+
 		this._direction = new Direction(vx, vy);
 	}
 
 	bounce (paddle: Paddle, side: string) {
-		// if (this._lastHit === paddle.owner)	{ return ; }
 		this._rebound = true;
 		this._lastHit = paddle.owner;
-		
+		console.log('in ball bounce, before, ball direction:', this._direction);
+
 		let	impactRatio = 0;
 		if (side === 'left' || side === 'right') {
 			impactRatio = (this._position.y - (paddle.position.y + paddle.height / 2)) / (paddle.height / 2);
 		}
 		else if (side === 'top' || side === 'bottom') {
-			impactRatio = ((this._position.x - (paddle.position.x + paddle.width / 2)) / (paddle.width / 2));
+			impactRatio = ((this._position.x - (paddle.position.x + paddle.height / 2)) / (paddle.height / 2));
 		}
 		impactRatio = Math.max(-0.9, Math.min(0.9, impactRatio));
 		
@@ -84,6 +91,7 @@ export class Ball {
 		}
 		
 		this._direction.normalize();
+		console.log('in ball bounce, after, ball direction:', this._direction);
 		
 		const	offset = this._radius + 0.1;
 		this._position.x += this._direction.x * offset;
@@ -188,9 +196,11 @@ export class Ball {
 	}
 
 	setCoordinates () {
-		this._coordinates.top    = this._position.y - this._radius;
-		this._coordinates.bottom = this._position.y + this._radius;
-		this._coordinates.left   = this._position.x - this._radius;
-		this._coordinates.right  = this._position.x + this._radius;
+		this._coordinates.top		= this._position.y - this._radius;
+		this._coordinates.bottom	= this._position.y + this._radius;
+		this._coordinates.left		= this._position.x - this._radius;
+		this._coordinates.right		= this._position.x + this._radius;
+		this._coordinates.center.x	= this._position.x;
+		this._coordinates.center.y	= this._position.y;
 	}
 }

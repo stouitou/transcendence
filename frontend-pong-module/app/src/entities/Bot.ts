@@ -4,7 +4,8 @@ import { Position } from "../Interfaces/Position.interface";
 
 export class	Bot extends Player {
 
-	private				_level: number;
+	private readonly	_level: number;
+	private				_targetSide: string | null = null;
 
 	constructor (level: number) {
 		super({name: null, role: 'bot'});
@@ -27,19 +28,25 @@ export class	Bot extends Player {
 	private followBallHorizontal (ball: Ball) {
 		if (!this._paddle)
 			return ;
-
+		
+		let 	target = this._paddle.coordinates.center.x;
 		const	noise = (Math.random() - 0.5) * Math.pow(this._level, 4);
 		const	ballPosition: Position = { x: ball.position.x + noise, y: ball.position.y + noise };
 
-		if (this._level )
-		if (this._paddle.position.x + (this._paddle.height / 2) > ballPosition.x &&
-			Math.abs(this._paddle.position.x + (this._paddle.height / 2) - ballPosition.x) > 8 &&
-			Math.abs(this._paddle.position.y + (this._paddle.height / 2) - ballPosition.y) > 10) {
+		const	isVertical = Math.abs(ball.direction.x) < 0.2;
+		const	isAligned = Math.abs(this._paddle?.coordinates.center.x - ball.position.x) < 8;
+ 
+		if (isVertical && isAligned) {
+			if (this._targetSide === null)	{ this._targetSide = Math.random() < 0.5 ? 'right' : 'left'; }
+			target = this._targetSide === 'right'
+				? this._paddle?.coordinates.center.x + (9 * (this._paddle?.height / 10))
+				: this._paddle?.coordinates.center.x + (this._paddle?.height / 10);
+		}
+
+		if (target > ballPosition.x) {
 			this._direction = 'left';
 		}
-		else if (this._paddle.position.x + (this._paddle.height / 2) < ballPosition.x &&
-			Math.abs(this._paddle.position.x + (this._paddle.height / 2) - ballPosition.x) > 8 &&
-			Math.abs(this._paddle.position.y + (this._paddle.height / 2) - ballPosition.y) > 10) {
+		else if (target < ballPosition.x) {
 			this._direction = 'right';
 		}
 	}
@@ -48,17 +55,24 @@ export class	Bot extends Player {
 		if (!this._paddle)
 			return ;
 
+		let 	target = this._paddle.coordinates.center.y;
 		const	noise = (Math.random() - 0.5) * Math.pow(this._level, 4);
 		const	ballPosition: Position = { x: ball.position.x + noise, y: ball.position.y + noise };
 
-		if (this._paddle.position.y + (this._paddle.height / 2) > ballPosition.y &&
-			Math.abs(this._paddle.position.y + (this._paddle.height / 2) - ballPosition.y) > 8 &&
-			Math.abs(this._paddle.position.x + (this._paddle.height / 2) - ballPosition.x) > 10) {
+		const	isHorizontal = Math.abs(ball.direction.y) < 0.2;
+		const	isAligned = Math.abs(this._paddle?.coordinates.center.y - ball.position.y) < 8;
+
+		if (isHorizontal && isAligned) {
+			if (this._targetSide === null)	{ this._targetSide = Math.random() < 0.5 ? 'down' : 'up'; }
+			target = this._targetSide === 'down'
+				? this._paddle?.coordinates.center.y + (9 * (this._paddle?.height / 10))
+				: this._paddle?.coordinates.center.y + (this._paddle?.height / 10);
+		}
+
+		if (target > ballPosition.y) { 
 			this._direction = 'up';
 		}
-		else if (this._paddle.position.y + (this._paddle.height / 2) < ballPosition.y &&
-			Math.abs(this._paddle.position.y + (this._paddle.height / 2) - ballPosition.y) > 8 &&
-			Math.abs(this._paddle.position.x + (this._paddle.height / 2) - ballPosition.x) > 10) {
+		else if (target < ballPosition.y) {
 			this._direction = 'down';
 		}
 	}

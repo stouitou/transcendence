@@ -34,7 +34,13 @@ export class Paddle {
 					x = this._ground.width - 5 - this._width;
 				else if (this._owner.location === 1)
 					x = 5;
-				this._coordinates = { top: y, bottom: y + this._height, left: x, right: x + this._width };
+				this._coordinates = {
+					top: y,
+					bottom: y + this._height,
+					left: x,
+					right: x + this._width,
+					center: { x: x + (this._width / 2), y: y + (this._height / 2) }
+				};
 				break;
 			case 2:
 			case 3:
@@ -43,7 +49,13 @@ export class Paddle {
 					y = this._ground.height - 5 - this._width;
 				else if (this._owner.location === 3)
 					y = 5;
-				this._coordinates = { top: y, bottom: y + this._width, left: x, right: x + this._height };
+				this._coordinates = {
+					top: y,
+					bottom: y + this._width,
+					left: x,
+					right: x + this._height,
+					center: { x: x + (this._height / 2), y: y + (this._width / 2) }
+				};
 				break;
 		}
 		this._position = { x: x, y: y};
@@ -80,16 +92,7 @@ export class Paddle {
 			}
 		}
 		
-		this._coordinates.left = this._position.x;
-		this._coordinates.top = this._position.y;
-		if (this._owner.location === 0 || this._owner.location === 1) {
-			this._coordinates.bottom = this._position.y + this._height;
-			this._coordinates.right = this._position.x + this._width;
-		}
-		if (this._owner.location === 2 || this._owner.location === 3) {
-			this._coordinates.bottom = this._position.y + this._width ;
-			this._coordinates.right = this._position.x + this._height;
-		}
+		this.updateCoordinates();
 	}
 
 	/** DESIGN‑ONLY CHANGE: use rounded‑rect helper */
@@ -155,5 +158,36 @@ export class Paddle {
 		}
 
 		return best.side ;
+	}
+
+	private updateCoordinates () {
+		switch (this._owner.location) {
+			case 0:
+			case 1:
+				this._coordinates = {
+					top: this._position.y,
+					bottom: this._position.y + this._height,
+					left: this._position.x,
+					right: this._position.x + this._width,
+					center: {
+						x: this._position.x + (this._width / 2),
+						y: this._position.y + (this._height / 2)
+					}
+				};
+				break ;
+			case 2:
+			case 3:
+				this._coordinates = {
+					top: this._position.y,
+					bottom: this._position.y + this._width,
+					left: this._position.x,
+					right: this._position.x + this._height,
+					center: {
+						x: this._position.x + (this._height / 2),
+						y: this._position.y + (this._width / 2)
+					}
+				};
+				break ;
+		}
 	}
 }
