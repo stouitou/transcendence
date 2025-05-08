@@ -2,156 +2,171 @@ import { Object } from "./Object.ts";
 import { Direction } from "./Direction.ts";
 import { Paddle } from "./Paddle.ts";
 import { Player } from "./Player.ts";
+import * as Design from "./Design";
+import { Position } from "../Interfaces/Position.interface.ts";
+import { Coordinates } from "../Interfaces/Coordinates.interface.ts";
 
-export class	Ball extends Object {
+export class Ball extends Object {
 
-	private	readonly	_color: string = 'rgb(255, 0, 0)';
-	private readonly	_diameter: number = 30;
-	private readonly	_radius: number = this._diameter / 2;
+	private readonly	_radius   = 15;
 
-	private readonly	_speed: number = 8;
+	private readonly	_speed    = 8;
+
 	private				_direction!: Direction;
-	private				_rebound: boolean = false;
+	private				_position!: Position;
+	private				_coordinates!: Coordinates;
 
-	private				_x!: number;
-	private				_y!: number;
+	private				_rebound   = false;
 
-	private				_top!: number;
-	private				_bottom!: number;
-	private				_left!: number;
-	private				_right!: number;
+	private				_lastHit: Player | null = null;
 
 	constructor (canvas: HTMLCanvasElement) {
 		super(canvas);
 		this.spawn();
 	}
 
-	get color () {
-		return this._color ;
+	/* ---------- getters ---------- */
+	get radius ()		{ return this._radius ; }
+	get speed ()		{ return this._speed ; }
+	get direction ()	{ return this._direction ; }
+	get	position ()		{ return this._position ; }
+	get	coordinates ()	{ return this._coordinates ; };
+
+	/* ---------- core behaviour ---------- */
+	spawn() {
+		const	x = this._fieldWidth  / 2;
+		const	y = (33 + (Math.random() * 100) / 3) / 100 * this._fieldHeight;
+		this._position = { x: x, y: y };
+
+		const	add = Math.random() * 30;
+		let		vx = Math.sin((45 + add) * Math.PI / 180);
+		let		vy = Math.cos((45 + add) * Math.PI / 180);
+		const	base = Math.random() * 4;
+		if (base < 2)				vx *= -1;
+		if (base >= 1 && base < 3)	vy *= -1;
+
+		this._coordinates = { top: y - this._radius, bottom: y + this._radius, left: x - this._radius, right: x + this._radius };
+		this._direction = new Direction(vx, vy);
 	}
 
-	get diameter () {
-		return this._diameter ;
-	}
-
-	get radius () {
-		return this._radius ;
-	}
-
-	get speed () {
-		return this._speed ;
-	}
-
-	get direction () {
-		return this._direction ;
-	}
-
-	get rebound () {
-		return this._rebound ;
-	}
-
-	get x () {
-		return this._x ;
-	}
-
-	get y () {
-		return this._y ;
-	}
-
-	get top () {
-		return this._top ;
-	}
-
-	get bottom () {
-		return this._bottom ;
-	}
-
-	get left () {
-		return this._left ;
-	}
-
-	get right () {
-		return this._right ;
-	}
-
-	spawn () {
-		this._x = (this._fieldWidth / 2);
-		this._y = (33 + ((Math.random() * 100) / 3)) / 100 * this._fieldHeight;
-		
-		// Ramdomize direction
-		const add: number = Math.random() * 30;
-		
-		let	x: number = Math.sin((45 + add) * Math.PI / 180);	// compute x direction depending on an angle between 45 and 75 degrees
-		let	y: number = Math.cos((45 + add) * Math.PI / 180);	// compute y direction depending on an angle between 45 and 75 degrees
-		
-		const base: number = Math.random() * 4;	// random integer between 0 and 4
-		if (base < 2)
-			x *= -1;
-		if (base >= 1 && base < 3)
-			y *= -1;
-		this._direction = new Direction(x, y);
-	}
-
-	move () {
-		this.updatePosition();
+	move() {
+		this.update();
 		this.draw();
 	}
 
-	bounce (paddle: Paddle) {
+	bounce(paddle: Paddle, side: string) {
+		console.log('collision on side: ', side);
+		console.log('direction before rebound: x = ', this._direction.x, ', y = ', this._direction.y);
 		this._rebound = true;
+		this._lastHit = paddle.owner;
 
-		this._direction.x *= -1;	
+		let	impactRatio = 0;
+		if (side === 'left' || side === 'right') {
+				impactRatio = (this._position.y - (paddle.position.y + paddle.height / 2)) / (paddle.height / 2);
+		}
+		else if (side === 'top' || side === 'bottom') {
+				impactRatio = ((this._position.x - (paddle.position.x + paddle.width / 2)) / (paddle.width / 2));
+		}
 
-		if (paddle.location === 0 || paddle.location === 1) {
-			// Formula for the rebound : θrebound ​= θmax ​× (2 × ((yimpact ​− ypaddle) / paddle height)​)
-			const impact: number = 2 * ((this._y - (paddle.y + (paddle.height / 2))) / paddle.height);
-			const angle = ((55 * Math.PI / 180) * impact) + (5 * Math.PI / 180);	// get an angle between 5 and 60 degrees
-			this._direction.x = Math.cos(angle) * Math.sign(this._direction.x);
+		impactRatio = Math.max(-1, Math.min(1, impactRatio));
+		console.log('impact ratio: ', impactRatio);
+
+		const	maxAngle = 60 * Math.PI / 180;
+		const	angle = impactRatio * maxAngle;
+
+		
+		if (side === 'left' || side === 'right') {
+			const	directionSign = (side === 'right') ? 1 : -1;
+			this._direction.x = Math.cos(angle) * directionSign;
 			this._direction.y = Math.sin(angle);
 		}
-		else {
-			const impact: number = 2 * ((this._y - (paddle.y + (paddle.height / 2))) / paddle.height);
-			const angle: number = ((5 * Math.PI / 180) * impact) + (55 * Math.PI / 180);	// get an angle between 5 and 60 degrees
-			this._direction.x = Math.sin(angle) * Math.sign(this._direction.x);
-			this._direction.y = -Math.cos(angle);
+		if (side === 'top' || side === 'bottom') {
+			const	directionSign = (side === 'bottom') ? 1 : -1;
+			this._direction.x = Math.sin(angle);
+			this._direction.y = Math.cos(angle) * directionSign;
 		}
+
+		this._direction.normalize();
+		console.log('direction after rebound: x = ', this._direction.x, ', y = ', this._direction.y);
 	}
 
-	out (players: Player[]) {
-		if (this._right < 0) {
-			players[0].score();
+	out (players: Player[]) : boolean {
+		if (this._coordinates.right < 0 || this._coordinates.left > this._fieldWidth || this._coordinates.bottom < 0 || this._coordinates.top > this._fieldHeight) {
+			if (this._coordinates.left > this._fieldWidth) {
+				if (this._lastHit === null || this._lastHit.location === 0) {
+					players[0].losePoint();
+				}
+				else if (this._lastHit)
+					this._lastHit.score();
+			}
+			else if (this._coordinates.right < 0) {
+				if (this._lastHit === null || this._lastHit.location === 1) {
+					players[1].losePoint();
+				}
+				else if (this._lastHit)
+					this._lastHit.score();
+			}
+			else if (this._coordinates.top > this._fieldHeight) {
+				if (this._lastHit === null || this._lastHit.location === 2) {
+					players[2].losePoint();
+				}
+				else if (this._lastHit)
+					this._lastHit.score();
+			}
+			else if (this._coordinates.bottom < 0) {
+				if (this._lastHit === null || this._lastHit.location === 3) {
+					players[3].losePoint();
+				}
+				else if (this._lastHit)
+					this._lastHit.score();
+			}
 			this._rebound = false;
-			return true;
+			this._lastHit = null;
+			return true ;
 		}
-		else if (this._left > this._fieldWidth) {
-			players[1].score();
-			this._rebound = false;
-			return true;
-		}
-		else if (this._bottom < 0 || this._top > this._fieldHeight){
-			this._rebound = false;
-			return true;
-		}
-		return false;
+		return false ;
 	}
 
-	private draw () {
-		this._field.fillStyle = this._color;
-		this._field.beginPath();
-		this._field.arc(this._x, this._y, this._radius, 0, Math.PI * 2);
-		this._field.fill();
+	/* ---------- internals ---------- */
+	update () {
+		let	speed = this._speed;
+		if (!this._rebound)	speed /= 2;
+
+		this._position.x += this._direction.x * speed;
+		this._position.y += this._direction.y * speed;
+
+		this._coordinates.top    = this._position.y - this._radius;
+		this._coordinates.bottom = this._position.y + this._radius;
+		this._coordinates.left   = this._position.x - this._radius;
+		this._coordinates.right  = this._position.x + this._radius;
 	}
 
-	private updatePosition () {
-		let	speed: number = this._speed;
-		if (!this._rebound)
-			speed /= 2;
+	/* ---------- glossy draw ---------- */
+	draw() {
+		const ctx = this._field;
+		const r   = this._radius;
+		const x   = this._position.x;
+		const y   = this._position.y;
 
-		this._x += this._direction.x * speed;
-		this._y += this._direction.y * speed;
-		this._top = this._y - this._radius;
-		this._bottom = this._y + this._radius;
-		this._left = this._x - this._radius;
-		this._right = this._x + this._radius;
+		/* Radial gradient for glossy depth */
+		const g = ctx.createRadialGradient(x - r * 0.4, y - r * 0.4, r * 0.1, x, y, r);
+		g.addColorStop(0,   "#ff768e");
+		g.addColorStop(0.55, Design.DESIGN.accentColor);
+		g.addColorStop(1,   "#4c000d");
+		ctx.fillStyle = g;
+
+		/* blur pass for soft glow / motion feel */
+		ctx.save();
+		ctx.filter = "blur(2px)";
+		ctx.beginPath();
+		ctx.arc(x, y, r, 0, Math.PI * 2);
+		ctx.fill();
+		ctx.restore();
+
+		/* specular highlight */
+		ctx.fillStyle = "rgba(255,255,255,.65)";
+		ctx.beginPath();
+		ctx.ellipse(x - r * 0.35, y - r * 0.35, r * 0.15, r * 0.10, 0, 0, Math.PI * 2);
+		ctx.fill();
 	}
 }

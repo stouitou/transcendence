@@ -1,8 +1,9 @@
 
-import { PongComponent } from './game.ts';
-import { NavBarComponent } from './navbar/NavBar.ts';
-import { BackgroundCanvas } from './background/background.ts';
-import { OnlineComponent } from './online-component.ts';
+import { PongComponent } from './game';
+import { NavBarComponent } from './navbar/NavBar';
+import { BackgroundCanvas } from './background/background';
+import { OnlineComponent } from './online-component';
+import { ProfileEdit } from './ProfileEdit';
 
 
 customElements.define('navbar-component', NavBarComponent);
@@ -11,4 +12,8 @@ customElements.define('pong-game', PongComponent);
 
 if (!customElements.get('is-online-component')) {
   customElements.define('is-online-component', OnlineComponent);
+}
+
+if (!customElements.get('profile-edit-component')) {
+  customElements.define('profile-edit-component', ProfileEdit);
 }

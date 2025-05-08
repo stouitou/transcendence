@@ -1,6 +1,5 @@
 import { BaseComponent } from "../../frameworks/base-component";
 import { User, UserContext } from "../../globalstate/GlobalState";
-import { fetchProfileData } from "../../services/authService.js";
 import { Logout } from "../button/logout-btn";
 import { MessageBtn } from "../button/message-btn";
 import { DropdownProfile } from "../DropdownProfile";
@@ -14,27 +13,15 @@ if (!customElements.get('dropdown-porfile-component')) {
   customElements.define('dropdown-porfile-component', DropdownProfile);
 }
 
-
 /**
  * Composant de barre de navigation
  */
 export class NavBarComponent extends BaseComponent<{ theme: string,user: User | null,islogged:boolean }> {
     
-/*   async firstLoad(){
-    try {
-      const profileData = await fetchProfileData();
-      UserContext().setUser(profileData);
-    }
-    catch (error) {
-        console.error('Error fetching profile data:', error);
-    } 
-  } */
   constructor() { super({ theme: 'light',user:null, islogged:false }); }
 
     connectedCallback() {
-      //super.connectedCallback();
       this.state.user = UserContext().user();
-     // this.firstLoad();
       this.render();
       document.addEventListener('profile-data-updated', (e: Event) => {
         const customEvent = e as CustomEvent;
@@ -96,43 +83,15 @@ export class NavBarComponent extends BaseComponent<{ theme: string,user: User | 
                     </a>
                     <a href="/register" class="nav-link">
                       Register	
-                    </a>`:``}
-                    ${user && 0? `<a href="/profile" class="nav-link">
-                      Profile	
-                    </a>
-                    <a href="/game-history" class="nav-link">
-                      GameHistory	
-                    </a>`:``}
-                   
+                    </a>`:``}                   
  <dropdown-porfile-component></dropdown-porfile-component>
 
                 </nav>
                 
             </div>
-
-             ${user && 0 ? `
-            <nav class=" flex justify-around  bg-gray-50 dark:bg-gray-700">
-    <div class="flex justify-center items-center m-3">
-        <div class="flex justify-center">
-            <ul id="subMenu" class="flex justify-center font-medium w-screen space-x-8 text-sm">
-            
-                    <a href="/dashboard" class="btn nav-link">Dashboard</a>
-                    <a href="/game-setting" class="btn nav-link">Setting</a>
-                    <a href="/profile" class="btn nav-link">Profile</a>
-                    <a href="/game-history" class="btn nav-link">GameHistory</a>
-                <li>
-                <logout-btn></logout-btn>
-                    <msg-btn></msg-btn>
-                </li>
-                
-            </ul>
-        </div>
-    </div>
-</nav>` : ''}
           </header>
     `;
-  // this.querySelector('#toggleBtn')!.addEventListener('click', this.toggleTheme.bind(this));
- // this.attachEvent(this, '#toggleBtn', 'click', this.toggleTheme.bind(this));
+
  this.attachEvent(this, '#theme-toggle', 'click', this.themeToggleFn.bind(this));
  
  

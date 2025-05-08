@@ -7,30 +7,24 @@ export class Direction {
 	constructor(x: number, y: number) {
 		this._x = x;
 		this._y = y;
+		this.normalize();
 	}
 
-	/* GETTERS */
-	public get x () {
-		return this._x;
-	}
-	public get y () {
-		return this._y;
-	}
+	/* ---------- getters ---------- */
+	get x ()	{ return this._x ; }
+	get y ()	{ return this._y ; }
 
-	/* SETTERS */
-	public set x (x: number) {
-		this._x = x;
-	}
-	public set y (y: number) {
-		this._y = y;
-	}
+	/* ---------- setters ---------- */
+	set x (x: number)	{ this._x = x; }
+	set y (y: number)	{ this._y = y; }
 
-	/* METHODS */
-	private magnitude = () => Math.sqrt(Math.pow(this._x, 2) + Math.pow(this._y, 2));
-
-	public normalize () {
+	/* ---------- core behaviour ---------- */
+	normalize = () => {
 		const	magnitude = this.magnitude();
 		this._x = this._x / magnitude;
 		this._y = this._y / magnitude;
 	}
+
+	/* ---------- internals ---------- */
+	private magnitude = () => Math.sqrt(Math.pow(this._x, 2) + Math.pow(this._y, 2));
 }

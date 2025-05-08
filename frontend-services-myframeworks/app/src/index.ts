@@ -1,5 +1,4 @@
-console.log('🚀 ~ file: index.ts:1');
-import  {Router}  from './router/Router.ts';
+import  { Router }  from './router/Router';
 customElements.define('app-router', Router);
 import './components/index.ts';
 import './pages/index.ts';

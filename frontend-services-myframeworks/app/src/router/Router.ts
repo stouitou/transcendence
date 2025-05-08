@@ -89,6 +89,7 @@ routerConfig.addRoute('/about', () => document.createElement('about-component'))
 routerConfig.addRoute('/game', () => document.createElement('game-component-classic'));//@TODO a rename
 routerConfig.addRoute('/login', () => document.createElement('login-component'));
 routerConfig.addRoute('/profile', () => document.createElement('profile-component'));
+routerConfig.addRoute('/profile/edit', () => document.createElement('profile-edit-component'));
 routerConfig.addRoute('/register', () => document.createElement('register-component'));
 routerConfig.addRoute('/game-history', () => document.createElement('game-history-component'));
 routerConfig.addRoute('/game-setting', () => document.createElement('game-setting-component'));

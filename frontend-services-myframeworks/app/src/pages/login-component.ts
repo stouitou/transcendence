@@ -14,12 +14,6 @@ export class Login extends BaseComponent<{login:LoginState}> {
     super({ login: { email: '', password: '' } });
   }
 
-/*   connectedCallback() {
-    super.connectedCallback();
-    this.render();
-    
-  } */
-
   setEmail(event: Event) {
     event.preventDefault();
     const input = event.target as HTMLInputElement;
@@ -36,7 +30,6 @@ export class Login extends BaseComponent<{login:LoginState}> {
 			return;
 		}
     try {
-    //  const globalState = GlobalState;
       const userContext = UserContext();
       const { setUser,user } = userContext;
 			const loginData: LoginData = { ...this.state.login };
@@ -47,7 +40,7 @@ export class Login extends BaseComponent<{login:LoginState}> {
 
       console.log('Login successful:', user());
       const router = RouterConfig.getInstance();
-      router.navigate('/profile');
+      router.navigate('/');
 		} catch (error) {
 			console.error('Login failed:', error);
 			alert('Login failed. Please try again.');
@@ -87,11 +80,6 @@ export class Login extends BaseComponent<{login:LoginState}> {
     `;
     this.attachEvent(this, '#loginBtn', 'click', this.handleSubmit.bind(this));
     this.attachEvent(this, '#email', 'input', this.setEmail.bind(this));
-    this.attachEvent(this, '#password', 'input', this.setPassword.bind(this));
-   // this.attachEvent(this.shadowRoot!, '#email', 'click', this.setEmail.bind(this));
-    //this.attachEvent(this.shadowRoot!, '#password', 'click', this.setPassword.bind(this));
-    //this.shadowRoot!.getElementById('incrementBtn')!.addEventListener('click', this.increment.bind(this));;
-   // this.attachEvent(this.shadowRoot!, '#incrementBtn', 'click', this.increment.bind(this));
-  
+    this.attachEvent(this, '#password', 'input', this.setPassword.bind(this));  
   } 
 }

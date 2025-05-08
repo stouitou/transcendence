@@ -2,6 +2,7 @@ import { LitElement, html, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Player } from '../entities/Player.js';
 import { Tournament } from '../entities/Tournament.js';
+import { Round } from '../models/Round.model.js';
 
 @customElement('tournament-component')
 export class  TournamentGame extends LitElement {
@@ -65,6 +66,10 @@ export class  TournamentGame extends LitElement {
       const players: Player[] = [];
       tournament.players.forEach((player: any) => { const newPlayer = new Player(player); players.push(newPlayer); });
       console.log('In tournamentGame, tournament: ', tournament);
+      const rounds: Round[] = [];
+      console.log('in tournamentGame, rounds: ', tournament.rounds);
+      tournament.rounds.forEach((round: any) => { const newRound = { id: round.id, games: round.games, state:round.state, current: round.current, player: round.players, created_at: round.created_at, updated_at: round.updated_at, tournaments: round.tournaments}; round.push(newRound); });
+      console.log('In tournamentGame, rounds: ', rounds);
       new Tournament(this.config.id, players, this._area!);
     }
     catch (error) {

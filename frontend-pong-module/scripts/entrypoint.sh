@@ -30,9 +30,15 @@ log "$CYAN"  "DEBUG" "************************************"
 # Copy the node_modules folder to the app directory
 log "$CYAN" "INFO" "Copie du dossier node_modules vers le répertoire de l'application..."
 cp -R /node_modules /app
+npm install babylonjs
+npm install @babylonjs/core @babylonjs/loaders
+npm install babylonjs-materials
+
 
 
   if [ "$NODE_ENV" = "development" ]; then
+
+    npm install
     npm run build
     # Start the application in watch mode
     log "$CYAN" "INFO" "Démarrage de l'application en mode développement avec nodemon..."

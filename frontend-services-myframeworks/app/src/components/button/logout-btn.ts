@@ -1,6 +1,6 @@
-import { logoutUser } from '../../services/authService.ts';
-import { BaseComponent } from "../../frameworks/base-component.ts";
-import { UserContext } from '../../globalstate/GlobalState.ts';
+import { logoutUser } from '../../services/authService';
+import { BaseComponent } from "../../frameworks/base-component";
+import { UserContext } from '../../globalstate/GlobalState';
 
 export class Logout extends BaseComponent {
   constructor() {

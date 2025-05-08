@@ -1,7 +1,7 @@
-import { BaseComponent } from "../frameworks/base-component.ts";
-import { User, UserContext } from "../globalstate/GlobalState.ts";
-import {IWebSocketsService, WebSocketsService} from "../globalstate/WebSocketService.ts";
-import { Logout } from "../components/button/logout-btn.ts";
+import { BaseComponent } from "../frameworks/base-component";
+import { User, UserContext } from "../globalstate/GlobalState";
+import {IWebSocketsService, WebSocketsService} from "../globalstate/WebSocketService";
+import { Logout } from "../components/button/logout-btn";
 
 if (!customElements.get('logout-btn'))
 customElements.define('logout-btn', Logout);

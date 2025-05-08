@@ -25,9 +25,9 @@ import { User,UserContext } from "../globalstate/GlobalState";
 
   export class DonutsChart extends BaseComponent<{ user: User | null}> {
 	  private dataChart: DonutsType;
-	  private svg: SVGSVGElement;
-		private label: HTMLElement;
-		private total: number;
+	  private svg: SVGSVGElement | null = null;
+		private label: HTMLElement | null = null;
+		private total: number = 0;
 	constructor() {
 		super({ user: null});
 		this.dataChart = {
@@ -132,6 +132,10 @@ import { User,UserContext } from "../globalstate/GlobalState";
 					circle.setAttribute("data-value", segment.value.toString());
 					circle.setAttribute("data-color", segment.color);
 					this.attachEventOnSvg(circle);
+					if (!this.svg) {
+						console.error("SVG element not found");
+						return;
+					}
 					this.svg.appendChild(circle);
 					return; // Pas besoin de continuer pour ce segment
 				  }
@@ -145,68 +149,83 @@ import { User,UserContext } from "../globalstate/GlobalState";
 		  path.setAttribute("data-value", segment.value.toString());
 		  path.setAttribute("data-color", segment.color);
 		  this.attachEventOnSvg(path);
+		  if (!this.svg) {
+			console.error("SVG element not found");
+			return;
+		  }
 		  this.svg.appendChild(path);
 	
 		  startAngle = endAngle;
 		});
-	
-	  //  this.label.textContent = `${this.total}%`;
-		//this.label.textContent = ``;
 	  }
 
-	  attachEventOnSvg(path: SVGPathElement) {
-		path.addEventListener("mouseover", (e) => {
-			const target = e.currentTarget as HTMLElement;
-			const label = target.getAttribute("data-label");
-			const value = target.getAttribute("data-value");
-			const color = target.getAttribute("data-color");
-		  
-			this.label.textContent = `${label}: ${value}`;
-			this.label.style.color = color || "#000";
-			this.label.style.backgroundColor = "#fff";
-			this.label.style.borderRadius = "5px";
-			this.label.style.padding = "5px";
-			this.label.style.position = "absolute";
-			this.label.style.zIndex = "10";
-			this.label.style.pointerEvents = "none";
-		  
-			// Positionner le label en fonction de la souris
-			const offsetX = 10; // Décalage horizontal
-			const offsetY = 10; // Décalage vertical
-			const mouseX = e.pageX;
-			const mouseY = e.pageY;
-		  
-			// Vérifier les limites de la fenêtre
-			const labelWidth = this.label.offsetWidth;
-			const labelHeight = this.label.offsetHeight;
-			const windowWidth = window.innerWidth;
-			const windowHeight = window.innerHeight;
-		  
-			let posX = mouseX + offsetX;
-			let posY = mouseY + offsetY;
-		  
-			// Ajuster si le label dépasse à droite
-			if (posX + labelWidth > windowWidth) {
-			  posX = mouseX - labelWidth - offsetX;
-			}
-		  
-			// Ajuster si le label dépasse en bas
-			if (posY + labelHeight > windowHeight) {
-			  posY = mouseY - labelHeight - offsetY;
-			}
-		  
-			this.label.style.left = `${posX}px`;
-			this.label.style.top = `${posY}px`;
-		  });
-		  path.addEventListener("mouseout", () => {
-			this.label.textContent = ``;
-			this.label.style.backgroundColor = "transparent";
-			this.label.style.borderRadius = "0px";
-			this.label.style.padding = "0px";
-			this.label.style.position = "static";
-			this.label.style.zIndex = "0";
-			this.label.style.pointerEvents = "none";
-			this.label.style.transform = `translate(0, 0)`;
-		  });
+
+	attachEventOnSvg(path: SVGPathElement) {
+		this.attachEventOnHtmlElement(path, "mouseover", this.handleMouseOver.bind(this) as EventListener);
+		this.attachEventOnHtmlElement(path, "mouseout", this.handleMouseout.bind(this) as EventListener);
+	}
+	handleMouseOver(e: MouseEvent) {
+		const target = e.currentTarget as HTMLElement;
+		const label = target.getAttribute("data-label");
+		const value = target.getAttribute("data-value");
+		const color = target.getAttribute("data-color");
+		if (!this.label) {
+			console.error("Label element not found");
+			return;
 		}
+	  
+		this.label.textContent = `${label}: ${value}`;
+		this.label.style.color = color || "#000";
+		this.label.style.backgroundColor = "#fff";
+		this.label.style.borderRadius = "5px";
+		this.label.style.padding = "5px";
+		this.label.style.position = "absolute";
+		this.label.style.zIndex = "10";
+		this.label.style.pointerEvents = "none";
+	  
+		// Positionner le label en fonction de la souris
+		const offsetX = 10; // Décalage horizontal
+		const offsetY = 10; // Décalage vertical
+		const mouseX = e.pageX;
+		const mouseY = e.pageY;
+	  
+		// Vérifier les limites de la fenêtre
+		const labelWidth = this.label.offsetWidth;
+		const labelHeight = this.label.offsetHeight;
+		const windowWidth = window.innerWidth;
+		const windowHeight = window.innerHeight;
+	  
+		let posX = mouseX + offsetX;
+		let posY = mouseY + offsetY;
+	  
+		// Ajuster si le label dépasse à droite
+		if (posX + labelWidth > windowWidth) {
+		  posX = mouseX - labelWidth - offsetX;
+		}
+	  
+		// Ajuster si le label dépasse en bas
+		if (posY + labelHeight > windowHeight) {
+		  posY = mouseY - labelHeight - offsetY;
+		}
+	  
+		this.label.style.left = `${posX}px`;
+		this.label.style.top = `${posY}px`;
+	  }
+	  
+
+	  handleMouseout(e: MouseEvent) {
+		const target = e.currentTarget as HTMLElement;
+		if (!this.label) {
+			console.error("Label element not found");
+			return;
+		}
+		this.label.textContent = ``;
+		this.label.style.backgroundColor = "transparent";
+		this.label.style.borderRadius = "0px";
+		this.label.style.padding = "0px";
+		this.label.style.position = "static";
+		this.label.style.zIndex = "0";
+		this.label.style.pointerEvents = "none";
+		this.label.style.transform = `translate(0, 0)`;
+	  }
 }

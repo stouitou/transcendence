@@ -1,13 +1,13 @@
-import { BaseComponent } from "../frameworks/base-component.ts";
-import { Game, Players, User, UserContext } from "../globalstate/GlobalState.ts";
-import { ProfileEdit } from '../components/ProfileEdit.ts';
-import { ProfileView } from '../components/ProfileView.ts';
+import { BaseComponent } from "../frameworks/base-component";
+import { Game, Players, User, UserContext } from "../globalstate/GlobalState";
+/* import { ProfileEdit } from '../components/ProfileEdit.ts';
+import { ProfileView } from '../components/ProfileView.ts'; */
 
 // Register the custom elements to be used in the Profile component
-if (!customElements.get('profile-edit-sub-component'))
+/* if (!customElements.get('profile-edit-sub-component'))
 customElements.define('profile-edit-sub-component', ProfileEdit);
 if (!customElements.get('profile-view-sub-component'))
-customElements.define('profile-view-sub-component', ProfileView);
+customElements.define('profile-view-sub-component', ProfileView); */
 
 /**
  * Profile component that displays the user's profile information

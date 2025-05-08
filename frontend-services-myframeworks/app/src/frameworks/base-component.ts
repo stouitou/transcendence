@@ -113,4 +113,12 @@ export abstract class BaseComponent<TState = {}> extends HTMLElement {
       this._attachedEvents.push({ event, handler });
     }
   }
+    // Fonction pour attacher les écouteurs d'événements
+    attachEventOnHtmlElement(element: HTMLElement | SVGElement,  event: string, handler: EventListener) {
+      const target = element;
+      if (target) {
+        target.addEventListener(event, handler);
+        this._attachedEvents.push({ event, handler });
+      }
+    }
 }
