@@ -4,11 +4,12 @@
     "module": "esnext",
     "strict": true,
     "esModuleInterop": true,
-    "outDir": "./dist/js",
-    "rootDir": "./src/ts"
+    "outDir": "./dist",
+    "rootDir": "./src"
   },
-  "include": ["src/ts/**/*"],
+  "include": ["src","src/ts/**/*", "vite-env.d.ts"],
   "types": [
     "babylonjs",
+    "node",
 ],
 }

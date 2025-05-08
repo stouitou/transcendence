@@ -1,7 +1,7 @@
-import { BaseComponent } from "../frameworks/base-component.ts";
-import { User, UserContext } from "../globalstate/GlobalState.ts";
-import { ProfileEdit } from '../components/ProfileEdit.ts';
-import { ProfileView } from '../components/ProfileView.ts';
+import { BaseComponent } from "../frameworks/base-component";
+import { User, UserContext } from "../globalstate/GlobalState";
+import { ProfileEdit } from '../components/ProfileEdit';
+import { ProfileView } from '../components/ProfileView';
 
 // Register the custom elements to be used in the Profile component
 if (!customElements.get('profile-edit-sub-component'))
@@ -20,7 +20,7 @@ export class Profile extends BaseComponent<{ user: User | null; isEditing: boole
 
   connectedCallback() {
     console.log('Profile');
-    super.connectedCallback();
+    //super.connectedCallback();
     this.state.user = UserContext().user();
     this.render();
     document.addEventListener('profile-data-updated', (e: Event) => {

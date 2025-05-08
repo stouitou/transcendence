@@ -3,12 +3,12 @@
  * @export
  * @interface IRepository
  */
-export interface IRepository<T> {
+export interface IRepository<T, C = Partial<T>> {
 	//implement CRUD methods
 	//create, read, update, delete
   
 	//create
-	create: (user: Partial<T>) => Promise<T>;
+	create: (user: C) => Promise<T>;
 	//read
 	getAll: () => Promise<T[]>;
 	getById: (id: number) => Promise<T | null>;

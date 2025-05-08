@@ -2,10 +2,11 @@ import { FastifyInstance } from "fastify";
 import FastifyPassport from "@fastify/passport";
 import { AuthController } from "../controllers/auth.controller";
 import { AuthSchema } from "../schemas/auth.schema";
-import { User } from "@src/models/User.models";
+import { User } from "../models/User.models";
 
-const redirectUrlAfterLoginSuccess = "https://localhost:4433/#profile";
-const redirectUrlAfterLoginError = "https://localhost:4433/login";
+const BACKEND_SERVER_URL = process.env.BACKEND_SERVER_URL || "https://localhost:4433";
+const redirectUrlAfterLoginSuccess = `${BACKEND_SERVER_URL}/profile`;
+const redirectUrlAfterLoginError = `${BACKEND_SERVER_URL}/login`;
 async function authRoutes(app: FastifyInstance) {
 
   const authController = new AuthController(app);

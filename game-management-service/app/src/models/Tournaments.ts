@@ -10,7 +10,7 @@ export class Tournaments{
   players?: User[]/*  | number[] */;
   created_at: Date;
   updated_at: Date;
-  rounds?: Round[];
+  rounds?: Round[]; //@TODO en faire un DTO
   currentRound?: number;
   winner?: User | number | string;
   //mode de la partie : local ou remote
@@ -35,12 +35,16 @@ export class Tournaments{
 
 
 export type TournamentsCreate = {
+  id?: number;
   players: number[];
-  difficulty: number;
-  state: string;
-  mode: string;
-  created_at: Date;
-  updated_at: Date;
+  currentRound?: number;
+ // difficulty: number;
+  state: string; // en attente, en cours, terminee
+  type: "local"| "remote"
+  max_players?: number;
+ // mode: string;
+/*   created_at: Date;
+  updated_at: Date; */
 }
 // 📌 Définition des modèles avec contraintes
 export type TournamentsBody = {
@@ -83,9 +87,11 @@ export const TournamentsSafe: TournamentsModel<TournamentsSafe> = {
 
 export const TournamentsCreate: TournamentsModel<TournamentsCreate> = {
   players: [],
-  difficulty: 0,
+  //difficulty: 0,
   state: "en attente",
-  mode: "en attente",
-  created_at: new Date(),
-  updated_at: new Date()
+  type: "local",
+  max_players: 20,
+  currentRound: 0,
+  //created_at: new Date(),
+  //updated_at: new Date()
 };

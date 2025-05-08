@@ -1,4 +1,4 @@
-class	User {
+export class	User {
 
 	protected readonly	_name: string;
 	protected readonly	_role: string;

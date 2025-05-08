@@ -6,16 +6,30 @@ import { Game } from "../globalstate/GlobalState";
  * If the request is successful, it returns the list of games as a JSON object.
  * If the request fails, it logs an error message to the console.
  * @returns {Promise<void>}
+ * 
  */
-export const getGames = async (): Promise<Game[] | void> => {
+type Pagination = {
+	limit?: number;
+	offset?: number;
+	order?: 'ASC' | 'DESC';
+}
+type Filter = {
+	type?: string;
+}
+export type MetaPagination = { limit: number, offset: number, order: 'ASC'|'DESC',total: number }
+export const getGames = async (pagination:Pagination,filter:Filter): Promise<{games:Game[],meta:MetaPagination} | void> => {
+	//limit: 10, offset: 2, order: 'ASC'
+	const { limit = 10, offset = 0, order = 'ASC' } = pagination;
+	const { type ="remote" } = filter;
 	try {
-		const response = await fetch(`/api/game-management-service/games`);
+		const response = await fetch(`/api/game-management-service/games/pagination?limit=${limit}&offset=${offset}&order=${order}&filters={"type":"${type}"}`);///games/pagination?limit=10&offset=2
 		if (response.ok) {
-			const games = await response.json();
-        console.log('games list:', games);
-        return games;
+			const {data, meta} = await response.json();
+        console.log('games list:', data);
+        return {games:data,meta};
 		} else {
-			throw ('[debug] Failed to fetch games list');
+			console.log ('[debug] Failed to fetch games list');
+			return {games:[],meta:{limit:0,offset:0,order:'ASC',total:0}};
 		}
 	} catch (error) {
 		console.error('Error fetching games data:', error);

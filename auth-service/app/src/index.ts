@@ -14,7 +14,7 @@ async function start() {
   try {
     await server.listen({ port: 3000, host: "0.0.0.0" });
      console.log(`🚀 Server running on node container http://localhost:3000`);
-     console.log(`🟩 API DOC Swagger : https://localhost:4433/api/auth/docs`);
+     console.log(`🟩 API DOC Swagger : ${process.env.BACKEND_SERVER_URL}/api/auth/docs`);
     } catch (err) {
     console.error(err);
     process.exit(1);

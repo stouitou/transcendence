@@ -162,6 +162,7 @@ class GlobalState {
     }
 
     private _firstLoadProfileData = async () => {
+      console.log('Fetching profile data on first load...');
         try {
           const profileData = await fetchProfileData();
           this.setuser(profileData);
@@ -278,14 +279,28 @@ export const UserContext = ()=>{
     const setLoginSuccess = () => {
         globalState.setLoginSuccess();
         globalState.setProfileData(user());
+        const id = user()?.id;
+        if (!id) {
+            console.error('User ID is undefined');
+            return;
+        }
+        globalState.ws?.sendLoginMessage(id.toString());
 
     };
     const setUserLogout = () => {
+        globalState.ws?.sendLogoutMessage();
         globalState.setLogoutSuccess();
-        globalState.setProfileData(null);
+        globalState.setProfileData(null); 
     };
     const ws = ()=>globalState.ws;
     return { user, setUser , setLoginSuccess, setUserLogout, ws};
+/*     return {
+      user: () => globalState.user,
+      setUser: globalState.setuser.bind(globalState),
+      setLoginSuccess: globalState.setLoginSuccess.bind(globalState),
+      setUserLogout: globalState.setLogoutSuccess.bind(globalState),
+      ws: () => globalState.ws,
+  }; */
 
 } 
   export default GlobalState.getInstance();

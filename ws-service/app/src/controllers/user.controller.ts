@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import  UserRepository  from '@src/repository/User.repository';
+import  UserRepository  from '../repository/User.repository';
 import { Param } from '@prisma/client/runtime/library';
 
 import { pipeline } from 'node:stream';

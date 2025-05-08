@@ -4,10 +4,12 @@ import { Login } from "./login-component";
 import { Profile } from "./profile-component";
 import { Register } from "./register";
 
-import { ChatComponent } from './chat-component.ts';
-import { TournamentHistory } from "./tounamentHistory-component.ts";
-import { Dashboard } from "./dashboard-test-component.ts";
-import { GameLobyComponent } from "./game-loby-componemt.ts";
+import { ChatComponent } from './chat-component';
+import { TournamentHistory } from "./tounamentHistory-component";
+import { Dashboard } from "./dashboard-test-component";
+import { GameLobyComponent } from "./game-loby-componemt";
+
+
 class HomeComponent extends HTMLElement {
 	connectedCallback() {
 	  this.innerHTML = `<h1>Welcome to the Home Page</h1>
@@ -21,9 +23,7 @@ class HomeComponent extends HTMLElement {
 	  this.innerHTML = `<h1>About Us</h1>`;
 	}
   }
-  document.addEventListener('ws-games', (e: Event) => {
-	console.log('Global listener received ws-games event:', e);
-  });
+
   customElements.define('home-component', HomeComponent);
   customElements.define('about-component', AboutComponent);
 if (!customElements.get('game-history-component')) {

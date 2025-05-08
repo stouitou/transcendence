@@ -1,4 +1,4 @@
-import { Player } from './tests/Player.js';
+/* import { Player } from './tests/Player.js';
 import { Tournament } from './entities/Tournament.js';
 
 const player1 = new Player("Olivier1");
@@ -8,10 +8,10 @@ const player4 = new Player("Bess4");
 const player5 = new Player("Paul5");
 
 const players: Player[] = [player1, player2, player3, player4, player5];
-
+ */
 // const game = new Game(player1, player2);
 // game.launch();
-new Tournament(players);
+//new Tournament(players);
 // let players: Player[] = [new Player("Olivier"), new Player("Sarah"), new Player("test1"), new Player("test2"), new Player("test3"), new Player("test4"), new Player("test5")];
 // const tournament = new Tournament(7, players);
 //const game = new Game();

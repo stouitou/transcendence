@@ -18,10 +18,14 @@ async function userRoutes(app: FastifyInstance) {
    * Il est utile pour les tâches qui doivent être effectuées pour chaque requête.
    */
   app.addHook('onRequest', async (request, reply) => {
+    const startTime = Date.now(); // Démarrer le chronomètre
+   
     const authToken = request.cookies.authToken;
     if (authToken && !request.headers.authorization) {
       request.headers.authorization = `Bearer ${authToken}`;
     }
+    let endTime = Date.now(); // Arrêter le chronomètre
+    console.log(`⏱️ Hook onRequest [check authToken] exécuté en ${endTime - startTime} ms`);
     //1- Récupération du token dans le header  
     const authHeader = request.headers.authorization;
   //  const authHeader = "Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6IiIsInJvbGUiOiJ1c2VyIiwibGV2ZWwiOjEsImF2YXRhciI6IiIsImNyZWF0ZWRfYXQiOiIyMDI1LTAzLTE0VDExOjQ5OjIwLjQ0MVoiLCJ1cGRhdGVkX2F0IjoiMjAyNS0wMy0xNFQxMTo0OToyMC40NDFaIiwiaWF0IjoxNzQxOTU5NjMwLCJleHAiOjE3NDE5NTk2OTB9.aE9IIldOzuRFNna9qDBmgOmvaBbDu1qYNkImLDy2-_rkllXfAbW0ejqrJyneJ1GlbojmBOFdhkz63dlYTI4zZ18XJzVKijnypuj_Tf3DWcrrbgUUQXvKhreFIeoo7a9kLYFsa4TjdYXOeV_pHfcdH--l7s7PAnXp0kRrHCwc605N82qDTzyAISyYvieL5cfEWak4lwIDLhpzpqdQw0k07Ois6U4xeR6CMy4Qc6IpKHk1h5Jy4LDjIy7dnwvBwldAeeoXuKRiwGhPZ1WFWhYwqh7y9WTtSNrObi7evTntdVwb8GxRwLHAqMFoGcjjWwjBzEPNqOUFFERtTaNFr-LXXYHIbpzWQQ2hN7D_8QUh26cy47PniueBZ4KeXGCF0A0IrqdQ0FRMZdeyij4kAELP8OcDlV9yOEqYvOf45wSh4mRZzfbrY14Iiqw9aEYwNtQmRRIT85Elm8JferFXil3nlTsJGTKpMjCdskOAMLoFYt3RK6OZNKmrMdWnBnllgqgEPlBR8ZJ72bSUyCYJF6BKFTSQLw0cC8Tff6WfGVbpbGRpDB9grvqBzVIp_LZxERvRSFB2IpTgfd9fOP-3HwHobQzOPVwbMcXWBaFVnvJxuJWiOMnpUgEBhOP89zF9nhabEXEf3aUsG9lrrm1eno0r6RQWmsSJR9jVzl9ii5p3Zs8";
@@ -42,6 +46,9 @@ async function userRoutes(app: FastifyInstance) {
       });
       //4- Vérification de la réponse
       const data = await res.json();
+
+    let endTime = Date.now(); // Arrêter le chronomètre
+    console.log(`⏱️ Hook onRequest [await res.json()] exécuté en ${endTime - startTime} ms`);
       //4-1 Si la réponse n'est pas ok, on retourne une erreur
       if (!res.ok) {
         console.error("not ok")
@@ -53,6 +60,9 @@ async function userRoutes(app: FastifyInstance) {
         //supprime pour des raisons de sécurité
        delete data.authProviders;
        console.log("🟠 userRoutes onRequest hook remove authProviders from current user")
+
+    let endTime = Date.now(); // Arrêter le chronomètre
+    console.log(`⏱️ Hook onRequest [delete data.authProviders;] exécuté en ${endTime - startTime} ms`);
       }
       //5- Ajout de l'utilisateur " authentifié, et netoyé" à la requête
       request.authenticatedUser = data
@@ -60,6 +70,9 @@ async function userRoutes(app: FastifyInstance) {
       //6- Gestion des erreurs
       console.error("🟥 userRoutes onRequest error",error)
       return reply.code(error.status).send({ error: error.message });
+    }finally {
+      const endTime = Date.now(); // Arrêter le chronomètre
+      console.log(`⏱️ Hook onRequest exécuté en ${endTime - startTime} ms`);
     }
   })
 

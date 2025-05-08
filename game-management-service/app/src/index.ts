@@ -4,6 +4,7 @@ import gameRoutes from "./routes/game.routes";
 import tournamentsRoutes from "./routes/tounament.routes";
 import gameHistoryRoutes from "./routes/gameHistory.routes";
 import roundRoutes from "./routes/round.routes";
+import dockerRoutes from "./routes/docker.routes";
 
 const app = server();
 
@@ -12,7 +13,12 @@ async function start() {
   await registerPlugins(app);
   //2- Enregistrer les routes
 	await app.register(gameRoutes, { prefix: "/api/game-management-service/games" });
+	await app.register(dockerRoutes, { prefix: "/api/game-management-service/docker/games" });
+	await app.register(gameHistoryRoutes, { prefix: "/docker/gameHistory" });
+
+	await app.register(dockerRoutes, { prefix: "/docker/games" });
 	await app.register(tournamentsRoutes, { prefix: "/api/game-management-service/tournaments" });
+	await app.register(tournamentsRoutes, { prefix: "/api/game-management-service/docker/tournaments" });
 	await app.register(gameHistoryRoutes, { prefix: "/api/game-management-service/gameHistory" });
 	await app.register(roundRoutes, { prefix: "/api/game-management-service/rounds" });
   //3- Recuperer les variables d'environnement

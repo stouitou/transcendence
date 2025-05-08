@@ -1,3 +1,4 @@
+
 import { PongComponent } from './game.ts';
 import { NavBarComponent } from './navbar/NavBar.ts';
 import { BackgroundCanvas } from './background/background.ts';

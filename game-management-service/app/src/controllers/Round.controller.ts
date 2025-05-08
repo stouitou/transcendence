@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import  RoundRepository  from '@src/repository/Round.repository';
-import { RoundBody } from '@src/models/Round';
+import  RoundRepository  from '../repository/Round.repository';
+import { RoundBody } from '../models/Round';
 
 export class RoundController {
   private roundRepository = new RoundRepository();

@@ -2,8 +2,8 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { EntityRepository } from "../repositories/Entity.repository";
 import { UrlSearchParams } from "../types/index.types";
 import { DeepPartial, ObjectLiteral } from "typeorm";
-import { generateErrorResponse, generateSucessResponse } from "@src/utils/responseHandler";
-import { CustomIdNotFoundError } from "@src/config/Databases";
+import { generateErrorResponse, generateSucessResponse } from "../utils/responseHandler";
+import { CustomIdNotFoundError } from "../config/Databases";
 /*
 options?: {
     limit?: number;
@@ -84,8 +84,41 @@ export class EntityController {
     this.updateEntity = this.updateEntity.bind(this);
     this.deleteEntity = this.deleteEntity.bind(this);
   }
+  // 📌 📢 Route : GET /table/:entity
+  getEntitys = async (req: FastifyRequest, reply: FastifyReply) => {
+    
+    try{
+      const { filters } = req.query as UrlSearchParams;
+      console.log("getEntitysAndCount",req.query);
+      // const { filters, limit, offset, order } = req.query as UrlSearchParams;
+      const { database, entity } = req.params as { database: string, entity: string };
+      //0- Récupérer la base de données par son nom
+      const entityDataSource = (await this.app.DB.getDataBase(database));
+      //1- Trouver l'entité par son nom
+      const entityClass = entityDataSource.getEntityByName(entity);
+      //2- Créer une instance de EntityRepository
+      const repository =  new EntityRepository(entityDataSource.getDataSource() ,entityClass!);
+      //3- Récupérer les données de l'entité avec les filtres
+      const query = req.query as UrlSearchParams;
+      const options = new buildOptions(query).getOptions();
+      if (filters) {
+        const parsedFilters =(filters as unknown as string[]).map((filter) => {
+          return JSON.parse(decodeURIComponent(filter));
+        });
+        const [data,total] = await repository.findByParamsAndCount(parsedFilters,options);
+        return generateSucessResponse(reply,200, data, {...options,total});
+      }
+      //4- Récupérer les données de l'entité
+        const [result,total] = await repository.findAllAndCount(options);
+      //5- Retourner les données
+      return generateSucessResponse(reply,200, result, {...options,total});
+    }
+    catch (error) {
 
-// 📌 📢 Route : GET /table/:entity
+    return generateErrorResponse(reply, error);
+  }
+};
+/* // 📌 📢 Route : GET /table/:entity
 getEntitys = async (req: FastifyRequest, reply: FastifyReply) => {
   try{
     const { filters } = req.query as UrlSearchParams;
@@ -106,19 +139,19 @@ getEntitys = async (req: FastifyRequest, reply: FastifyReply) => {
       });
 //filters          | [ '[{"id":"5"},{"role":"user"}]' ]
 //parsedFilters    | [ { id: '5' }, { role: 'user' } ]
-      const result = await repository.findByParams(parsedFilters,options);
-      return generateSucessResponse(reply,200, result, options);
+      const [result,total] = await repository.findByParamsAndCount(parsedFilters,options);
+      return generateSucessResponse(reply,200, result, {...options,total});
     }
     //4- Récupérer les données de l'entité
-      const result = await repository.findAll(options);
+      const [result,total] = await repository.findAllAndCount(options);
     //5- Retourner les données
-    return generateSucessResponse(reply,200, result, options);
+    return generateSucessResponse(reply,200, result, {...options,total});
   }
   catch (error) {
 
   return generateErrorResponse(reply, error);
 }
-};
+}; */
 
 // 📌 📢 Route : GET /table/:entity/:id
 getEntityById = async (req: FastifyRequest, reply: FastifyReply) => {
@@ -197,7 +230,15 @@ createEntity = async (req: FastifyRequest, reply: FastifyReply) => {
     const {id, ...data } = req.body as DeepPartial<ObjectLiteral>;
     //WARNING  id est un champ auto généré
     //5- Créer une nouvelle entité
-    const result = await repository.create(data);
+    const createdEntity = await repository.create(data);
+
+
+    //3- Récupérer les données de l'entité avec les filtres
+    const query = req.query as UrlSearchParams;
+    const options = new buildOptions(query).getOptions();
+    // 5- Charger les relations associées
+    const result = await repository.findById(createdEntity.id, options.relations); // Remplacez par vos relations
+
     //6- Retourner les données  
     return generateSucessResponse(reply,201, result);
   }
@@ -224,8 +265,15 @@ updateEntity = async (req: FastifyRequest, reply: FastifyReply) => {
     const result = await repository.update(entityId, data);
   //5-a Vérifier si l'entité a été crée
     //if (!result) return generateErrorResponse(reply, 404, `Entity '${entity}' could not be updated`, `Entity '${entity}' could not be updated`);
+
+        //3- Récupérer les données de l'entité avec les filtres
+        const query = req.query as UrlSearchParams;
+        if (!query) return generateSucessResponse(reply,200, result);
+        const options = new buildOptions(query).getOptions();
+        // 5- Charger les relations associées
+        const resultwhithrelation = await repository.findById(entityId, options.relations); // Remplacez par vos relations
     //6- Retourner les données
-    return generateSucessResponse(reply,200, result);
+    return generateSucessResponse(reply,200, resultwhithrelation);
   }
   catch (error) {
     console.log(error);

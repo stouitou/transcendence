@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 
-import { RoundController } from "@src/controllers/Round.controller";
+import { RoundController } from "../controllers/Round.controller";
 
 
 

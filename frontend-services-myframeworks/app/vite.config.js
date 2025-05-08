@@ -1,5 +1,6 @@
 import { defineConfig } from 'vite';
 
+const allowedHostFromEnv = process.env.BACKEND_SERVER_NAME || 'localhost';
 export default defineConfig({
   server: {
     port: 3000,
@@ -11,7 +12,7 @@ export default defineConfig({
     },
     allowedHosts: [
       'localhost',
-      'bess-f4r1s3',
+      allowedHostFromEnv,//'bess-f4r1s3',
     ]
   },
   publicDir: 'public',

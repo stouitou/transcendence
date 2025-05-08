@@ -1,7 +1,9 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import  GameRepository  from '@src/repository/Game.repository';
-import { GameBody } from '@src/models/Game';
-import { UserStats } from '@src/models/User';
+import  GameRepository  from '../repository/Game.repository';
+import { GameBody, GameCreate } from '../models/Game';
+import { UserStats } from '../models/User';
+import { BuildOptions, UrlSearchParams } from '@src/utils/BuildOptions';
+import { IParams } from '@src/repository/helpers';
 
 const handlefetchStats = async (authorization:string|undefined,cookie : string|undefined,userId:number, dataStats:Partial<UserStats>) => {
   try {
@@ -27,7 +29,7 @@ const handlefetchStats = async (authorization:string|undefined,cookie : string|u
   }
 }
 
-const handleSetStats = async (type:string,format:string,request:FastifyRequest<{ Body?: GameBody }>,reply:FastifyReply) => {
+const handleSetStats = async (type:string,format:string,request:FastifyRequest<{ Body?: GameCreate }>,reply:FastifyReply) => {
 
  // const { ...requestBody } = request.body;
   const {authorization,cookie} = request.headers;
@@ -106,12 +108,39 @@ export class GameController {
       this.createGame = this.createGame.bind(this);
       this.getGames = this.getGames.bind(this);
       this.getGameById = this.getGameById.bind(this);
+      this.getGamesByQuery = this.getGamesByQuery.bind(this);
       this.updateGame = this.updateGame.bind(this);
       this.deleteGame = this.deleteGame.bind(this);
       this.joinGameById = this.joinGameById.bind(this);
+      this.createGameDocker = this.createGameDocker.bind(this);
     }
 
-  async createGame(request: FastifyRequest<{ Body: GameBody }>, reply: FastifyReply) {  
+  async createGameDocker(request: FastifyRequest<{ Body: GameCreate }>, reply: FastifyReply) {
+
+    const { ...requestBody } = request.body;
+ //   const {authorization,cookie} = request.headers;
+    const {type , format , mode} = request.params as {type:string,format:string,mode:string};
+    if (!type || !format || !mode) {
+      return reply.status(400).send({ error: 'Invalid request params' });
+    }
+    if (type !== 'local' && type !== 'remote') {
+      return reply.status(400).send({ error: 'Invalid game type' });
+    }
+    if (format !== 'classic' && format !== 'tournament') {
+      return reply.status(400).send({ error: 'Invalid game format' });
+    }
+    if (mode !== 'normal' && mode !== 'rapide') {
+      return reply.status(400).send({ error: 'Invalid game mode' });
+    }
+
+    const games = await this.gameRepository.create({...requestBody,type,format,mode});
+    console.log("GameController createGame ",games?'ok':'ko');
+    if (!games) {
+      return reply.status(404).send({ error: 'Game creation failed' });
+    }
+    return reply.status(201).send(games);
+  }
+  async createGame(request: FastifyRequest<{ Body: GameCreate }>, reply: FastifyReply) {  
     const { ...requestBody } = request.body;
  //   const {authorization,cookie} = request.headers;
     const {type , format , mode} = request.params as {type:string,format:string,mode:string};
@@ -143,6 +172,15 @@ export class GameController {
   async getGames(request: FastifyRequest, reply: FastifyReply) {  
     console.log("--GameController getGames ");
     const games = await  this.gameRepository.getAll();
+        console.log("GameController getGames ",games);
+    return reply.send(games);
+  }
+
+  async getGamesByQuery(request: FastifyRequest, reply: FastifyReply) {  
+    console.log("--GameController getGamesByQuery ");
+    const query = request.query as IParams;
+   // const options = new BuildOptions(query).getOptions();
+    const games = await  this.gameRepository.getAllbyQuery(query);
         console.log("GameController getGames ",games);
     return reply.send(games);
   }

@@ -1,4 +1,4 @@
-import AuthProviderRepository from "@src/repository/AuthProvider.repository";
+import AuthProviderRepository from "../repository/AuthProvider.repository";
 import  UserRepository  from "../repository/User.repository";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { BaseController } from "./BaseController";
@@ -111,9 +111,12 @@ export class AuthController extends BaseController {
 
   // 🟢 Vérification du token
   async me(req: FastifyRequest, reply: FastifyReply) {
+
+    const startTime = Date.now(); // Démarrer le chronomètre
     const authHeader = req.headers.authorization;
     if (!authHeader) return reply.status(401).send({ error: "No token provided" });
-
+    let endTime = Date.now(); // Arrêter le chronomètre
+    console.log(`⏱️ [AuthController]  [AuthController] Hook onRequest [check authToken] exécuté en ${endTime - startTime} ms`);
     try {
      // console.log("🔓 me authHeader",authHeader)
 
@@ -131,9 +134,13 @@ export class AuthController extends BaseController {
       console.log("Issued At:", iatDate);
       console.log("Expires At:", expDate);
 
-  
+      let endTime = Date.now(); // Arrêter le chronomètre
+      console.log(`⏱️ [AuthController]  Hook onRequest [this.app.jwt.verify] exécuté en ${endTime - startTime} ms`);
    //const result = await  UserRepository.getUserById(decoded.id);
    const result = await  this.UserRepository.getById(decoded.id);
+
+   endTime = Date.now(); // Arrêter le chronomètre
+   console.log(`⏱️ [AuthController]  Hook onRequest [await  this.UserRepository.getById(decoded.id)] exécuté en ${endTime - startTime} ms`);
   // console.log("🟢 me result",result)
    if (!result) {
     return reply.status(401).send({ error: "Invalid token" });
@@ -141,6 +148,9 @@ export class AuthController extends BaseController {
   //created_at
   //created_at
   // console.log("81 🟢 me result",result)  
+  endTime = Date.now(); // Arrêter le chronomètre
+  console.log(`⏱️ [AuthController]  Hook onRequest [reply.status(200).send(result)] exécuté en ${endTime - startTime} ms`);
+ 
    return reply.status(200).send(result);
     } catch (err) {
       console.error("🔴 me error",err)

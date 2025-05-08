@@ -1,4 +1,3 @@
-
 export class RouterConfig {
   private static instance: RouterConfig; // Instance unique
   private _routes: { [path: string]: () => HTMLElement } = {};
@@ -47,7 +46,7 @@ export class RouterConfig {
   // Charger un composant
   private loadComponent(path: string,searchParams: URLSearchParams | null = null) {
     console.log('Loading component for path:', path);
-    console.log('searchParams:', searchParams);
+   // console.log('searchParams:', searchParams);
     const app = document.querySelector('router-view');
     if (!app) {
       console.error('<router-view> not found in the DOM');
@@ -70,7 +69,7 @@ export class RouterConfig {
       // Passer les paramètres de recherche au composant
       const params = Object.fromEntries(searchParams.entries());
       (component as any).params = params;
-      console.log('params:', params);
+      //console.log('params:', params);
     }
     app.appendChild(component);
     this._currentComponent = component;
@@ -87,7 +86,7 @@ const routerConfig = RouterConfig.getInstance();
 routerConfig.addRoute('/', () => document.createElement('home-component'));
 routerConfig.addRoute('/about', () => document.createElement('about-component'));
 //routerConfig.addRoute('/game', () => document.createElement('pong-game'));
-routerConfig.addRoute('/game', () => document.createElement('game-component'));
+routerConfig.addRoute('/game', () => document.createElement('game-component-classic'));//@TODO a rename
 routerConfig.addRoute('/login', () => document.createElement('login-component'));
 routerConfig.addRoute('/profile', () => document.createElement('profile-component'));
 routerConfig.addRoute('/register', () => document.createElement('register-component'));
@@ -107,6 +106,7 @@ export class Router extends HTMLElement {
 
   constructor() {
     super();
+    console.log('Router constructor');
     this.routerConfig = RouterConfig.getInstance(); // Obtenir l'instance unique de RouterConfig
     window.addEventListener('popstate', this.handlePopState.bind(this));
     document.addEventListener('click', this.handleLinkClick.bind(this));

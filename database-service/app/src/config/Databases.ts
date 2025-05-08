@@ -1,11 +1,11 @@
-import { AuthProvider } from "@src/models/AuthProvider.entity";
-import { Game } from "@src/models/Game.entity";
-import { GameHistory } from "@src/models/GameHistory.entity";
-import { Players } from "@src/models/RemotePlayers";
-import { Round } from "@src/models/Round.entity";
-import { Tournaments } from "@src/models/Tournament.entity";
-import { User } from "@src/models/User.entity";
-import { UserStats } from "@src/models/UserStat";
+import { AuthProvider } from "../models/AuthProvider.entity";
+import { Game } from "../models/Game.entity";
+import { GameHistory } from "../models/GameHistory.entity";
+import { Players } from "../models/RemotePlayers";
+//import { Round } from "../models/Round.entity";
+import { Tournaments } from "../models/Tournament.entity";
+import { User } from "../models/User.entity";
+import { UserStats } from "../models/UserStat";
 import { DataSource, EntityNotFoundError, EntityTarget, ObjectLiteral } from "typeorm";
 type DatabaseParams = {
 	type: "sqlite" | "mysql";
@@ -22,7 +22,7 @@ static databasesConfigs: DatabasesConfigs = {
 	myDb: {
 	  type: "sqlite",
 	  database: "./data/myDb.sqlite",
-	  entities: [User, AuthProvider ,Game, GameHistory,Tournaments,Round,UserStats,Players],// Entités TypeORM
+	  entities: [User, AuthProvider ,Game, GameHistory,Tournaments/* ,Round */,UserStats,Players],// Entités TypeORM
 	  synchronize: true,
 	  logging: false,
 	//  migrations: ["src/migrations/*.ts"], // npx typeorm migration:generate -n MigrationName && (npx typeorm migration:run || npx typeorm migration:revert)

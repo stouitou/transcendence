@@ -65,13 +65,20 @@ export const fetchProfileData = async (): Promise<any |void> => {
 
 
 export const logoutUser = async (): Promise<void> => {
-    await fetch(`/api/auth/logout`, {
+    const response = await fetch(`/api/auth/logout`, {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json'
         },
 		body: JSON.stringify({  })
     });
+    if (response.ok) {
+        const profileData = await response.json();
+        console.log('Logout successful:', profileData);
+    }
+    else {
+        throw new Error('Failed to logout');
+    }
 }
 
 export type LoginProvider = 'google' | 'github' | '42api';

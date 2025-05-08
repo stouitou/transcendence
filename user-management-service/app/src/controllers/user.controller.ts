@@ -1,5 +1,5 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import  UserRepository  from '@src/repository/User.repository';
+import  UserRepository  from '../repository/User.repository';
 import { Param } from '@prisma/client/runtime/library';
 
 import { pipeline } from 'node:stream';
@@ -7,7 +7,7 @@ import fs  from 'node:fs';
 import { promisify } from 'util';
 import path from 'node:path';
 import { createWriteStream } from 'node:fs';
-import { UserStats } from '@src/models/User';
+import { UserStats } from '../models/User';
 const pump = promisify(pipeline);
 
 export type User = {

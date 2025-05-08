@@ -42,8 +42,8 @@ cp -R /node_modules /app
 	# Install only production dependencies
 	npm install --omit=dev
 	# Build the application
-	exec npm run build
+	 npm run build
     log "$GREEN" "INFO" "Démarrage de l'application en mode production..."
     # Start the application  
-    exec npm start
+    exec npm run start 
   fi

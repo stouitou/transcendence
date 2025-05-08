@@ -3,7 +3,7 @@ import { Entity, PrimaryGeneratedColumn, Column, OneToOne, JoinColumn, UpdateDat
 import { GameHistory } from "./GameHistory.entity";
 import { User } from "./User.entity";
 import { Tournaments } from "./Tournament.entity";
-import { Round } from "./Round.entity";
+//import { Round } from "./Round.entity";
 
 @Entity()
 export class Game {
@@ -35,10 +35,17 @@ export class Game {
   @JoinColumn()
   players: User[];
 
+  @Column({ type: "int", default: 0 }) //en attente, en cours, terminee
+  currentRound: number;
+  //chaque partie a plusieurs joueurs
+  @ManyToOne(() => Tournaments, {onDelete: "CASCADE",/*  cascade: true , onUpdate: 'CASCADE', */ nullable: true  })
+  @JoinColumn()
+  tournament: Tournaments;
   //chaque partie a un ou aucun round
-  @ManyToOne(() => Round, (rounds) => rounds.games, { /* cascade: true , */ onUpdate: 'CASCADE'  })
-  @JoinColumn() //Utile?
-  rounds: Round;
+  //a effacer
+  //@ManyToOne(() => Round, (rounds) => rounds.games, { /* cascade: true , */ onUpdate: 'CASCADE'  })
+  //@JoinColumn() //Utile?
+  //rounds: Round;
 
   @CreateDateColumn()
   created_at: Date;
@@ -54,8 +61,8 @@ export class Game {
   @Column({ type: "text", default: "classic" }) //classic, tournement
   format: string;
 
-  //si local, les players sont un tableau de displaynames
+/*   //si local, les players sont un tableau de displaynames
   @Column({ type: "simple-array", nullable:true}) 
-  local_players: string[];
+  local_players: string[]; */
 }
 

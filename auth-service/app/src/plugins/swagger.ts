@@ -4,8 +4,7 @@ import swaggerUI from "@fastify/swagger-ui";
 import { getEnvVariable } from "../utils/getEnvVariable";
 
 export async function registerSwagger(app: FastifyInstance) {
-  const host:string = getEnvVariable("BACKEND_SERVER_NAME_API");
-  const port:string = getEnvVariable("BACKEND_SERVER_SSH_PORT");
+  const BACKEND_SERVER_URL:string = getEnvVariable("BACKEND_SERVER_URL");
   // configuration de Swagger
   await app.register(swagger, {
     openapi: {
@@ -29,7 +28,7 @@ export async function registerSwagger(app: FastifyInstance) {
           bearerAuth: [],
         },
       ],
-	  servers: [{ url: `https://${host}:${port}` }],
+	  servers: [{ url: `${BACKEND_SERVER_URL}` }],
     },
   });
 

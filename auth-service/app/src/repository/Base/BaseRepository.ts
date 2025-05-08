@@ -6,7 +6,7 @@ import { IParams } from "../helpers";
  * role : Centralise les URLs de la DB
  */
 export abstract class BaseRepository<T> {
-  protected SQLITE_DATABASE_URL = DATABASE_CONFIG.SQLITE_DATABASE_URL;
+  protected SQLITE_DATABASE_URL =   DATABASE_CONFIG.SQLITE_DATABASE_URL;
   protected DATABASE_NAME: string;
   protected TABLE: string;
   protected RELATION_TABLE: string[];

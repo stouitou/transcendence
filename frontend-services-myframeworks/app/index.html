@@ -9,13 +9,25 @@
   <script >
     // On page load or when changing themes, best to add inline in `head` to avoid FOUC
     if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
-        document.documentElement.classList.add('dark');
+      console.log('dark',window.matchMedia('(prefers-color-scheme: dark)').matches)  
+      document.documentElement.classList.add('dark');
+      localStorage.setItem('color-theme', 'dark');
     } else {
+      console.log('light',window.matchMedia('(prefers-color-scheme: dark)').matches)
         document.documentElement.classList.remove('dark')
+        localStorage.setItem('color-theme', 'light');
     }
 </script>
-<script  type="module" src="https://localhost:4433/frontend-pong-module/app/src/component/classic.ts"></script>
-<script  type="module" src="https://localhost:4433/frontend-pong-module/app/src/component/tournamentGame.ts"></script>
+<script type="module">
+  const VITE_BACKEND_SERVER_URL = import.meta.env.VITE_BACKEND_SERVER_URL || 'https://localhost:4433';
+    const script = document.createElement('script');
+    script.type = 'module';
+    script.src = `${VITE_BACKEND_SERVER_URL}/frontend-pong-module/components.js`;
+    document.head.appendChild(script);
+    script.onload = () => {
+      console.log('Modules chargés dynamiquement depuis :', VITE_BACKEND_SERVER_URL);
+    };
+</script>
 
 </head>
   <div id="app">

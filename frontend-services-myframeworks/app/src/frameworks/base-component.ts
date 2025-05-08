@@ -52,6 +52,7 @@ export abstract class BaseComponentShadowRoot<TState = {}> extends HTMLElement {
 
 export abstract class BaseComponent<TState = {}> extends HTMLElement {
   protected state: TState;
+  private _attachedEvents: { event: string; handler: EventListener }[] = [];
 
   constructor(initialState: TState) {
     super();
@@ -75,6 +76,7 @@ export abstract class BaseComponent<TState = {}> extends HTMLElement {
   // Fonction pour attacher les écouteurs d'événements Globaux
   listenCustomEvent(event: string, handler: EventListener) {
      document.addEventListener(event, handler);
+     this._attachedEvents.push({ event, handler });
   }
 
   // Fonction à surcharger pour le rendu
@@ -89,6 +91,13 @@ export abstract class BaseComponent<TState = {}> extends HTMLElement {
   // Cycle de vie : Appelé lorsque le composant est retiré du DOM
   disconnectedCallback() {
     // Nettoyage si nécessaire
+   // console.log('DisconnectedCallback: Cleaning up events length', this._attachedEvents.length);
+    this._attachedEvents.forEach(({ event, handler }) => {
+      document.removeEventListener(event, handler);
+    });    
+    this._attachedEvents = [];
+   // console.log('DisconnectedCallback: Events cleaned up');
+  
   }
 
   // Cycle de vie : Appelé lorsqu'un attribut est modifié
@@ -101,6 +110,7 @@ export abstract class BaseComponent<TState = {}> extends HTMLElement {
     const target = element.querySelector(selector);
     if (target) {
       target.addEventListener(event, handler);
+      this._attachedEvents.push({ event, handler });
     }
   }
 }

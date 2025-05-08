@@ -5,7 +5,7 @@ COPY ./app/package*.json ./
 
 # Create and change to the app directory
 WORKDIR /app
-RUN npm install -g npm@11.2.0
+RUN npm install -g npm@11.3.0
 RUN npm install 
 
 RUN chown -R node:node /app

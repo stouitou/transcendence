@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { TournamentsController } from "@src/controllers/tournaments.controller";
+import { TournamentsController } from "../controllers/tournaments.controller";
 
 
 
@@ -73,15 +73,17 @@ async function gameRoutes(app: FastifyInstance) {
   app.get("/", {/* preHandler: [loggerMiddleware], *//* schema: UserSchema.getTournaments */}, tounamentsController.getTournaments);
   app.get("/:id",/*  {schema: UserSchema.getTournamentById} ,*/ tounamentsController.getTournamentById);
   app.put("/:id"/* , {schema: UserSchema.updateUser} */, tounamentsController.updateTournament);
-  app.put("/:id/addPlayer"/* , {schema: UserSchema.updateUser} */, tounamentsController.addPlayerToTournament);
+ // app.put("/:id/addPlayer"/* , {schema: UserSchema.updateUser} */, tounamentsController.addPlayerToTournament);
   //closeregistration and generate 1rst round
-  app.put("/:id/closeRegistration"/* , {schema: UserSchema.updateUser} */, tounamentsController.closeRegistrationsAndGenerateFirstRound);
+ // app.put("/:id/closeRegistration"/* , {schema: UserSchema.updateUser} */, tounamentsController.closeRegistrationsAndGenerateFirstRound);
   //generate next round
   app.put("/:id/generateNextRound"/* , {schema: UserSchema.updateUser} */, tounamentsController.generateNextRound);
   app.delete("/:id",/*  {schema: UserSchema.deleteTournament}, */ tounamentsController.deleteTournament);
  // app.post("/query", {schema: UserSchema.requestQuery}, tounamentsController.requestQuery);
   //pour tester les users
-  app.post("/"/* , {schema: UserSchema.createTournament } */, tounamentsController.createTournament);
+  app.post("/:type/:format/normal"/* , {schema: UserSchema.createGame } */, tounamentsController.createTournamentForLoby);
+//  app.post("/create/:type/:format", tounamentsController.createTournamentForLoby);
+ // app.post("/"/* , {schema: UserSchema.createTournament } */, tounamentsController.createTournament);
 
 }
 

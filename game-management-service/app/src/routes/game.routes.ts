@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { GameController } from "@src/controllers/game.controller";
+import { GameController } from "../controllers/game.controller";
 
 
 
@@ -71,6 +71,7 @@ async function gameRoutes(app: FastifyInstance) {
 
 
   app.get("/", {/* preHandler: [loggerMiddleware], *//* schema: UserSchema.getGames */}, gameController.getGames);
+  app.get("/pagination", {/* preHandler: [loggerMiddleware], *//* schema: UserSchema.getGames */}, gameController.getGamesByQuery);
   app.get("/:id",/*  {schema: UserSchema.getGameById} ,*/ gameController.getGameById);
   app.put("/:id"/* , {schema: UserSchema.updateUser} */, gameController.updateGame);
   app.delete("/:id",/*  {schema: UserSchema.deleteGame}, */ gameController.deleteGame);

@@ -4,7 +4,7 @@ FROM node:23-alpine
 COPY ./app/package*.json ./
 RUN apk add --no-cache xdg-utils
 
-RUN npm install -g npm@11.2.0
+RUN npm install -g npm@11.3.0
 RUN npm install
 
 # Create and change to the app directory

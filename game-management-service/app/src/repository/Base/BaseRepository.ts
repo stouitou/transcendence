@@ -5,7 +5,7 @@ import { IParams } from "../helpers";
  * BaseRepository - Abstract class
  * role : Centralise les URLs de la DB
  */
-export abstract class BaseRepository<T> {
+export abstract class BaseRepository<T, C = Partial<T>> {
   protected SQLITE_DATABASE_URL = DATABASE_CONFIG.SQLITE_DATABASE_URL;
   protected DATABASE_NAME: string;
   protected TABLE: string;
@@ -25,7 +25,7 @@ export abstract class BaseRepository<T> {
     return this.RELATION_TABLE;
   }
 
-  abstract create(entity: Partial<T>): Promise<T>;
+  abstract create(entity: C): Promise<T>;
   abstract getAll(): Promise<T[]>;
   abstract getById(id: number): Promise<T | null>;
   abstract getByParams(params: any): Promise<T[] | null>;//@TODO any or Partial<T>
@@ -46,4 +46,20 @@ export abstract class BaseRepository<T> {
     
       return `?${encodeFilter(params)}`;
     };
+
+   buildQueryString(params: IParams): string {
+    const searchParams = new URLSearchParams();
+    
+    for (const key in params) {
+      if (params[key] !== undefined && params[key] !== null) {
+      if (key === "filters" && Array.isArray(params[key])) {
+        // Encoder les filtres complexes en JSON
+        searchParams.append(key, encodeURIComponent(JSON.stringify(params[key])));
+      } else {
+        searchParams.append(key, String(params[key]));
+      }
+      }
+    }
+      return searchParams.toString();
+    }
 }

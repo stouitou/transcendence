@@ -14,82 +14,10 @@ export class Dashboard extends BaseComponent<{ user: User | null,tournamentsData
 	constructor() {
 		super({ user: null, tournamentsData: [] });
 	  }
-  
-/* 	quelques données de test
-	constructor() {
-	  super();
-	  this.tournamentsData =   [
-		{
-		  id: 1,
-		  state: "Terminé",
-		  created_at: new Date(),
-		  updated_at: new Date(),
-		  winner: { id: 101, name: "Alice", avatar: "", role: "Joueur", games: null, tournaments: null, created_at: "", updated_at: "" },
-		  rounds: [
-			{
-			  id: 1,
-			  state: "Fini",
-			  current: 1,
-			  created_at: new Date(),
-			  updated_at: new Date(),
-			  games: [
-				{
-				  id: 1001,
-				  difficulty: "Moyen",
-				  state: "Terminé",
-				  created_at: "",
-				  gameHistory: { id: 5001, score1: 10, player1: 101, score2: 8, player2: 102, created_at: "", updated_at: "" }
-				}
-			  ]
-			}
-		  ]
-		},
-		{
-			id: 2,
-			state: "Terminé",
-			created_at: new Date(),
-			updated_at: new Date(),
-			winner: { id: 101, name: "Alice", avatar: "", role: "Joueur", games: null, tournaments: null, created_at: "", updated_at: "" },
-			rounds: [
-			  {
-				id: 1,
-				state: "Fini",
-				current: 0,
-				created_at: new Date(),
-				updated_at: new Date(),
-				games: [
-				  {
-					id: 1001,
-					difficulty: "Moyen",
-					state: "Terminé",
-					created_at: "",
-					gameHistory: { id: 5001, score1: 10, player1: 101, score2: 8, player2: 102, created_at: "", updated_at: "" }
-				  }
-				]
-			  }, {
-				id: 2,
-				state: "Fini",
-				current: 1,
-				created_at: new Date(),
-				updated_at: new Date(),
-				games: [
-				  {
-					id: 1001,
-					difficulty: "Moyen",
-					state: "Terminé",
-					created_at: "",
-					gameHistory: { id: 5001, score1: 10, player1: 101, score2: 8, player2: 102, created_at: "", updated_at: "" }
-				  }
-				]
-			  }
-			]
-		  }
-	  ];
-	 // this.attachShadow({ mode: 'open' });
-	} */
+
   
   connectedCallback() {
-	super.connectedCallback();
+	//super.connectedCallback();
 	this.state.user = UserContext().user();
 	if (this.state.user) {
 		this.state.tournamentsData = this.state.user.tournaments || [];

@@ -1,8 +1,8 @@
-import { loginUser,LoginData, fetchProfileData } from '../services/authService.ts';
-import { BaseComponent } from "../frameworks/base-component.ts";
-import GlobalState, { UserContext } from "../globalstate/GlobalState.ts";
-import { RouterConfig } from '../router/Router.ts';
-import { LoginProvider } from '../components/login-provider-component.ts';
+import { loginUser,LoginData, fetchProfileData } from '../services/authService';
+import { BaseComponent } from "../frameworks/base-component";
+import GlobalState, { UserContext } from "../globalstate/GlobalState";
+import { RouterConfig } from '../router/Router';
+import { LoginProvider } from '../components/login-provider-component';
 type LoginState = {
   email: string;
   password: string;

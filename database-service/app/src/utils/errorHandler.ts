@@ -1,5 +1,5 @@
 
-import { CustomEntityNotFoundError, CustomIdNotFoundError, DatabaseNotFoundError } from "@src/config/Databases";
+import { CustomEntityNotFoundError, CustomIdNotFoundError, DatabaseNotFoundError } from "../config/Databases";
 import { 
 	EntityNotFoundError,
 	QueryFailedError,

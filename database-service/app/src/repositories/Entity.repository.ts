@@ -1,4 +1,4 @@
-import { CustomEntityNotFoundError } from "@src/config/Databases";
+import { CustomEntityNotFoundError } from "../config/Databases";
 import { Repository, DeepPartial, FindManyOptions, FindOneOptions, ObjectLiteral, EntityTarget, DataSource, EntityMetadata } from "typeorm";
 
 
@@ -29,6 +29,17 @@ export class EntityRepository<T extends ObjectLiteral> {
       relations,
     } as FindManyOptions<T>);
   }
+   // 📌 🔍 Trouver tous les éléments avec relations optionnelles
+   async findAllAndCount(options?: { limit?: number; offset?: number; order?: "ASC" | "DESC"; relations?: string[] }): Promise<[T[],number]> {
+    const { limit, offset, order, relations = [] } = options || {};
+    return this.repo.findAndCount({
+      where: {} as any,
+      order: order ? { id: order } as any : undefined,
+      take: limit,
+      skip: offset,
+      relations,
+    } as FindManyOptions<T>);
+  }
 
   // 📌 🔍 Trouver un élément par ID avec relations optionnelles
   async findById(id: number, relations: string[] = []): Promise<T | null> {
@@ -40,6 +51,18 @@ export class EntityRepository<T extends ObjectLiteral> {
   async findByParams(params: Partial<T>, options?: { limit?: number; offset?: number; order?: "ASC" | "DESC"; relations?: string[] }): Promise<T[]> {
     const { limit, offset, order, relations = [] } = options || {};
     return this.repo.find({
+      where: params as any,
+      order: order ? { id: order } as any : undefined,
+      take: limit,
+      skip: offset,
+      relations,
+    } as FindManyOptions<T>);
+  }
+
+  // 📌 🔍 Trouver un élément avec des filtres avancés
+  async findByParamsAndCount(params: Partial<T>, options?: { limit?: number; offset?: number; order?: "ASC" | "DESC"; relations?: string[] })/* : Promise<[T[], number]> */ {
+    const { limit, offset, order, relations = [] } = options || {};
+    return await  this.repo.findAndCount({
       where: params as any,
       order: order ? { id: order } as any : undefined,
       take: limit,

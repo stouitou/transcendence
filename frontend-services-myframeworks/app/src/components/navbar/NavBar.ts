@@ -1,8 +1,9 @@
-import { BaseComponent } from "../../frameworks/base-component.ts";
-import { User, UserContext } from "../../globalstate/GlobalState.ts";
-import { Logout } from "../button/logout-btn.ts";
-import { MessageBtn } from "../button/message-btn.ts";
-import { DropdownProfile } from "../DropdownProfile.ts";
+import { BaseComponent } from "../../frameworks/base-component";
+import { User, UserContext } from "../../globalstate/GlobalState";
+import { fetchProfileData } from "../../services/authService.js";
+import { Logout } from "../button/logout-btn";
+import { MessageBtn } from "../button/message-btn";
+import { DropdownProfile } from "../DropdownProfile";
 
 if (!customElements.get('logout-btn'))
 customElements.define('logout-btn', Logout);
@@ -13,16 +14,27 @@ if (!customElements.get('dropdown-porfile-component')) {
   customElements.define('dropdown-porfile-component', DropdownProfile);
 }
 
+
 /**
  * Composant de barre de navigation
  */
 export class NavBarComponent extends BaseComponent<{ theme: string,user: User | null,islogged:boolean }> {
     
+/*   async firstLoad(){
+    try {
+      const profileData = await fetchProfileData();
+      UserContext().setUser(profileData);
+    }
+    catch (error) {
+        console.error('Error fetching profile data:', error);
+    } 
+  } */
   constructor() { super({ theme: 'light',user:null, islogged:false }); }
 
     connectedCallback() {
-      super.connectedCallback();
+      //super.connectedCallback();
       this.state.user = UserContext().user();
+     // this.firstLoad();
       this.render();
       document.addEventListener('profile-data-updated', (e: Event) => {
         const customEvent = e as CustomEvent;
@@ -72,6 +84,10 @@ export class NavBarComponent extends BaseComponent<{ theme: string,user: User | 
                     </a>
                     <a href="/game" class="nav-link">
                       Game	
+                    </a>
+
+                    <a href="/game-loby" class="nav-link">
+                    game-loby	test
                     </a>
 
                      ${!user ?`

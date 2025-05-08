@@ -2,6 +2,7 @@ import "reflect-metadata";
 import { Entity, PrimaryGeneratedColumn, Column, ManyToOne, OneToOne, JoinColumn } from "typeorm";
 import { User } from "./User.entity";
 import { GameHistory } from "./GameHistory.entity";
+import { Tournaments } from "./Tournament.entity";
 
 @Entity()
 export class Players {
@@ -26,4 +27,12 @@ export class Players {
   @ManyToOne(() =>  (User),{ nullable: true, onUpdate: 'CASCADE', eager:true })
   @JoinColumn()
   user: User;
+
+    //is IA
+  @Column({ type: "boolean", default: false }) //true si IA 
+  is_IA: boolean;
+
+/*   @ManyToOne(() =>  (Tournaments),{ nullable: true, onUpdate: 'CASCADE', eager:true })
+  @JoinColumn()
+  tournament: Tournaments; */
 }

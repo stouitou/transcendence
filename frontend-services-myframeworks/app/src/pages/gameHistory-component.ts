@@ -1,49 +1,147 @@
-import { BaseComponent } from "../frameworks/base-component.ts";
-import { Game, User, UserContext } from "../globalstate/GlobalState.ts";
+import { BaseComponent } from "../frameworks/base-component";
+import { Game, User, UserContext } from "../globalstate/GlobalState";
+import { getGames, MetaPagination } from "../services/api";
 
 
 export class GameHistory extends BaseComponent<{ user: User | null,
-	 localGame: Game[] | null,
-	remoteGame: Game[] | null,}> {
+	//games: Game[] | null,
+	localGame: Game[] | null,
+	remoteGame: Game[] | null,
+	metaPagination:{localGame: MetaPagination| null, remoteGame: MetaPagination| null} }> {
   constructor() {
-	super({ user: null, localGame: null, remoteGame: null });
+	super({ user: null,/* games:null, */ localGame: null, remoteGame: null,metaPagination:{localGame: null, remoteGame: null} });
   }
 
   connectedCallback() {
-	super.connectedCallback();
+	//super.connectedCallback();
 	this.state.user = UserContext().user();
-	this.setFilteredGames(this.state.user?.games?? null);
+	getGames({limit:10},{type:"remote"}).then((data) => {
+		if (!data) return;
+		const {games,meta} = data;
+		console.log('getGames(remote).then((data) games', games);
+	  if (games) {
+		
+		//this.state.games = {...this.state.games,...games};
+	//	this.state.games = games;
+		this.state.metaPagination.remoteGame= meta;
+		this.state.remoteGame = games//.filter((game) => game.type === 'remote');
+		//this.state.games = {...this.state.games, ...this.state.remoteGame};
+		this.render();
+		}
+	}).catch((e) =>console.error(e));
+	getGames({limit:10},{type:"local"}).then((data) => {
+		if (!data) return;
+		const {games,meta} = data;
+		console.log('getGames(local).then((data) games', games);
+	  if (games) {
+		//this.state.games = {...this.state.games,...games};
+		//this.state.games = games;
+		this.state.metaPagination.localGame = meta;
+		this.state.localGame = games//.filter((game) => game.type === 'local');
+		this.render();
+		}
+	}).catch((e) =>console.error(e));
+	//console.log('localGame', this.state.localGame);
+	//this.setFilteredGames(this.state.user?.games?? null);
 	this.render();
-	document.addEventListener('profile-data-updated', (e: Event) => {
+	/* document.addEventListener('profile-data-updated', (e: Event) => {
 	  const customEvent = e as CustomEvent;
 	  console.log('profile-data-updated event received');
 	  this.state.user = customEvent.detail.profileData;
 	  this.setFilteredGames(this.state.user?.games?? null);
 	  this.render();
-	});
+	}); */
   }
 
-  setFilteredGames(games: Game[]| null) {
-	if (!games) return;
-	const localGame = games.filter((game) => game.type === 'local');
-	const remoteGame = games.filter((game) => game.type === 'remote');
-	this.setState({ ...this.state, localGame, remoteGame });
-	  }
 
 
   setUser(user: User) {
 	this.setState({ ...this.state, user });
   }
 
+  determinePageCount(offset:number,pagination: MetaPagination):{ currentPage: number, pageCount: number } {
+	const { limit, total } = pagination;
+	const pageCount = Math.ceil(total / limit);
+	const currentPage = Math.floor(offset / limit) + 1;
+	return { currentPage, pageCount };
+	
+  }
+  generatePagination(currentPage: number, pageCount: number,type:string): string {
+	let paginationHTML = '';
+  
+	// Bouton "Précédent"
+	paginationHTML += `
+	  <li  data-page="${currentPage - 1}" data-type="${type}" class="paginator">
+		<div class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+		   data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>
+		  <span class="sr-only">Previous</span>
+		  <svg class="w-3 h-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+			<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4"/>
+		  </svg>
+		</div>
+	  </li>
+	`;
+  
+	// Boutons pour chaque page
+	for (let i = 1; i <= pageCount; i++) {
+	  paginationHTML += `
+		<li  data-page="${i}"  data-type="${type}" class="paginator">
+		  <div class="flex items-center justify-center px-4 h-10 leading-tight ${
+			i === currentPage
+			  ? 'text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white'
+			  : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white'
+		  }" data-page="${i}">
+			${i}
+		  </div>
+		</li>
+	  `;
+	}
+  
+	// Bouton "Suivant"
+	paginationHTML += `
+	  <li  data-page="${currentPage + 1}"  data-type="${type}" class="paginator">
+		<div class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
+		   data-page="${currentPage + 1}" ${currentPage === pageCount ? 'disabled' : ''}>
+		  <span class="sr-only">Next</span>
+		  <svg class="w-3 h-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
+			<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
+		  </svg>
+		</div>
+	  </li>
+	`;
+  
+	return paginationHTML;
+  }
   render() {
-	const { user , localGame, remoteGame} = this.state;
+	const { user , localGame, remoteGame,metaPagination} = this.state;
 
 	if (user) {
 		console.log('game', user.games);
+		const localPagination = metaPagination.localGame
+		? this.generatePagination(
+			this.determinePageCount(metaPagination.localGame.offset, metaPagination.localGame).currentPage,
+			this.determinePageCount(0, metaPagination.localGame).pageCount,
+			"local"
+		  )
+		: '';
+  
+	  const remotePagination = metaPagination.remoteGame
+		? this.generatePagination(
+			this.determinePageCount(metaPagination.remoteGame.offset, metaPagination.remoteGame).currentPage,
+			this.determinePageCount(0, metaPagination.remoteGame).pageCount,
+			"remote"
+		  )
+		: '';
 	  this.innerHTML = `
 		
         <div class="mx-auto p-6 text-center">
-              <h2 class="text-3xl font-bold text-center mb-6 ">Game History Local</h2>
+              <h2 class="text-3xl font-bold text-center mb-6 ">Game History Local ${this.state.metaPagination.localGame?.total||0}</h2>
+				<nav aria-label="Page navigation ">
+					<ul class="flex items-center -space-x-px h-10 text-base">
+						${ localPagination}
+					</ul>
+				</nav>
+			
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
@@ -76,7 +174,12 @@ export class GameHistory extends BaseComponent<{ user: User | null,
 
 
 		        <div class="mx-auto p-6 text-center">
-              <h2 class="text-3xl font-bold text-center mb-6 ">Game History Remote</h2>
+              <h2 class="text-3xl font-bold text-center mb-6 ">Game History Remote ${this.state.metaPagination.remoteGame?.total||0}</h2>
+			  				<nav aria-label="Page navigation ">
+					<ul class="flex items-center -space-x-px h-10 text-base">
+						${ remotePagination}
+					</ul>
+				</nav>
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
         <thead class="text-xs text-gray-700 uppercase bg-gray-50 dark:bg-gray-700 dark:text-gray-400">
             <tr>
@@ -130,7 +233,7 @@ export class GameHistory extends BaseComponent<{ user: User | null,
 			  const target = e.currentTarget as HTMLElement;
 			   const id = target.getAttribute('data-id');
 			  if (!id) return;		 
-			 const game = this.state.user?.games?.find(t => t.id === Number(id));
+			 const game = this.state.localGame?.find(t => t.id === Number(id))|| this.state.remoteGame?.find(t => t.id === Number(id));
 			 if (!game) return;
 			 // Créer un nouvel élément <tr>
 			 const newRow = document.createElement('tr');
@@ -156,21 +259,39 @@ export class GameHistory extends BaseComponent<{ user: User | null,
 			}});
 		  });
 
-		
+		  this.querySelectorAll('.paginator').forEach((button) => {
+			button.addEventListener('click', (e: Event) => {
+			  e.preventDefault();
+			  console.log('paginator click');
+			  const target = e.currentTarget as HTMLElement;
+			  const page = Number(target.getAttribute('data-page'));
+			  const type = target.getAttribute('data-type');
+			  console.log('page', page);
+			  if (!page || page < 1) return;
+			  if (!type) return;		  
+			  // Charger les données pour la page sélectionnée
+			  getGames({ limit: 10, offset: (page - 1) * 10 }, { type: type }).then((data) => {
+				if (!data) return;
+				const { games, meta } = data;
+				if (type === 'remote') {
+				  this.state.metaPagination.remoteGame = meta;
+				  this.state.remoteGame = games;
+				}
+				if (type === 'local') {
+				  this.state.metaPagination.localGame = meta;
+				  this.state.localGame = games;
+				}
+				this.render();
+			  });
+			});
+		  });
 	  return;
 	}
 	this.innerHTML = `not user //@TODO: add loading spinner or redirect`;
   }
 
   gameDetailsView = (game:Game) => {
-	let victory:number|null = null;
-	if (game?.gameHistory)
-		{
-			if ( game?.gameHistory.score1 >  game?.gameHistory.score2 ) victory = game?.gameHistory.player1;
-			if ( game?.gameHistory.score2 > game?.gameHistory.score1 ) victory = game?.gameHistory.player2;
-			if ( game?.gameHistory.score1 ===  game?.gameHistory.score2 ) victory = null;
-		}
-	console.log('game', game);
+	console.log('gameDetailsView', game);
 	return (`
 	<tr data-id="${game.id}" class="gameRow border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
 	
@@ -199,8 +320,8 @@ export class GameHistory extends BaseComponent<{ user: User | null,
 		</td>
 		<td class="px-6 py-4">
 			<div class="flex items-center">
-					<div class=${`h-2.5 w-2.5 rounded-full  ${victory === this.state.user?.id ? 'bg-green-500 ' : ''}`}></div>
-					<span>${victory === this.state.user?.id?"ME":victory?`User-${victory}`:"" }</span>
+					<div class="h-2.5 w-2.5 rounded-full  bg-green-500"></div>
+					<span>${game.gameHistory?.winner??""}</span>
 				
 			</div>
 		</td>

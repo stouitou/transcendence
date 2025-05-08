@@ -1,8 +1,7 @@
-import { LitElement, html, css } from 'lit';
+import { LitElement, css } from 'lit';
 import { customElement, property } from 'lit/decorators.js';
 import { Player } from '../entities/Player.js';
 import { Match } from '../entities/Match.js';
-import { createGameDatabase, updateStateGameDatabase } from '../utils/databaseGame.js';
 import { Bot } from '../entities/Bot.js';
 
 // Export 'game-component' as a tagname in HTML
@@ -96,7 +95,7 @@ export class  classic extends LitElement {
 
   // Get the first player from the API
   // TODO For the moment, we get him with id 1, in the future, we will get him with the id of the user logged in
-  private async createPlayer () : Promise<Player> {
+/*   private async createPlayer () : Promise<Player> {
       const url: string = 'https://localhost:4433/api/user/me';  // URL adress of the API
 
       try {
@@ -114,7 +113,7 @@ export class  classic extends LitElement {
         console.error('Error while creating player: ', error);
         return new Player({name: 'Host', role: 'user', level: 1});                           // Backup value for the player if the API call fails
       }
-  }
+  } */
 
   private async createGame (players: Player[]) : Promise<void> {
   //  createGameDatabase(players, 'classic');

@@ -5,11 +5,12 @@
  * -- Permet de changer facilement de DB sans modifier le code des services.
  */
 import  { IParams } from "../repository/helpers";
-import { Game } from "../models/Game";
+import { Game, GameCreate } from "../models/Game";
 import { IRepository } from "./Base/IRepository";
 import { BaseRepository } from "./Base/BaseRepository";
-import { User } from "@src/models/User";
-import { Players } from "@src/models/GameHistory";
+import { User } from "../models/User";
+import { Players } from "../models/GameHistory";
+import { UrlSearchParams } from "@src/utils/BuildOptions";
 
 /**
  * GameRepository - Gestion des appels HTTP à la DB
@@ -27,18 +28,18 @@ import { Players } from "@src/models/GameHistory";
  * -- update() : Met à jour un utilisateur
  * -- delete() : Supprime un utilisateur
  */
-class GameRepository extends BaseRepository<Game> implements IRepository<Game>  {
+class GameRepository extends BaseRepository<Game,GameCreate> implements IRepository<Game,GameCreate>  {
   //constructor : initialise:
   // - le nom de la DB 
   // - le nom de la table,
   // - les relations (nom des propriétés liées à d'autres tables)
   constructor() {
-    super("myDb", "game", ["tournaments", "players", "gameHistory"]);
+    super("myDb", "game", [/* "tournaments",  */"players", "gameHistory","gameHistory.players"]);
   }
   //create
-  create = async (game: Partial<Game>): Promise<Game> => {
+  create = async (game: Partial<GameCreate>): Promise<Game> => { 
     const {/*  authProviders, */ id, ...gameExtracted } = game;
-    const response = await fetch(this.URL, {
+    const response = await fetch(this.URL+this.getRelations(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -65,6 +66,36 @@ class GameRepository extends BaseRepository<Game> implements IRepository<Game>  
     return `?relations=${this.RELATIONS.join("&relations=")}`;
   };
 
+  /**
+   * 
+   * @returns "data": [
+    { "id": 1, "name": "User 1" },
+    { "id": 2, "name": "User 2" },
+    { "id": 3, "name": "User 3" }
+  ],
+  "meta": {
+    "total": 200,
+    "page": 1,
+    "limit": 5,
+    "totalPages": 40
+  }
+   */
+  getAllbyQuery = async (query:IParams): Promise<Game[]> =>{
+  const queryPagination = this.buildQueryString(query);
+    //return data.map(User.fromJSON);
+    const url = `${this.URL}?${queryPagination}`;
+    //const url = `${this.URL}${this.getRelations()}&${queryPagination}`;
+    console.log("🔐 GameRepository.getAll()  --start-- fetch from: ", this.URL)
+    const response = await fetch(url);
+    console.log("🔐 GameRepository.getAll()  --response--",response)
+    const data = await response.json();
+    console.log("🔐 GameRepository.getAll()  --data--",data)
+   // const results = data.data//.map((user: User) => User.fromJSON(user));
+    const results = data//.map((user: User) => User.fromJSON(user));
+    //const results = data.data.map(User.fromJSON);
+    console.log("🔐 GameRepository.getAll()  --results--",results)
+    return {...results};
+  }
   //read
   getAll = async (): Promise<Game[]> =>{
    

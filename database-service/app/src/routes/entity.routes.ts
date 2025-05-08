@@ -1,6 +1,6 @@
 import { FastifyInstance } from "fastify";
 import { EntityController } from "../controllers/Entity.controller";
-import { Schemas } from "@src/schema/entity.schema";
+import { Schemas } from "../schema/entity.schema";
 
 export async function entityRoutes(fastify: FastifyInstance) {
   

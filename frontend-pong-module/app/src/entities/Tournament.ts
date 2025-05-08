@@ -267,6 +267,13 @@ const finishTournament = async (id: number, winner: Player) => {
 		name: winner.name,
 		role: winner.role,
 		level: 0,
+		avatar: 'winner.avatar',
+		created_at: new Date(),
+		updated_at: new Date(),
+		tournaments: [],
+		games: [],
+		rounds: [],
+		friends: []
 	};
 	const body = { winner: user };
 	updateTournamentInDatabase(id, body);

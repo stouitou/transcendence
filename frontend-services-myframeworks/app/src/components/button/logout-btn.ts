@@ -9,9 +9,9 @@ export class Logout extends BaseComponent {
 
   handleSubmitLogout = async (e: Event) => {
     e.preventDefault();
-    console.log('handleSubmitLogout');
+    console.log('btn handleSubmitLogout');
 try {
-  await  logoutUser();
+  await  logoutUser(); 
   UserContext().setUserLogout();
 
 } catch (error) {

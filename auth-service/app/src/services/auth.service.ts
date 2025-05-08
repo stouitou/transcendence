@@ -3,8 +3,8 @@ import { OauthProviderResponse } from "../types/provider.types";
 //import { UserRepository } from "../repository/UserRepository";
 import { User } from "../models/User.models";
 //import { AuthProvider } from "../Entity/AuthProvider.entity";
-//import AuthProviderRepository from "@src/repository/AuthProvider.repository";
-import UserRepository from "@src/repository/User.repository";
+//import AuthProviderRepository from "../repository/AuthProvider.repository";
+import UserRepository from "../repository/User.repository";
 import bcrypt from "bcryptjs"
 
 /**

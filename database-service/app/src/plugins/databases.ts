@@ -1,5 +1,5 @@
 import fp from 'fastify-plugin';
-import { Databases } from '@src/config/Databases';
+import { Databases } from '../config/Databases';
 
 
 declare module "fastify" {

@@ -5,11 +5,11 @@
  * -- Permet de changer facilement de DB sans modifier le code des services.
  */
 import  { IParams } from "./helpers";
-import { Tournaments } from "../models/Tournaments";
+import { Tournaments, TournamentsCreate } from "../models/Tournaments";
 import { IRepository } from "./Base/IRepository";
 import { BaseRepository } from "./Base/BaseRepository";
-import { User } from "@src/models/User";
-import { Round } from "@src/models/Round";
+import { User } from "../models/User";
+import { Round } from "../models/Round";
 
 /**
  * TournamentsRepository - Gestion des appels HTTP à la DB
@@ -27,16 +27,19 @@ import { Round } from "@src/models/Round";
  * -- update() : Met à jour un utilisateur
  * -- delete() : Supprime un utilisateur
  */
-class TournamentsRepository extends BaseRepository<Tournaments> implements IRepository<Tournaments>  {
+class TournamentsRepository extends BaseRepository<Tournaments,TournamentsCreate> implements IRepository<Tournaments,TournamentsCreate>  {
   //constructor : initialise:
   // - le nom de la DB 
   // - le nom de la table,
   // - les relations (nom des propriétés liées à d'autres tables)
   constructor() {
-    super("myDb", "tournaments", [/* "games", */ "players","rounds"]);
+    super("myDb", "tournaments", ["games","players","winner"/* ,"rounds" */]);
   }
   //create
-  create = async (game: Partial<Tournaments>): Promise<Tournaments> => {
+  create = async (game: TournamentsCreate): Promise<Tournaments> => {
+    if (!game.players) {
+      throw new Error("Players are required to create a tournament");
+    }
     const {/*  authProviders, */ id, ...gameExtracted } = game;
     const response = await fetch(this.URL, {
       method: "POST",
@@ -84,7 +87,7 @@ class TournamentsRepository extends BaseRepository<Tournaments> implements IRepo
  getById= async (id: number): Promise<Tournaments | null> => {
       
     //const url = `${this.URL}/id/${id}?relations=players&relations=rounds&relations=rounds.games&relations=rounds.games.players`;//{this.getRelations()}
-    const url = `${this.URL}/id/${id}?relations=players&relations=rounds&relations=rounds.games&relations=rounds.games.players`;//{this.getRelations()}
+    const url = `${this.URL}/id/${id}?relations=players&relations=games&relations=games.players&relations=winner`;//{this.getRelations()}
     console.log("🔐 TournamentsRepository.getById()  --url--",url)
     const response = await fetch(url);
     const  result  = await response.json();
@@ -206,8 +209,10 @@ class TournamentsRepository extends BaseRepository<Tournaments> implements IRepo
     //4- ajouter le joueur
     roundsIds.push(RoundId);
     //5- mettre à jour le tournoi
+    //const url = `${this.URL}/id/${id}?relations=players&relations=rounds&relations=rounds.games&relations=rounds.games.players`;//{this.getRelations()}
 
-    const response = await fetch(`${this.URL}/id/${tournamentsId}`, {
+   // const response = await fetch(url);
+    const response = await fetch(`${this.URL}/id/${tournamentsId}?relations=players&relations=games&relations=games.players&relations=games.gameHistory`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -217,7 +222,7 @@ class TournamentsRepository extends BaseRepository<Tournaments> implements IRepo
       }),
     });
     const data = await response.json();
-    console.log("🔐 TournamentsRepository.addRound()  --data--",data)
+    console.log("🔐create TournamentsRepository.addRound()  --data--",data)
     return data.data;
   }
 

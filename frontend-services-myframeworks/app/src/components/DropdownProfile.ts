@@ -15,19 +15,24 @@ export class DropdownProfile extends BaseComponent<{ isDrop: boolean, avatar: st
   setName() {
     this.state.name = this.state.user?.name || "no login";
   }
+  /**
+   * @description set the event listener (Global) for the custom event
+   */
+  private wsProfileListener = (e: Event) => {
+    const customEvent = e as CustomEvent;
+          console.log('profile-data-updated event received',customEvent.detail);
+          this.state.user = customEvent.detail.profileData;
+          this.setAvatar();
+          this.setName();
+          this.render();
+  }
+
   connectedCallback() {
         this.state.user = UserContext().user();
         this.setAvatar();
         this.setName();
         this.render();
-        document.addEventListener('profile-data-updated', (e: Event) => {
-          const customEvent = e as CustomEvent;
-          console.log('profile-data-updated event received');
-          this.state.user = customEvent.detail.profileData;
-          this.setAvatar();
-          this.setName();
-          this.render();
-        });
+        this.listenCustomEvent('profile-data-updated', this.wsProfileListener);
   };
 
 
@@ -84,7 +89,7 @@ export class DropdownProfile extends BaseComponent<{ isDrop: boolean, avatar: st
                 <a href="/profile" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">profile</a>
             </li>
             <li id="logoutBtn">
-                <a href="#" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign out</a>
+                <a href="/" class="block px-4 py-2 text-sm text-gray-700 hover:bg-gray-100 dark:hover:bg-gray-600 dark:text-gray-200 dark:hover:text-white">Sign out</a>
             </li>
             </ul>
        </div>
@@ -108,7 +113,7 @@ export class DropdownProfile extends BaseComponent<{ isDrop: boolean, avatar: st
       e.preventDefault();
       console.log('handleSubmitLogout');
       try {
-        await  logoutUser();
+        await  logoutUser(); 
         UserContext().setUserLogout();      
       } catch (error) {
         console.error('logoutUser failed:', error);

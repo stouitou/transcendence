@@ -1,6 +1,6 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import  GameHistoryRepository  from '@src/repository/GameHistory.repository';
-import { GameHistoryBody } from '@src/models/GameHistory';
+import  GameHistoryRepository  from '../repository/GameHistory.repository';
+import { GameHistoryBody } from '../models/GameHistory';
 
 export class GameHistoryController {
   private gameHistoryRepository = new GameHistoryRepository();

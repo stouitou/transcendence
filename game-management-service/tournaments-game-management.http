@@ -1,28 +1,101 @@
 ### get All Tournament
 GET  https://localhost:4433/api/game-management-service/tournaments HTTP/1.1
+### get All Tournament
 
+
+POST  https://localhost:4433/api/game-management-service/tournaments/create/local/classic HTTP/1.1
+Content-Type: application/json
+
+{
+  "state": "en attente",
+  "type": "local",
+  "format": "classic",
+  "max_players": 4,
+  "players": [3, 1,5],
+"configPlayers": {
+  "players": [
+    {
+      "type":"remote",
+      "avatar":null,
+      "display_name":"player1",
+      "score":0,
+      "user":3
+      },
+     {
+      "type":"remote",
+      "avatar":null,
+      "display_name":"player2",
+      "score":0,
+      "user":1
+     // "is_IA":true
+      },
+     {
+      "type":"remote",
+      "avatar":null,
+      "display_name":"player3",
+      "score":0,
+      "user":5
+     // "is_IA":true
+      }
+    ]
+}
+}
+### get a tournament 5
+### get a tournament 5
+GET  https://localhost:4433/api/v2/database/myDb/table/tournaments/id/67?relations=players&relations=games&relations=games.players&relations=games.gameHistory HTTP/1.1
 ### create a tournament
 //optional (default value): "difficulty": 1
 //optional (default value): "state": "en attente"
 //optional (default value): "mode": "normal"
 //created_at and updated_at are automatically set
-POST  https://localhost:4433/api/game-management-service/tournaments HTTP/1.1
-authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6ImphY2siLCJyb2xlIjoidXNlciIsImxldmVsIjoxLCJhdmF0YXIiOiJ1cGxvYWRzLzMtYXZhdGFydGVzdC5qcGciLCJjcmVhdGVkX2F0IjoiMjAyNS0wMy0xNFQxMTo0OToyMC40NDFaIiwidXBkYXRlZF9hdCI6IjIwMjUtMDMtMTdUMTA6NTc6MTAuMDAwWiIsImlhdCI6MTc0MjIyODQ5OSwiZXhwIjoxNzQyMjY0NDk5fQ.BLV-sRHswGUTP6ngiOtEM2ZSb0P3nRvN0hmgga72EHKDcjBLYUnSF8q83Spslasq506npkbWXC-39ztmjG1rQdaZHh6QtYsnP9zWGkc6qbbP3gfLDKI-41EbLQFTmlrMZOpdjk-UVNx95_mD1JH2tg2L4QvAE4CeELwYVpjlHuqgclSoA8Y4Ra7NdVdsHoE3gWg2Hex6GQX2JwEvX3Lk7u4f7St0Nspsw224fI9SZLB50qJUFB51iSwwSqXcVK3GyEuoWIKPJR-JtLjzTvU1LrYQbKsonluPTjwG9vsB8HDClUsv6UpG8CmrqaIKesPwKvL5rhRo-RwanMw8gmCDB5VbHQ0RScFIY6w7XJ6hP69_TgfmYTNhQWjZ2ORa8If2MGNE29hweIYoQeNtLudGmHMQPo6gHibLabdZ0K7wZWueCdXWFBd5t0ns2PhxWhes1Y7-r40QLz7KsigZwaGWjW52Te9wTVBb39lb6EVjHGepHs1QhneObWLfmQo0flM9ZN8fY-T9qbTLEH45ea7Ka2IAy0ivqappg7aD6NL3a4tn1HMbhqbaOeYXI6lOQiwICFis6PNSxJ4Uf09GXVkuluEmi2FlJcwDhDyj3XA5H9-mJsgUEjj2SQUfx0HLxH3bsi32XiOzQbTImTRkzq2Z_ejEqdsruIc3fRGd68YkjEQ
+POST  https://localhost:4433/api/v2/database/myDb/table/tournaments?relations=players&relations=games&relations=games.players&relations=games.gameHistory HTTP/1.1
+authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Nywicm9sZSI6InVzZXIiLCJuYW1lIjoiYnVzdGVycyBCIiwiYXZhdGFyIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSTg1Szl5Sk5ZT3JSODZ6V0VwRmpLaHpXZG9BMEhoN1lNSkN3U1NxNC1QMlU0eDhnPXM5Ni1jIiwiaWF0IjoxNzQ2NDc4MTI5LCJleHAiOjE3NDY1MTQxMjl9.NLAoEZ0y0ADF2EfZSGpKlDOR6oAtQgpR-rTJVHr8Ptc3z12hm67ZZ4MIoIItGISgZ8QVjy5es6NGZJtW-G90zFhRuUXi_souml5d_esEJc4Oz2ZbKOSGKaVohnIY6eMKrEKaNmAT-UXBikxNddslbtwSr-_IKG6AVcxWsyiBbhUEhrL-FHzpQcOzPxLzmAXfEsKcBtOc0gxia3P5nxb1PNz_wG7W-nikXh2CfUK2Akj1F13PfPBmmRPC2ApDBWPSIjvDQ0OA3afpHMlzs9pg7SnZMv1e2kiXTcRf7LzlHNf99ASK9X_m93trtsPYeuZGjeuZQkceZg_dQBxRY-viSsThmmHQrvs9ksaxy0VBohHRlK--S7oHgK9aZcG81S_r9aIPdn-1jA_FBc0RXGQTAuID2VNwSITDQJxiG670EhuuE4aG1UMcQnuPwskI_XJUsWIc9P7_jIJSJ2hxWM4ljRV5JEHUuP1nxLM0wD0wLJwYJ2rHF7WrYvBQLiiABlGPeRhD5JA43e6mIX5-qgmVcTd8uLzoJzFC0QaXyWfcKvR3ZLSkUSAN2i_zr_vyH-wDPZQbxG3oiOFgvQYDmOAt0BdMNH7qiaFDOHUwLI1mh61hnj_Jtej8jSDZPhL9Oga_1X2Otg6-HVvN8-VKcqbJ-ZgwP0b04BqkAbjIVh4RJKI
 Content-Type: application/json
 
 {
+  "players":[1,2]
+}
+### on cree les games pour le tournois
+//  "tournament":{"id":4,"currentRound":1},// met a jour tournoi
+// ou   "tournament":4, 
+POST  https://localhost:4433/api/v2/database/myDb/table/game?relations=tournament HTTP/1.1
+authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Nywicm9sZSI6InVzZXIiLCJuYW1lIjoiYnVzdGVycyBCIiwiYXZhdGFyIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSTg1Szl5Sk5ZT3JSODZ6V0VwRmpLaHpXZG9BMEhoN1lNSkN3U1NxNC1QMlU0eDhnPXM5Ni1jIiwiaWF0IjoxNzQ2NDc4MTI5LCJleHAiOjE3NDY1MTQxMjl9.NLAoEZ0y0ADF2EfZSGpKlDOR6oAtQgpR-rTJVHr8Ptc3z12hm67ZZ4MIoIItGISgZ8QVjy5es6NGZJtW-G90zFhRuUXi_souml5d_esEJc4Oz2ZbKOSGKaVohnIY6eMKrEKaNmAT-UXBikxNddslbtwSr-_IKG6AVcxWsyiBbhUEhrL-FHzpQcOzPxLzmAXfEsKcBtOc0gxia3P5nxb1PNz_wG7W-nikXh2CfUK2Akj1F13PfPBmmRPC2ApDBWPSIjvDQ0OA3afpHMlzs9pg7SnZMv1e2kiXTcRf7LzlHNf99ASK9X_m93trtsPYeuZGjeuZQkceZg_dQBxRY-viSsThmmHQrvs9ksaxy0VBohHRlK--S7oHgK9aZcG81S_r9aIPdn-1jA_FBc0RXGQTAuID2VNwSITDQJxiG670EhuuE4aG1UMcQnuPwskI_XJUsWIc9P7_jIJSJ2hxWM4ljRV5JEHUuP1nxLM0wD0wLJwYJ2rHF7WrYvBQLiiABlGPeRhD5JA43e6mIX5-qgmVcTd8uLzoJzFC0QaXyWfcKvR3ZLSkUSAN2i_zr_vyH-wDPZQbxG3oiOFgvQYDmOAt0BdMNH7qiaFDOHUwLI1mh61hnj_Jtej8jSDZPhL9Oga_1X2Otg6-HVvN8-VKcqbJ-ZgwP0b04BqkAbjIVh4RJKI
+Content-Type: application/json
+
+{
+  "currentRound": 1,
+  "tournament":{"id":4,"currentRound":1},
+  "players": [2],
+  "gameHistory": {
+    "players": [
+      {
+        "type":"remote",
+        "avatar":null,
+        "display_name":"meTest",
+        "user":2
+      },
+      {
+        "type":"remote",
+        "avatar":null,
+        "display_name":"IA",
+        "user":null
+      }
+    ],
+    "winner":"meTest"
+  }
+
 }
 ### add player to a tournament
-PUT  https://localhost:4433/api/game-management-service/tournaments/24/addPlayer HTTP/1.1
-authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6ImphY2siLCJyb2xlIjoidXNlciIsImxldmVsIjoxLCJhdmF0YXIiOiJ1cGxvYWRzLzMtYXZhdGFydGVzdC5qcGciLCJjcmVhdGVkX2F0IjoiMjAyNS0wMy0xNFQxMTo0OToyMC40NDFaIiwidXBkYXRlZF9hdCI6IjIwMjUtMDMtMTdUMTA6NTc6MTAuMDAwWiIsImlhdCI6MTc0MjIyODQ5OSwiZXhwIjoxNzQyMjY0NDk5fQ.BLV-sRHswGUTP6ngiOtEM2ZSb0P3nRvN0hmgga72EHKDcjBLYUnSF8q83Spslasq506npkbWXC-39ztmjG1rQdaZHh6QtYsnP9zWGkc6qbbP3gfLDKI-41EbLQFTmlrMZOpdjk-UVNx95_mD1JH2tg2L4QvAE4CeELwYVpjlHuqgclSoA8Y4Ra7NdVdsHoE3gWg2Hex6GQX2JwEvX3Lk7u4f7St0Nspsw224fI9SZLB50qJUFB51iSwwSqXcVK3GyEuoWIKPJR-JtLjzTvU1LrYQbKsonluPTjwG9vsB8HDClUsv6UpG8CmrqaIKesPwKvL5rhRo-RwanMw8gmCDB5VbHQ0RScFIY6w7XJ6hP69_TgfmYTNhQWjZ2ORa8If2MGNE29hweIYoQeNtLudGmHMQPo6gHibLabdZ0K7wZWueCdXWFBd5t0ns2PhxWhes1Y7-r40QLz7KsigZwaGWjW52Te9wTVBb39lb6EVjHGepHs1QhneObWLfmQo0flM9ZN8fY-T9qbTLEH45ea7Ka2IAy0ivqappg7aD6NL3a4tn1HMbhqbaOeYXI6lOQiwICFis6PNSxJ4Uf09GXVkuluEmi2FlJcwDhDyj3XA5H9-mJsgUEjj2SQUfx0HLxH3bsi32XiOzQbTImTRkzq2Z_ejEqdsruIc3fRGd68YkjEQ
+PUT  https://localhost:4433/api/game-management-service/tournaments/3/addPlayer HTTP/1.1
+authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Nywicm9sZSI6InVzZXIiLCJuYW1lIjoiYnVzdGVycyBCIiwiYXZhdGFyIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSTg1Szl5Sk5ZT3JSODZ6V0VwRmpLaHpXZG9BMEhoN1lNSkN3U1NxNC1QMlU0eDhnPXM5Ni1jIiwiaWF0IjoxNzQ2NDc4MTI5LCJleHAiOjE3NDY1MTQxMjl9.NLAoEZ0y0ADF2EfZSGpKlDOR6oAtQgpR-rTJVHr8Ptc3z12hm67ZZ4MIoIItGISgZ8QVjy5es6NGZJtW-G90zFhRuUXi_souml5d_esEJc4Oz2ZbKOSGKaVohnIY6eMKrEKaNmAT-UXBikxNddslbtwSr-_IKG6AVcxWsyiBbhUEhrL-FHzpQcOzPxLzmAXfEsKcBtOc0gxia3P5nxb1PNz_wG7W-nikXh2CfUK2Akj1F13PfPBmmRPC2ApDBWPSIjvDQ0OA3afpHMlzs9pg7SnZMv1e2kiXTcRf7LzlHNf99ASK9X_m93trtsPYeuZGjeuZQkceZg_dQBxRY-viSsThmmHQrvs9ksaxy0VBohHRlK--S7oHgK9aZcG81S_r9aIPdn-1jA_FBc0RXGQTAuID2VNwSITDQJxiG670EhuuE4aG1UMcQnuPwskI_XJUsWIc9P7_jIJSJ2hxWM4ljRV5JEHUuP1nxLM0wD0wLJwYJ2rHF7WrYvBQLiiABlGPeRhD5JA43e6mIX5-qgmVcTd8uLzoJzFC0QaXyWfcKvR3ZLSkUSAN2i_zr_vyH-wDPZQbxG3oiOFgvQYDmOAt0BdMNH7qiaFDOHUwLI1mh61hnj_Jtej8jSDZPhL9Oga_1X2Otg6-HVvN8-VKcqbJ-ZgwP0b04BqkAbjIVh4RJKI
 Content-Type: application/json
 
 {
   "playerId": "1"
 }
 ### add player to a tournament
-PUT  https://localhost:4433/api/game-management-service/tournaments/24/addPlayer HTTP/1.1
-authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6ImphY2siLCJyb2xlIjoidXNlciIsImxldmVsIjoxLCJhdmF0YXIiOiJ1cGxvYWRzLzMtYXZhdGFydGVzdC5qcGciLCJjcmVhdGVkX2F0IjoiMjAyNS0wMy0xNFQxMTo0OToyMC40NDFaIiwidXBkYXRlZF9hdCI6IjIwMjUtMDMtMTdUMTA6NTc6MTAuMDAwWiIsImlhdCI6MTc0MjIyODQ5OSwiZXhwIjoxNzQyMjY0NDk5fQ.BLV-sRHswGUTP6ngiOtEM2ZSb0P3nRvN0hmgga72EHKDcjBLYUnSF8q83Spslasq506npkbWXC-39ztmjG1rQdaZHh6QtYsnP9zWGkc6qbbP3gfLDKI-41EbLQFTmlrMZOpdjk-UVNx95_mD1JH2tg2L4QvAE4CeELwYVpjlHuqgclSoA8Y4Ra7NdVdsHoE3gWg2Hex6GQX2JwEvX3Lk7u4f7St0Nspsw224fI9SZLB50qJUFB51iSwwSqXcVK3GyEuoWIKPJR-JtLjzTvU1LrYQbKsonluPTjwG9vsB8HDClUsv6UpG8CmrqaIKesPwKvL5rhRo-RwanMw8gmCDB5VbHQ0RScFIY6w7XJ6hP69_TgfmYTNhQWjZ2ORa8If2MGNE29hweIYoQeNtLudGmHMQPo6gHibLabdZ0K7wZWueCdXWFBd5t0ns2PhxWhes1Y7-r40QLz7KsigZwaGWjW52Te9wTVBb39lb6EVjHGepHs1QhneObWLfmQo0flM9ZN8fY-T9qbTLEH45ea7Ka2IAy0ivqappg7aD6NL3a4tn1HMbhqbaOeYXI6lOQiwICFis6PNSxJ4Uf09GXVkuluEmi2FlJcwDhDyj3XA5H9-mJsgUEjj2SQUfx0HLxH3bsi32XiOzQbTImTRkzq2Z_ejEqdsruIc3fRGd68YkjEQ
+PUT  https://localhost:4433/api/game-management-service/tournaments/3/addPlayer HTTP/1.1
+authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Nywicm9sZSI6InVzZXIiLCJuYW1lIjoiYnVzdGVycyBCIiwiYXZhdGFyIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSTg1Szl5Sk5ZT3JSODZ6V0VwRmpLaHpXZG9BMEhoN1lNSkN3U1NxNC1QMlU0eDhnPXM5Ni1jIiwiaWF0IjoxNzQ2NDc4MTI5LCJleHAiOjE3NDY1MTQxMjl9.NLAoEZ0y0ADF2EfZSGpKlDOR6oAtQgpR-rTJVHr8Ptc3z12hm67ZZ4MIoIItGISgZ8QVjy5es6NGZJtW-G90zFhRuUXi_souml5d_esEJc4Oz2ZbKOSGKaVohnIY6eMKrEKaNmAT-UXBikxNddslbtwSr-_IKG6AVcxWsyiBbhUEhrL-FHzpQcOzPxLzmAXfEsKcBtOc0gxia3P5nxb1PNz_wG7W-nikXh2CfUK2Akj1F13PfPBmmRPC2ApDBWPSIjvDQ0OA3afpHMlzs9pg7SnZMv1e2kiXTcRf7LzlHNf99ASK9X_m93trtsPYeuZGjeuZQkceZg_dQBxRY-viSsThmmHQrvs9ksaxy0VBohHRlK--S7oHgK9aZcG81S_r9aIPdn-1jA_FBc0RXGQTAuID2VNwSITDQJxiG670EhuuE4aG1UMcQnuPwskI_XJUsWIc9P7_jIJSJ2hxWM4ljRV5JEHUuP1nxLM0wD0wLJwYJ2rHF7WrYvBQLiiABlGPeRhD5JA43e6mIX5-qgmVcTd8uLzoJzFC0QaXyWfcKvR3ZLSkUSAN2i_zr_vyH-wDPZQbxG3oiOFgvQYDmOAt0BdMNH7qiaFDOHUwLI1mh61hnj_Jtej8jSDZPhL9Oga_1X2Otg6-HVvN8-VKcqbJ-ZgwP0b04BqkAbjIVh4RJKI
 Content-Type: application/json
 
 {
@@ -30,7 +103,7 @@ Content-Type: application/json
 }
 ### add player to a tournament
 PUT  https://localhost:4433/api/game-management-service/tournaments/24/addPlayer HTTP/1.1
-authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6ImphY2siLCJyb2xlIjoidXNlciIsImxldmVsIjoxLCJhdmF0YXIiOiJ1cGxvYWRzLzMtYXZhdGFydGVzdC5qcGciLCJjcmVhdGVkX2F0IjoiMjAyNS0wMy0xNFQxMTo0OToyMC40NDFaIiwidXBkYXRlZF9hdCI6IjIwMjUtMDMtMTdUMTA6NTc6MTAuMDAwWiIsImlhdCI6MTc0MjIyODQ5OSwiZXhwIjoxNzQyMjY0NDk5fQ.BLV-sRHswGUTP6ngiOtEM2ZSb0P3nRvN0hmgga72EHKDcjBLYUnSF8q83Spslasq506npkbWXC-39ztmjG1rQdaZHh6QtYsnP9zWGkc6qbbP3gfLDKI-41EbLQFTmlrMZOpdjk-UVNx95_mD1JH2tg2L4QvAE4CeELwYVpjlHuqgclSoA8Y4Ra7NdVdsHoE3gWg2Hex6GQX2JwEvX3Lk7u4f7St0Nspsw224fI9SZLB50qJUFB51iSwwSqXcVK3GyEuoWIKPJR-JtLjzTvU1LrYQbKsonluPTjwG9vsB8HDClUsv6UpG8CmrqaIKesPwKvL5rhRo-RwanMw8gmCDB5VbHQ0RScFIY6w7XJ6hP69_TgfmYTNhQWjZ2ORa8If2MGNE29hweIYoQeNtLudGmHMQPo6gHibLabdZ0K7wZWueCdXWFBd5t0ns2PhxWhes1Y7-r40QLz7KsigZwaGWjW52Te9wTVBb39lb6EVjHGepHs1QhneObWLfmQo0flM9ZN8fY-T9qbTLEH45ea7Ka2IAy0ivqappg7aD6NL3a4tn1HMbhqbaOeYXI6lOQiwICFis6PNSxJ4Uf09GXVkuluEmi2FlJcwDhDyj3XA5H9-mJsgUEjj2SQUfx0HLxH3bsi32XiOzQbTImTRkzq2Z_ejEqdsruIc3fRGd68YkjEQ
+authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Nywicm9sZSI6InVzZXIiLCJuYW1lIjoiYnVzdGVycyBCIiwiYXZhdGFyIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSTg1Szl5Sk5ZT3JSODZ6V0VwRmpLaHpXZG9BMEhoN1lNSkN3U1NxNC1QMlU0eDhnPXM5Ni1jIiwiaWF0IjoxNzQ2NDc4MTI5LCJleHAiOjE3NDY1MTQxMjl9.NLAoEZ0y0ADF2EfZSGpKlDOR6oAtQgpR-rTJVHr8Ptc3z12hm67ZZ4MIoIItGISgZ8QVjy5es6NGZJtW-G90zFhRuUXi_souml5d_esEJc4Oz2ZbKOSGKaVohnIY6eMKrEKaNmAT-UXBikxNddslbtwSr-_IKG6AVcxWsyiBbhUEhrL-FHzpQcOzPxLzmAXfEsKcBtOc0gxia3P5nxb1PNz_wG7W-nikXh2CfUK2Akj1F13PfPBmmRPC2ApDBWPSIjvDQ0OA3afpHMlzs9pg7SnZMv1e2kiXTcRf7LzlHNf99ASK9X_m93trtsPYeuZGjeuZQkceZg_dQBxRY-viSsThmmHQrvs9ksaxy0VBohHRlK--S7oHgK9aZcG81S_r9aIPdn-1jA_FBc0RXGQTAuID2VNwSITDQJxiG670EhuuE4aG1UMcQnuPwskI_XJUsWIc9P7_jIJSJ2hxWM4ljRV5JEHUuP1nxLM0wD0wLJwYJ2rHF7WrYvBQLiiABlGPeRhD5JA43e6mIX5-qgmVcTd8uLzoJzFC0QaXyWfcKvR3ZLSkUSAN2i_zr_vyH-wDPZQbxG3oiOFgvQYDmOAt0BdMNH7qiaFDOHUwLI1mh61hnj_Jtej8jSDZPhL9Oga_1X2Otg6-HVvN8-VKcqbJ-ZgwP0b04BqkAbjIVh4RJKI
 Content-Type: application/json
 
 {
@@ -38,23 +111,23 @@ Content-Type: application/json
 }
 ### add player to a tournament
 PUT  https://localhost:4433/api/game-management-service/tournaments/1/addPlayer HTTP/1.1
-authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6ImphY2siLCJyb2xlIjoidXNlciIsImxldmVsIjoxLCJhdmF0YXIiOiJ1cGxvYWRzLzMtYXZhdGFydGVzdC5qcGciLCJjcmVhdGVkX2F0IjoiMjAyNS0wMy0xNFQxMTo0OToyMC40NDFaIiwidXBkYXRlZF9hdCI6IjIwMjUtMDMtMTdUMTA6NTc6MTAuMDAwWiIsImlhdCI6MTc0MjIyODQ5OSwiZXhwIjoxNzQyMjY0NDk5fQ.BLV-sRHswGUTP6ngiOtEM2ZSb0P3nRvN0hmgga72EHKDcjBLYUnSF8q83Spslasq506npkbWXC-39ztmjG1rQdaZHh6QtYsnP9zWGkc6qbbP3gfLDKI-41EbLQFTmlrMZOpdjk-UVNx95_mD1JH2tg2L4QvAE4CeELwYVpjlHuqgclSoA8Y4Ra7NdVdsHoE3gWg2Hex6GQX2JwEvX3Lk7u4f7St0Nspsw224fI9SZLB50qJUFB51iSwwSqXcVK3GyEuoWIKPJR-JtLjzTvU1LrYQbKsonluPTjwG9vsB8HDClUsv6UpG8CmrqaIKesPwKvL5rhRo-RwanMw8gmCDB5VbHQ0RScFIY6w7XJ6hP69_TgfmYTNhQWjZ2ORa8If2MGNE29hweIYoQeNtLudGmHMQPo6gHibLabdZ0K7wZWueCdXWFBd5t0ns2PhxWhes1Y7-r40QLz7KsigZwaGWjW52Te9wTVBb39lb6EVjHGepHs1QhneObWLfmQo0flM9ZN8fY-T9qbTLEH45ea7Ka2IAy0ivqappg7aD6NL3a4tn1HMbhqbaOeYXI6lOQiwICFis6PNSxJ4Uf09GXVkuluEmi2FlJcwDhDyj3XA5H9-mJsgUEjj2SQUfx0HLxH3bsi32XiOzQbTImTRkzq2Z_ejEqdsruIc3fRGd68YkjEQ
+authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Nywicm9sZSI6InVzZXIiLCJuYW1lIjoiYnVzdGVycyBCIiwiYXZhdGFyIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSTg1Szl5Sk5ZT3JSODZ6V0VwRmpLaHpXZG9BMEhoN1lNSkN3U1NxNC1QMlU0eDhnPXM5Ni1jIiwiaWF0IjoxNzQ2NDc4MTI5LCJleHAiOjE3NDY1MTQxMjl9.NLAoEZ0y0ADF2EfZSGpKlDOR6oAtQgpR-rTJVHr8Ptc3z12hm67ZZ4MIoIItGISgZ8QVjy5es6NGZJtW-G90zFhRuUXi_souml5d_esEJc4Oz2ZbKOSGKaVohnIY6eMKrEKaNmAT-UXBikxNddslbtwSr-_IKG6AVcxWsyiBbhUEhrL-FHzpQcOzPxLzmAXfEsKcBtOc0gxia3P5nxb1PNz_wG7W-nikXh2CfUK2Akj1F13PfPBmmRPC2ApDBWPSIjvDQ0OA3afpHMlzs9pg7SnZMv1e2kiXTcRf7LzlHNf99ASK9X_m93trtsPYeuZGjeuZQkceZg_dQBxRY-viSsThmmHQrvs9ksaxy0VBohHRlK--S7oHgK9aZcG81S_r9aIPdn-1jA_FBc0RXGQTAuID2VNwSITDQJxiG670EhuuE4aG1UMcQnuPwskI_XJUsWIc9P7_jIJSJ2hxWM4ljRV5JEHUuP1nxLM0wD0wLJwYJ2rHF7WrYvBQLiiABlGPeRhD5JA43e6mIX5-qgmVcTd8uLzoJzFC0QaXyWfcKvR3ZLSkUSAN2i_zr_vyH-wDPZQbxG3oiOFgvQYDmOAt0BdMNH7qiaFDOHUwLI1mh61hnj_Jtej8jSDZPhL9Oga_1X2Otg6-HVvN8-VKcqbJ-ZgwP0b04BqkAbjIVh4RJKI
 Content-Type: application/json
 
 {
   "playerId": "4"
 }
 ### get a tournament 5
-GET  https://localhost:4433/api/game-management-service/tournaments/1 HTTP/1.1
+GET  https://localhost:4433/api/game-management-service/tournaments/66 HTTP/1.1
 
-### close registration for tournament 5 and generate 1rst round
-PUT  https://localhost:4433/api/game-management-service/tournaments/1/closeRegistration HTTP/1.1
+### close registration for tournament 5 and generate 1rst round //manque round.Game
+PUT  https://localhost:4433/api/game-management-service/tournaments/13/closeRegistration HTTP/1.1
 
 ### get a tournament 5
 GET  https://localhost:4433/api/game-management-service/rounds/1?relations=players HTTP/1.1
 
 ### get a games 18
-GET  https://localhost:4433/api/game-management-service/games/1?relations=players HTTP/1.1
+GET  https://localhost:4433/api/game-management-service/games/66?relations=players HTTP/1.1
 
 
 ### update game 1
@@ -80,7 +153,7 @@ Content-Type: application/json
   "game": {"id":2, "state":"terminee"}
 }
 ### generate next round
-PUT  https://localhost:4433/api/game-management-service/tournaments/1/generateNextRound HTTP/1.1
+PUT  https://localhost:4433/api/game-management-service/tournaments/66/generateNextRound HTTP/1.1
 
 
 
@@ -96,5 +169,9 @@ Content-Type: application/json
   "game": {"id":3 , "state":"terminee"}
 }
 ### generate next round
-PUT  https://localhost:4433/api/game-management-service/tournaments/1/generateNextRound HTTP/1.1
+PUT  https://localhost:4433/api/game-management-service/tournaments/67/generateNextRound HTTP/1.1
 
+
+###
+
+GET https://localhost:4433/api/game-management-service/tournaments/68 HTTP/1.1

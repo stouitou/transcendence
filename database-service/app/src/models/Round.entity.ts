@@ -11,9 +11,9 @@ export class Round {
   id: number;
 
   //chaque Round a plusieurs parties
-  @OneToMany(() => Game, (game) => game.rounds, { cascade: true , onUpdate: 'CASCADE' , nullable: true })
+/*   @OneToMany(() => Game, (game) => game.rounds, { cascade: true , onUpdate: 'CASCADE' , nullable: true })
   @JoinColumn()
-  games: Game[];
+  games: Game[]; */
 
   //etat de la partie
   @Column({ type: "text", default: "en attente" }) //en attente, en cours, terminee
@@ -23,9 +23,9 @@ export class Round {
   current: number;
   
   //chaque Tournoi a plusieurs joueurs
-  @ManyToMany(() => User, (user) => user.rounds, { cascade: true , onUpdate: 'CASCADE' , nullable: true  })
+  @ManyToMany(() => User/* , (user) => user.rounds */, { cascade: true , onUpdate: 'CASCADE' , nullable: true  })
   @JoinColumn()
-  players: User[];
+  players: User[];//@tODO a rename en users
   
   @CreateDateColumn()
   created_at: Date;
@@ -34,16 +34,16 @@ export class Round {
   updated_at: Date;
 
   //chaque round a un tournoi
-  @ManyToOne(() => Tournaments, (tournaments) => tournaments.rounds, { nullable: true, onUpdate: 'CASCADE'/* , eager:true */ })
+/*   @ManyToOne(() => Tournaments, (tournaments) => tournaments.rounds, { nullable: true, onUpdate: 'CASCADE', eager:true })
  // @JoinColumn()//Utile?
-  tournaments: Tournaments;
+  tournaments: Tournaments; */
 
   //mode de la partie : local ou remote
   @Column({ type: "text", default: "local" }) //local, remote
   type: string;
 
   //si local, les players sont un tableau de displaynames
-  @Column({ type: "simple-array", nullable:true }) 
-  local_players: string[];
+/*   @Column({ type: "simple-array", nullable:true }) 
+  local_players: string[]; */
 }
 

@@ -1,21 +1,43 @@
-import { FastifyRequest } from "fastify";
-import { get } from "http";
 import { RawData, WebSocket } from "ws";
-interface WaitingPlayers {
-		userId: string,
+export interface WaitingPlayers {
+		userId: number,//@TODO:  user: number,
 		id: number | null,
-		name: string | null,
+		name: string | null,//@TODO: change to display_name
 		avatar: string | null,
-		state: string | null
-	
+		state: string | null,
+		// state: "waiting" | "playing" | "finished" | "joined" | "left" | "cancelled",
+		isInGame: boolean,
+		isIA: boolean,//@TODO: change to is_IA
+		position?: {
+			x: number,
+			y: number
+		},
+		size?: {width: number, height: number}
+		score?: number,
 }
-interface WebbSocketGame {
+export interface WebSocketGameConfig {
+	type : string,
+	format : string,
+	//gameType: string, // "pong" | "pong2" | "pong3"
+	tournamentId: number | null,
+	maxPlayers: number,
+	isallowedRegistration: boolean, // for friendly game
+	gameId: number,
+	state: string, // "open","waiting" | "playing" | "finished"
+	players: WaitingPlayers[],
+	ball?: {
+		x: number,
+		y: number
+	}
+}
+export interface WebbSocketGame {
 	state : string,
-	waitingPlayers:WaitingPlayers[]
+	//waitingPlayers:WaitingPlayers[],
+	config: WebSocketGameConfig
 }
 // Gestion des utilisateurs connectés
 const clients = new Map<string, WebSocket>();
-const games = new Map<number, WebbSocketGame>();
+const games = new Map<string, WebbSocketGame>();
 
 export const wsService = {
 	clients,
@@ -80,12 +102,18 @@ export const wsService = {
 		return Array.from(clients.keys());
 	},
 
-	addGame: (id: number, game: any) => {
+	addGame: (id: string, game: any) => {
+		try {
         games.set(id, game);
+		}
+		catch (error) {
+			console.error("🟥 Error in addGame",error);
+			throw error;
+		}
     },
 
 	// Supprimer un client
-    removeGame: (id: number) => {
+    removeGame: (id: string) => {
         games.delete(id);
         console.log(`❌ Game ${id} delete`);
     },
@@ -94,31 +122,32 @@ export const wsService = {
 	},
 	notifyIsGames:()=>
 	{
+		console.log("🔒games notify",wsService.getGames());
 		const jsonMessage = JSON.stringify({ type:"games", games:wsService.getGames() });
 		wsService.broadcast(jsonMessage);
 	},
-	getGamebyId: (id: number) => {
+	getGamebyId: (id: string) => {
 		if (games.has(id)) {
 			return games.get(id);
 		}
 	},
-	addWaitingPlayersToGame: (gameId: number, waitingPlayers:WaitingPlayers) => {
+	addWaitingPlayersToGame: (gameId: string, waitingPlayers:WaitingPlayers) => {
 
 		if (games.has(gameId)) {
 			const game = games.get(gameId)!;
 			// Vérifier si le joueur est déjà dans la liste des joueurs en attente
-			const playerExists = game.waitingPlayers.some((player) => player.userId === waitingPlayers.userId);
+			const playerExists = game.config.players.some((player) => player.id === waitingPlayers.id);
 			if (playerExists) {
 				console.log(`Player ${waitingPlayers.userId} already in waitingPlayers`);
 				// Si le joueur existe déjà, on met a jour ses informations
-				const playerIndex = game.waitingPlayers.findIndex((player) => player.userId === waitingPlayers.userId);
-				game.waitingPlayers[playerIndex].state = waitingPlayers.state;
-				game.waitingPlayers[playerIndex].avatar = waitingPlayers.avatar;
-				game.waitingPlayers[playerIndex].name = waitingPlayers.name;
-				game.waitingPlayers[playerIndex].id = waitingPlayers.id;
+				const playerIndex = game.config.players.findIndex((player) => player.userId === waitingPlayers.userId);
+				game.config.players[playerIndex].state = waitingPlayers.state;
+				game.config.players[playerIndex].avatar = waitingPlayers.avatar;
+				game.config.players[playerIndex].name = waitingPlayers.name;
+				game.config.players[playerIndex].id = waitingPlayers.id;
 				return;
 			}
-			game.waitingPlayers.push(waitingPlayers);
+			game.config.players.push(waitingPlayers);
 			games.set(gameId, game);
 		}else {
 			console.log(`waitingPlayers  err`,waitingPlayers);

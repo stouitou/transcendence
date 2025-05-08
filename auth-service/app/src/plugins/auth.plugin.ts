@@ -30,8 +30,9 @@ export async function registerAuthPlugin(app: FastifyInstance) {
 		return data.user/* .id */});
 	
 	// Désérialisation : on récupère les infos de l'utilisateur depuis l'ID stocké
-	fastifyPassport.registerUserDeserializer(async (id:number, request) => {
-    console.log("🔓 Désérialisation de l'utilisateur, ID:", id);
+	fastifyPassport.registerUserDeserializer(async (user:{id:number}, request) => {
+    const id = user.id;
+	//console.log("🔓35 Désérialisation de l'utilisateur, ID:", id);
 	const userRepository = new UserRepository();
     return await userRepository.getById(id);
   });

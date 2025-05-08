@@ -1,15 +1,76 @@
-import { BaseComponent } from "../frameworks/base-component.ts";
-import { Players, User, UserContext } from "../globalstate/GlobalState.ts";
-import { IWebSocketsService } from "../globalstate/WebSocketService.ts";
-import { fetchProfileData } from "../services/authService.ts";
-import { JoinGameComponent, LobyComponent, LobyComponentClient } from "./loby-component.ts";
+import { BaseComponent } from "../frameworks/base-component";
+import { Game, Players, User, UserContext } from "../globalstate/GlobalState";
+import { IWebSocketsService } from "../globalstate/WebSocketService";
+import { fetchProfileData } from "../services/authService";
+import { LobyComponentClient } from "./loby-component";
+class PlayerConfig {
+  id?: number | null;
+  name: string | null;
+  avatar: string | null;
+  state: string | null;
+  isInGame: boolean;
+  isIA: boolean;
+  constructor(id: number | null, name: string | null, avatar: string | null, state: string | null, isInGame: boolean, isIA: boolean) {
+    this.id = id;
+    this.name = name;
+    this.avatar = avatar;
+    this.state = state;
+    this.isInGame = isInGame;
+    this.isIA = isIA;
+  }
+  toJSON() {
+    return {
+      id: this.id,
+      name: this.name,
+      avatar: this.avatar,
+      state: this.state,
+      isInGame: this.isInGame,
+      isIA: this.isIA
+    };
+  }
+}
+class ConfigGame {
+  type: string;
+  format: string;
+  tournamentId: number | null;
+  maxPlayers: number;
+  isallowedRegistration: boolean;
+  gameId: number;
+  state: string;
+  players?: PlayerConfig[];
+  constructor(config:{type: string, format: string, tournamentId: number | null, maxPlayers: number, isallowedRegistration: boolean, gameId: number, state: string, players?: PlayerConfig[]}) {
+    this.type = config.type;
+    this.format = config.format;
+    this.tournamentId = config.tournamentId;
+    this.maxPlayers = config.maxPlayers;
+    this.isallowedRegistration = config.isallowedRegistration;
+    this.gameId = config.gameId;
+    this.state = config.state;
+    this.players = config.players;
+  }
+  toJSON() {
+    return {
+      type: this.type,
+      format: this.format,
+      tournamentId: this.tournamentId,
+      maxPlayers: this.maxPlayers,
+      isallowedRegistration: this.isallowedRegistration,
+      gameId: this.gameId,
+      state: this.state,
+      players: this.players
+    };
+  }
+  sendMessage(socket: IWebSocketsService | null | undefined) {
+    if (!socket) {
+      console.error("WebSocket is not initialized");
+      return;
+    }
+    const message = JSON.stringify({ type: "gameCreate", gameId: this.gameId, config: this });
+    console.log("sendMessage bu ConfigGame", message);
+    socket.sendMessage(message);
+  }
+}
 
-
-if (!customElements.get('lobby-component'))
-customElements.define('lobby-component', LobyComponent);
-
-if (!customElements.get('join-game-component'))
-  customElements.define('join-game-component', JoinGameComponent);
 export class GameSetting extends BaseComponent<{ user: User | null; difficulty: number,type:string,format:string,mode:string,
   max_players: number, players?: Players[] ,ws?: IWebSocketsService | null}> {
   constructor() {
@@ -33,40 +94,21 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
       user: this.state.type === 'remote' ? this.state.user!.id : null,
     }
   };
+  const config = {
+    players: this.state.players,
+    type: this.state.type,
+    format: this.state.format,
+    mode: this.state.mode,
+    max_players: this.state.max_players,
+    isallowedRegistration: true,
+  }
 
-    const result = await fetch(`https://localhost:4433/api/game-management-service/games/${this.state.type}/${this.state.format}/${this.state.mode}`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json',
-      },
-      body: JSON.stringify(data),
-    });
-    if (result.ok) {
-      const data = await result.json();
-      //update user
-        const updateUser = await fetchProfileData();
-        UserContext().setUser(updateUser);
-
-        if (this.state.type === 'remote') {
-          const message = JSON.stringify({ type: "gameCreate",  gameId: data.id ,   name: this.state.user?.name, avatar: this.state.user?.avatar });  
-                 
-          this.state.ws?.sendMessage(message);
-          }
-        //create lobby
-        const lobby = document.querySelector('#lobby') as HTMLElement;
-        if (lobby) {
-/*           const lobbyComponent = document.createElement('lobby-component') as LobyComponentClient;
-          lobbyComponent.data = data.id; */
-          const lobbyComponent = document.createElement('lobby-client-component') as LobyComponent;
-          lobbyComponent.data = Number( data.id);
-          lobby.setAttribute('data-type', "yes");
-          lobby.appendChild(lobbyComponent);
-        }
-       
-    } else {
-      console.error('Error creating game:', result.statusText);
-    }
+  this.state.ws?.sendMessage(JSON.stringify({ type: "gameCreate", gameId: 1, config: config }));
+  return;
+ 
   };
+
+
 
   connectedCallback() {
     super.connectedCallback();
@@ -74,14 +116,18 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     this.state.ws = UserContext().ws();
     this.state.players![0].avatar = this.state.user?.avatar;
     this.state.players![0].display_name = this.state.user?.name;
+    this.state.players![0].user = this.state.user?.id?? null;
+    this.state.players![0].is_IA = false;
     this.render();
+
     document.addEventListener('profile-data-updated', (e: Event) => {
       const customEvent = e as CustomEvent;
       console.log('profile-data-updated event received');
       this.state.user = customEvent.detail.profileData;
       this.state.players![0].avatar = this.state.user?.avatar;
       this.state.players![0].display_name = this.state.user?.name;
-      this.state.players![0].user = this.state.user;
+      this.state.players![0].user = this.state.user?.id?? null;
+      this.state.players![0].is_IA = false;
       this.render();
     });
   }
@@ -341,11 +387,5 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
 
   this.attachEvent(this, '#start-game', 'click', this.handlePost.bind(this));
 
-
-/*   const lobby = this.querySelector('#joinGame') as HTMLElement;
-  if (lobby) {
-    const lobbyComponent = document.createElement('join-game-component');
-    lobby.appendChild(lobbyComponent);
-  } */
   }
 }

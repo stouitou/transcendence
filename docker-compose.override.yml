@@ -32,6 +32,8 @@ services:
     container_name: auth_service
     environment:
       - NODE_ENV=development
+      - BACKEND_SERVER_URL=${BACKEND_SERVER_BASE_URL}
+      - BACKEND_SERVER_WS_URL=${BACKEND_SERVER_BASE_WS_URL}
     depends_on:
       - database-services
     volumes:
@@ -48,6 +50,8 @@ services:
     container_name: user-management-service
     environment:
       - NODE_ENV=development
+      - BACKEND_SERVER_URL=${BACKEND_SERVER_BASE_URL}
+      - BACKEND_SERVER_WS_URL=${BACKEND_SERVER_BASE_WS_URL}
     depends_on:
       - database-services
       - auth_services
@@ -64,6 +68,8 @@ services:
     container_name: game-management-service
     environment:
       - NODE_ENV=development
+      - BACKEND_SERVER_URL=${BACKEND_SERVER_BASE_URL}
+      - BACKEND_SERVER_WS_URL=${BACKEND_SERVER_BASE_WS_URL}
     depends_on:
       - database-services
       - auth_services
@@ -81,6 +87,8 @@ services:
     container_name: ws-service
     environment:
       - NODE_ENV=development
+      - BACKEND_SERVER_URL=${BACKEND_SERVER_BASE_URL}
+      - BACKEND_SERVER_WS_URL=${BACKEND_SERVER_BASE_WS_URL}
     depends_on:
       - database-services
       - auth_services
@@ -112,6 +120,9 @@ services:
     container_name: frontend-services
     environment:
       - NODE_ENV=development
+      - BACKEND_SERVER_NAME=${BACKEND_SERVER_NAME}
+      - VITE_BACKEND_SERVER_URL=${BACKEND_SERVER_BASE_URL}
+      - VITE_BACKEND_SERVER_WS_URL=${BACKEND_SERVER_BASE_WS_URL}
     volumes:
     #  - ./frontend-services/app:/app
     #  - ./frontend-services/app/node_modules:/app/node_modules
@@ -130,6 +141,9 @@ services:
     container_name: frontend-pong-module
     environment:
       - NODE_ENV=development
+      - BACKEND_SERVER_NAME=${BACKEND_SERVER_NAME}
+      - VITE_BACKEND_SERVER_URL=${BACKEND_SERVER_BASE_URL}
+      - VITE_BACKEND_SERVER_WS_URL=${BACKEND_SERVER_BASE_WS_URL}
     volumes:
       - ./frontend-pong-module/app:/app
       - ./frontend-pong-module/app/node_modules:/app/node_modules

@@ -1,13 +1,14 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
-import { wsService } from '@src/services/ws.service';
+import { WaitingPlayers, wsService } from '../services/ws.service';
 import { WebSocket } from "@fastify/websocket"
-import { console } from 'inspector';
-
+import {  LobyFactory } from '../services/LobyFactory';
+import { Player } from '../models/gameClass/Player';
 
 export class WsController {
   constructor() { }
     async ws(socket:WebSocket, req:FastifyRequest) {
-      console.log('req headers',req.headers)
+        //debug env var
+      //  console.log("WebSocket - [WsController]  process.env:", process.env);
       //1- get userId from cookie
       //const userId = req.authenticatedUser?.name || `Guest-${Date.now()}`;
       const id = req.authenticatedUser?.id || null;
@@ -20,8 +21,8 @@ export class WsController {
 
       //4- notify all clients      
      wsService.notifyIsOnline();
-     wsService.notifyIsGames();
-
+     //4 - notify all clients for loby
+    LobyFactory.broadcastCreatedLobyMessage(wsService.clients);
 
 
       /**
@@ -55,25 +56,105 @@ export class WsController {
             console.log("🔒 Message privé de", userId, "à", message.to, ":", message.message);
               wsService.sendToClient(message.to, JSON.stringify({ type: "private", from: userId, message: message.message }));
           }
-          else if (message.type === "gameCreate" && message.gameId) {
-            const gameData = {gameId:message.gameId, state : "open", waitingPlayers:[{userId,id: id, name: message.name, avatar: message.avatar,state:"subscribe"}] };
-            wsService.addGame(message.gameId, gameData);
-            wsService.notifyIsGames();
+          else if (message.type === "gameCreate" && message.gameId && Array.isArray(message.config.players)) {
+           
+            if (!id) {
+              console.error("⚠️ User not authenticated");
+              socket.send(JSON.stringify({ error: "User not authenticated" }));
+              return;
+            }
+
+          const loby = LobyFactory.createLoby()
+          const setPlayers:WaitingPlayers[] = message.config.players.map((player:any,index:number) => ({
+          id: null,
+          name: player.display_name,
+          avatar: player.avatar,
+          state: "subscribe",//player.state,
+          isInGame: false,
+          isIA: player.is_IA,
+          userId: player.user?? -1,//@TODO a verifier
+        }));
+          loby.config.setMode(message.config.mode)
+          .setFormat(message.config.format)
+          .setType(message.config.type)
+          .setIsAllowedRegistration(message.config.isallowedRegistration)
+          .setMaxPlayers(message.config.max_players);
+          loby.playerManager.setPlayers(setPlayers)
+          LobyFactory.broadcastCreatedLobyMessage(wsService.clients);
+          socket.send(JSON.stringify({ type:"SUCCESCREATEGAME", lobyId:loby.lobyId }));
+
+            return;
+          }
+          else if (message.type === "lobyJoined" && message.lobyId) {
+            if (!id) {
+              console.error("⚠️ User not authenticated");
+              socket.send(JSON.stringify({ error: "User not authenticated" }));
+              return;
+            }
+            //le joueur rejoint le loby
+            const game = LobyFactory.getLobyById(message.lobyId);
+            //1-a :  on recupere la game
+            if (!game) {
+              console.error("⚠️ Game not found");
+             // socket.send(JSON.stringify({ type:"startGame", format:message.format,gameId:message.pongId, state: "notfound" }));
+              return;
+            }
+            //1-b : on verifie si la game type == "remote"
+            //anciennement via game.config.<key>
+            if (game.config.type !== "remote") {
+            //if (game.config.type !== "remote") {
+              console.error("⚠️ Game not remote");
+              return;
+            }
+            //1-c : on verifie si la game state == "open"
+            if (game.config.state !== "open") {
+              console.error("⚠️ Game not open");
+              return;
+            }
+            const waitingPlayers = { 
+              userId:id,
+              id: id, 
+              name: message.name, 
+              avatar: message.avatar
+              ,state:"joined",
+              isInGame:false,
+              isIA:false,
+              
+            };
+            const players = new Player(waitingPlayers);
+            game.playerManager.addPlayerToWaitingList(players);
+            LobyFactory.broadcastCreatedLobyMessage(wsService.clients);
 
           }
-          else if (message.type === "gameJoined" && message.gameId) {
-           /* { type: "gameJoined",  gameId: dataID , 
-            waitingPlayers: {id: this.state.user?.id, name: this.state.user?.name, avatar: this.state.user?.avatar},
-            state: "joined" }
-            */
-            const waitingPlayers = { userId,id: id, name: message.name, avatar: message.avatar,state:message.state };
-            wsService.addWaitingPlayersToGame(Number(message.gameId), waitingPlayers);
-            console.log("🔒games ",wsService.getGames());
-            wsService.notifyIsGames();
-          //  wsService.broadcast(JSON.stringify({ ...message  }));
+          else if (message.type === "gameJoined" && message.lobyId) {
+            //le joueur rejoint la partie,
+            //1-a :  on recupere le loby
+         const game = LobyFactory.getLobyById(message.lobyId);
+            if (!game) {
+              console.error("⚠️ Game not found");
+             // socket.send(JSON.stringify({ type:"startGame", format:message.format,gameId:message.pongId, state: "notfound" }));
+              return;
+            }
+            //1-b : on verifie si la game type == "remote"
+            if (game.config.type !== "remote") {
+              console.error("⚠️ Game not remote");
+              return;
+            }
+            //1-c : on verifie si la game state == "open"//@TODO peut etre close registration
+            if (game.config.state !== "open") {
+              console.error("⚠️ Game not open");
+              return;
+            }
 
-
-          }
+            if (game.playerManager.addPlayerFromWaitingList(id)) {
+              console.log("Player added from waiting list");
+               LobyFactory.broadcastCreatedLobyMessage(wsService.clients);
+              return;
+            }
+            console.error("Player not added from waiting list");
+            console.log(`Player ${userId} not in waiting list players`);
+  
+           } 
           else if (message.type === "logout"&& message.userId) {
             console.log("🔒logout from ", message.userId);
           //  wsService.removeClient(userId);
@@ -91,7 +172,6 @@ export class WsController {
             wsService.updateClientId(message.userId, newUserId);
             socket.send(JSON.stringify({ type:"welcome", client:wsService.clients.size, userId:`${newUserId}` }));
             wsService.notifyIsOnline();
-
           }
           else {
               wsService.handleMessage(userId, data);
@@ -120,4 +200,12 @@ export class WsController {
     }
 }
 
-
+export interface Players {
+  id?: number;
+  type: string;
+  is_IA:boolean;
+  avatar?:string;
+  display_name?:string;
+  score:number;
+  user:  number | null;//ou User donc u objet
+}

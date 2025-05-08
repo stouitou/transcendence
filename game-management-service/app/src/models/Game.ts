@@ -1,5 +1,5 @@
 
-import { GameHistory } from "./GameHistory";
+import { GameHistory, GameHistoryCreate } from "./GameHistory";
 import { Tournaments } from "./Tournaments";
 import { User } from "./User";
 
@@ -16,8 +16,9 @@ export class Game{
   //mode de la partie : local ou remote
   type: string;
   //si local, les players sont un tableau de displaynames
-  local_players: string[];
+ // local_players: string[];
   format: string;
+  currentRound: number = 0;
 
  
 	constructor(data: Partial<Game>) {
@@ -29,7 +30,7 @@ export class Game{
     this.players = [];
     this.type = "local";
     this.format = "classic";
-    this.local_players = [];
+   // this.local_players = [];
     Object.assign(this, data);
     this.created_at = new Date(data?.created_at?data.created_at:new Date());
 	  this.updated_at = new Date(data?.updated_at?data.updated_at:new Date());
@@ -39,12 +40,17 @@ export class Game{
 
 
 export type GameCreate = {
-  players: number[];
-  difficulty: number;
+  id?: number;
+  gameHistory?: GameHistoryCreate;
+  difficulty: number;  
+  max_players?: number;
   state: string;
   mode: string;
-  created_at: Date;
-  updated_at: Date;
+  players: number[];
+  currentRound?: number;
+  tournament?: number;
+  type: "local" | "remote";
+  format: "classic" | "tournament" | "normal";
 }
 // 📌 Définition des modèles avec contraintes
 export type GameBody = {
@@ -100,6 +106,10 @@ export const GameCreate: GameModel<GameCreate> = {
   difficulty: 1,
   state: "en attente",
   mode: "normal",
-  created_at: new Date(),
-  updated_at: new Date()
+  currentRound: 0,
+  tournament: undefined,
+  type: "local",
+  format: "classic",
+  gameHistory: undefined,
+  max_players: 4,
 };

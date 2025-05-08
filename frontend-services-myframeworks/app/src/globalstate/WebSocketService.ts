@@ -1,29 +1,60 @@
 import GlobalState from "./GlobalState";
 interface WaitingPlayers {
-  userId: string,
+  userId: number,
   id: number | null,
   name: string | null,
   avatar: string | null,
-  state: string | null
+  state: string | null,
+  // state: "waiting" | "playing" | "finished" | "joined" | "left" | "cancelled",
+  isInGame: boolean,
+  isIA: boolean,
 
 }
-interface WebSocketGame {
-  gameId : string,
+export interface WebSocketGame {
+  //gameId : string,
+  lobyId : string,
 	state : string,
-	waitingPlayers:WaitingPlayers[]
+	//waitingPlayers:WaitingPlayers[],
+  config: {
+    type: string, // "local" | "remote"
+    format: string, // "classic" | "tournament",
+    //gameType: string, // "pong" | "pong2" | "pong3"
+    tournamentId: string | null,
+    maxPlayers: number,
+    isallowedRegistration: boolean, // for friendly game
+    gameId: string,
+    state: string, // "waiting" | "playing" | "finished"
+    players: WaitingPlayers[],
+    waitingList: WaitingPlayers[],
+
+/*     gameStarted: boolean,
+    gameFinished: boolean,
+    gameOver: boolean,
+    gamePaused: boolean,
+    gameResumed: boolean,
+    gameEnded: boolean,
+    gameCancelled: boolean,
+    gameAbandoned: boolean,
+    gameDeleted: boolean,
+    gameCreated: boolean,
+    gameUpdated: boolean,
+    gameStartedAt: string,
+    gameFinishedAt: string, */
+  }
 }
 interface WebSocketGames {
 	type : "games",
-	games:WebSocketGame[]
+	games:Match[]
 }
 export interface IWebSocketsService {
     setUserId: (userId: string) => void;
     setIsOnline: (users: string[]) => void;
     setPrivateMessages: (callback: (prevMessages: WebSocketPrivateReceivedMessage[]) => WebSocketPrivateReceivedMessage[]) => void;
     setWsGames: (callback: (prevMessages: WebSocketGameReceivedMessage[]) => WebSocketGameReceivedMessage[]) => void;
-    wsGames: WebSocketGameReceivedMessage[];
+    wsGames: Match[];
 
    isUserInGamebyId(gameID:number, UserID:number): boolean;
+   isUserInLobybyId(lobyId:string, UserID:number): boolean;
 
     setWsGamesJoined: (usersGamesJoined: WebSocketGameJoinedReceivedMessage[]) => void;
     removeWsGamesJoined: (id: number) => void;
@@ -43,12 +74,46 @@ export type WebSocketPrivateReceivedMessage = {
 	from: string,
 	message: string,
 }
-
+export type Match = {
+  id: string,
+  lobyId: string,
+  players: {id: number;
+  name: string;
+  avatar: string;
+  state: string;
+  isInGame: boolean;
+  isIA: boolean;
+  position: {
+      x: number;
+      y: number;
+  };
+  size: {
+      width: number;
+      height: number;
+  };
+  score: number;
+  paddle: {
+      position: {x: number, y: number};
+      size: {width: number, height: number};
+  };
+}[],
+  ball: {position: {x: number, y: number}},
+  config: {
+    type: string;
+    format: string;
+    tournamentId: string | null;
+    maxPlayers: number;
+    isallowedRegistration: boolean;
+    gameId: string;
+    state: string;
+    players: WaitingPlayers[];
+    waitingList: WaitingPlayers[];
+}
+}
 export type WebSocketGameReceivedMessage = {
 
 	type: "game",
-	gameId: string,
-	state: string,
+  games:Match[]
 }
 
 export type WebSocketGameJoinedReceivedMessage = {
@@ -69,7 +134,7 @@ export class WebSocketsService {
     private _userId: string | null;
     private _isOnline: string[];
     private _privateMessages: WebSocketPrivateReceivedMessage[];
-    private _wsGames: WebSocketGame[];
+    private _wsGames: Match[];
     private _wsGamesJoined: WebSocketGameJoinedReceivedMessage[];
     //this._broadcastChannel = new BroadcastChannel('websocket-channel'); // Crée un canal de communication
   
@@ -88,7 +153,12 @@ export class WebSocketsService {
     }
 
     private _firstLoadWs = () => {
-         this._ws = new WebSocket('wss://localhost:4433/ws');
+
+// const BACKEND_SERVER_PORT = import.meta.env.VITE_BACKEND_SERVER_URL || "https://localhost:4433";
+ 
+ const VITE_BACKEND_SERVER_WS_URL = import.meta.env.VITE_BACKEND_SERVER_WS_URL || 'wss://localhost:4433/ws';
+      console.log(`WebSocketService _firstLoadWs ${VITE_BACKEND_SERVER_WS_URL}`);
+         this._ws = new WebSocket(VITE_BACKEND_SERVER_WS_URL);
          if (!this._ws) {
             console.error('WebSocket is not available');
             return;
@@ -163,6 +233,15 @@ export class WebSocketsService {
               console.log('test', data);
               this.setest(data);
               break; */
+          case 'SUCCESCREATEGAME':
+            document.dispatchEvent(
+              new CustomEvent('SUCCESCREATEGAME', {
+                bubbles: true,
+                composed: true,
+                detail: { ...data },
+              })
+            );
+            break
           default:
             console.warn('Unknown message type:', data.type);
         }
@@ -249,7 +328,7 @@ export class WebSocketsService {
         })
       );
     } */
-    public setWsGames(wsGame: WebSocketGame[]) {
+    public setWsGames(wsGame: Match[]) {
       this._wsGames = [...wsGame];
       document.dispatchEvent(
         new CustomEvent('ws-games', {
@@ -306,6 +385,7 @@ export class WebSocketsService {
 
 // Envoi du message lors du login
   sendLoginMessage =  (id:string) => {
+      console.log('[WEBSOCKET]  sendLoginMessage', { type: "login", userId:this.userId , id});
       if (this._ws && this._ws.readyState === WebSocket.OPEN) {
           const data = JSON.stringify({ type: "login", userId:this.userId , id});
           this._ws.send(data);
@@ -317,6 +397,7 @@ export class WebSocketsService {
   };
 // Envoi du message lors du logout
     sendLogoutMessage =  () => {
+      console.log('[WEBSOCKET] sendLogoutMessage', { type: "logout", userId:this.userId });
       if (!this._ws || this._ws.readyState !== WebSocket.OPEN) {
           console.warn("⚠️ WebSocket pas encore prêt. Ajout du message en attente...");
           setTimeout(this.sendLogoutMessage, 100); // Réessaye après 100ms
@@ -328,14 +409,28 @@ export class WebSocketsService {
 
   //
   public isUserInGamebyId(gameID:number, UserID:number): boolean {
-    const game = this._wsGames.find((game) => Number(game.gameId) === gameID);
+  //  const game = this._wsGames.find((game) => Number(game.config.gameId) === gameID);
+    const game = this._wsGames.find((game) => Number(game.config.gameId) === gameID);
     if (game) {
-      const waitingPlayer = game.waitingPlayers.find((player) => player.id === UserID);
+      const waitingPlayer = game.config.players.find((player) => player.id === UserID);
       console.log("isUserInGamebyId gameID, UserID", gameID, UserID);
       console.log("isUserInGamebyId waitingPlayer", waitingPlayer);
       return waitingPlayer? true : false;
     }
     return false;
-  }
+  };
+  public isUserInLobybyId(lobyId:string, UserID:number): boolean {
+    console.log("isUserInLobybyId lobyId, UserID", lobyId, UserID);
+    console.log("isUserInLobybyId this._wsGames", this._wsGames);
+      const game = this._wsGames.find((game) => (game.lobyId) === lobyId);
+      console.log("isUserInLobybyId game", game);
+      if (game) {
+        const isplayer = game.config.players.find((player) => player.userId === UserID);
+        console.log("isUserInGamebyId lobyId, UserID", lobyId, UserID);
+        console.log("isUserInGamebyId isplayer", isplayer);
+        return isplayer? true : false;
+      }
+      return false;
+    }
 }
 export default WebSocketsService.getInstance();

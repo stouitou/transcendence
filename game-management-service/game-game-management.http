@@ -1,3 +1,79 @@
+### get user1 with relations authProviders
+GET  https://localhost:4433/api/v2/database/myDb/table/game?filters={"type":"remote"} HTTP/1.1
+
+### test upadate gameHistory
+GET https://localhost:4433/api/game-management-service/games/pagination?limit=10&offset=2&filters={"type":"remote"} HTTP/1.1
+Authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6Miwicm9sZSI6InVzZXIiLCJuYW1lIjoibml6YXIgYnJpZ3VpIiwiYXZhdGFyIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSmhNRmdvRy1wS3cwV3JoemtxU3IxOWZUaEdKMmJiZ3dPMVJ3eVFiclBtSmVSTXlRPXM5Ni1jIiwiaWF0IjoxNzQ2NjkzMDQ3LCJleHAiOjE3NDY3MjkwNDd9.RtResv4CqhiYb5p-AtXrH7Q_SDHLI-tRBIdVEYXM69cHCrHF5ANyHg97MParbgCNoIayNiHNNKhWNJ2QjsWqJklL7oVjC06cAygdPWg93HD7iikMTHjMNKFIZzHjCJDIbvMqw1qApsCHyrDS0PJ47V_nIA6Q-hDAOO-RhtpHFFoHA0GFFWHzHoBsaVe6he914YGgGyyf1kdPqLwBiiw8E3vvDcAAuesREg7hkfKS5MuuWJa8QCoY95WP-zUxOge-eFNHwEbYtqF7BKNJ7zA7bHCI00bRGs_cUVLPlYxOC4c1QIt-D4PLQHhKdayYKPOwo249aAOiLumh8NWs7jHU2cD6Vu2a8S_s67w1PWIQftN0CfEpuhkZRNIpO7CWCBc-JXd2kpLLyszbEcUbj1mf3xrXmELGbP0HKd7kS_rqYouLJMFReV3gfoP3-J3hcYm0KyscYBM7Npb-pyW1Cl-mezOgWDWbG6DCxoAm0ZRTzDpBfOdeeJAKTiQm_lHuxLsv3yWC0D6sRTJcy1ITUYoW-qOPw14C3d2UeCeL7DgMjYHGDMVERPxdoKfZ_seM1JkDPeNI4j8UpKWNJ0X1222Ju7mcBVo2oiEX3GtC-vN2k0AftMv7Cz5M0QAA9Ad4ubc4I2_svwIB7NLOXZr9poAdyqIj_bd5F1LO0TT4mBTMmdk
+### test upadate gameHistory
+GET https://localhost:4433/api/game-management-service/docker/games/66?relations=gameHistory HTTP/1.1
+### test upadate game
+### test upadate gameHistory by gameId
+PUT https://localhost:4433/api/game-management-service/id/125 HTTP/1.1
+Content-Type: application/json
+
+{
+  "state": "terminee"
+}
+### test upadate gameHistory
+PUT https://localhost:4433/api/game-management-service/gameHistory/112 HTTP/1.1
+Content-Type: application/json
+
+{
+  "players":[
+    {
+      "id":200,
+      "score":10
+      },
+     {
+      "id":201,
+      "score":5
+      },
+     {
+      "id":202,
+      "score":5
+      }
+    ],
+  "game": {"id":125,"state":"terminee"},
+  "winner": "IA-3"
+}
+
+
+### test upadate gameHistory
+PUT https://localhost:4433/api/game-management-service/gameHistory/11 HTTP/1.1
+Content-Type: application/json
+
+{
+  "players":[
+    {
+      "id":20,
+      "score":10
+      },
+     {
+      "id":22,
+      "score":1
+      }
+    ],
+  "game": {"id":11,"state":"terminee"},
+  "winner": "player1"
+}
+### test upadate gameHistory
+PUT https://localhost:4433/api/game-management-service/gameHistory/10 HTTP/1.1
+Content-Type: application/json
+
+{
+  "players":[
+    {
+      "id":19,
+      "score":1
+      },
+     {
+      "id":21,
+      "score":5
+      }
+    ],
+  "game": {"id":10,"state":"terminee"},
+  "winner": "srgtrfh"
+}
 ### get All games
 GET  https://localhost:4433/api/game-management-service/games HTTP/1.1
 
@@ -7,7 +83,7 @@ GET  https://localhost:4433/api/game-management-service/games HTTP/1.1
 //created_at and updated_at are automatically set
 ///:type/:format/:mode
 POST  https://localhost:4433/api/game-management-service/games/remote/classic/normal HTTP/1.1
-authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MywibmFtZSI6Ik5pemFyIiwicm9sZSI6InVzZXIiLCJsZXZlbCI6MSwiYXZhdGFyIjoiIiwiY3JlYXRlZF9hdCI6IjIwMjUtMDQtMTRUMDk6NDc6MTQuNDUxWiIsInVwZGF0ZWRfYXQiOiIyMDI1LTA0LTE0VDA5OjQ3OjE0LjQ1MVoiLCJ1c2VyU3RhdHMiOnsiaWQiOjIsInRvdGFsX2dhbWVfcGxheWVkIjoxMCwidG90YWxfZ2FtZV93b24iOjUsInRvdGFsX2dhbWVfbG9zdCI6NSwidG90YWxfZ2FtZV9kcmF3IjowLCJsb2NhbF9nYW1lX3BsYXllZCI6MCwibG9jYWxfZ2FtZV93b24iOjAsImxvY2FsX2dhbWVfbG9zdCI6MCwibG9jYWxfZ2FtZV9kcmF3IjowLCJyZW1vdGVfZ2FtZV9wbGF5ZWQiOjAsInJlbW90ZV9nYW1lX3dvbiI6MCwicmVtb3RlX2dhbWVfbG9zdCI6MCwicmVtb3RlX2dhbWVfZHJhdyI6MCwidG91cm5hbWVudF9nYW1lX3BsYXllZCI6MCwidG91cm5hbWVudF9nYW1lX3dvbiI6MCwidG91cm5hbWVudF9nYW1lX2xvc3QiOjAsInRvdXJuYW1lbnRfZ2FtZV9kcmF3IjowLCJ0b3VybmFtZW50X2xvY2FsX2dhbWVfcGxheWVkIjowLCJ0b3VybmFtZW50X2xvY2FsX2dhbWVfd29uIjowLCJ0b3VybmFtZW50X2xvY2FsX2dhbWVfbG9zdCI6MCwidG91cm5hbWVudF9sb2NhbF9nYW1lX2RyYXciOjAsInRvdXJuYW1lbnRfcmVtb3RlX2dhbWVfcGxheWVkIjowLCJ0b3VybmFtZW50X3JlbW90ZV9nYW1lX3dvbiI6MCwidG91cm5hbWVudF9yZW1vdGVfZ2FtZV9sb3N0IjowLCJ0b3VybmFtZW50X3JlbW90ZV9nYW1lX2RyYXciOjB9LCJpYXQiOjE3NDQ2MjQwNzQsImV4cCI6MTc0NDY2MDA3NH0.YoHgNt5CgT1crErTvs48zy30bBWh0U0bNbeyl0y7j9xC1_KMWgplAQAe3xKHbnE0Rp7lCjqWDc_7jYnOW_qhBGsppEHEPbXecupQeQEMRXlQ7nyIs59uAkXj5AmzdNUWgHbT5t6L1yXMqlEt-D6dLIfc2f5BKK-F4GmT1MpQzn_-Q-5QpKRi54XhcJPQeSXM4dLHCXF9r-3ZPxtyd7WlZRHvzFi7NvfuVxpxXPLG2zC8-Doqqu4vtReynyLENZWA58TR8A7rPcoHYdswVy8r_sAloQhmvcerEP9AYyePUsDgiq0iTQKURBiDFUunE3buA_A9QHrcPxpw6FcqwJ5m6BQJhWfsVMQ9kpSgZleMg2hIKi07ZEAVGfxeSpyHDDzvesRrO8oWQ0RNua9CY0ELPGaRrx7KJHSlAlExdnZgO2QgoAvoKNbgSgznr_I3arkaZ5OcdAf6tdb7GdFh8Bu-C4ia3fCCyOYwBYxiErZr7dBpG_aG2EJALl819FhHrwdQE3gSDoDxooWP9jQ6eYXHXTXyWcKlZkdcZOuN4AVeVUIBh7J1l9-0luKt5ZoHbxJHSayef-WNe3ACyyj7dQSvogdRgJ4-sUv_aMhET_kgFM8b-XOuz9pxzxT0FFbu1c9F3wY_ycJIBxxGvboiqGdHzAuGDn2uOELlja4k9l-vgEQ
+authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InVzZXIiLCJuYW1lIjoibml6YXIgYnJpZ3VpIiwiYXZhdGFyIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSmhNRmdvRy1wS3cwV3JoemtxU3IxOWZUaEdKMmJiZ3dPMVJ3eVFiclBtSmVSTXlRPXM5Ni1jIiwiaWF0IjoxNzQ2MDkyMzI1LCJleHAiOjE3NDYxMjgzMjV9.O0yyonRA8N1FpRYr8uhU46rkECZPe1z4IbthqSzngcld_RXH9VAHvDPyoSKV1_1TajFwwAXqQNvjmCm3O7r_vkIka94xhxeVaXl2i6J5sq1PYqG6WeJmfkH38p_4oC0_vDSbLptKE--UruPnGNWYn4aD5MhH1DezQ2tNYnuOQuSSjLFP5IWUf_t-pDSAy8uWK3YABh7GVeJi_Ys4RqFvBEk0g7lkqg6pjHdI73_Z9Adntdw2RoKOrapNxB4n1wu06Oq0o69PxFnxbbtuH20GuifMU0eXymBWPGHBJDQupH--mioDSY49YYiM0q5k8wTanuobwrNp80jF4OcQDLu5y0W0lNnsnAteUMRss8CKcSFjaSrkWWgPQ_IJto9SYac4Tw_--XrPd08g1tMy2MFhGRVKw9sZ1xkIjLCKEJAautSE_yRmQRT5UdNwR9x0RVHksszV-OE4Hc68JcHXl6uUzm9hMS1VHbOwbI4u_VcAuCNraY-SUCyAainRy19nu6jzafUT37rVPGthh-h39Tnvdx51WVdxmCcQXopK-QaLLISmvnPcc1EKOm0Kow7Jp1E0MCY6a1Tle5w6_jOwKwNql4m9X5iLviDTrjvSIpr-A1RnSnbUssrrmPYvTiZhU7vWbByf-vuR5q0rDT1uqp3lKzOzGiK8B9xTVjTIwHo_5uE
 Content-Type: application/json
 
 {
@@ -24,13 +100,41 @@ Content-Type: application/json
      {
       "type":"remote",
       "avatar":null,
-      "display_name":"meTestPlayer2",
+      "display_name":"IA",
       "score":1,
-      "user":1
+      //"user":1
+      "is_IA":true
       }
     ],
-    "winner":"meTest",
+    "winner":"meTest"
 }
+}
+
+###
+POST  https://localhost:4433/api/game-management-service/games/remote/classic/normal HTTP/1.1
+authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6MSwicm9sZSI6InVzZXIiLCJuYW1lIjoibml6YXIgYnJpZ3VpIiwiYXZhdGFyIjoiaHR0cHM6Ly9saDMuZ29vZ2xldXNlcmNvbnRlbnQuY29tL2EvQUNnOG9jSmhNRmdvRy1wS3cwV3JoemtxU3IxOWZUaEdKMmJiZ3dPMVJ3eVFiclBtSmVSTXlRPXM5Ni1jIiwiaWF0IjoxNzQ2MDkyMzI1LCJleHAiOjE3NDYxMjgzMjV9.O0yyonRA8N1FpRYr8uhU46rkECZPe1z4IbthqSzngcld_RXH9VAHvDPyoSKV1_1TajFwwAXqQNvjmCm3O7r_vkIka94xhxeVaXl2i6J5sq1PYqG6WeJmfkH38p_4oC0_vDSbLptKE--UruPnGNWYn4aD5MhH1DezQ2tNYnuOQuSSjLFP5IWUf_t-pDSAy8uWK3YABh7GVeJi_Ys4RqFvBEk0g7lkqg6pjHdI73_Z9Adntdw2RoKOrapNxB4n1wu06Oq0o69PxFnxbbtuH20GuifMU0eXymBWPGHBJDQupH--mioDSY49YYiM0q5k8wTanuobwrNp80jF4OcQDLu5y0W0lNnsnAteUMRss8CKcSFjaSrkWWgPQ_IJto9SYac4Tw_--XrPd08g1tMy2MFhGRVKw9sZ1xkIjLCKEJAautSE_yRmQRT5UdNwR9x0RVHksszV-OE4Hc68JcHXl6uUzm9hMS1VHbOwbI4u_VcAuCNraY-SUCyAainRy19nu6jzafUT37rVPGthh-h39Tnvdx51WVdxmCcQXopK-QaLLISmvnPcc1EKOm0Kow7Jp1E0MCY6a1Tle5w6_jOwKwNql4m9X5iLviDTrjvSIpr-A1RnSnbUssrrmPYvTiZhU7vWbByf-vuR5q0rDT1uqp3lKzOzGiK8B9xTVjTIwHo_5uE
+Content-Type: application/json
+
+{
+"players": [3],
+"gameHistory": {
+  "players": [
+    {
+      "type":"remote",
+      "avatar":null,
+      "display_name":"meTest",
+      "user":3
+      },
+     {
+      "type":"remote",
+      "avatar":null,
+      "display_name":"IA",
+      //"user":1
+      "is_IA":true
+      }
+    ]
+}
+
 }
 ### Create a new local game 
 POST  https://localhost:4433/api/game-management-service/games HTTP/1.1

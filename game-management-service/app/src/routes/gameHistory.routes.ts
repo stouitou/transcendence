@@ -1,5 +1,5 @@
 import { FastifyInstance } from "fastify";
-import { GameHistoryController } from "@src/controllers/gameHistory.controller";
+import { GameHistoryController } from "../controllers/gameHistory.controller";
 
 
 
