@@ -1,12 +1,13 @@
-import { Object } from "./Object.ts";
 import { Ball } from "./Ball.ts";
-import { Player } from "./Player.ts";
-import * as Design from "./Design";
-import { Position } from "../Interfaces/Position.interface.ts";
 import { Coordinates } from "../Interfaces/Coordinates.interface.ts";
+import { Ground } from "../Interfaces/Ground.interface.ts";
 import { Limits } from "../Interfaces/Limits.interface.ts";
+import { Player } from "./Player.ts";
+import { Position } from "../Interfaces/Position.interface.ts";
+import * as Design from "./Design";
 
-export class Paddle extends Object {
+export class Paddle {
+	private readonly	_ground: Ground;
 	private readonly	_owner: Player;
 
 	private readonly	_width: number = 20;
@@ -18,9 +19,9 @@ export class Paddle extends Object {
 	private				_position: Position;
 	private				_coordinates!: Coordinates;
 
-	constructor (canvas: HTMLCanvasElement, owner: Player) {
-		super(canvas);
-		this._limits = { up: 0, down: this._fieldHeight, left: 0, right: this._fieldWidth };
+	constructor (ground: Ground, owner: Player) {
+		this._ground = ground;
+		this._limits = { up: 0, down: this._ground.height, left: 0, right: this._ground.width };
 
 		this._owner = owner;
 		let	x = 3;
@@ -28,21 +29,33 @@ export class Paddle extends Object {
 		switch (this._owner.location) {
 			case 0:
 			case 1:
-				y = (this._fieldHeight / 2) - (this._height / 2);
+				y = (this._ground.height / 2) - (this._height / 2);
 				if (this._owner.location === 0)
-					x = this._fieldWidth - 5 - this._width;
+					x = this._ground.width - 5 - this._width;
 				else if (this._owner.location === 1)
 					x = 5;
-				this._coordinates = { top: y, bottom: y + this._height, left: x, right: x + this._width };
+				this._coordinates = {
+					top: y,
+					bottom: y + this._height,
+					left: x,
+					right: x + this._width,
+					center: { x: x + (this._width / 2), y: y + (this._height / 2) }
+				};
 				break;
 			case 2:
 			case 3:
-				x = (this._fieldWidth / 2) - (this._height / 2);
+				x = (this._ground.width / 2) - (this._height / 2);
 				if (this._owner.location === 2)
-					y = this._fieldHeight - 5 - this._width;
+					y = this._ground.height - 5 - this._width;
 				else if (this._owner.location === 3)
 					y = 5;
-				this._coordinates = { top: y, bottom: y + this._width, left: x, right: x + this._height };
+				this._coordinates = {
+					top: y,
+					bottom: y + this._width,
+					left: x,
+					right: x + this._height,
+					center: { x: x + (this._height / 2), y: y + (this._width / 2) }
+				};
 				break;
 		}
 		this._position = { x: x, y: y};
@@ -57,6 +70,7 @@ export class Paddle extends Object {
 	get	position ()		{ return this._position ; }
 	get	coordinates () 	{ return this._coordinates ; }
 
+	/* ---------- setters ---------- */
 	set limits (limits: Limits)	{ this._limits = limits; }
 
 	/* ---------- main API ---------- */
@@ -78,16 +92,7 @@ export class Paddle extends Object {
 			}
 		}
 		
-		this._coordinates.left = this._position.x;
-		this._coordinates.top = this._position.y;
-		if (this._owner.location === 0 || this._owner.location === 1) {
-			this._coordinates.bottom = this._position.y + this._height;
-			this._coordinates.right = this._position.x + this._width;
-		}
-		if (this._owner.location === 2 || this._owner.location === 3) {
-			this._coordinates.bottom = this._position.y + this._width ;
-			this._coordinates.right = this._position.x + this._height;
-		}
+		this.updateCoordinates();
 	}
 
 	/** DESIGN‑ONLY CHANGE: use rounded‑rect helper */
@@ -108,7 +113,7 @@ export class Paddle extends Object {
 				break;
 		}
 		Design.drawPaddle(
-			this._field,
+			this._ground.field,
 			this._position.x,
 			this._position.y,
 			width,
@@ -118,11 +123,12 @@ export class Paddle extends Object {
 
 	collision (ball: Ball) {
 		if (
-			ball.position.x + ball.radius > this._coordinates.left  &&
-			ball.position.x - ball.radius < this._coordinates.right &&
-			ball.position.y + ball.radius > this._coordinates.top   &&
-			ball.position.y - ball.radius < this._coordinates.bottom
+			ball.coordinates.right > this._coordinates.left  &&
+			ball.coordinates.left < this._coordinates.right &&
+			ball.coordinates.bottom > this._coordinates.top   &&
+			ball.coordinates.top < this._coordinates.bottom
 		) {
+			this._owner.historiqueGame.totalBouncesPerPlayer++;
 			const	side: string = this.getSideCollision(ball);
 			ball.bounce(this, side);
 			return true;
@@ -130,20 +136,58 @@ export class Paddle extends Object {
 		return false;
 	}
 
+	/* ---------- internals ---------- */
 	private getSideCollision (ball: Ball) : string {
 		const dxLeft = Math.abs(ball.position.x - this._coordinates.left);
 		const dxRight = Math.abs(ball.position.x - this._coordinates.right);
 		const dyTop = Math.abs(ball.position.y - this._coordinates.top);
 		const dyBottom = Math.abs(ball.position.y - this._coordinates.bottom);
 
-		const minDist = Math.min(dxLeft, dxRight, dyTop, dyBottom);
+		const	possibleSides: { side: string, dist: number }[] = [];
 
-		switch (minDist) {
-			case dxLeft:	return 'left' ;
-			case dxRight:	return 'right' ;
-			case dyTop:		return 'top' ;
-			case dyBottom:	return 'bottom' ;
+		if (ball.direction.x > 0)	possibleSides.push( { side: 'left', dist: dxLeft });
+		if (ball.direction.x < 0)	possibleSides.push( { side: 'right', dist: dxRight });
+		if (ball.direction.y > 0)	possibleSides.push( { side: 'top', dist: dyTop });
+		if (ball.direction.y < 0)	possibleSides.push( { side: 'bottom', dist: dyBottom });
+
+		if (possibleSides.length === 0)	return 'left' ;
+
+		let	best = possibleSides[0];
+		for (const side of possibleSides) {
+			if (side.dist < best.dist)	best = side;
 		}
-		return 'left' ;
+
+		return best.side ;
+	}
+
+	private updateCoordinates () {
+		switch (this._owner.location) {
+			case 0:
+			case 1:
+				this._coordinates = {
+					top: this._position.y,
+					bottom: this._position.y + this._height,
+					left: this._position.x,
+					right: this._position.x + this._width,
+					center: {
+						x: this._position.x + (this._width / 2),
+						y: this._position.y + (this._height / 2)
+					}
+				};
+				break ;
+			case 2:
+			case 3:
+				this._coordinates = {
+					top: this._position.y,
+					bottom: this._position.y + this._width,
+					left: this._position.x,
+					right: this._position.x + this._height,
+					center: {
+						x: this._position.x + (this._height / 2),
+						y: this._position.y + (this._width / 2)
+					}
+				};
+				break ;
+		}
 	}
 }

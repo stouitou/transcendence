@@ -1,313 +1,272 @@
-/* Match.ts – same game logic, modern design hooks only */
-
 import { Player } from "./Player";
-import { Ball } from "./Ball";
-import { Paddle } from "./Paddle";
-import { Alert } from "./Alert";
-import * as Design from "./Design";
+import { GameManager } from "./managers/GameManager";
+import { Renderer } from "./managers/Renderer";
+import { WebSocketManager } from "./managers/WebSocketManager";
+import { StatisticsManager } from "./managers/StatisticsManager";
+import { Position } from "../Interfaces/Position.interface";
+import { Size } from "./Pong";
 
-export let CANVAS_WIDTH = 700;
-export let CANVAS_HEIGHT = 500;
+export let CANVAS_WIDTH = 800;
+export let CANVAS_HEIGHT = 600;
 
-export class Match {
+export class Match2 {
 
-	/* ---------- core state (unchanged) ---------- */
-	private readonly	_gameWrapper: HTMLDivElement;
+	private isRunning: boolean = false;
 
-	private				_appendix: HTMLDivElement;
-	private				_canvas!: HTMLCanvasElement;
-	private				_field!: CanvasRenderingContext2D;
-	private				_width!: number;
-	private				_height!: number;
-
-	private				_ball!: Ball;
-	private				_players: Player[] = [];
-
-	private readonly	_pointsToWin = 2;
-	private 			_winner: Player | null = null;
-
-	private 			_break = false;
-
-	constructor(container: HTMLDivElement) {
-		this._gameWrapper = container;
-		this._appendix = Design.createAppendix();
-		this._gameWrapper.appendChild(this._appendix);
-
-		this.eventListener();
+	private gameManager: GameManager | null = null;
+	/* private */ renderer: Renderer;
+	private _webSocketManager:WebSocketManager= new WebSocketManager();
+	private statisticsManager: StatisticsManager;
+  
+	constructor() {
+		// S'abonner aux événements WebSocket
+	//	this.webSocketManager.on("setup", (data) => this.handleSetup(data));
+		this.webSocketManager.on("welcometogame", (data) => console.log(data));
+		this.webSocketManager.on("me", (data) => console.log(data));
+		this.webSocketManager.on("state", (data) => this.updateGameStateHandler(data.game));
+		this.webSocketManager.on("MESSAGE", (data) => console.log(data));
+		this.webSocketManager.on("COUNTDOWN", (data) => this.renderCountdownHandler(data));
+		this.webSocketManager.on("SETUPNEWGAME", (data) => this.setGameManager(data.data));//console.log(data.data));
+		this.webSocketManager.on("PREPARE_MATCHES_STARTED_ROUND", (data) =>this.renderGameHeroTreeDiv(data.data));
+		this.webSocketManager.on("PREPARE_MATCHES_STARTED_ROUND_GAME", (data) => this.renderGameHeroDiv(data.data));//envoi du match qui va debuter dans 10secondes
+		this.webSocketManager.on("STOP", () => this.stop());//signal de stop du serveur
+		this.webSocketManager.on("CURRENTPHASE_UPDATE_LOBBY", (data) => console.log("[CURRENTPHASE_UPDATE_LOBBY]",data));//phase actuelle
+  
+	  this.renderer = new Renderer();
+	  this.statisticsManager = new StatisticsManager();
+	  this.gameManager = new GameManager();
+	}
+	get webSocketManager() {
+		return this._webSocketManager;
+	}
+	/* ----------  Renderer getters/setters UI ---------- */
+	// on transfere les getters et setters de Match.ts vers Renderer.ts
+	setCanvas(canvas: HTMLCanvasElement | null) { this.renderer.setCanvas(canvas); }
+	setGameUI(div: HTMLElement | null) { this.renderer.setGameUI(div); }
+	setGameAlert(div: HTMLElement | null) { this.renderer.setGameAlert(div); }
+	setGameHero(div: HTMLElement | null) { this.renderer.setGamehero(div); }
+	setGameHeroTree(div: HTMLElement | null) { this.renderer.setGameheroTree(div); }
+	renderGameHeroDiv(data:any) {
+		this.renderer.renderGameHeroDiv(data);
+	}
+	renderGameHeroTreeDiv(data:any) {
+		this.renderer.renderGameHeroTreeDiv(data);
 	}
 
-	/* ---------- public API ---------- */
-	addPlayer (newPlayer: Player) {
-		this._players.push(newPlayer);
+	/**
+	 * handler utiliser par le wsocket pour le countdown initial
+	 * @param data 
+	 */
+	renderCountdownHandler(data: {matchId: string, value: number}) {
+
+		console.log('renderCountdown', data.value);
+		this.renderer.setupDisplay()
+		this.renderer.renderCountdown(data.value);
 	}
 
-	async start () : Promise<void> {
-		await this.createField();
-		await this.setupGame();
-		await this.beforeGame();
+	/**
+	 * handler utiliser par le wsocket pour metre a jour l'etat du jeu en remote
+	 * @param game 
+	 */
+	updateGameStateHandler(game:{ball:{position: {x:number,y:number},size:{width:number,height:number}}, players: Player[]}) {
+		this.gameManager?.updateGameState(game);
+	}	
 
-		return new Promise(resolve => {
-			const loop = async () => {
-				/* win check */
-				for (const player of this._players) {
-					if (player.points === this._pointsToWin) {
-						await this.endGame(player);
-						resolve();
-						// TODO: Return lobby
-						return;
-					}
-				}
-
-				if (!this._break) {
-					await this.update();
-					await this.render();
-				}
-				requestAnimationFrame(loop);
-			};
-			loop();
-		});
-	}
-
-	/* ---------- internals ---------- */
-	private async createField () {
-		this._canvas = this.createCanvas()!;
-		this._field = this._canvas.getContext('2d') as CanvasRenderingContext2D;
-		this._width = this._canvas.width;
-		this._height = this._canvas.height;
-		this._gameWrapper.appendChild(this._canvas);
-	}
-
-	private createCanvas () {
-		const	canvas: HTMLCanvasElement = document.createElement('canvas');
-
-		canvas.style.position = 'relative';
-		canvas.style.margin = '0';
-		canvas.style.padding = '0';
-		canvas.style.border = 'none';
-		canvas.style.top = '0';
-		canvas.style.verticalAlign = 'top';
-		canvas.height = CANVAS_HEIGHT;
-		if (this._players.length > 2)
-			CANVAS_WIDTH = 500;
-		console.log('canvas height: ', CANVAS_HEIGHT);
-		console.log('canvas width: ', CANVAS_WIDTH);
-		canvas.width = CANVAS_WIDTH;
-
-		return canvas;
-	}
-
-	private async setupGame () {
-		this._ball = new Ball(this._canvas);
-		for (let i = 0; i < this._players.length; i++) {
-			this._players[i].location = i;
-			this._players[i].points = 0;
-			this._players[i].paddle = new Paddle(this._canvas, this._players[i]);
-		}
-	}
-
-	private async beforeGame () {
-		await this.displayStartButton();
-		this.displayScore();
-		await this.displayCountdown();
-	}
-
-	private async displayStartButton () : Promise<void> {
-		return new Promise((resolve) => {
+	/**
+	 * setup le gameManager avec les donnees recues
+	 * @param dataMatch :DataMatch
+	 */
+	setGameManager(dataMatch: DataMatch) {//@TODO: a rename en DataMatch ou setGameManagerHandler???
+		//effacer les joueurs existants
+		this.gameManager?.clearPlayers();
+		//set le gameManager avec les donnees recues
+		this.gameManager?.setDataconfig(dataMatch);
+		//construire le jeux
+		this.gameManager?.setupGame();
+		//initialiser les graphiques
+		this.renderer.setupDisplay()
+		//afficher l'ui initiale: joueurs/score et terrain
+		this.renderer.render(this.gameManager!.getPlayers());
+		if (this.gameManager?.dataconfig?.config.type === 'remote') {
+			this.attachRemoteMovementListener();//attacher les ecouteurs de mouvement 
+			this.start();//remote
+		}else {
+			this.startLocal();
 			
-			const	button: HTMLButtonElement = document.createElement('button');
-			button.style.minWidth = '50%';
-			button.style.marginTop = '20px';
-			button.style.border = '2px solid rgb(0, 0, 0)';
-			button.style.borderRadius = '5px';
-			button.style.padding = '5px';
-			button.style.cursor = 'pointer';
-			// style of the text in the button
-			button.classList.add('text-black', 'text-lg', 'font-bold', 'font-sans', 'transition-colors', 'hover:bg-black', 'hover:text-white');	// font-sans: fontFamily = 'system-ui'
-			button.textContent = 'Start';
-	/* ---------- internal helpers (design‑only edits) ---------- */
-			const alert = new Alert(`${this._players[0].name}\nvs\n${this._players[1].name}\n`);
-			const btn = document.createElement("button");
-			Design.styleStartButton(btn);
-			btn.textContent = "Start";
-			btn.onclick = () => {
-				this._gameWrapper.removeChild(alert.element);
-				resolve();
-			};
-			alert.element.appendChild(btn);
-			this._gameWrapper.appendChild(alert.element);
-		});
+		}
 	}
+	/**
+	 * Gérer les mouvements des joueurs distants
+	 * @param event 
+	 */
+	  attachRemoteMovementListener () {
+		// Listen for remote player movements
+		document.addEventListener('keydown', this.handleKeyDown);
+		document.addEventListener('keyup', this.handleKeyUp);
+	  }
+	  removeRemoteMovementListener () {
+		// Remove the event listeners when not needed
+		if (this.gameManager?.dataconfig && this.gameManager?.dataconfig.config.type === 'remote') {
+		  document.removeEventListener('keydown', this.handleKeyDown);
+		  document.removeEventListener('keyup', this.handleKeyUp);
+		}
+	  }
+	  handleKeyDown = (event: KeyboardEvent) => {
+		const key = event.key;
+		switch (key) {
+		  case 'ArrowLeft':
+			this._webSocketManager.sendMoveMessage("left");
+			break;
+		  case 'ArrowRight':
+			this._webSocketManager.sendMoveMessage("right");
+			break;
+		  case 'ArrowDown':
+			this._webSocketManager.sendMoveMessage("down");
+			break;
+		  case 'ArrowUp':
+			this._webSocketManager.sendMoveMessage("up");
+			break;
+		  default:
+			console.log('Unknown key pressed:', key);
+			break;
+		}
+	  };
+	  handleKeyUp = (event: KeyboardEvent) => {
+		const key = event.key;
+		switch (key) {
+		  case 'ArrowLeft':
+		  case 'ArrowRight':
+		  case 'ArrowDown':
+		  case 'ArrowUp':
+			this._webSocketManager.sendMoveMessage();
+			break;
+		  default:
+			console.log('Unknown key pressed:', key);
+			break;
+		}
+	  }
+	  
 
-	private displayScore () {
-		this._players.forEach((player) => {
-			const    name: HTMLParagraphElement = document.createElement('p');
-            name.textContent = player.name;
-            name.style.margin = '10px';
-            const    score: HTMLParagraphElement = document.createElement('p');
-            score.textContent = `${player.points}`;
-            name.style.margin = score.style.margin = "10px";
-            name.style.color  = score.style.color  = Design.DESIGN.accentColor;
 
-            /* flip‑up animate each refresh */
-            Design.animateScore(score);
 
-            if (player.location === 0) {
-                player.display.style.gridColumn = "3"
-                player.display.style.gridRow = "2";
-            } else if (player.location === 1) {
-                player.display.style.gridColumn = "1";
-                player.display.style.gridRow = "2";
-            } else if (player.location === 2) {
-                player.display.style.gridColumn = "2";
-                player.display.style.gridRow = "3";
-            } else if (player.location === 3) {
-                player.display.style.gridColumn = "2";
-                player.display.style.gridRow = "1";
-            }
-
-            player.display.appendChild(name);
-            player.display.appendChild(score);
-            this._appendix.appendChild(player.display);
-		});
-	}
+	/**
+	 * Boucle de jeu principale. Remote
+	 * une simple boucle de jeu qui rend à chaque frame
+	 *
+	 */
+	private gameLoop() {
+		//return;
+		if (!this.isRunning) return;
 	
-	private async displayCountdown(): Promise<void> {
-		const frames = ["3", "2", "1", "GO"];
-		return new Promise(resolve => {
-			frames.forEach((f, i) => {
-				setTimeout(() => {
-					Design.drawCountdownFrame(this._field, f);
-					if (i === frames.length - 1) resolve();
-				}, i * 1000);
-			});
-		});
+		// Mettre à jour la logique du jeu // en remote gerer par le serveur
+		//this.gameManager!.update();
+	
+		// Rendre les éléments graphiques
+		this.renderer.draw(this.gameManager!.getBall(), this.gameManager!.getPlayers());
+	
+		// Appeler la prochaine frame
+		requestAnimationFrame(() => this.gameLoop());
+	  }
+	
+	stop() {
+		this.isRunning = false;
+	  }
+
+
+
+	async start() {
+		if (!this.gameManager) {
+			throw new Error('GameManager not initialized');
+		}
+	
+		// Initialiser le jeu
+		//  await this.gameManager.setupGame();
+	
+		// Démarrer la boucle de jeu
+		this.isRunning = true;
+		this.gameLoop();
 	}
-
-	private async update () {
-
-		this._players.forEach((player) => player.paddle!.collision(this._ball))
+	private gameLoopLocal() {
+		if (!this.isRunning) return;
+	
+		// Mettre à jour la logique du jeu
+		this.gameManager!.update();
 		
-		if (!this._players[2] && this._ball.position.y + this._ball.radius >= this._height ||
-			!this._players[3] && this._ball.position.y - this._ball.radius <= 0) {
-				this._ball.direction.y *= -1;
-			}
-			else if (this._ball.out(this._players)) {
-				this._ball.spawn();
-			}
+		// Rendre les éléments graphiques
+		this.renderer.draw(this.gameManager!.getBall(), this.gameManager!.getPlayers());
 
-		this._ball.update();
-		for (let i = 0; i < this._players.length; i++) {
-			this._players[i].move(this._ball);
-			this._players[i].paddle?.update();
-			this.defineLimits(this._players[i]);
+		//verifier le score
+		if (this.gameManager!.checkMaxScore(this._webSocketManager.sendMessage.bind(this._webSocketManager))) {
+			this.stop();
+			//afficher l'historique du jeu en fin de partie
+			this.renderer.displayHistoriqueGame(this.statisticsManager, this.gameManager!.getPlayers());
+		}	
+	
+		// Appeler la prochaine frame
+		requestAnimationFrame(() => this.gameLoopLocal());
+	}
+
+	async startLocal() {
+		if (!this.gameManager) {
+			throw new Error('GameManager not initialized');
 		}
+		
+		// Démarrer la boucle de jeu
+		this.isRunning = true;
+		this.gameLoopLocal();
 	}
+ }
 
-	private async render () {
-		Design.drawBackground(this._field);
-		this._ball.draw();
-		for (let i = 0; i < this._players.length; i++) {
-			this._players[i].paddle?.draw();
-		}
-	}
 
-	private async endGame(winner: Player): Promise<void> {
-		winner.lastWin = true;
-		this._players.forEach(p => (p.lastWin = p === winner));
-		this._winner = winner;
-		await this.congratulate(winner);
-	}
 
-	private async congratulate(winner: Player): Promise<void> {
-		return new Promise(resolve => {
-			const alert = new Alert(`Congratulations\n${winner.name} !\n`);
-			this._gameWrapper.appendChild(alert.element);
-			setTimeout(() => {
-				this._gameWrapper.removeChild(alert.element);
-				resolve();
-			}, 4000);
-		});
-	}
 
-	private defineLimits (player: Player) {
-		switch (player.location) {
-			case 0:
-				if (this._players[3] && this._players[3].paddle) {
-					if (player.paddle && player.paddle.coordinates.top <= player.paddle.width + 5)
-						this._players[3].paddle.limits = { ...this._players[3].paddle.limits, right: player.paddle.coordinates.left };
-					else if (player.paddle)
-						this._players[3].paddle.limits = { ...this._players[3].paddle.limits, right: this._width };
-				}
-				if (this._players[2] && this._players[2].paddle) {
-					if (player.paddle && player.paddle.coordinates.bottom >= this._height - (player.paddle.width + 5)) {
-						this._players[2].paddle.limits = { ...this._players[2].paddle.limits, right: player.paddle.coordinates.left };
-						console.log('bottom: ',player.paddle.coordinates.bottom);
-					}
-					else if (player.paddle)
-						this._players[2].paddle.limits = { ...this._players[2].paddle.limits, right: this._width };
-				}
-				break ;
-			case 1:
-				if (this._players[3] && this._players[3].paddle) {
-					if (player.paddle && player.paddle.coordinates.top <= player.paddle.width + 5)
-						this._players[3].paddle.limits = { ...this._players[3].paddle.limits, left: player.paddle.coordinates.right };
-					else if (player.paddle)
-						this._players[3].paddle.limits = { ...this._players[3].paddle.limits, left: 0 };
-				}
-				if (this._players[2] && this._players[2].paddle) {
-					if (player.paddle && player.paddle.coordinates.bottom >= this._height - (player.paddle.width + 5)) {
-						this._players[2].paddle.limits = { ...this._players[2].paddle.limits, left: player.paddle.coordinates.right };
-					}
-					else if (player.paddle)
-						this._players[2].paddle.limits = { ...this._players[2].paddle.limits, left: 0 };
-				}
-				break ;
-			case 2:
-				if (this._players[1] && this._players[1].paddle) {
-					if (player.paddle && player.paddle.coordinates.left <= player.paddle.width + 5)
-						this._players[1].paddle.limits = { ...this._players[1].paddle.limits, down: player.paddle.coordinates.top };
-					else if (player.paddle)
-						this._players[1].paddle.limits = { ...this._players[1].paddle.limits, down: this._height };
-				}
-				if (this._players[0] && this._players[0].paddle) {
-					if (player.paddle && player.paddle.coordinates.right >= this._width - (player.paddle.width + 5)) {
-						this._players[0].paddle.limits = { ...this._players[0].paddle.limits, down: player.paddle.coordinates.top };
-					}
-					else if (player.paddle)
-						this._players[0].paddle.limits = { ...this._players[0].paddle.limits, down: this._height };
-				}
-				break ;
-			case 3:
-				if (this._players[1] && this._players[1].paddle) {
-					if (player.paddle && player.paddle.coordinates.left <= player.paddle.width + 5)
-						this._players[1].paddle.limits = { ...this._players[1].paddle.limits, up: player.paddle.coordinates.bottom };
-					else if (player.paddle)
-						this._players[1].paddle.limits = { ...this._players[1].paddle.limits, up: 0 };
-				}
-				if (this._players[0] && this._players[0].paddle) {
-					if (player.paddle && player.paddle.coordinates.right >= this._width - (player.paddle.width + 5)) {
-						this._players[0].paddle.limits = { ...this._players[0].paddle.limits, up: player.paddle.coordinates.bottom };
-					}
-					else if (player.paddle)
-						this._players[0].paddle.limits = { ...this._players[0].paddle.limits, up: 0 };
-				}
-				break ;
-		}
-	}
 
-	private eventListener() {
-		document.addEventListener("keydown", e => {
-			if (e.key === " ") {
-				this._break = !this._break;
-				if (this._break)	Design.drawPauseIcon(this._field);
-			}
-		});
+interface WaitingPlayers {
+	userId: number,
+	id: number | null,
+	name: string | null,
+	avatar: string | null,
+	state: string | null,
+	// state: "waiting" | "playing" | "finished" | "joined" | "left" | "cancelled",
+	isInGame: boolean,
+	isIA: boolean,
+	position?: {
+			x: number,
+			y: number
+		},
+	size?: Size,// taille du paddle
+	score?: number,
+}
 
-		document.addEventListener('keydown', (event) => {
-			this._players.forEach((player) => { player.keyPressed.add(event.key); player.direction = null });
-		});
-		document.addEventListener('keyup', (event) => {
-			this._players.forEach((player) => { player.keyPressed.delete(event.key); player.direction = null });
-		});
+export type DataMatch = {
+	id: string,
+	lobyId: string,
+	players: {
+		id: number;
+		name: string;
+		avatar: string;
+		state: string;
+		isInGame: boolean;
+		isIA: boolean;
+		position: Position;
+		size: Size;
+		score: number;
+		paddle: {
+			position: Position;
+			size: Size;
+		};
+	}[],
+	ball: {
+		position: Position
+	},
+	config: {
+		type: string;
+		format: string;
+		tournamentId: string | null;
+		maxPlayers: number;
+		isallowedRegistration: boolean;
+		gameId: string;
+		state: string;
+		players: WaitingPlayers[];
 	}
 }

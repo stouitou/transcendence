@@ -1,129 +1,109 @@
 import { Ball } from "./Ball";
-import { Paddle } from "./Paddle";
+//import { HistoriqueGame } from "../Interfaces/HistoriqueGame.interface";
+import { Paddle, Position } from "./Pong";
+//import { Paddle } from "./Paddle";
+import { InputManager } from "./managers/InputManager";
+import { Bot } from "./Bot";
 
-export class	Player{
+type Direction = "left" | "right" | "top" | "bottom"
+const directions:Direction[] = ['left', 'right', 'top', 'bottom'];
+export /* abstract */ class	Player{
+
+		//id: string;
+		state: string = 'waiting'; // waiting, playing, finished
+		//name: string = 'host';
+		isRemote: boolean = false;
+		isIA: boolean = false;
+		isInGame: boolean = false;
+		//paddle: Paddle;
+		//direction: Direction;
+		score: number = 0;
+		position: Position = { x: 0, y: 0 };
 
 	protected readonly		_id: string;
 	protected readonly		_name: string;
-	protected readonly		_role: string;
 
-	protected				_location: number = 0;
-	protected				_points: number = 0;
 	protected				_paddle: Paddle | null = null;
-	protected				_direction: string | null = null;
+	/* protected */			_location: number = 0;
+	//protected				_points: number; -> score
+	protected				_direction: Direction /* | null = null */;
 
-	protected				_keyPressed: Set<string> = new Set();
-	protected				_display: HTMLDivElement;
+//	protected				_keyPressed: Set<string> = new Set();
+	//protected				_display: HTMLDivElement;
 	protected				_lastWin: boolean = false;
 
-	constructor (json: any) {
-		this._id = json.id;
-		this._name = json.name;
-		if (!this._name)
-			this._name = 'Host';
-		this._role = json.role;
-		if (!this._role)
-			this._role = 'user';
+	//private				_historiqueGame: HistoriqueGame;
 
-		this._display = document.createElement('div');
-		this.displayProperties();
+	_historyPlayer = {bounceCount: 0, goalsConceded: 0};
+	bot:Bot | null = null;
+
+	constructor (json: any,index: number,public inputManager: InputManager) {
+		
+		//this._historiqueGame = { maxBounceCount: 0, mostGoalsConcededPlayer: 0, playerWithMostPointsLost: 0, totalBouncesPerPlayer: 0};
+		this.paddle = new Paddle(json.paddle.position, json.paddle.size);
+		this.direction = directions[index];
+			this._id = json.id;
+			this._name = json.name;
+			this.isRemote = json.isRemote;
+			this.isIA = json.isIA;
+			this.isInGame = json.isInGame;
+			this.score = json.score?? 0;
+			this._direction = directions[index];
+			this._location = index;
+			this.bot = new Bot(1, this);
+		
 	}
 
 	/* ---------- getters ---------- */
-	get name () { return this._name ; }
-	get role () { return this._role ; }
-	get lastWin () { return this._lastWin ; }
-	get points () { return this._points ; }
-	get location () { return this._location ; }
-	get keyPressed () { return this._keyPressed ; }
-	get direction (): string | null { return this._direction ; }
-	get display () { return this._display ; }
-	get paddle () : Paddle | null { return this._paddle ; }
+	get id ()						{ return this._id ; }
+	get name ()						{ return this._name ; }
+	get paddle () : Paddle | null	{ return this._paddle ; }
+	get location ()					{ return this._location ; }
+	//get points ()					{ return this._points ; } -> score
+	get direction (): string | null	{ return this._direction ; }
+//	get keyPressed ()				{ return this._keyPressed ; } -> gerer par InputManager
+//	get display ()					{ return this._display ; } -> gerer par Renderer
+	get lastWin ()					{ return this._lastWin ; }
+//	get historiqueGame ()			{ return this._historiqueGame ; }
 
 	/* ---------- setters ---------- */
-	set points (points: number) { this._points = points; }
-	set location (location: number) { this._location = location; }
-	set paddle (paddle: Paddle) { this._paddle = paddle; }
-	set	direction (direction: string | null) { this._direction = direction; }
-	set lastWin (lastWin: boolean) { this._lastWin = lastWin; }
+	set paddle (paddle: Paddle)					{ this._paddle = paddle; }
+	set location (location: number)				{ this._location = location; }
+	//set points (points: number)					{ this._points = points; }
+	set	direction (direction: Direction/* string | null */)	{ this._direction = direction; }
+	set lastWin (lastWin: boolean)				{ this._lastWin = lastWin; }
+	//set historiqueGame (historiqueGame: HistoriqueGame)			{ this._historiqueGame = historiqueGame }
 
-	move (ball: Ball) {
-		if (this.role === 'bot') {
-			switch (this._location) {
-				case 0:
-				case 1:
-					this.followBallVertical(ball);
-					break ;
-				case 2:
-				case 3:
-					this.followBallHorizontal(ball);
-					break ;
-			}
-			return ;
-		}
-
-		this._keyPressed.forEach((key) => {
-			switch (this._location) {
-				case 0:
-					if (key === 'ArrowUp')			this._direction = 'up';
-					else if (key === 'ArrowDown')	this._direction = 'down';
-					break ;
-				case 1:
-					if (key === 'w')				this._direction = 'up';
-					else if (key === 's')			this._direction = 'down';
-					break ;
-				case 2:
-					if (key === 'ArrowLeft')		this._direction = 'left';
-					else if (key === 'ArrowRight')	this._direction = 'right';
-					break ;
-				case 3:
-					if (key === 'a')				this._direction = 'left';
-					else if (key === 'd')			this._direction = 'right';
-					break ;	
-			}
-		});
+	setScore(score: number) {
+		this.score = score;
 	}
 
-	score () {
-		this._points++;
-		const score: HTMLParagraphElement = this._display.lastElementChild as HTMLParagraphElement;
-		score.textContent = `${this._points}`;
-	}
-	
-	losePoint () {
-		if (this._points === 0)
-			return ;
-		this._points--;
-		const score: HTMLParagraphElement = this._display.lastElementChild as HTMLParagraphElement;
-		score.textContent = `${this._points}`;
-	}
-
-	private displayProperties () {
-		this._display.style.position = 'relative';
-		this._display.style.display = 'flex';
-		this._display.style.alignItems = 'space-between';
-		this._display.style.width = '50%';
-		this._display.style.height = 'auto';
-		this._display.style.margin = '5px';
-		this._display.style.justifyContent = 'space-between';
-	}
-
-	private followBallHorizontal (ball: Ball) {
-		if (this._paddle && (this._paddle.position.x + (this._paddle.height / 2) > ball.position.x)) {
-			this._direction = 'left';
+	updateMovement(ball: Ball) {
+		if (this.isIA) {
+		  this.bot?.move(ball);
+		  const movement = this.inputManager.getMovementByDirection();
+		 this.inputManager.clearDirection();
+		  this._paddle?.move(movement.dx, movement.dy);
+		} else if (this.inputManager) {
+		  const movement = this.inputManager.getDirectionMovement();
+		  this._paddle?.move(movement.dx, movement.dy);
 		}
-		else if (this._paddle && (this._paddle.position.x + (this._paddle.height / 2) < ball.position.x)) {
-			this._direction = 'right';
-		}
-	}
-
-	private followBallVertical (ball: Ball) {
-		if (this._paddle && (this._paddle.position.y + (this._paddle.height / 2) > ball.position.y)) {
-			this._direction = 'up';
-		}
-		else if (this._paddle && (this._paddle.position.y + (this._paddle.height / 2) < ball.position.y)) {
-			this._direction = 'down';
-		}
+	  }
+	toJSON() {
+		return {
+			id: this._id,
+			state: this.state,
+			name: this._name,
+			isRemote: this.isRemote,
+			isIA: this.isIA,
+			isInGame: this.isInGame,
+			score: this.score,
+			paddle: {
+				position: this.paddle?.position,
+				size: this.paddle?.size,
+			},
+			position: this.paddle?.position,
+		};
 	}
 
 }

@@ -24,42 +24,42 @@ export const DESIGN = {
 /* ---------- global page styling (gradient + grain) ---------- */
 (() => {
     /* gradient */
-    const styleId = "ae‑page‑style";
+    const   styleId = "ae‑page‑style";
     if (!document.getElementById(styleId)) {
-        const css = document.createElement("style");
+        const   css = document.createElement("style");
         css.id = styleId;
         css.textContent = `
-      body{
+    body{
         background: radial-gradient(circle at 30% 20%, #f3f8ff 0%, #e9f0ff 45%, #dfe8ff 100%);
         min-height:100vh;
         overflow-x:hidden;
-      }
+    }
     `;
-        document.head.appendChild(css);
+    document.head.appendChild(css);
     }
 
     /* grain overlay (optional aesthetic depth) */
     if (!document.getElementById("ae‑grain")) {
-        const grain = document.createElement("div");
+        const   grain = document.createElement("div");
         grain.id = "ae‑grain";
         Object.assign(grain.style, {
-            position     : "fixed",
-            inset        : "0",
-            pointerEvents: "none",
-            zIndex       : "1",
+            position        : "fixed",
+            inset           : "0",
+            pointerEvents   : "none",
+            zIndex          : "1",
             backgroundImage:
                 "url(\"data:image/svg+xml;base64,"
                 + "PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxnIGZpbGw9JyMwMDAwMDAnIGZpbGwtb3BhY2l0eT0nLjA0Jz48cmVjdCB3aWR0aD0nMScgaGVpZ2h0PScxJy8+PC9nPjwvc3ZnPg==\")",
-            backgroundSize: "4px 4px",
-            mixBlendMode  : "overlay",
-            opacity       : ".4",
+            backgroundSize  : "4px 4px",
+            mixBlendMode    : "overlay",
+            opacity         : ".4",
         } as Partial<CSSStyleDeclaration>);
         document.body.appendChild(grain);
     }
 
     /* Google font */
     if (!document.getElementById("poppins‑font")) {
-        const link = document.createElement("link");
+        const   link = document.createElement("link");
         link.id  = "poppins‑font";
         link.rel = "stylesheet";
         link.href = "https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap";
@@ -68,59 +68,81 @@ export const DESIGN = {
 })();
 
 /* ---------- structure helpers ---------- */
-export function createAppendix(): HTMLDivElement {
-    const bar = document.createElement("div");
+export function createAppendix (ratio: number): HTMLDivElement {
+    const   bar = document.createElement("div");
+
+    const   height = ratio * 50;
+    const   middleRow = 50;
+    let     bottomRow = 0;
+    let     topRow = 0;
+
+    if (ratio > 1)
+        bottomRow = 50;
+    if (ratio > 2)
+        topRow = 50;
+
     Object.assign(bar.style, {
-        width      : "500px",
-        height     : "150px",
-        display    : "grid",
-        gridTemplateColumns   : "100px 100px 100px",
-        gridTemplateRows      : "40px 40px 40px",
-        justifyContent : "center",
-        alignItems : "center",
-        padding    : "18px 0",
-        fontSize   : "24px",
-        fontWeight : "600",
-        color      : DESIGN.accentColor,
-        borderTopLeftRadius : "260px",
-        borderTopRightRadius: "260px",
-        background : "rgb(13, 63, 119)",
-        backdropFilter: "blur(10px)",
-        border     : "3px solid rgb(255, 0, 0)",
-        boxShadow  : "0 8px 30px rgba(0,0,0,.08)",
+        width                   : `${CANVAS_WIDTH}px`,
+        height                  : `${height}px`,
+        display                 : "grid",
+        gridTemplateColumns     : "1fr 1fr 1fr",
+        gridTemplateRows        : `${topRow}px ${middleRow}px ${bottomRow}px`,
+        justifyContent          : "center",
+        justifyItems            : "center",
+        alignItems              : "center",
+        padding                 : "0",
+        margin                  : "0",
+        fontSize                : "24px",
+        fontWeight              : "600",
+       // transform               : "scaleY(1.2)",
+        color                   : DESIGN.accentColor,
+        boSizing                : "border-box",
+        borderTopLeftRadius     : "260px",
+        borderTopRightRadius    : "260px",
+        background              : "rgb(13, 63, 119)",
+        backdropFilter          : "blur(10px)",
+        border                  : "3px solid rgb(255, 0, 0)",
+        boxShadow               : "0 8px 30px rgba(0,0,0,.08)",
     } as Partial<CSSStyleDeclaration>);
-    return bar;
+
+    return bar ;
 }
 
-export function createGameCanvas(_: Player[]): HTMLCanvasElement {
-    const canvas = document.createElement("canvas");
+export function createGameCanvas (_: Player[]): HTMLCanvasElement {
+    const   canvas = document.createElement("canvas");
     canvas.width  = CANVAS_WIDTH;
     canvas.height = CANVAS_HEIGHT;
+
     Object.assign(canvas.style, {
-        display     : "block",
-        margin      : "40px auto",
-        borderRadius: "14px",
-        boxShadow   : "0 12px 28px rgba(0,0,0,.12)",
+        display         : "block",
+        margin          : "40px auto",
+        borderRadius    : "14px",
+        boxShadow       : "0 12px 28px rgba(0,0,0,.12)",
     } as Partial<CSSStyleDeclaration>);
-    return canvas;
+
+    return canvas ;
 }
 
 /* ---------- button polish ---------- */
-export function styleStartButton(btn: HTMLButtonElement) {
+export function styleStartButton (btn: HTMLButtonElement) {
+
     Object.assign(btn.style, {
-        minWidth   : "220px",
-        padding    : "14px 28px",
-        fontFamily : DESIGN.fontFamily,
-        fontSize   : "22px",
-        fontWeight : "600",
-        background : DESIGN.buttonColor,
-        color      : DESIGN.textColor,
-        border     : "none",
-        borderRadius: "50px",
-        cursor     : "pointer",
-        boxShadow  : "0 4px 12px rgba(0,0,0,.15)",
-        transition : "transform .18s ease, box-shadow .18s ease",
+        minWidth        : "220px",
+        height          : "30px",
+        margin          : "5px",
+        padding         : "4px 28px",
+        fontFamily      : DESIGN.fontFamily,
+        fontSize        : "24px",
+        fontWeight      : "600",
+        background      : DESIGN.buttonColor,
+        color           : DESIGN.textColor,
+        border          : "none",
+        borderRadius    : "50px",
+        cursor          : "pointer",
+        boxShadow       : "0 4px 12px rgba(0,0,0,.15)",
+        transition      : "transform .18s ease, box-shadow .18s ease",
     } as Partial<CSSStyleDeclaration>);
+
     btn.onmouseenter = () => {
         btn.style.transform = "translateY(-3px)";
         btn.style.boxShadow = "0 8px 18px rgba(0,0,0,.22)";
@@ -133,10 +155,11 @@ export function styleStartButton(btn: HTMLButtonElement) {
 
 /* ---------- score flip micro‑animation ---------- */
 let scoreCSSInjected = false;
-function ensureScoreCSS() {
-    if (scoreCSSInjected) return;
+function ensureScoreCSS () {
+    if (scoreCSSInjected)   return;
+
     scoreCSSInjected = true;
-    const s = document.createElement("style");
+    const   s = document.createElement("style");
     s.textContent = `
   @keyframes flipUp{
     0%{ transform:translateY(12px) rotateX(90deg); opacity:0 }
@@ -145,13 +168,14 @@ function ensureScoreCSS() {
   }`;
     document.head.appendChild(s);
 }
-export function animateScore(el: HTMLElement) {
+
+export function animateScore (el: HTMLElement) {
     ensureScoreCSS();
     el.style.animation = "flipUp .4s cubic-bezier(.4,1.4,.6,1)";
 }
 
 /* ---------- core drawing helpers ---------- */
-export function drawBackground(ctx: CanvasRenderingContext2D) {
+export function drawBackground (ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = DESIGN.fieldColor;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -165,7 +189,7 @@ export function drawBackground(ctx: CanvasRenderingContext2D) {
     ctx.stroke();
 }
 
-export function drawCountdownFrame(
+export function drawCountdownFrame (
     ctx: CanvasRenderingContext2D,
     frame: string
 ) {
@@ -178,29 +202,29 @@ export function drawCountdownFrame(
     ctx.fillText(frame, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
 }
 
-export function drawPauseIcon(ctx: CanvasRenderingContext2D) {
-    const w=16,h=48,gap=12;
+export function drawPauseIcon (ctx: CanvasRenderingContext2D) {
+    const   w = 16, h = 48, gap = 12;
     ctx.fillStyle = DESIGN.lineColor;
-    ctx.fillRect(CANVAS_WIDTH/2-gap/2-w, CANVAS_HEIGHT-40-h, w, h);
-    ctx.fillRect(CANVAS_WIDTH/2+gap/2,   CANVAS_HEIGHT-40-h, w, h);
+    ctx.fillRect(CANVAS_WIDTH / 2 - gap / 2 - w, CANVAS_HEIGHT - 40 - h, w, h);
+    ctx.fillRect(CANVAS_WIDTH / 2 + gap / 2,   CANVAS_HEIGHT - 40 - h, w, h);
 }
 
 /* paddles & ball (canvas variants) */
-export function drawPaddle(
+export function drawPaddle (
     ctx: CanvasRenderingContext2D,
-    x:number,y:number,w:number,h:number
-){
+    x:number, y:number, w:number, h:number
+) {
     ctx.fillStyle = DESIGN.accentColor;
-    ctx.fillRect(x,y,w,h);
+    ctx.fillRect(x, y, w, h);
 }
 
-export function drawBall(
-    ctx: CanvasRenderingContext2D, x:number,y:number,r:number
-){
-    const g = ctx.createRadialGradient(x-r*0.4,y-r*0.4,r*0.1, x,y,r);
-    g.addColorStop(0,"#ff768e");
-    g.addColorStop(0.55,DESIGN.accentColor);
-    g.addColorStop(1,"#4c000d");
+export function drawBall (
+    ctx: CanvasRenderingContext2D, x: number,y: number,r: number
+) {
+    const   g = ctx.createRadialGradient(x - r * 0.4, y - r * 0.4, r * 0.1, x, y, r);
+    g.addColorStop(0, "#ff768e");
+    g.addColorStop(0.55, DESIGN.accentColor);
+    g.addColorStop(1, "#4c000d");
     ctx.fillStyle = g;
 
     ctx.save();
@@ -212,6 +236,21 @@ export function drawBall(
 
     ctx.fillStyle = "rgba(255,255,255,.65)";
     ctx.beginPath();
-    ctx.ellipse(x-r*0.35, y-r*0.35, r*0.15, r*0.10, 0, 0, Math.PI*2);
+    ctx.ellipse(x-r * 0.35, y-r * 0.35, r * 0.15, r * 0.10, 0, 0, Math.PI * 2);
     ctx.fill();
 }
+
+const   style = document.createElement('style');
+style.textContent = `
+    .score-cell {
+        margin:         0;
+        color:          Design.DESIGN.accentColor;
+        text-align:     center;
+        white-space:    nowrap;
+        overflow:       visible;
+        text-overflow:  clip;
+        width:          100%;
+        line-height:    24px;
+    }
+`;
+document.head.appendChild(style);

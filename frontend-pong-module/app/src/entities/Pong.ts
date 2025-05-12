@@ -76,7 +76,7 @@ export class Paddle {
 		this.setMapping(localMappings[playerIndex]);
 		this.setBindMapping(localBindMappings);
 		if(this.isActive){
-			window.addEventListener('keydown', (e) => this.keysPressed.add(e.key));
+			window.addEventListener('keydown', (e) => {this.keysPressed.add(e.key),console.log("keydown",event);});
 			window.addEventListener('keyup', (e) => this.keysPressed.delete(e.key));
 		}
 	}
@@ -128,6 +128,24 @@ export class Paddle {
 		}
 		return { dx, dy , direction};
 	}
+
+	setDirection(direction: string) {
+		this.directionReceived.add(direction);
+	}
+	clearDirection() {
+		this.directionReceived.clear();
+	}
+	getMovementByDirection() {
+		let dx = 0;
+		let dy = 0;
+		for (const direction of this.directionReceived) {
+		  if (this.controlBindMapping[direction]) {
+			dx += this.controlBindMapping[direction].dx;
+			dy += this.controlBindMapping[direction].dy;
+		  }
+		}
+		return { dx, dy };
+	  }
   }
 
  const directions:Direction[] = ['left', 'right', 'top', 'bottom'];
@@ -143,8 +161,8 @@ export class Player {
 	score: number = 0;
 	position: Position = { x: 0, y: 0 };
 
-	constructor(jsonData: any, paddle: Paddle, index: number = 0) {
-		this.paddle = paddle;
+	constructor(jsonData: any, paddle:Paddle|null=null /* new Paddle( { x: 0, y: 0 },{width:10,height:50}) */, index: number = 0) {
+		this.paddle =paddle ||new Paddle(jsonData.paddle.position, jsonData.paddle.size);
 		this.direction = directions[index];
 			this.id = jsonData.id;
 			this.name = jsonData.name;
