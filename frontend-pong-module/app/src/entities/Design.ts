@@ -8,7 +8,7 @@
    • global pastel gradient + grain overlay
    ========================================================= */
 
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./Match";
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from "../component/classic.ts";
 import { Player } from "./Player";
 
 /* ---------- palette / fonts ---------- */

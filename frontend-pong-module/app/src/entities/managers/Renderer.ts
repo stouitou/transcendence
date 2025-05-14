@@ -3,46 +3,31 @@ import { Player } from '../Player';
 import * as Design from "../Design";
 import { Ground } from '../../Interfaces/Ground.interface';
 import { StatisticsManager } from './StatisticsManager';
-export class Renderer {
- /*  private canvas: HTMLCanvasElement;
-  private ctx: CanvasRenderingContext2D; */
-	private				_ground!: Ground;
-	private				_score!: HTMLDivElement;
-	private _gameCanvas: HTMLCanvasElement | null = null;
-	private _gameCtx: CanvasRenderingContext2D | null = null;
-	private _gameDivUi: HTMLElement | null = null;
-	private _gameDivAlert: HTMLElement | null = null;
-	private _gameDivHero: HTMLElement | null = null;
-	private _gameDivHeroTree: HTMLElement | null = null;
+export class	Renderer {
 
-	constructor() {}
-  	/* ---------- getters/setters UI ---------- */
-	get gameCanvas () : HTMLCanvasElement | null {
-		return this._gameCanvas;
-	}
-	setCanvas(canvas: HTMLCanvasElement | null) {
-		this._gameCanvas = canvas;
-		this._gameCtx = canvas?.getContext('2d')!;
-	}
-	get gameDivUi () : HTMLElement | null {
-		return this._gameDivUi;
-	}
-	setGameUI(div: HTMLElement | null) {
-		this._gameDivUi = div;
-	}
-	get gameDivAlert () : HTMLElement | null {
-		return this._gameDivAlert;
-	}
-	setGameAlert(div: HTMLElement | null) {
-		this._gameDivAlert = div;
-	}
+	private	_canvas: HTMLCanvasElement | null = null;
+	private	_ctx: CanvasRenderingContext2D | null = null;
+	private	_gameUi: HTMLElement | null = null;
+	private _gameHero: HTMLElement | null = null;
+	private	_gameHeroTree: HTMLElement | null = null;
 
-	setGamehero(div: HTMLElement | null) {
-		this._gameDivHero = div;
-	}
-	setGameheroTree(div: HTMLElement | null) {
-		this._gameDivHeroTree = div;
-	}
+	private		_ground!: Ground;
+	private		_score!: HTMLDivElement;
+	private 	_gameAlert: HTMLElement | null = null;
+
+	constructor () { }
+
+  	/* ---------- getters / setters UI ---------- */
+	get gameCanvas () : HTMLCanvasElement | null	{ return this._canvas ; }
+	get gameDivUi () : HTMLElement | null			{ return this._gameUi ; }
+	get gameDivAlert () : HTMLElement | null		{ return this._gameAlert ; }
+
+	set canvas (canvas: HTMLCanvasElement)	{ this._canvas = canvas; this._ctx = canvas?.getContext('2d')!; }
+	set gameUi (div: HTMLElement)			{ this._gameUi = div; }
+	set gameAlert (div: HTMLElement)		{ this._gameAlert = div; }
+	set gameHero (div: HTMLElement)			{ this._gameHero = div; }
+	set gameHeroTree (div: HTMLElement)		{ this._gameHeroTree = div; }
+
 	private displayScore (Players: Player[] = []) {
 		this._score.innerHTML = '';
 		Players.forEach((player,index) => {
@@ -69,27 +54,27 @@ export class Renderer {
 	}
 		/* -----------setup inital Display */
 		setupDisplay () {
-			if (!this._gameCanvas) {
+			if (!this._canvas) {
 				throw new Error('Game canvas not found');
 			}
-			this._gameCanvas.style.verticalAlign = 'top';
-			this._gameCanvas.height = 600//CANVAS_HEIGHT; //@TODO a recuperer dynamiquement !!!
+			this._canvas.style.verticalAlign = 'top';
+			this._canvas.height = 600//CANVAS_HEIGHT; //@TODO a recuperer dynamiquement !!!
 //			if (this._players.length > 2)
 			//	CANVAS_WIDTH = 500;
-			this._gameCanvas.width = 800//CANVAS_WIDTH;//@TODO a recuperer dynamiquement !!!
+			this._canvas.width = 800//CANVAS_WIDTH;//@TODO a recuperer dynamiquement !!!
 	
 			this._ground = {
-				field: /* this._gameCtx!, */this._gameCanvas.getContext('2d') as CanvasRenderingContext2D,
-				width: this._gameCanvas.width,
-				height: this._gameCanvas.height
+				field: /* this._ctx!, */this._canvas.getContext('2d') as CanvasRenderingContext2D,
+				width: this._canvas.width,
+				height: this._canvas.height
 			}
 	
 			this._score = Design.createAppendix(/* this._players.length */4 - 1);
 	
 			this._score.style.width = '100%';
 			this._score.style.height = '100%';
-			this._gameDivUi!.innerHTML = '';
-			this._gameDivUi?.appendChild(this._score);
+			this._gameUi!.innerHTML = '';
+			this._gameUi?.appendChild(this._score);
 	
 			Design.drawBackground(this._ground.field);
 		}
@@ -101,11 +86,11 @@ export class Renderer {
 	 */
 	renderCountdown(countdown: number) {
 	//	this.setupDisplay();
-		if (!this._gameCtx || !this._gameCanvas) {
+		if (!this._ctx || !this._canvas) {
 			console.error('Game context is not set.');
 			return;
 		}
-		this._gameCtx.clearRect(0, 0, this._gameCanvas.width, this._gameCanvas.height);
+		this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
 		Design.drawBackground(this._ground.field);
 		Design.drawCountdownFrame(this._ground.field, countdown.toString());
 	}
@@ -115,7 +100,7 @@ export class Renderer {
 	this.setupDisplay();
 	 this.displayScore(players);
   //  this.clear(); 
-//	Design.drawBackground(this._gameCtx!);
+//	Design.drawBackground(this._ctx!);
 //	this.drawBall(ball);
 /* this.displayCountdown().then(() => {
 		Design.drawBackground(this._ground.field);
@@ -172,29 +157,29 @@ export class Renderer {
   }
 
   clear() {
-	if (!this._gameCtx || !this._gameCanvas) {
+	if (!this._ctx || !this._canvas) {
 	  // Si le contexte de jeu n'est pas défini, on ne peut pas effacer le canvas
 	  console.error('Game context is not set.');
 	  return;
 	}
-    this._gameCtx.clearRect(0, 0, this._gameCanvas.width, this._gameCanvas.height);
+    this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
   }
 
   private drawBall(ball: Ball) {
-/* 	if (!this._gameCtx) {
+/* 	if (!this._ctx) {
 	  console.error('Game context is not set.');
 	  return;
 	}
-    this._gameCtx.fillStyle = 'white';
-    this._gameCtx.beginPath();
-    this._gameCtx.arc(
+    this._ctx.fillStyle = 'white';
+    this._ctx.beginPath();
+    this._ctx.arc(
       ball.position.x + ball.size.width / 2, // Centre X
       ball.position.y + ball.size.height / 2, // Centre Y
       ball.size.width / 2, // Rayon
       0,
       Math.PI * 2
     );
-    this._gameCtx.fill(); */
+    this._ctx.fill(); */
 		/* ---------- glossy draw ---------- */
 			const ctx = this._ground.field;/* 
 			const r   = this._radius;
@@ -227,12 +212,12 @@ export class Renderer {
   }
 
   private drawPaddle(position: { x: number; y: number }, size: { width: number; height: number }) {
-	/* if (!this._gameCtx) {
+	/* if (!this._ctx) {
 	  console.error('Game context is not set.');
 	  return;
 	}
-    this._gameCtx.fillStyle = 'white';
-    this._gameCtx.fillRect(position.x, position.y, size.width, size.height); */
+    this._ctx.fillStyle = 'white';
+    this._ctx.fillRect(position.x, position.y, size.width, size.height); */
 	/* 	let height: number = 0;
 			let width: number = 0;
 	 */
@@ -249,7 +234,7 @@ export class Renderer {
 					break;
 			} */
 			Design.drawPaddle(
-				this._gameCtx!,
+				this._ctx!,
 				position.x,
 				position.y,
 				size.width,
@@ -263,7 +248,7 @@ export class Renderer {
 
 	renderGameHeroDiv(data: PREPARE_MATCHES_STARTED_ROUND_GAME) {
 		console.log('Renderer: renderGameHeroDiv data:',data);
-		const div = this._gameDivHero as HTMLDivElement;
+		const div = this._gameHero as HTMLDivElement;
         if (div) {
           div.innerHTML = '';
           displayPrepareMatchesStartedRoundGame(div,data);
@@ -277,7 +262,7 @@ export class Renderer {
 	}
 
 	renderGameHeroTreeDiv(data: PREPARE_MATCHES_STARTED_ROUND[]) {
-		const div = this._gameDivHeroTree as HTMLDivElement;
+		const div = this._gameHeroTree as HTMLDivElement;
         if (div) {
           div.innerHTML = '';
           displayPrepareMatchesStartedTournament(div,data);
@@ -337,8 +322,8 @@ export class Renderer {
 			text += "Nombre de rebond de " + players[x].name + " est de " + players[x].historiqueGame.totalBouncesPerPlayer + "\n";
 		} */
 		menuHistoriqueGame.textContent = text;
-		this._gameDivAlert?.appendChild(menuHistoriqueGame);
-		this._gameDivAlert?.classList.add('show');
+		this._gameAlert?.appendChild(menuHistoriqueGame);
+		this._gameAlert?.classList.add('show');
 		}
 	}
 }
