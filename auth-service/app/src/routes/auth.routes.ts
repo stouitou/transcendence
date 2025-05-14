@@ -3,6 +3,8 @@ import FastifyPassport from "@fastify/passport";
 import { AuthController } from "../controllers/auth.controller";
 import { AuthSchema } from "../schemas/auth.schema";
 import { User } from "../models/User.models";
+import qrcode from "qrcode";
+import { generateTOTPSecret, verifyTOTP } from "@src/utils/totp";
 
 const BACKEND_SERVER_URL = process.env.BACKEND_SERVER_URL || "https://localhost:4433";
 const redirectUrlAfterLoginSuccess = `${BACKEND_SERVER_URL}/profile`;
@@ -111,6 +113,10 @@ async function authRoutes(app: FastifyInstance) {
     // reply.send(err);
     }
   });
+
+
+  app.get('/2fa/qrcode', authController.generate2FAQRcode);
+  app.post('/2fa/verify', authController.verify2FA);
 }
 
 export default authRoutes;

@@ -25,11 +25,11 @@ export class JWT {
        * debug token info
        * 
        */
-          const iatDate = new Date(decoded.iat * 1000);
-          const expDate = new Date(decoded.exp * 1000);
-          console.log("class JWT::verify()");
-          console.log("Issued At:", iatDate);
-          console.log("Expires At:", expDate);
+    //      const iatDate = new Date(decoded.iat * 1000);
+    //      const expDate = new Date(decoded.exp * 1000);
+    //      console.log("class JWT::verify()");
+    //      console.log("Issued At:", iatDate);
+    //      console.log("Expires At:", expDate);
     if (keyName === "ACCESS_TOKEN_PUBLIC_KEY") {
       return jwt.verify(token, this.secret.public, { algorithms: ['RS256'] })
     }else if (keyName === "REFRESH_TOKEN_PUBLIC_KEY") {

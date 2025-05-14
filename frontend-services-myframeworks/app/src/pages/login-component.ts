@@ -23,6 +23,37 @@ export class Login extends BaseComponent<{login:LoginState}> {
     const input = event.target as HTMLInputElement;
     this.setState({ login: { ...this.state.login, password: input.value } });
   }
+  handleVerify2FACode = async(e: Event)=> {
+    e.preventDefault()
+    const input = document.getElementById('2faCode') as HTMLInputElement;
+    const code = input.value;
+    if (code === "") {
+      alert("Please fill in all fields");
+      return;
+    }
+    try {
+      const result = await fetch('/api/auth/2fa/verify', {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json',
+        },
+        body: JSON.stringify({ code }),
+      });
+      if (!result.ok) {
+        throw new Error('Failed to verify 2FA code');
+      }
+      const data2FA = await result.json();
+      console.log('2FA verification successful:');
+      const data = await fetchProfileData();
+      UserContext().setUser(data);
+      UserContext().setLoginSuccess();
+      const router = RouterConfig.getInstance();
+      router.navigate('/');
+    } catch (error) {
+      console.error('2FA verification failed:', error);
+      alert('2FA verification failed. Please try again.');
+    }
+  }
   handleSubmit = async(e: Event)=> {
     e.preventDefault()
     if (this.state.login.email === "" || this.state.login.password === "") {
@@ -33,12 +64,54 @@ export class Login extends BaseComponent<{login:LoginState}> {
       const userContext = UserContext();
       const { setUser,user } = userContext;
 			const loginData: LoginData = { ...this.state.login };
-			await  loginUser(loginData);
+			const loginToken = await  loginUser(loginData);
+      const { twoFactorRequired} = loginToken;
+      console.log('Login 2FA token:', loginToken);
+      if (twoFactorRequired) {
+        console.log('Two-factor authentication required');
+      this.innerHTML = `
+      <style>
+  .qr-code-container {
+    text-align: center;
+    margin-top: 20px;
+  }
+  .qr-code-image {
+    max-width: 200px;
+    margin: 0 auto;
+    display: block;
+  }
+</style>
+        <div class="qr-code-container">
+          <h2 class="text-2xl font-bold text-center mb-4">Scan this QR Code</h2>
+          <img 
+          referrerpolicy="no-referrer"
+          src="/api/auth/2fa/qrcode" alt="QR Code for 2FA" class="qr-code-image" />
+          <p class="text-center mt-4">Use an authenticator app like Google Authenticator to scan the QR code.</p>
+          <p class="text-center mt-4">Then enter the code below:</p>
+          <input
+            id="2faCode"
+            type="text"
+            class="form-text-input"
+            placeholder="Enter the code"
+            required
+          />
+          <button
+            id="verify2faBtn"
+            type="submit"
+            class="btn mt-4"
+            >
+            Verify 2FA Code
+          </button>
+        </div>
+      `;
+      this.attachEvent(this, '#verify2faBtn', 'click', this.handleVerify2FACode.bind(this));
+        return;
+      }
 			const data = await fetchProfileData();
       UserContext().setUser(data);
       UserContext().setLoginSuccess();
 
-      console.log('Login successful:', user());
+      console.log('Login successful');
       const router = RouterConfig.getInstance();
       router.navigate('/');
 		} catch (error) {

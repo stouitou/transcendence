@@ -6,7 +6,9 @@ import { User } from "../models/User.models";
 //import AuthProviderRepository from "../repository/AuthProvider.repository";
 import UserRepository from "../repository/User.repository";
 import bcrypt from "bcryptjs"
+import AuthProviderRepository from "@src/repository/AuthProvider.repository";
 
+import { generateTOTPSecret, verifyTOTP } from "@src/utils/totp";
 /**
  * Service d'authentification
  * rappel: un service est une classe qui contient des méthodes qui effectuent des opérations spécifiques
@@ -16,9 +18,11 @@ import bcrypt from "bcryptjs"
 export class AuthService {
 
   private UserRepository: UserRepository;
+  private AuthProviderRepository: AuthProviderRepository;
 
   constructor(private app: FastifyInstance) {
     this.UserRepository = new UserRepository();
+    this.AuthProviderRepository = new AuthProviderRepository();
   }
 
   /**
@@ -28,8 +32,9 @@ export class AuthService {
    * @param hash 
    * @returns 
    */
-  private isValidPassword(password: string, hash: string) {
-    return bcrypt.compare(password, hash);
+  private async isValidPassword(password: string, hash: string) {
+    console.log("🔐 AuthService: isValidPassword()  --",await bcrypt.compare(password, hash),"--  password ",password, " hash ",hash)
+    return await bcrypt.compare(password, hash);
   }
 
   /**
@@ -66,7 +71,7 @@ export class AuthService {
     if (!existingUser) return null;
 
     //3- on verifie le mot de passe avec bcrypt via la methode isValidPassword de AuthProvider
-    const isPasswordValid = this.isValidPassword(password, "existingUser.password");
+    const isPasswordValid = await this.isValidPassword(password, existingUser.authProviders[0].password??"password");
     if (!isPasswordValid) return null;
 
     //4- on retourne l'authProvider
@@ -212,4 +217,54 @@ async registerWithOauthProvider(profile:any, provider: string) {
   // 5️⃣- retourner l'utilisateur
   return user;
 }
+
+
+  //2FA
+    /**
+   * Générer un token JWT temporaire pour l'authentification à deux facteurs
+   *
+   * @param user
+   * @returns
+   */
+  generateTemp2FAToken(email:string) { //@TODO : changer le type de user et retourner un objet User complet
+    return this.app.jwt.sign({
+      email: email,
+      stage: 'pending-2fa',
+    },
+    { expiresIn: "5m" }
+    );
+  }
+  async get2FASecret(email: string): Promise< {secret:string,otpauth:string| null } > {
+    //1- on verifie si l'utilisateur existe
+    if (!email) throw new Error("email not found");
+    //2- on verifie si l'utilisateur a deja un secret
+    const user = await this.UserRepository.getOneByParams({authProviders:{provider_id:email, provider:"local"}});
+    if (!user) throw new Error("User not found");
+    //3- on verifie si l'utilisateur a deja activé l'authentification à deux facteurs
+    if (user.authProviders[0].two_factor_auth_secret) return {secret:user.authProviders[0].two_factor_auth_secret, otpauth:null};
+    //3- on genere le secret de l'authentification à deux facteurs
+    const {secret,otpauth} = generateTOTPSecret(user.authProviders[0].provider_id)//this.app.authService.generateTemp2FAToken(user.authProviders[0].provider_id);
+    //4- on enregistre le secret dans la base de données
+     const userUpdated = await  this.AuthProviderRepository.set2FASecret(user.authProviders[0].id!, secret);
+
+     console.log("🔐AuthService:  get2FASecret()  userWithAuthProvider updated : ",userUpdated)
+    return {secret,otpauth};
+  }
+  /**
+   * 🔄 Activer l'authentification à deux facteurs
+   * 
+   * @param user 
+   * @returns 
+   */
+  async enableTwoFactorAuth(user: User): Promise<User> {
+    //1- on verifie si l'utilisateur existe
+    if (!user) throw new Error("User not found");
+    //2- on verifie si l'utilisateur a deja activé l'authentification à deux facteurs
+    if (user.authProviders[0].two_factor_auth) throw new Error("Two factor auth already enabled");
+    //3- on active l'authentification à deux facteurs
+    user.authProviders[0].two_factor_auth = true;
+    //4- on enregistre l'utilisateur dans la base de données
+    const updatedUser = await this.UserRepository.update(user);
+    return updatedUser;
+  }
 }
