@@ -28,10 +28,21 @@ export class LobyFactory {
 		}
 		return loby;
 	  }
+	  //remove loby from the map where loby.config.state=="finished"
+	  static cleanupLoby() {
+		for (const [lobyId, loby] of lobys.entries()) {
+		  if (loby.getCurrentPhase() === "LOBBYENDPHASE") {
+			lobys.delete(lobyId);
+			console.log(`LobyFactory Loby with ID ${lobyId} deleted`);
+		  }
+		}
+	  }
 	  static broadcastCreatedLobyMessage = (sockets: Map<string, WebSocket>)=> {
+		this.cleanupLoby();
 		const rooms = Array.from(lobys.values());
 	  
 		const array = rooms.map((room) => (room.toJSON() ));
+
 		const messages = { type:"games", games:array };
 		console.log(`LobyFactory broadcastCreatedMessage messages`,messages);
 	  

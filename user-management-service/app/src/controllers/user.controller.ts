@@ -1,13 +1,11 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import  UserRepository  from '../repository/User.repository';
-import { Param } from '@prisma/client/runtime/library';
 
 import { pipeline } from 'node:stream';
-import fs  from 'node:fs';
 import { promisify } from 'util';
-import path from 'node:path';
 import { createWriteStream } from 'node:fs';
 import { UserStats } from '../models/User';
+import Helpers, { IParams } from '@src/repository/helpers';
 const pump = promisify(pipeline);
 
 export type User = {
@@ -295,6 +293,128 @@ export class UserController {
       return reply.status(400).send({ error: error.message });
     }
   } */
+
+
+    /**
+     * 
+     * @param request 
+     * @param reply 
+     * @returns 
+     */
+
+  async getUserGames(request: FastifyRequest, reply: FastifyReply) {
+   try {
+    const authHeader = request.headers.authorization;
+    const response = await fetch('http://game_management_service:3000/api/games', {
+      method: 'GET',
+      headers: {
+        'Authorization': authHeader?? '',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch games: ${response.statusText}`);
+    }
+
+    const games = await response.json();
+    return reply.code(200).send(games);
+  } catch (error) {
+    console.error("Error fetching games:", error);
+    return reply.code(500).send({ error: "Failed to fetch games" });
+  }
+}
+async getUserGameById(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+  try {
+    const authHeader = request.headers.authorization;
+    const gameId = request.params.id;
+    const response = await fetch(`http://game_management_service:3000/api/games/${gameId}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': authHeader?? '',
+      },
+    });
+
+    if (!response.ok) {
+      throw new Error(`Failed to fetch game: ${response.statusText}`);
+    }
+
+    const game = await response.json();
+    return reply.code(200).send(game);
+  } catch (error) {
+    console.error("Error fetching game:", error);
+    return reply.code(500).send({ error: "Failed to fetch game" });
+  }
+}
+
+async getUserFriends(request: FastifyRequest, reply: FastifyReply) {
+    try {
+      const authHeader = request.headers.authorization;
+      const response = await fetch('http://game_management_service:3000/api/tournaments', {
+        method: 'GET',
+        headers: {
+          'Authorization': authHeader?? '',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch tournaments: ${response.statusText}`);
+      }
+  
+      const tournaments = await response.json();
+      return reply.code(200).send(tournaments);
+    } catch (error) {
+      console.error("Error fetching tournaments:", error);
+      return reply.code(500).send({ error: "Failed to fetch tournaments" });
+    }
+  }
+
+  async getUserTournaments(request: FastifyRequest, reply: FastifyReply) {
+        console.log("[UserController] getUserTournaments request.query ",request.query);
+        const query = request.query as IParams;
+        const builQuery = Helpers.buildQueryString(query);
+    try {
+      const authHeader = request.headers.authorization;
+      const response = await fetch(`http://game-management-service:3000/api/game-management-service/tournaments?${builQuery}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': authHeader?? '',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch tournament: ${response.statusText}`);
+      }
+  
+      const tournament = await response.json();
+      return reply.code(200).send(tournament);
+    } catch (error) {
+      console.error("Error fetching tournament:", error);
+      return reply.code(500).send({ error: "Failed to fetch tournament" });
+    }
+  }
+  async getUserTournamentById(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+    try {
+      const authHeader = request.headers.authorization;
+      const tournamentId = request.params.id;
+      const response = await fetch(`http://tournament_management_service:3000/api/tournaments/${tournamentId}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': authHeader?? '',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch tournament: ${response.statusText}`);
+      }
+  
+      const tournament = await response.json();
+      return reply.code(200).send(tournament);
+    } catch (error) {
+      console.error("Error fetching tournament:", error);
+      return reply.code(500).send({ error: "Failed to fetch tournament" });
+    }
+  }
+
 
 }
 

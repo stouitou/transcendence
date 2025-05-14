@@ -22,7 +22,7 @@ export const getGames = async (pagination:Pagination,filter:Filter): Promise<{ga
 	const { limit = 10, offset = 0, order = 'ASC' } = pagination;
 	const { type ="remote" } = filter;
 	try {
-		const response = await fetch(`/api/game-management-service/games/pagination?limit=${limit}&offset=${offset}&order=${order}&filters={"type":"${type}"}`);///games/pagination?limit=10&offset=2
+		const response = await fetch(`/api/game-management-service/games/pagination?limit=${limit}&offset=${offset}&order=${order}&filters={"type":"${type}","format":"classic"}&relations=tournament`);///games/pagination?limit=10&offset=2
 		if (response.ok) {
 			const {data, meta} = await response.json();
         console.log('games list:', data);
@@ -264,3 +264,23 @@ export const generateNextRound = async (tournamentId:number): Promise<Tournament
 	console.log('generateNextRound successful:', result);
 	return result;
 }
+
+
+export const getTounaments = async (pagination:Pagination,filter:Filter): Promise<{tournaments:Tournaments[],meta:MetaPagination} | void> => {
+	//limit: 10, offset: 2, order: 'ASC'
+	const { limit = 10, offset = 0, order = 'ASC' } = pagination;
+	const { type ="remote" } = filter;
+	try {
+		const response = await fetch(`/api/users/me/tournaments?limit=${limit}&offset=${offset}&order=${order}&filters={"type":"${type}"}`);///games/pagination?limit=10&offset=2
+		if (response.ok) {
+			const {data, meta} = await response.json();
+        console.log('games list:', data);
+        return {tournaments:data,meta};
+		} else {
+			console.log ('[debug] Failed to fetch tournaments list');
+			return {tournaments:[],meta:{limit:0,offset:0,order:'ASC',total:0}};
+		}
+	} catch (error) {
+		console.error('Error fetching tournaments data:', error);
+	}
+};

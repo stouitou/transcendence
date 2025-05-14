@@ -52,13 +52,6 @@ export type GameHistoryPlayer =
   }
 export class DatabaseManager {
 	private tournamentId: number = -1;
-	//private config: LobyConfig;
-	//private gameHistoryId: number = -1;
-/* 	private playerManager: PlayerManager
-	constructor(config: LobyConfig, playerManager: PlayerManager) {
-		this.config = config;
-		this.playerManager = playerManager;
-	} */
 	
 	processDataBaseCreateMatch = async(match:Match,currentRound:number=0,tournamentId:number|null=null) => {
 
@@ -89,7 +82,8 @@ export class DatabaseManager {
 			currentRound,
 			tournament: tournamentId,
 			};
-			const result = await fetch(`http://game-management-service:3000/docker/games/${match.config.type}/${match.config.format}/normal`, {
+		try {
+			const response = await fetch(`http://game-management-service:3000/docker/games/${match.config.type}/${match.config.format}/normal`, {
 
 			method: 'POST',
 			headers: {
@@ -97,47 +91,28 @@ export class DatabaseManager {
 			},
 			body: JSON.stringify(dataDB),
 			});
-		if (result.ok) {
-			const data = await result.json();
-			//const databasePlayers = data.gameHistory.players;
-			//console.log("[Match]processDataBaseCreateMatch createGame data ",data);
+			  if (!response.ok) {
+            console.error("processDataBaseCreateTournament error ", response);
+            throw new Error(`HTTP error! status: ${response.status}`);
+        }
+			const data = await response.json();
 			match.config.gameId=data.id;
 			match.config.state = data.state;			
 			match.setgameHistoryId(data.gameHistory.id); //utilie pour la mise a jour des resultats
-//		//	//match.tournamentId = data.tournament.id;
-			//on dois metre a jour les id des joueurs via leur userId
-		/* 	match.playerManager.players = match.playerManager.players.map((player) => {
-				const dbPlayer = data.gameHistory.players.find((dbPlayer: any) => dbPlayer.user != null && ( dbPlayer.user.id === player.userId));
-				
-				if (dbPlayer) {
-					player.id = dbPlayer.id;
-					//player.state = "waiting";
-					//player.isInGame = false;
-					player.score = 0;
-				}
-				return player;
-			}); */
 			const ids = data.gameHistory.players.map((player: any) => player.id);
 			match.playerManager.players = match.playerManager.players.map((player,index) => {
-				const dbPlayer = data.gameHistory.players.find((dbPlayer: any) => dbPlayer.user != null && ( dbPlayer.user.id === player.userId));
+			//	const dbPlayer = data.gameHistory.players.find((dbPlayer: any) => dbPlayer.user != null && ( dbPlayer.user.id === player.userId));
 				player.score = 0;
 				player.id = ids[index];				
 				return player;
 			});
-
-			//this.playerManager.setPlayers(updatedPlayers);
-		//	this.config.players = data.players ?? [];
-			console.log("[Match]processDataBaseCreateMatch createGame data ",data);
-			console.log("[Match]processDataBaseCreateMatch createGame data.players ",data.players);
-			console.log("[Match]processDataBaseCreateMatch createGame data.gameHistory ",data.gameHistory);
-			console.log("[Match]processDataBaseCreateMatch match.playerManager.players ",match.playerManager.players);
-
 			return data;
-		} else {
-			console.error("GameController createGame error ",result);
-			throw new Error("Error creating game");
-		}
+		}catch (error) {
+			console.error("[DatabaseManager] processDataBaseCreateMatch error", error);
+			throw error; // Relancer l'erreur pour la propager
+    	}
 	}
+
 	processDataBaseSaveMatchResult = async(match:Match) => {
 		console.log("[Match]processDataBaseSaveMatchResult gameId ",match.config.gameId);
 		console.log("[Match]processDataBaseSaveMatchResult gameHistoryId ",match.gameHistoryId);
@@ -223,14 +198,34 @@ export class DatabaseManager {
 				//
 
 				console.log("processDataBaseCreateTournament dataDB ",`http://game-management-service:3000/docker/tournaments/${config.type}/${config.format}/normal`);
-			return fetch(`http://game-management-service:3000/api/game-management-service/docker/tournaments/${config.type}/${config.format}/normal`, {
+			
 
-			method: 'POST',
-			headers: {
-				'Content-Type': 'application/json',
-			},
-			body: JSON.stringify({...dataDB}),
-			}).then((response) => {
+   		 try {
+				const response = await fetch(`http://game-management-service:3000/api/game-management-service/docker/tournaments/${config.type}/${config.format}/normal`, {
+					method: 'POST',
+					headers: {
+						'Content-Type': 'application/json',
+					},
+					body: JSON.stringify({...dataDB}),
+				});
+
+				if (!response.ok) {
+					console.error("processDataBaseCreateTournament error ", response);
+					throw new Error(`HTTP error! status: ${response.status}`);
+				}
+
+				const data = await response.json();
+				const { tournament, games } = data as { tournament: TournamentDATABASE; games: GameDATABASE[] };
+				this.tournamentId = tournament.id;
+				return { tournament, games };
+			} catch (error) {
+				console.error("[catch] processDataBaseCreateTournament error", error);
+				throw error; // Relancer l'erreur pour la propager
+			}
+				
+				
+				
+				/* .then((response) => {
 				if (!response.ok) {
 					console.error("processDataBaseCreateTournament error ",response);
 					throw new Error(`HTTP error! status: ${response.status}`);
@@ -245,7 +240,7 @@ export class DatabaseManager {
 			.catch((error) => {
 				console.error("processDataBaseCreateTournament error", error);
 				throw error;
-			});		
+			});	 */	
 	}
 
 	processDataBaseGenerateNextRoundTournament = async() => {

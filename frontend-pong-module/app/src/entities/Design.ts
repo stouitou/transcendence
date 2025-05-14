@@ -47,9 +47,12 @@ export const DESIGN = {
             inset           : "0",
             pointerEvents   : "none",
             zIndex          : "1",
-            backgroundImage:
-                "url(\"data:image/svg+xml;base64,"
-                + "PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxnIGZpbGw9JyMwMDAwMDAnIGZpbGwtb3BhY2l0eT0nLjA0Jz48cmVjdCB3aWR0aD0nMScgaGVpZ2h0PScxJy8+PC9nPjwvc3ZnPg==\")",
+            backgroundImage: `url("data:image/svg+xml;utf8,
+                <svg xmlns='http://www.w3.org/2000/svg' width='1' height='1'>
+                <g fill='#000000' fill-opacity='.04'>
+                    <rect width='1' height='1'/>
+                </g>
+                </svg>")`,
             backgroundSize  : "4px 4px",
             mixBlendMode    : "overlay",
             opacity         : ".4",

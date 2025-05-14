@@ -181,7 +181,7 @@ export class GameController {
     const query = request.query as IParams;
    // const options = new BuildOptions(query).getOptions();
     const games = await  this.gameRepository.getAllbyQuery(query);
-        console.log("GameController getGames ",games);
+ //       console.log("GameController getGames ",games);
     return reply.send(games);
   }
 

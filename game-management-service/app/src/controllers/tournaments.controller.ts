@@ -6,6 +6,7 @@ import { Game } from '../models/Game';
 import RoundRepository from '../repository/Round.repository';
 import { GameHistory, Players } from '../models/GameHistory';
 import GameRepository from '../repository/Game.repository';
+import { IParams } from '@src/repository/helpers';
 
 export class TournamentsController {
   private tournamentsRepository = new TournamentsRepository();
@@ -342,11 +343,19 @@ export class TournamentsController {
       return reply.status(201).send(tournament);
     } */
 
+
+
   async getTournaments(request: FastifyRequest, reply: FastifyReply) {  
-    console.log("--TournamentsController getTournaments ");
+/*     console.log("--TournamentsController getTournaments ");
     const tournaments = await  this.tournamentsRepository.getAll();
         console.log("TournamentsController getTournaments ",tournaments);
-    return reply.send(tournaments);
+    return reply.send(tournaments); */
+        console.log("--TournamentsController getTournaments ");
+        const query = request.query as IParams;
+       // const options = new BuildOptions(query).getOptions();
+        const tournaments = await  this.tournamentsRepository.getAllbyQuery(query);
+        console.log("TournamentsController getTournaments ",tournaments);
+          return reply.send(tournaments);
   }
 
 

@@ -165,6 +165,9 @@ export class Loby {
 		// Notifier tous les joueurs de la phase actuelle
 		this.socketManagerInstance.broadcastMessage({ type: "PHASE_UPDATE", phase: phaseName });
 	  }
+	getCurrentPhase(): string {
+		return this.currentPhase;
+	}
   
 	addPlayerToLoby(player: WaitingPlayers, socket: WebSocket): void {
 /* 	  this.playerManagerInstance.addPlayer(player);

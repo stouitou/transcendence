@@ -8,7 +8,7 @@ import { GameHistoryPlayer } from "./DatabaseManager";
 export class LobbyEndPhase implements LobbyPhaseStep {
 	name = "LOBBYENDPHASE";
   
-	constructor(private context:PhaseContext, private socketManager: SocketManager) {}
+	constructor(private lobyConfig:LobyConfig,private context:PhaseContext, private socketManager: SocketManager) {}
   
 	async execute(): Promise<LobbyPhaseTransition> {
 		this.socketManager.broadcastMessage({ type: "LOBBYENDPHASE", data: this.context.tournamentWinner });
@@ -190,14 +190,20 @@ console.log("TournamentRedirectPhase");
 		//const configs = this.createConfigMatch();
 	//	const matches = this.matchManager.createMatchForRound(configs, this.lobyConfig.lobyId);
 		//const matches = this.matchManager.createMatchesForRound(configs, this.lobyConfig.lobyId);
-		const matches = this.matchManager.createMatches(configs, this.lobyConfig.lobyId);
+		try {
+			const matches = await this.matchManager.createMatches(configs, this.lobyConfig.lobyId);
+		
+			return { next: "skip" };
+		} catch (error) {
+			console.error("[CreateMatchRedirectPhase]......   Error creating matches:", error);
+			return { next: "error", error };
+		}
 			//this.matchManager.createMatchForRound();
 		
-			await new Promise(resolve => setTimeout(resolve, 2000));
+		//	await new Promise(resolve => setTimeout(resolve, 2000));
 			// Force end after 60 seconds
 	//		await new Promise(resolve => setTimeout(resolve, 60000));
 	//		this.matchManager.forceStopAll(0);//@TODO a definir le roundNumber
-			return { next: "skip" };
 	}
 
 	  }
@@ -299,7 +305,7 @@ export class PhaseManager {
 	  this.phases.push(new WaitOthersPhase(this.matchManager, this.socketManager));
 	  this.phases.push(new TournamentRedirectPhase(this.config, this.socketManager));
 	  this.phases.push(new CreateTournamentNexyRoundPhase(this.context,this.matchManager, this.config));
-	  this.phases.push(new LobbyEndPhase(this.context,this.socketManager));
+	  this.phases.push(new LobbyEndPhase(this.config,this.context,this.socketManager));
 	}
   
 	async startPhaseLoop() {
@@ -332,6 +338,7 @@ export class PhaseManager {
 				return;
 			case "error":
 			  console.error(`[PhaseManager] Error in phase: ${current.name}`, transition.error);
+			  this.socketManager.broadcastMessage({ type: "PHASE_ERROR", error: transition.error });
 			  return; // ou on peut continuer ou redémarrer
 		  }
   

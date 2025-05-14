@@ -4,10 +4,12 @@ import { UserSchema } from '../schemas/user.schema';
 
 import  { AuthMiddleware } from "../middlewares/auth.middleware";
 
-//@TODO pour tester les hooks
 
-
-async function userRoutes(app: FastifyInstance) {
+/**
+ * Ensemble des routes de l'API utilisateur actuellement connecté
+ * @param app 
+ */
+async function userMeRoutes(app: FastifyInstance) {
   
   //1- Création d'une instance de UserController
   const userController = new UserController();
@@ -84,62 +86,77 @@ async function userRoutes(app: FastifyInstance) {
    
   }) */
 
+  
+
+// manipuler les donnees liees a l'utilisateur connecte
   //3- Définition des routes
-//  app.get('/me',{/* preHandler: [authMiddleware.authMiddleware],schema: UserSchema.me */}, async function (req, reply) {
-//    console.log("🔗 userRoutes /me")
-//    //console.log("🔗 userRoutes /me req.authenticatedUser",req.authenticatedUser)
-//    return reply.code(200).send({ ... req.authenticatedUser })
-//  })
-
-
-
-  app.get('/decode', /* {schema: UserSchema.bebugResponse}, */async (request, reply) => {
-    console.log("🔗 userRoutes /decode")
-
-    if (!request.authenticatedUser) {
-      // Si le token n'est pas présent, on retourne une erreur
-      return reply.status(401).send({ error: "Accès interdit, token requis." });
-    }
-    return reply.code(200).send({ ...request.authenticatedUser });
+  /* 
+    recuperer les donnees de l'utilisateur connecté contenues dans le token
+  */
+  app.get('/',{/* preHandler: [authMiddleware.authMiddleware],schema: UserSchema.me */}, async function (req, reply) {
+    console.log("🔗 userRoutes /me")
+    //console.log("🔗 userRoutes /me req.authenticatedUser",req.authenticatedUser)
+    return reply.code(200).send({ ... req.authenticatedUser })
   })
-
-
-
-  app.get("/", {/* preHandler: [loggerMiddleware], *//* schema: UserSchema.getUsers */}, userController.getUsers);
-  app.get("/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserById);
-  app.get("/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserStatsById);
-  app.put("/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.updateStatsById);
-//  app.put("/me",/*  {schema: UserSchema.updateUser}, */ userController.updateMe);
-//  app.put("/me/addFriend",/*  {schema: UserSchema.updateUser}, */ userController.addFriend);
-//  app.put("/me/removeFriend",/*  {schema: UserSchema.updateUser}, */ userController.removeFriend);
-  app.put("/:id", {schema: UserSchema.updateUser}, userController.updateUser);
-  app.delete("/:id",/*  {schema: UserSchema.deleteUser}, */ userController.deleteUser);
- // app.post("/query", {schema: UserSchema.requestQuery}, userController.requestQuery);
-  //pour tester les users
-  app.post("/", {schema: UserSchema.createUser }, userController.createUser);
-
-
- app.post('/upload-avatar', { //@TODO : à rename /me/upload-avatar
+  /*
+   metre a jour les donnees de l'utilisateur connecté
+   */
+  app.put("/",/*  {schema: UserSchema.updateUser}, */ userController.updateMe);
+  /* metre a jour l'avatar de l'utilisateur connecté*/
+   app.post('/upload-avatar', { //@TODO : à rename /avatar
   schema: {
     consumes: ['multipart/form-data'],
-/*    body: {
-    type: 'object',
-     // required: ['avatar'],
-      properties: {
-        // file that gets decoded to string
-          file: { type: 'string', format: 'binary' }
-      },
-  }  */
-/*     body: {
-      type: 'object',
-     // required: ['avatar'],
-      properties: {
-        // file that gets decoded to string
-          avatar: { type: 'string', format: 'binary' }
-      },
-    } */
   }
 }, userController.updateUserAvatar);
+  /* 
+   recuperer les amis de l'utilisateur connecté
+  */
+//  app.get("/friends",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserFriendsById);
+  /* recuperer les demandes d'amis de l'utilisateur connecté*/
+//  app.get("/friendRequests",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserFriendRequestsById);
+  /* recuperer les invitations de l'utilisateur connecté*/
+//  app.get("/invitations",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserInvitationsById);
+  /* recuperer les invitations de l'utilisateur connecté*/
+//  app.get("/invitations/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserInvitationById);
+  /* 
+   recuperer les stats de l'utilisateur connecté
+  */
+  app.get("/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserStatsById);
+  /* metre a jour les amis de l'utilisateur connecté*/
+  app.put("/addFriend",/*  {schema: UserSchema.updateUser}, */ userController.addFriend);
+  app.put("/removeFriend",/*  {schema: UserSchema.updateUser}, */ userController.removeFriend);
+
+  //app.get("/", {/* preHandler: [loggerMiddleware], *//* schema: UserSchema.getUsers */}, userController.getUsers);
+  //app.get("/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserById);
+  app.get("/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserStatsById);
+  //app.put("/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.updateStatsById);
+  //app.put("/:id", {schema: UserSchema.updateUser}, userController.updateUser);
+  //app.delete("/:id",/*  {schema: UserSchema.deleteUser}, */ userController.deleteUser);
+ // app.post("/query", {schema: UserSchema.requestQuery}, userController.requestQuery);
+  //pour tester les users
+
+  /**
+   * gestion des games de l'utilisateur connecté
+   */
+  app.get("/games", userController.getUserGames);
+  app.get("/games/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserGameById);
+  //app.get("/games/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserGameStatsById);
+  //app.put("/games/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.updateUserGameStatsById);
+
+  /**
+   * gestion des tournaments de l'utilisateur connecté
+   */
+  app.get("/tournaments",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserTournaments);
+  app.get("/tournaments/id/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserTournamentById);
+//  app.get("/tournaments/id/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserTournamentStatsById);
+//  app.put("/tournaments/id/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.updateUserTournamentStatsById);
+//  app.get("/tournaments/id/:id/rounds",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserTournamentRoundsById);
+//  app.get("/tournaments/id/:id/rounds/:roundId",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserTournamentRoundById);
+//  app.get("/tournaments/id/:id/rounds/:roundId/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserTournamentRoundStatsById);
+  //app.post("/", {schema: UserSchema.createUser }, userController.createUser);
+
+
+
 }
 
-export default userRoutes;
+export default userMeRoutes;

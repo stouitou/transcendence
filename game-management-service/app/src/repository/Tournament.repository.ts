@@ -83,7 +83,24 @@ class TournamentsRepository extends BaseRepository<Tournaments,TournamentsCreate
     console.log("🔐 TournamentsRepository.getAll()  --results--",results)
     return {...results};
   }
-
+  getAllbyQuery = async (query:IParams): Promise<Tournaments[]> =>{
+  const queryPagination = this.buildQueryString(query);
+    //return data.map(User.fromJSON);
+    const url = `${this.URL}?${queryPagination}&relations=winner`;//{this.getRelations()}
+  //  const url = `${this.URL}?limit=10`;
+   
+    //const url = `${this.URL}${this.getRelations()}&${queryPagination}`;
+    console.log("🔐 TournamentsRepository.getAllbyQuery()  --start-- fetch from: ", url)
+    const response = await fetch(url);
+    console.log("🔐 TournamentsRepository.getAllbyQuery()  --response--",response)
+    const data = await response.json();
+    console.log("🔐 TournamentsRepository.getAllbyQuery()  --data--",data)
+   // const results = data.data//.map((user: User) => User.fromJSON(user));
+    const results = data//.map((user: User) => User.fromJSON(user));
+    //const results = data.data.map(User.fromJSON);
+    console.log("🔐 TournamentsRepository.getAllbyQuery()  --results--",results)
+    return {...results};
+  }
  getById= async (id: number): Promise<Tournaments | null> => {
       
     //const url = `${this.URL}/id/${id}?relations=players&relations=rounds&relations=rounds.games&relations=rounds.games.players`;//{this.getRelations()}

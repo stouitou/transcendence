@@ -54,7 +54,7 @@ export class GameManager {
 						},
 						
 					}
-			const inputManager = new InputManager(index, player.isIA);
+			const inputManager = new InputManager(index, !player.isIA);
 			const  newPlayer = new Player(jsonData,index,inputManager)
 			this.inputManagers.set(player.id.toString(), inputManager);
 
