@@ -2,9 +2,7 @@ import AuthProviderRepository from "../repository/AuthProvider.repository";
 import  UserRepository  from "../repository/User.repository";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { BaseController } from "./BaseController";
-import { generateQRCode } from "@src/utils/qrcode";
-import { verifyTOTP } from "@src/utils/totp";
-import qrcode from "qrcode";
+import { send2FAEmail } from "@src/services/mail.service";
 
 
 /**
@@ -37,11 +35,8 @@ export class AuthController extends BaseController {
 		   this.register = this.register.bind(this);
 		   this.login = this.login.bind(this);
 		   this.me = this.me.bind(this);
-        this.logout = this.logout.bind(this);
-        this.verify2FA = this.verify2FA.bind(this);
-        this.generate2FAQRcode = this.generate2FAQRcode.bind(this);
-        this.enable2FA = this.enable2FA.bind(this);
-        this.disable2FA = this.disable2FA.bind(this);
+       this.logout = this.logout.bind(this);
+       this.loginForgetPassword = this.loginForgetPassword.bind(this);
 	  }
 
   /**
@@ -83,28 +78,36 @@ export class AuthController extends BaseController {
   async login(req: FastifyRequest, reply: FastifyReply) {
     const { email, password } = req.body as { email: string; password: string };
     const user = await this.app.authService.validateUser(email, password);
- //   console.log("🟢 user ",user)
     if (!user) {
       return reply.status(401).send({ error: "Invalid credentials" });
     }
 
     // Vérifier si l'utilisateur a activé l'authentification à deux facteurs
     // Si oui, générer un token temporaire pour l'authentification à deux facteurs
-    if (user.authProviders && !user.authProviders[0].two_factor_auth) {
+    const is2FAEnabled = user.authProviders && user.authProviders[0].two_factor_auth;
+    if (user.authProviders && is2FAEnabled ) {
       //1- generer un token temporaire pour l'authentification à deux facteurs
-      const tempToken = this.app.authService.generateTemp2FAToken(user.authProviders[0].provider_id);
-      reply.setCookie('AuthToken2FA', tempToken, {
+      const {provider_id, two_factor_auth_method = "totp"} = user.authProviders[0];
+      const tempToken = this.app.authService.generateTemp2FAToken(provider_id,two_factor_auth_method);
+      console.log("🔐[LOGIN] tempToken generate")
+      reply.setCookie('authToken2FA', tempToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production', // Utiliser 'secure' en production
           sameSite: 'strict',
           path: '/',
           maxAge: 350 //==> 5 minutes
       });
-      //2- générer un secret pour l'authentification à deux facteurs ou le recuperer s'il existe déjà
-   //  const secret = this.app.authService.get2FASecret(user);
- //     console.log("🟢 token 2FA ",tempToken)
-     // const qrCode = await generateQRCode('https://localhost:4433/login?token=' + tempToken);
-      return reply.status(201).send({ twoFactorRequired: true, tempToken });
+      //2- si la methode est email, envoyer un code de vérification par email
+      if (two_factor_auth_method === "email") {
+        const { otp, otpExpiration } = await this.app.twoFactorAuthService.generate2FAEmailCode(user);
+        console.log("🔐 otp",otp)
+        console.log("🔐 otpExpiration",otpExpiration)
+        // Envoyer le code de vérification par email
+         console.log("🔐[LOGIN] send2FAEmail to: ",email)
+
+        await send2FAEmail(email, otp);
+      }
+      return reply.status(201).send({ twoFactorRequired: true, method: two_factor_auth_method });
     }
     // Sinon, générer un token JWT normal
 
@@ -223,87 +226,117 @@ export class AuthController extends BaseController {
       reply.send(error);
     }
   }
-  //2FA
-  async enable2FA(req: FastifyRequest, reply: FastifyReply) {}
 
-  async disable2FA(req: FastifyRequest, reply: FastifyReply) {}
 
-  async generate2FAQRcode(req: FastifyRequest, reply: FastifyReply) {
-         const authToken2FA = req.cookies.AuthToken2FA;
-        if (!authToken2FA) {
-          return reply.status(401).send({ error: "Unauthorized" });
-        }
-        // Vérifier le token temporaire pour l'authentification à deux facteurs
-         const decoded = this.app.jwt.verify(authToken2FA, "ACCESS_TOKEN_PUBLIC_KEY") as any;
-      const userEmail = decoded.email; // récupère dynamiquement l'utilisateur ici
-      console.log("🔐 2FA QR code userEmail",userEmail)
-      const userAuthProvider = await this.AuthProviderRepository.getOneByParams({provider_id:userEmail,provider:"local"});
-      if (!userAuthProvider) {
-        return reply.status(400).send({ error: "UserAuthProvider not found" });
-      }
-      const {/* secret, */otpauth} = await this.app.authService.get2FASecret(userEmail);
-      //si le otpath n'existe pas,envoyer une image vide sans erreur
-      if (!otpauth) {
-        return reply.status(200).header('Content-Type', 'image/png').send(Buffer.from([]));
-      }
-      // Vérifier si l'utilisateur a déjà un secret pour l'authentification à deux facteurs
-          const qrBuffer = await qrcode.toBuffer(`${otpauth}` , { type: 'png' });
-    
-      reply
-        .header('Content-Type', 'image/png')
-        .send(qrBuffer);
-    }
-  
-  /**
-   * Vérifier le code de l'authentification à deux facteurs
+//@BUG : a revoir
+   /**
+   * Connexion (loginForgetPassword) by email
    * 
    * @param req 
    * @param reply 
    * @returns 
    */
-
-  async verify2FA(req: FastifyRequest, reply: FastifyReply) {
-    const authToken2FA = req.cookies.AuthToken2FA;
-    if (!authToken2FA) {
-      return reply.status(401).send({ error: "[verify2FA] Unauthorized" });
+  async loginForgetPassword(req: FastifyRequest, reply: FastifyReply) {
+    const { email } = req.body as { email: string; password: string };
+    const user = await this.app.authService.validateAuthProvider(email, "local");    
+    if (!user) {
+      return reply.status(201).send({ twoFactorRequired: true, method: 'email' });
+   //   return reply.status(401).send({ error: "Invalid credentials" });//@TODO on devrait pas dire que les identifiants sont invalides
     }
-    // Vérifier le token temporaire pour l'authentification à deux facteurs
-    const decoded = this.app.jwt.verify(authToken2FA, "ACCESS_TOKEN_PUBLIC_KEY") as any;
-    const userEmail = decoded.email; // récupère dynamiquement l'utilisateur ici
-      const { code } = req.body as { code: string };
-      if (!code) {
-        return reply.status(400).send({ error: "Code is required" });
-      }
-    //  const authProvider = await this.AuthProviderRepository.getAuthProviderByEmail(userEmail);
-      const authProvider = await this.AuthProviderRepository.getOneByParams({provider_id:userEmail,provider:"local"});
-      if (!authProvider) {
-        return reply.status(400).send({ error: "User not found" });
-      }
-      const { two_factor_auth_secret } = authProvider; // à implémenter ou extraire depuis base
-      if (!two_factor_auth_secret) {
-        return reply.status(400).send({ error: "2FA secret not found" });
-      }
-      const isValid = verifyTOTP(code, two_factor_auth_secret);//TOPCode
-      console.log("🔐 2FA verify isValid",isValid)
-      if (!isValid) {
-        return reply.status(400).send({ error: "Invalid 2FA code" });
-      }
+    console.log("🔐[LOGIN] user",user)
+   // return reply.status(200).send({ user });
 
-      // Authentifier l'utilisateur
-      const params = {authProviders:{provider_id:userEmail, provider:"local"}};
-      const user = await this.UserRepository.getOneByParams(params);
-      if (!user) {
-        return reply.status(400).send({ error: "User not found" });
-      }
-      const token = this.app.authService.generateToken(user);
-        // Définir le cookie avec le token
-      reply.setCookie('authToken', token, {
+    // Vérifier si l'utilisateur a activé l'authentification à deux facteurs
+    // Si oui, générer un token temporaire pour l'authentification à deux facteurs
+    const is2FAEnabled = user.authProviders && user.authProviders[0].two_factor_auth;
+    if (user.authProviders && is2FAEnabled ) {
+      //1- generer un token temporaire pour l'authentification à deux facteurs
+      const {provider_id, two_factor_auth_method = "totp"} = user.authProviders[0];
+      const tempToken = this.app.authService.generateTemp2FAToken(provider_id,two_factor_auth_method);
+      console.log("🔐[LOGIN] tempToken generate")
+      reply.setCookie('authToken2FA', tempToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production', // Utiliser 'secure' en production
           sameSite: 'strict',
           path: '/',
-          maxAge: 3600 // 1 heure
+          maxAge: 350 //==> 5 minutes
+      });
+      //2- si la methode est email, envoyer un code de vérification par email
+      if (two_factor_auth_method === "email") {
+        const { otp, otpExpiration } = await this.app.twoFactorAuthService.generate2FAEmailCode(user);
+        console.log("🔐 otp",otp)
+        console.log("🔐 otpExpiration",otpExpiration)
+        // Envoyer le code de vérification par email
+         console.log("🔐[LOGIN] send2FAEmail to: ",email)
+
+        await send2FAEmail(email, otp);
+      }
+      return reply.status(201).send({ twoFactorRequired: true, method: two_factor_auth_method });
+    }
+      // Sinon, générer un token JWT forgot password
+
+    const token = this.app.authService.generateToken(user);//@TODO
+  //  console.log("🟢 token ",token)
+
+        // Définir le cookie avec le token
+      reply.setCookie('authForgetPasswordToken', token, {
+          httpOnly: true,
+          secure: process.env.NODE_ENV === 'production', // Utiliser 'secure' en production
+          sameSite: 'strict',
+          path: '/',
+          maxAge: 350 //==> 5 minutes
       });
     return reply.status(201).send({ token: token });
+  }
+
+//@BUG : a revoir
+  /**
+   * changer le mot de passe oublié
+   * on utilise le token de reinitialisation du mot de passe: authForgetPasswordToken
+   * 
+   * @param req 
+   * @param reply 
+   * @returns 
+   */
+  async loginResetPassword(req: FastifyRequest, reply: FastifyReply) {
+    const { password } = req.body as { password: string };
+    if (!password) {
+      return reply.status(400).send({ error: "Password is required" });
     }
+    //- recuperer le token de reinitialisation du mot de mot de passe depuis les cookies
+    const authForgetPasswordToken = req.cookies.authForgetPasswordToken;
+    if (!authForgetPasswordToken) {
+      return reply.status(401).send({ error: "No token provided" });
+    }
+    //- verifier le token de reinitialisation du mot de mot de passe et y recuperer l'id de l'utilisateur
+    const decoded = this.app.jwt.verify(authForgetPasswordToken,"ACCESS_TOKEN_PUBLIC_KEY") as {id: number};
+    if (!decoded) {
+      return reply.status(401).send({ error: "Invalid token" });
+    }
+    //- recuperer l'utilisateur depuis la base de donnees
+    const user = await this.UserRepository.getById(decoded.id);
+    if (!user) {
+      return reply.status(401).send({ error: "User not found" });
+    }
+    //- verifier si l'utilisateur a un authProvider
+    if (!user.authProviders || user.authProviders.length === 0) {
+      return reply.status(401).send({ error: "User has no auth provider" });
+    }
+    if (user.authProviders.length === 0) {
+      return reply.status(401).send({ error: "User has no auth provider" });
+    }
+    //- verifier si l'utilisateur a un authProvider de type local
+    if (user.authProviders[0].provider !== "local") {
+      return reply.status(401).send({ error: "User has no auth provider of type local" });
+    }
+    //- changer le mot de passe de l'utilisateur
+    const updatedUser = await this.app.authService.updatePassword(user.authProviders[0].id!, password);
+    if (!updatedUser) {
+      return reply.status(401).send({ error: "User not found" });
+    }
+    //- supprimer le cookie de reinitialisation du mot de passe
+    reply.clearCookie('authForgetPasswordToken');
+    //- retourner un message de succes
+    return reply.status(200).send({ message: "Password changed successfully" });
+  }
 }

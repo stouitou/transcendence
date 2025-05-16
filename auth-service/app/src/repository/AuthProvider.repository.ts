@@ -9,6 +9,7 @@ import Helpers, { IParams } from "../repository/helpers";
 import { AuthProvider } from "../models/AuthProvider.models";
 import { IRepository } from "./Base/IRepository";
 import { BaseRepository } from "./Base/BaseRepository";
+import { encrypt } from "@src/utils/crypto";
 
 /**
  * AuthProviderRepository - Gestion des appels HTTP à la DB
@@ -166,7 +167,12 @@ class AuthProviderRepository extends BaseRepository<AuthProvider> implements IRe
     const response = await fetch(`${this.URL}/id/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
-      body: JSON.stringify({ two_factor_auth_secret:secret, two_factor_auth:true }),
+      body: JSON.stringify({ 
+        two_factor_auth_method:'totp',
+        two_factor_auth_secret:secret,
+        two_factor_auth:true,
+        otpExpiration : null,
+        otp : null }),
     });
     const data = await response.json();
 //    console.log("🔐User.repository.ts UserRepository.set2FASecret()  --data--",data)
@@ -175,6 +181,23 @@ class AuthProviderRepository extends BaseRepository<AuthProvider> implements IRe
       throw new Error("User update failed");
     }
     return userUpdated;
+  }
+
+  set2FAEmailCode = async (id: number, code: string,otpExpiration:Date): Promise<AuthProvider | null> => {
+    
+    const otp = encrypt(code);
+    const response = await fetch(`${this.URL}/id/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ otp, otpExpiration}),
+    });
+    const data = await response.json();
+    const userUpdated = data.data;
+    if (!userUpdated) {
+      throw new Error("User update failed");
+    }
+    return userUpdated;
+
   }
 }
 export default AuthProviderRepository;

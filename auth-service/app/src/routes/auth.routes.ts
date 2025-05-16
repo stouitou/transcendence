@@ -5,6 +5,8 @@ import { AuthSchema } from "../schemas/auth.schema";
 import { User } from "../models/User.models";
 import qrcode from "qrcode";
 import { generateTOTPSecret, verifyTOTP } from "@src/utils/totp";
+import { sendMail } from "@src/services/mail.service";
+import { TwoFactorController } from "@src/controllers/twoFactor.controller";
 
 const BACKEND_SERVER_URL = process.env.BACKEND_SERVER_URL || "https://localhost:4433";
 const redirectUrlAfterLoginSuccess = `${BACKEND_SERVER_URL}/profile`;
@@ -12,6 +14,7 @@ const redirectUrlAfterLoginError = `${BACKEND_SERVER_URL}/login`;
 async function authRoutes(app: FastifyInstance) {
 
   const authController = new AuthController(app);
+  const twoFactorController = new TwoFactorController(app);
   // Routes base Auth
   app.post("/register", { schema: AuthSchema.register }, authController.register);
   app.post("/login", { schema: AuthSchema.login }, authController.login);
@@ -89,7 +92,7 @@ async function authRoutes(app: FastifyInstance) {
     schema: AuthSchema.oauthCallback
   },
   async (request, reply) => {
-    const { code } = request.query as { code: string };
+  //  const { code } = request.query as { code: string };
     console.log("🔓 42 Callback");
     try {
       const { token } = await app.fortyTwoOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
@@ -115,8 +118,16 @@ async function authRoutes(app: FastifyInstance) {
   });
 
 
-  app.get('/2fa/qrcode', authController.generate2FAQRcode);
-  app.post('/2fa/verify', authController.verify2FA);
+  app.get('/2fa/qrcode', twoFactorController.generate2FAQRcode);
+  app.post('/2fa/verify', twoFactorController.verify2FA);
+  app.put('/2fa/enable', twoFactorController.enable2FA);
+  app.put('/2fa/disable', twoFactorController.disable2FA);
+  app.get('/2fa/status', twoFactorController.getStatus2FA);
+  //app.post('/2fa/verify-email', twoFactorController.verifyEmail2FA);
+  app.get('/testSendMail', sendMail);
+  app.post('/login/forget-password', authController.loginForgetPassword);//generate reset password token
+  app.post('/login/reset-password', authController.loginResetPassword);//set a new password 
+
 }
 
 export default authRoutes;

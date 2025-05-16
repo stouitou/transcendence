@@ -6,6 +6,7 @@ import jwtPlugin ,{ JWT } from "../plugins/jwtPlugin";
 import { AuthService } from "../services/auth.service";
 import  ServicesPlugin  from "../plugins/services"; 
 import { registerAuthPlugin } from "./auth.plugin";
+import { TwoFactorAuthService } from "@src/services/TwoFactorAuthServices";
 
 interface AuthenticatedUser { role: string; id?: number; name?: string; display_name?:string;avatar?:string }
 declare module 'fastify' {
@@ -17,6 +18,7 @@ declare module 'fastify' {
 declare module 'fastify' {
    interface FastifyInstance {
 	authService: AuthService;
+	twoFactorAuthService: TwoFactorAuthService;
 	jwt: JWT;
   }
 }

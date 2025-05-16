@@ -49,7 +49,21 @@ providers.forEach((provider) => {
 if ( process.env.SQLITE_DATABASE_URL == undefined || process.env.SQLITE_DATABASE_URL.trim() === '') {
   process.env.SQLITE_DATABASE_URL = "http://database-services:3000/api/v2/database"
   console.log("SQLITE_DATABASE_URL non défini dans le fichier .env, Utilisation de la valeur par défaut.");
-} 
+}
+
+if ( process.env.MAIL_HOST == undefined || process.env.MAIL_HOST.trim() === '') {
+  process.env.MAIL_HOST = "ssl0.ovh.net"
+  console.log("MAIL_HOST non défini dans le fichier .env, Utilisation de la valeur par défaut.");
+}
+
+if ( process.env.MAIL_USER == undefined || process.env.MAIL_USER.trim() === '') {
+  process.env.MAIL_USER = "noreply@doodydoo.fr"
+  console.log("MAIL_USER non défini dans le fichier .env, Utilisation de la valeur par défaut.");
+}
+if ( process.env.MAIL_PASS == undefined || process.env.MAIL_PASS.trim() === '') {
+  process.env.MAIL_PASS = "MailPasswordNotFound"
+  console.log("MAIL_USER non défini dans le fichier .env, aucun mot de passe n'a été trouvé, les mail ne seront pas envoye!!!.");
+}
 export default fp(async (fastify, opts) => {
   fastify.decorate('env', process.env);
 });

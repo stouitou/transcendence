@@ -21,11 +21,19 @@ export class AuthProvider {
 
   //2FA
   //activation de l'authentification à deux facteurs
-  @Column({ type: "boolean", default: false })
+  @Column({ type: "boolean", default: true })
   two_factor_auth: boolean;
   //secret de l'authentification à deux facteurs
   // utilisé pour générer le code de vérification
   //ex: "JBSWY3DPEHPK3PXP" sera HASHED
   @Column({ type: "text", nullable: true })
-  two_factor_auth_secret: string;
+  two_factor_auth_secret: string; //secret de l'authentification à deux facteurs via app mobile
+
+  @Column({ type: "text", default: "totp" /* nullable:true */})//'totp' | 'email';
+  two_factor_auth_method: string;
+
+  @Column({ type: "date",  nullable:true })
+  otpExpiration: Date; // date d'expiration du code de vérification par email
+  @Column({ type: "text", nullable:true })
+  otp: string; // code de vérification par email
 }

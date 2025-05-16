@@ -25,12 +25,19 @@ export class Login extends BaseComponent<{login:LoginState}> {
   }
   handleVerify2FACode = async(e: Event)=> {
     e.preventDefault()
-    const input = document.getElementById('2faCode') as HTMLInputElement;
-    const code = input.value;
-    if (code === "") {
+    //const input = document.getElementById('2faCode') as HTMLInputElement;
+    //const code = input.value;
+    const inputs = document.querySelectorAll<HTMLInputElement>(".code-input");
+  const code = Array.from(inputs).map((input) => input.value).join("");
+
+  if (code.length !== 6) {
+    alert("Please fill in all fields");
+    return;
+  }
+/*     if (code === "") {
       alert("Please fill in all fields");
       return;
-    }
+    } */
     try {
       const result = await fetch('/api/auth/2fa/verify', {
         method: 'POST',
@@ -60,9 +67,11 @@ export class Login extends BaseComponent<{login:LoginState}> {
 			alert("Please fill in all fields");
 			return;
 		}
+    if (this.state.login.password.length < 8) {
+      alert("password must be at least 8 characters long");
+      return;
+    }
     try {
-      const userContext = UserContext();
-      const { setUser,user } = userContext;
 			const loginData: LoginData = { ...this.state.login };
 			const loginToken = await  loginUser(loginData);
       const { twoFactorRequired} = loginToken;
@@ -80,21 +89,50 @@ export class Login extends BaseComponent<{login:LoginState}> {
     margin: 0 auto;
     display: block;
   }
+    .code-input-container {
+  display: flex;
+  justify-content: center;
+  gap: 10px;
+  margin-top: 20px;
+}
+
+.code-input {
+  width: 40px;
+  height: 40px;
+  text-align: center;
+  font-size: 18px;
+  border: 2px solid green;
+  border-radius: 5px;
+  outline: none;
+  transition: border-color 0.3s ease;
+}
+
+.code-input:focus {
+  border-color: darkgreen;
+  box-shadow: 0 0 5px rgba(0, 128, 0, 0.5);
+}
 </style>
         <div class="qr-code-container">
           <h2 class="text-2xl font-bold text-center mb-4">Scan this QR Code</h2>
-          <img 
+       <!--   <img 
           referrerpolicy="no-referrer"
-          src="/api/auth/2fa/qrcode" alt="QR Code for 2FA" class="qr-code-image" />
-          <p class="text-center mt-4">Use an authenticator app like Google Authenticator to scan the QR code.</p>
-          <p class="text-center mt-4">Then enter the code below:</p>
-          <input
+          src="/api/auth/2fa/qrcode" alt="QR Code for 2FA" class="qr-code-image" />-->
+          <p class="text-center mt-4">enter the code below:</p>
+          <!--<input
             id="2faCode"
             type="text"
             class="form-text-input"
             placeholder="Enter the code"
             required
-          />
+          />-->
+          <div id="2faCodeContainer" class="code-input-container">
+            <input type="text" maxlength="1" class="form-text-input code-input" />
+            <input type="text" maxlength="1" class="form-text-input code-input" />
+            <input type="text" maxlength="1" class="form-text-input code-input" />
+            <input type="text" maxlength="1" class="form-text-input code-input" />
+            <input type="text" maxlength="1" class="form-text-input code-input" />
+            <input type="text" maxlength="1" class="form-text-input code-input" />
+          </div>
           <button
             id="verify2faBtn"
             type="submit"
@@ -105,6 +143,8 @@ export class Login extends BaseComponent<{login:LoginState}> {
         </div>
       `;
       this.attachEvent(this, '#verify2faBtn', 'click', this.handleVerify2FACode.bind(this));
+        // Initialiser la navigation automatique entre les champs
+        this.handle2FAInput();
         return;
       }
 			const data = await fetchProfileData();
@@ -155,4 +195,23 @@ export class Login extends BaseComponent<{login:LoginState}> {
     this.attachEvent(this, '#email', 'input', this.setEmail.bind(this));
     this.attachEvent(this, '#password', 'input', this.setPassword.bind(this));  
   } 
+
+  handle2FAInput = () => {
+        const inputs = document.querySelectorAll<HTMLInputElement>(".code-input");
+
+        inputs.forEach((input, index) => {
+          input.addEventListener("input", (e) => {
+            const target = e.target as HTMLInputElement;
+            if (target.value.length === 1 && index < inputs.length - 1) {
+              inputs[index + 1].focus(); // Passer au champ suivant
+            }
+          });
+
+          input.addEventListener("keydown", (e) => {
+            if (e.key === "Backspace" && input.value === "" && index > 0) {
+              inputs[index - 1].focus(); // Revenir au champ précédent
+            }
+          });
+        });
+      };
 }

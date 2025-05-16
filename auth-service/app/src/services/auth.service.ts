@@ -9,6 +9,8 @@ import bcrypt from "bcryptjs"
 import AuthProviderRepository from "@src/repository/AuthProvider.repository";
 
 import { generateTOTPSecret, verifyTOTP } from "@src/utils/totp";
+import { AuthProvider } from "@src/models/AuthProvider.models";
+import { decrypt } from "@src/utils/crypto";
 /**
  * Service d'authentification
  * rappel: un service est une classe qui contient des méthodes qui effectuent des opérations spécifiques
@@ -226,45 +228,56 @@ async registerWithOauthProvider(profile:any, provider: string) {
    * @param user
    * @returns
    */
-  generateTemp2FAToken(email:string) { //@TODO : changer le type de user et retourner un objet User complet
+  generateTemp2FAToken(email:string,method:string) {
+    //const method : 'totp' | 'email';
     return this.app.jwt.sign({
       email: email,
       stage: 'pending-2fa',
+      method: method
     },
     { expiresIn: "5m" }
     );
   }
-  async get2FASecret(email: string): Promise< {secret:string,otpauth:string| null } > {
+
+  //@TODO : in progress
+  async generateResetToken(email: string): Promise<string> {
     //1- on verifie si l'utilisateur existe
     if (!email) throw new Error("email not found");
     //2- on verifie si l'utilisateur a deja un secret
     const user = await this.UserRepository.getOneByParams({authProviders:{provider_id:email, provider:"local"}});
     if (!user) throw new Error("User not found");
-    //3- on verifie si l'utilisateur a deja activé l'authentification à deux facteurs
-    if (user.authProviders[0].two_factor_auth_secret) return {secret:user.authProviders[0].two_factor_auth_secret, otpauth:null};
     //3- on genere le secret de l'authentification à deux facteurs
     const {secret,otpauth} = generateTOTPSecret(user.authProviders[0].provider_id)//this.app.authService.generateTemp2FAToken(user.authProviders[0].provider_id);
+    console.log("[🔐AuthService]:  get2FASecret()  {secret,otpauth} = generateTOTPSecret : ",secret,otpauth)
     //4- on enregistre le secret dans la base de données
      const userUpdated = await  this.AuthProviderRepository.set2FASecret(user.authProviders[0].id!, secret);
 
      console.log("🔐AuthService:  get2FASecret()  userWithAuthProvider updated : ",userUpdated)
-    return {secret,otpauth};
+     return secret;
   }
-  /**
-   * 🔄 Activer l'authentification à deux facteurs
-   * 
-   * @param user 
-   * @returns 
-   */
-  async enableTwoFactorAuth(user: User): Promise<User> {
-    //1- on verifie si l'utilisateur existe
-    if (!user) throw new Error("User not found");
-    //2- on verifie si l'utilisateur a deja activé l'authentification à deux facteurs
-    if (user.authProviders[0].two_factor_auth) throw new Error("Two factor auth already enabled");
-    //3- on active l'authentification à deux facteurs
-    user.authProviders[0].two_factor_auth = true;
-    //4- on enregistre l'utilisateur dans la base de données
-    const updatedUser = await this.UserRepository.update(user);
-    return updatedUser;
+
+
+  //@TODO : in progress
+  async verifyResetToken(token: string): Promise<boolean> {
+    try {
+      const decoded = this.app.jwt.verify(token, "REFRESH_TOKEN_PUBLIC_KEY") as any;
+      return true;
+    } catch (err) {
+      throw new Error("Invalid token");
+    }
   }
+
+  //@TODO : in progress
+   async updatePassword(providerId:number , password: string) :Promise<AuthProvider | null>{
+    // 1 - vérifier si l'utilisateur existe déjà
+
+    // 2- crypter le mot de passe
+    const passwordHash = bcrypt.hashSync(password, 10);
+    // 3 - update le mot de passe
+    const authProvider = await this.AuthProviderRepository.update({id:providerId, password:passwordHash});
+    // 4- retourner le user
+    console.log("🔐AuthService:  updatePassword()  updated ")
+    return authProvider;
+  }
+
 }

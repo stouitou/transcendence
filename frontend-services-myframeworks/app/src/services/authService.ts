@@ -25,7 +25,7 @@ export const registerUser = async (data: RegisterData): Promise<void> => {
     console.log('Registration successful:', result);
 };
 
-export const loginUser = async (data: LoginData): Promise<{ twoFactorRequired: boolean|null, tempToken:any|null,token:any|null,qrCode:any }> => {
+export const loginUser = async (data: LoginData): Promise<{ twoFactorRequired: boolean|null, tempToken:any|null,token:any|null}> => {
     const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
