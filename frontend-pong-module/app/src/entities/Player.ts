@@ -61,6 +61,7 @@ export class	Player {
 	get name ()						{ return this._name ; }
 	get paddle () : Paddle | null	{ return this._paddle ; }
 	get location ()					{ return this._location ; }
+	get score ()					{ return this._score ; }
 	//get points ()					{ return this._points ; } -> score
 	get direction (): string | null	{ return this._direction ; }
 //	get keyPressed ()				{ return this._keyPressed ; } -> gerer par InputManager

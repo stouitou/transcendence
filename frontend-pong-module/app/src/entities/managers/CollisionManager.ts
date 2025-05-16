@@ -28,7 +28,7 @@ export class CollisionManager {
 		}
 	}
 
-	private checkWallCollision(ball: Ball) {
+	private checkWallCollision (ball: Ball) {
 		if (ball.position.x <= (0 +ball.size.width)) {
 			ball.velocity.x *= -1; // Inverser la direction horizontale
 			ball.lastWallBounce = 0;

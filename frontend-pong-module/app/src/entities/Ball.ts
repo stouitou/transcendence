@@ -19,6 +19,7 @@ export class	Ball {
 		this._velocity = velocity;
 		this.normalize();
 		this._speed = speed;
+		console.log('ball size: ', this._size);
 	}
 
 	get position ()							{ return this._position ; }
