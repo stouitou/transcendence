@@ -1,6 +1,6 @@
 import { Ball } from '../Ball';
 import { Player } from '../Player';
-import { Paddle } from '../Pong';
+import { Paddle } from '../Paddle';
 
 export class CollisionManager {
 

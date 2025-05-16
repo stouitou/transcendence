@@ -1,38 +1,44 @@
 import { InputManager } from './InputManager';
 import { Player } from '../Player';
-import { Ball } from '../Ball';
 import { CollisionManager } from './CollisionManager';
 import { StatisticsManager } from './StatisticsManager';
-import { DataMatch } from '../Match';
 import { ScoreManager } from './ScoreManager';
+import { Ball } from '../Ball';
+import { DataMatch } from '../../Interfaces/DataMatch.interface';
 
 export class GameManager {
-  private players: Player[] = [];
-  private ball: Ball =new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 });;
-  private collisionManager:CollisionManager = new CollisionManager();
 
-  private scoreManager: ScoreManager |null = null;
-  private statisticsManager: StatisticsManager = new StatisticsManager();
-  dataconfig: DataMatch |null = null;
+	private	_players: Player[] = [];
+	private	_ball: Ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 }, 0.4);;
+	private	_collisionManager:CollisionManager = new CollisionManager();
 
-  inputManagers: Map<string, InputManager> = new Map(); // par joueur id
+	private scoreManager: ScoreManager |null = null;
+	private statisticsManager: StatisticsManager = new StatisticsManager();
+	dataconfig: DataMatch | null = null;
 
-  constructor() {
-   // this.players = players;
-    this.createBall();
-  }
-  setDataconfig(dataMatch: DataMatch){
-	this.dataconfig = dataMatch;
-	return this
+	inputManagers: Map<string, InputManager> = new Map(); // par joueur id
 
-  }
-  createBall() {
-	this.ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 });
-}
-  private addPlayer(player: Player) {
-	this.players.push(player);
-	console.log('addPlayer',this.players);
-  }
+	constructor () {
+		this.createBall();
+	}
+
+	get ball ()		{ return this._ball ; }
+	get players()	{ return this._players ; }
+
+	setDataconfig(dataMatch: DataMatch){
+		this.dataconfig = dataMatch;
+		return this
+	}
+
+	createBall() {
+		this._ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 }, 4);
+	}
+
+	private addPlayer(player: Player) {
+		this._players.push(player);
+		console.log('addPlayer', this._players);
+	}
+
 	addPlayers() {
 		const dataMatch = this.dataconfig;
 		if (!dataMatch) {
@@ -46,7 +52,7 @@ export class GameManager {
 						name: player.name,
 						isRemote: dataMatch?.config.type === 'remote',
 						isInGame: player.isInGame,
-						isIA: player.isIA,  
+						isIA: player.isIA,	
 						score: player.score,
 						paddle: {
 							position: player.position,
@@ -54,97 +60,82 @@ export class GameManager {
 						},
 						
 					}
-			const inputManager = new InputManager(index, !player.isIA);
-			const  newPlayer = new Player(jsonData,index,inputManager)
+			const	inputManager = new InputManager(index, !player.isIA);
+			const	newPlayer = new Player(jsonData, index, inputManager)
 			this.inputManagers.set(player.id.toString(), inputManager);
 
 			this.addPlayer(newPlayer);
 		});
-
 	}
 
-	clearPlayers() {
-		if (this.players.length > 0) {
-			//this.players.forEach((player) => {})
-			this.players = [];
+	clearPlayers () {
+		if (this._players.length > 0) {
+			//this._players.forEach((player) => {})
+			this._players = [];
 		}
 	}
 
-  setupGame() {
-    this.clearPlayers();
-    this.ball.reset({ x: 350, y: 250 }, { x: 5, y: 5 });
-	this.addPlayers();
-	this.scoreManager = new ScoreManager(this.players);
-  }
-  /**
-   * * Met à jour le mouvement des joueurs 
-   * * Chaque IA ajuste sa position pour suivre la balle.
-   */
-  updatePlayersMovement() {
-	//for (const [index, player] of this.players.entries()) {
-	for (const player of this.players) {
-			 player.updateMovement(this.ball);
-	}	
-  }	
-  /**
-   * * Met à jour l'état du jeu, y compris la position de la balle et des joueurs.
-   * * Vérifie les collisions et met à jour le score.
-   */
-  update() {
-    // Mettre à jour les joueurs
-	this.updatePlayersMovement();
-
-    // Mettre à jour la balle, deleguer a la classe Ball
-    this.ball.update();
-
-    // Déléguer la gestion des collisions au CollisionManager
-    this.collisionManager.handleCollisions(this.ball, this.players);
-
-    // Mettre à jour les statistiques, deleguer a la classe StatisticsManager
-    this.statisticsManager.updateStatistics(this.ball, this.players);
-
-	// Mettre à jour le score, deleguer a la classe ScoreManager
-	if (this.scoreManager) {
-		this.scoreManager.updateScore(this.ball);		
+	setupGame () {
+		this.clearPlayers();
+		this._ball.reset();
+		this.addPlayers();
+		this.scoreManager = new ScoreManager(this._players);
 	}
 
-  }
+	/**
+	 * * Met à jour l'état du jeu, y compris la position de la balle et des joueurs.
+	 * * Vérifie les collisions et met à jour le score.
+	 */
+	update () {
+		// Update players
+		this.updatePlayersMovement();
 
-  /**
-   * * Vérifie si un joueur a atteint le score maximum.
-   * * Si oui, arrête le jeu et envoie un message via WebSocket.
-   */
-  checkMaxScore(wsMessageHandler: (data: any) => void):boolean {
+		// Update ball, Ball Class responsability
+		this._ball.update();
+
+		// CollisionManager responsability
+		this._collisionManager.handleCollisions(this._ball, this._players);
+
+		// Update statistics, StatisticsManager Class responsability
+		this.statisticsManager.updateStatistics(this._ball, this._players);
+
+		// Update score, ScoreManager Class responsability
+		if (this.scoreManager) {
+			this.scoreManager.updateScore(this._ball);		
+		}
+	}
+
+	/**
+	 * * Vérifie si un joueur a atteint le score maximum.
+	 * * Si oui, arrête le jeu et envoie un message via WebSocket.
+	 */
+	checkMaxScore(wsMessageHandler: (data: any) => void):boolean {
 	if (this.scoreManager) {
-		if (!this.dataconfig)  return true;//stop game
+		if (!this.dataconfig)	return true;//stop game
 		return this.scoreManager.checkMaxScore(wsMessageHandler,this.dataconfig?.lobyId!,(this.dataconfig.id));
 	}
 	return true;//stop game
  }
 
-  getBall() {
-    return this.ball;
-  }
 
-  getPlayers() {
-    return this.players;
-  }
+	// Met à jour l'état du jeu avec les données reçues du serveur.	@param game 
+	updateGameState (game: { ball: { position: { x:number, y:number }, size: { width: number, height: number } }, players: Player[] }) {
+		this._ball.position = game.ball.position;
 
-
-  /**
-   * met à jour l'état du jeu avec les données reçues du serveur.
-   * @param game 
-   */
-  updateGameState(game:{ball:{position: {x:number,y:number},size:{width:number,height:number}}, players: Player[]}) {
-	this.ball.position = game.ball.position;
-	//	this.ball.size = game.ball.size;
-	for (const [index, player] of game.players.entries()) {
-		//this.players[index].paddle.position = player.position;
-		if (this.players[index].paddle && player.paddle) {
-		this.players[index].paddle.position = player.paddle.position;
+		for (const [index, player] of game.players.entries()) {
+			//this._players[index].paddle.position = player.position;
+			if (this._players[index].paddle && player.paddle) {
+				this._players[index].paddle.position = player.paddle.position;
+			}
+			/* this._players[index].paddle.size = player.paddle.size; */
+			this._players[index].score = player.score;
 		}
-		/* this.players[index].paddle.size = player.paddle.size; */
-		this.players[index].score = player.score;
 	}
-  }
+	// Update players movements. Each IA adjust position to follow ball
+	private updatePlayersMovement () {
+		for (const player of this._players) {
+				player.updateMovement(this._ball);
+		}	
+	}	
+
 }

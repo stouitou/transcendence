@@ -16,8 +16,8 @@ export class Player {
 	direction: Direction;
 	score: number = 0;
 	position: {x:number,y:number} = { x: 0, y: 0 };
-	initialPosition:{x:number,y:number}[] = [{ x: 20, y: 250 }, { x: 780, y: 250 }, { x: 400, y: 20 }, { x: 400, y: 580 }];
-	sizes:{ width: number, height: number }[] = [{ width: 10, height: 100 }, { width: 10, height: 100 }, { width: 100, height: 10 }, { width: 100, height: 10 }];
+	initialPosition:{x:number,y:number}[] = [{ x: 775, y: 250 }, { x: 5, y: 250 }, { x: 450, y: 575 }, { x: 450, y: 5 }];
+	sizes:{ width: number, height: number }[] = [{ width: 20, height: 100 }, { width: 20, height: 100 }, { width: 100, height: 20 }, { width: 100, height: 20 }];
 	size:{ width: number, height: number }
 	index: number = 0;
 

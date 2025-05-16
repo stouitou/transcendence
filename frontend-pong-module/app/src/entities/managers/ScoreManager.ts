@@ -1,5 +1,5 @@
 import { Player } from "../Player";
-import { Ball } from "../Ball";
+import { Ball } from '../Ball';
 
 export class ScoreManager {
   private players: Player[];
@@ -31,7 +31,7 @@ export class ScoreManager {
 	  );
 	  //ball.lastHit = null; // Réinitialiser le dernier joueur ayant touché la balle
 	  //ball.lastWallBounce = null; // Réinitialiser le dernier mur touché
-	  ball.resetBall(this.canvas);
+	  ball.reset();
 	}
   }
 

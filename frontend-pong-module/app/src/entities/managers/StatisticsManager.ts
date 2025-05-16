@@ -20,7 +20,7 @@ export class StatisticsManager {
   updateStatistics(ball: Ball, players: Player[]) {
     // Exemple : Mise à jour des statistiques
 	//total des rebonds de la balle sur le round
-	this._gameHistory.maxBounceCount = ball._maxBounceCountRound;
+	this._gameHistory.maxBounceCount = ball.maxBounceCountRound;
 	//Le joueur qui s'est pris le plus de buts 
 	const goalsConceded = players.reduce((prev, current) => {
 		return (prev._historyPlayer.goalsConceded > current._historyPlayer.goalsConceded) ? prev : current;

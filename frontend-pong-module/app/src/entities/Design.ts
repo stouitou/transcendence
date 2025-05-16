@@ -175,7 +175,9 @@ export function animateScore (el: HTMLElement) {
 }
 
 /* ---------- core drawing helpers ---------- */
-export function drawBackground (ctx: CanvasRenderingContext2D) {
+export function drawBackground (ctx: CanvasRenderingContext2D | null) {
+    if (!ctx)   { return ; }
+
     ctx.fillStyle = DESIGN.fieldColor;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
@@ -212,7 +214,7 @@ export function drawPauseIcon (ctx: CanvasRenderingContext2D) {
 /* paddles & ball (canvas variants) */
 export function drawPaddle (
     ctx: CanvasRenderingContext2D,
-    x:number, y:number, w:number, h:number
+    x: number, y: number, w: number, h: number
 ) {
     ctx.fillStyle = DESIGN.accentColor;
     ctx.fillRect(x, y, w, h);
