@@ -84,18 +84,29 @@ export class AuthServiceController {
 
   // Générer un QR code pour le 2FA
   async generate2FAQrCode(req: FastifyRequest): Promise<any> {
-    const response = await fetch(`${this.authServiceUrl}/2fa/qrcode`, {
-      method: 'GET',
-      headers: this.getHeaders(req),
-    //  body: JSON.stringify({ userId: req.authenticatedUser?.id }),
-    });
+    try {
+      const response = await fetch(`${this.authServiceUrl}/2fa/qrcode`, {
+        method: 'GET',
+        headers: this.getHeaders(req),
+      //  body: JSON.stringify({ userId: req.authenticatedUser?.id }),
+      });
 
-    if (!response.ok) {
-      const error = await response.json();
-      throw new Error(`Failed to generate 2FA QR code: ${error.message}`);
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(`Failed to generate 2FA QR code: ${error.message}`);
+      }
+      // Vérifier si le type de contenu est image/png
+      const contentType = response.headers.get('Content-Type');
+      if (contentType !== 'image/png') {
+        throw new Error(`Unexpected content type: ${contentType}`);
+      }else {
+        console.log('QR code generated successfully');
+      }
+
+      return response;
+    } catch (error) {
+      throw new Error(`ERROR [generate2FAQrCode] Failed to generate 2FA QR code: ${error.message}`);
     }
-
-    return await response.json();
   }
 
     async verify2FA(req: FastifyRequest): Promise<any> {
