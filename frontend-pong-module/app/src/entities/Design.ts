@@ -1,256 +1,252 @@
 /* =========================================================
-   Design.ts   –   “Animated Elegance” full style module
-   • 1200×800 playfield helpers
-   • glass‑morphic appendix bar
-   • button hover polish
-   • score flip animation
-   • glossy paddle / ball painters
-   • global pastel gradient + grain overlay
+   Design.ts   –   “Dusk-Glow” style module  v3
+   • responsive play-field helpers (max 1200×900)
+   • glassy appendix bar
+   • button hover polish + score flip
+   • high-contrast paddle / ball painters
+   • fancy dusk gradient bg (vertical scroll intact)
    ========================================================= */
 
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./Match";
 import { Player } from "./Player";
 
+
 /* ---------- palette / fonts ---------- */
 export const DESIGN = {
-    fieldColor  : "#0d3f77",   // darker blue so glass stands out
+    fieldColor  : "#171d29",     // deep charcoal-blue
     lineColor   : "#ffffff",
-    accentColor : "#ff3b30",
-    buttonColor : "#ffca28",
-    textColor   : "#212121",
-    fontFamily  : "Poppins, sans‑serif",
+    accentColor : "#00faff",     // vivid aqua
+    buttonColor : "#ffffff",
+    textColor   : "#472525",     // soft light grey
+    fontFamily  : "'Inter', 'Helvetica Neue', Arial, sans-serif",
 };
 
-/* ---------- global page styling (gradient + grain) ---------- */
+/* ---------- global page styling ---------- */
 (() => {
-    /* gradient */
-    const   styleId = "ae‑page‑style";
+    const styleId = "dg-page-style";
     if (!document.getElementById(styleId)) {
-        const   css = document.createElement("style");
+        const css = document.createElement("style");
         css.id = styleId;
         css.textContent = `
-    body{
-        background: radial-gradient(circle at 30% 20%, #f3f8ff 0%, #e9f0ff 45%, #dfe8ff 100%);
-        min-height:100vh;
-        overflow-x:hidden;
-    }
-    `;
-    document.head.appendChild(css);
+  body {
+    /* light pastel base via CSS vars */
+    --dg-grad-start: #ffffff;
+    --dg-grad-end:   #f7f7f7;
+
+    /* two-layer background: soft radial + linear fade */
+    background:
+      radial-gradient(circle at 30% 20%, #ffffff 0%, #fcfcfc 50%, #f2f2f2 100%),
+      linear-gradient(135deg, var(--dg-grad-start) 0%, var(--dg-grad-end) 100%);
+    min-height: 100vh;
+    overflow-x: hidden;           /* keep vertical scroll */
+    color: ${DESIGN.textColor};
+    font-family: ${DESIGN.fontFamily};
+  }
+
+  /* light “vignette” glow edges */
+  body::before {
+    content: "";
+    position: fixed;
+    inset: 0;
+    pointer-events: none;
+    background:
+      radial-gradient(circle at 50% 110%, transparent 0%, rgba(255, 255, 255, 0.6) 90%);
+    mix-blend-mode: overlay;
+    z-index: -1;
+  }
+
+  /* still hide any stray decorative balls */
+  .ball, .bg-ball, .background-ball {
+    display: none !important;
+  }
+`;
+        document.head.appendChild(css);
     }
 
-    /* grain overlay (optional aesthetic depth) */
-    if (!document.getElementById("ae‑grain")) {
-        const   grain = document.createElement("div");
-        grain.id = "ae‑grain";
-        Object.assign(grain.style, {
-            position        : "fixed",
-            inset           : "0",
-            pointerEvents   : "none",
-            zIndex          : "1",
-            backgroundImage:
-                "url(\"data:image/svg+xml;base64,"
-                + "PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxnIGZpbGw9JyMwMDAwMDAnIGZpbGwtb3BhY2l0eT0nLjA0Jz48cmVjdCB3aWR0aD0nMScgaGVpZ2h0PScxJy8+PC9nPjwvc3ZnPg==\")",
-            backgroundSize  : "4px 4px",
-            mixBlendMode    : "overlay",
-            opacity         : ".4",
-        } as Partial<CSSStyleDeclaration>);
-        document.body.appendChild(grain);
-    }
-
-    /* Google font */
-    if (!document.getElementById("poppins‑font")) {
-        const   link = document.createElement("link");
-        link.id  = "poppins‑font";
+    /* Inter font */
+    if (!document.getElementById("inter-font")) {
+        const link = document.createElement("link");
+        link.id  = "inter-font";
         link.rel = "stylesheet";
-        link.href = "https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap";
+        link.href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap";
         document.head.appendChild(link);
     }
 })();
 
 /* ---------- structure helpers ---------- */
-export function createAppendix (ratio: number): HTMLDivElement {
-    const   bar = document.createElement("div");
-
-    const   height = ratio * 50;
-    const   middleRow = 50;
-    let     bottomRow = 0;
-    let     topRow = 0;
-
-    if (ratio > 1)
-        bottomRow = 50;
-    if (ratio > 2)
-        topRow = 50;
+export function createAppendix(_: number): HTMLDivElement {
+    const bar = document.createElement("div");
 
     Object.assign(bar.style, {
-        width                   : `${CANVAS_WIDTH}px`,
-        height                  : `${height}px`,
-        display                 : "grid",
-        gridTemplateColumns     : "1fr 1fr 1fr",
-        gridTemplateRows        : `${topRow}px ${middleRow}px ${bottomRow}px`,
-        justifyContent          : "center",
-        justifyItems            : "center",
-        alignItems              : "center",
-        padding                 : "0",
-        margin                  : "0",
-        fontSize                : "24px",
-        fontWeight              : "600",
-       // transform               : "scaleY(1.2)",
-        color                   : DESIGN.accentColor,
-        boSizing                : "border-box",
-        borderTopLeftRadius     : "260px",
-        borderTopRightRadius    : "260px",
-        background              : "rgb(13, 63, 119)",
-        backdropFilter          : "blur(10px)",
-        border                  : "3px solid rgb(255, 0, 0)",
-        boxShadow               : "0 8px 30px rgba(0,0,0,.08)",
+        width               : `${CANVAS_WIDTH}px`,
+        height              : "66px",
+        display             : "grid",
+        gridTemplateColumns : "repeat(4,1fr)",
+        alignItems          : "center",
+        fontSize            : "20px",
+        fontWeight          : "600",
+        color               : DESIGN.textColor,
+        backdropFilter      : "blur(12px)",
+        borderRadius        : "14px",
+        border              : "1px solid rgba(255,255,255,.14)",
+        background          : "rgba(255,255,255,.07)",
+        boxShadow           : "0 10px 32px rgba(0,0,0,.35)",
     } as Partial<CSSStyleDeclaration>);
 
-    return bar ;
+    return bar;
 }
 
-export function createGameCanvas (_: Player[]): HTMLCanvasElement {
-    const   canvas = document.createElement("canvas");
-    canvas.width  = CANVAS_WIDTH;
-    canvas.height = CANVAS_HEIGHT;
+export function createGameCanvas(_: Player[]): HTMLCanvasElement {
+    /* responsive sizing: up to 1200×900, keep 4:3 aspect */
+    const W = Math.min(1200, window.innerWidth * 0.95);
+    const H = W * 0.75;
+    setCanvasSize(W, H);
+
+    const canvas = document.createElement("canvas");
+    canvas.width  = W;
+    canvas.height = H;
 
     Object.assign(canvas.style, {
-        display         : "block",
-        margin          : "40px auto",
-        borderRadius    : "14px",
-        boxShadow       : "0 12px 28px rgba(0,0,0,.12)",
+        width        : `${W}px`,
+        height       : `${H}px`,
+        display      : "block",
+        margin       : "40px auto",
+        borderRadius : "14px",
+        boxShadow    : "0 14px 36px rgba(0,0,0,.30)",
     } as Partial<CSSStyleDeclaration>);
 
-    return canvas ;
+    return canvas;
 }
 
 /* ---------- button polish ---------- */
-export function styleStartButton (btn: HTMLButtonElement) {
-
+export function styleStartButton(btn: HTMLButtonElement) {
     Object.assign(btn.style, {
-        minWidth        : "220px",
-        height          : "30px",
-        margin          : "5px",
-        padding         : "4px 28px",
-        fontFamily      : DESIGN.fontFamily,
-        fontSize        : "24px",
-        fontWeight      : "600",
-        background      : DESIGN.buttonColor,
-        color           : DESIGN.textColor,
-        border          : "none",
-        borderRadius    : "50px",
-        cursor          : "pointer",
-        boxShadow       : "0 4px 12px rgba(0,0,0,.15)",
-        transition      : "transform .18s ease, box-shadow .18s ease",
+        minWidth     : "180px",
+        height       : "40px",
+        margin       : "6px",
+        padding      : "6px 26px",
+        fontFamily   : DESIGN.fontFamily,
+        fontSize     : "20px",
+        fontWeight   : "600",
+        background   : DESIGN.buttonColor,
+        color        : DESIGN.fieldColor,
+        border       : "2px solid transparent",
+        borderRadius : "8px",
+        cursor       : "pointer",
+        transition   : "background .2s ease, color .2s ease, transform .15s ease",
     } as Partial<CSSStyleDeclaration>);
 
     btn.onmouseenter = () => {
-        btn.style.transform = "translateY(-3px)";
-        btn.style.boxShadow = "0 8px 18px rgba(0,0,0,.22)";
+        btn.style.background  = "transparent";
+        btn.style.color       = DESIGN.buttonColor;
+        btn.style.borderColor = DESIGN.buttonColor;
+        btn.style.transform   = "translateY(-2px)";
     };
     btn.onmouseleave = () => {
-        btn.style.transform = "translateY(0)";
-        btn.style.boxShadow = "0 4px 12px rgba(0,0,0,.15)";
+        btn.style.background  = DESIGN.buttonColor;
+        btn.style.color       = DESIGN.fieldColor;
+        btn.style.borderColor = "transparent";
+        btn.style.transform   = "translateY(0)";
     };
 }
 
-/* ---------- score flip micro‑animation ---------- */
+/* ---------- score flip micro-animation ---------- */
 let scoreCSSInjected = false;
-function ensureScoreCSS () {
-    if (scoreCSSInjected)   return;
-
+function ensureScoreCSS() {
+    if (scoreCSSInjected) return;
     scoreCSSInjected = true;
-    const   s = document.createElement("style");
+    const s = document.createElement("style");
     s.textContent = `
-  @keyframes flipUp{
-    0%{ transform:translateY(12px) rotateX(90deg); opacity:0 }
-    80%{ opacity:1 }
-    100%{ transform:translateY(0) rotateX(0deg); }
-  }`;
+    @keyframes flipUp{
+      0%   { transform:translateY(12px) rotateX(90deg); opacity:0 }
+      80%  { opacity:1 }
+      100% { transform:translateY(0)   rotateX(0deg);  }
+    }`;
     document.head.appendChild(s);
 }
-
-export function animateScore (el: HTMLElement) {
+export function animateScore(el: HTMLElement) {
     ensureScoreCSS();
     el.style.animation = "flipUp .4s cubic-bezier(.4,1.4,.6,1)";
 }
 
 /* ---------- core drawing helpers ---------- */
-export function drawBackground (ctx: CanvasRenderingContext2D) {
+export function drawBackground(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = DESIGN.fieldColor;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     ctx.strokeStyle = DESIGN.lineColor;
-    ctx.lineWidth   = 4;
+    ctx.lineWidth   = 3;
     ctx.strokeRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
     ctx.beginPath();
+    ctx.setLineDash([10, 10]);
+    ctx.strokeStyle = "#b0b9c9";
     ctx.moveTo(CANVAS_WIDTH / 2, 0);
     ctx.lineTo(CANVAS_WIDTH / 2, CANVAS_HEIGHT);
     ctx.stroke();
+    ctx.setLineDash([]);
 }
 
-export function drawCountdownFrame (
+export function drawCountdownFrame(
     ctx: CanvasRenderingContext2D,
     frame: string
 ) {
     drawBackground(ctx);
-    ctx.font = `900 96px ${DESIGN.fontFamily}`;
-    ctx.textAlign = "center";
+    ctx.font         = `1000 96px ${DESIGN.fontFamily}`;
+    ctx.textAlign    = "center";
     ctx.textBaseline = "middle";
-    // ctx.fillStyle = '000000';
-    ctx.fillStyle = DESIGN.accentColor;
+    ctx.fillStyle    = DESIGN.accentColor;
     ctx.fillText(frame, CANVAS_WIDTH / 2, CANVAS_HEIGHT / 2);
 }
 
-export function drawPauseIcon (ctx: CanvasRenderingContext2D) {
-    const   w = 16, h = 48, gap = 12;
+export function drawPauseIcon(ctx: CanvasRenderingContext2D) {
+    const w = 16, h = 48, gap = 12;
     ctx.fillStyle = DESIGN.lineColor;
     ctx.fillRect(CANVAS_WIDTH / 2 - gap / 2 - w, CANVAS_HEIGHT - 40 - h, w, h);
     ctx.fillRect(CANVAS_WIDTH / 2 + gap / 2,   CANVAS_HEIGHT - 40 - h, w, h);
 }
 
-/* paddles & ball (canvas variants) */
-export function drawPaddle (
+/* ---------- paddles & ball ---------- */
+export function drawPaddle(
     ctx: CanvasRenderingContext2D,
-    x:number, y:number, w:number, h:number
+    x: number, y: number, w: number, h: number
 ) {
-    ctx.fillStyle = DESIGN.accentColor;
+    ctx.fillStyle   = DESIGN.accentColor;
+    ctx.shadowColor = "rgba(0,0,0,.50)";
+    ctx.shadowBlur  = 8;
     ctx.fillRect(x, y, w, h);
+    ctx.shadowBlur  = 0;
 }
 
-export function drawBall (
-    ctx: CanvasRenderingContext2D, x: number,y: number,r: number
+export function drawBall(
+    ctx: CanvasRenderingContext2D,
+    x: number, y: number, r: number
 ) {
-    const   g = ctx.createRadialGradient(x - r * 0.4, y - r * 0.4, r * 0.1, x, y, r);
-    g.addColorStop(0, "#ff768e");
-    g.addColorStop(0.55, DESIGN.accentColor);
-    g.addColorStop(1, "#4c000d");
+    if (x + r < 0 || x - r > CANVAS_WIDTH || y + r < 0 || y - r > CANVAS_HEIGHT)
+        return;
+
+    const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.1, x, y, r);
+    g.addColorStop(0,   "#ffffff");
+    g.addColorStop(0.4, "#c4c4c4");
+    g.addColorStop(1,   "#7a7a7a");
     ctx.fillStyle = g;
 
-    ctx.save();
-    ctx.filter = "blur(2px)";
     ctx.beginPath();
-    ctx.arc(x,y,r,0,Math.PI*2);
-    ctx.fill();
-    ctx.restore();
-
-    ctx.fillStyle = "rgba(255,255,255,.65)";
-    ctx.beginPath();
-    ctx.ellipse(x-r * 0.35, y-r * 0.35, r * 0.15, r * 0.10, 0, 0, Math.PI * 2);
+    ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.fill();
 }
 
-const   style = document.createElement('style');
+/* ---------- scoreboard cell helper ---------- */
+const style = document.createElement("style");
 style.textContent = `
-    .score-cell {
-        margin:         0;
-        color:          Design.DESIGN.accentColor;
-        text-align:     center;
-        white-space:    nowrap;
-        overflow:       visible;
-        text-overflow:  clip;
-        width:          100%;
-        line-height:    24px;
-    }
-`;
+  .score-cell{
+    margin:0;
+    color:${DESIGN.accentColor};
+    text-align:center;
+    white-space:nowrap;
+    overflow:visible;
+    text-overflow:clip;
+    width:100%;
+    line-height:26px;
+  }`;
 document.head.appendChild(style);
