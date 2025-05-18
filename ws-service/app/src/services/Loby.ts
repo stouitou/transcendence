@@ -16,7 +16,7 @@ export class LobyConfig {
 		_lobyId:string,
 		_type:string,//remote or local
 		_format:string,//classic or tournament
-		_mode:string,//normal or rapid ..  //@TODO a redefinir
+	//	_mode:string,//normal or rapid ..  //@TODO a redefinir
 		_tournamentId:number|null,
 		_maxPlayers:number,
 		_isallowedRegistration:boolean,
@@ -28,7 +28,7 @@ export class LobyConfig {
 				_lobyId: ' ',
 				_type:"local",
 				_format: "classic",
-				_mode: "normal",
+			//	_mode: "normal",
 				_tournamentId: null,
 				_maxPlayers: 2,
 				_isallowedRegistration: true,
@@ -45,22 +45,23 @@ export class LobyConfig {
 		return this.config._lobyId;
 	}
 
-	setMode(mode: string) {
+	/* setMode(mode: string) {
 		this.config._mode = mode;
 	return this;
 	}
 	get mode() {
 	return this.config._mode;
-	}
+	} */
 	setFormat(format: string) {
-	this.config._format = format;
+		
+	this.config._format = format == "classic" ? "classic" : "tournament";
 	return this;
 	}
 	get format() {
 	return this.config._format;
 	}
 	setType(type: string) {
-	this.config._type = type;
+	this.config._type = type == "local" ? "local" : "remote";
 	return this;
 	}
 	get type() {
@@ -123,6 +124,7 @@ export class LobyConfig {
 }
 
 export class Loby {
+	createDate = Date.now();
 	private _lobyId: string = generateUID();
 	private _config: LobyConfig = new LobyConfig(this._lobyId);
 	private playerManagerInstance: PlayerManager = new PlayerManager();
@@ -259,7 +261,7 @@ export class Loby {
 		  config: {
 			type: this.config.type,
 			format: this.config.format,
-			mode: this.config.mode,
+		//	mode: this.config.mode,
 			tournamentId: this.config.tournamentId,
 			maxPlayers: this.config.maxPlayers,
 			isallowedRegistration: this.config.isAllowedRegistration,

@@ -26,10 +26,10 @@ export class Game {
   @Column({ type: "text", default: "en attente" }) //en attente, en cours, terminee
   state: string;
 
-  //mode de la partie
+/*   //mode de la partie
   @Column({ type: "text", default: "normal" }) //normal: classique, rapide: contre la montre, tournoi?: plusieurs joueurs
   mode: string;
-
+ */
   //chaque partie a plusieurs joueurs
   @ManyToMany(() => User, (user) => user.games, { cascade: true , onUpdate: 'CASCADE'  })
   @JoinColumn()
@@ -59,7 +59,7 @@ export class Game {
 
   //format de la partie : local ou remote
   @Column({ type: "text", default: "classic" }) //classic, tournement
-  format: string;
+  format: string; 
 
 /*   //si local, les players sont un tableau de displaynames
   @Column({ type: "simple-array", nullable:true}) 

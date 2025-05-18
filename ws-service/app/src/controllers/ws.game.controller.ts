@@ -37,7 +37,7 @@ export class WsGameController {
           const message = JSON.parse(data.toString());
           console.log("message",message);
           if (typeof message !== "object" || message === null) {
-            console.error("⚠️ Message invalide reçu :", message);
+            console.error("⚠️[WsGameController] Message invalide reçu :", message);
             socket.send(JSON.stringify({ error: "Message invalide" }));
             return;
         }

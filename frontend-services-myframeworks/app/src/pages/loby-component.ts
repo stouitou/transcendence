@@ -1,5 +1,5 @@
 import { BaseComponent } from "../frameworks/base-component";
-import { Game, User, UserContext } from "../globalstate/GlobalState";
+import { User, UserContext } from "../globalstate/GlobalState";
 import {IWebSocketsService, Match} from "../globalstate/WebSocketService";
 interface WaitingPlayers {
   userId: string,
@@ -7,7 +7,6 @@ interface WaitingPlayers {
   name: string | null,
   avatar: string | null,
   state: string | null,
-  // state: "waiting" | "playing" | "finished" | "joined" | "left" | "cancelled",
   isInGame: boolean,
   isIA: boolean,
 
@@ -15,7 +14,6 @@ interface WaitingPlayers {
 export interface WebSocketGameConfig {
 	type : string,
 	format : string,
-	//gameType: string, // "pong" | "pong2" | "pong3"
 	tournamentId: string | null,
 	maxPlayers: number,
 	isallowedRegistration: boolean, // for friendly game
@@ -24,7 +22,6 @@ export interface WebSocketGameConfig {
 	players: WaitingPlayers[],
 }
 export type GameReceivedMessage = {
-	//gameId: string,
   lobyId: string,
 	state: string,
   config: WebSocketGameConfig,
@@ -39,7 +36,6 @@ export type GameJoinedReceivedMessage = {
 export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService | null ,
   games: Match[]|null,
   game: Match|null,
-//  waitingPlayers: GameJoinedReceivedMessage[]|null,
   user: User|null,
   subscribe: boolean}> {
 
@@ -172,20 +168,35 @@ ${waitingPlayers?`
         </table>
   </div>
       `;
-        this.attachEvent(this, '#join-game', 'click', (event: Event) => {
+      this.attachEvent(this, '#join-game', 'click',async (event: Event) => {
+      
+      try {
           const target = event.target as HTMLElement;
           if (!target.matches('button')) return; // le clic provient d'un bouton
           // Vérifiez si le bouton a l'attribut data-type
           const dataID = target.getAttribute('data-loby-id');
-          if (dataID) {
-            const lobyId = (dataID);
-            this.setSubscribe();
-            const data = JSON.stringify({ type: "gameJoined",  lobyId: lobyId ,state: "subscribe" });          
-            this.state.ws?.sendMessage(data);
+          const response = await fetch(`/api/auth/ws-csrf`)
+          if (!response.ok) {
+            console.error('Failed to fetch CSRF token for WebSocket');
+            return;
           }
-        });
-    }
-    
+          const wsCSRFToken = await response.json();
+          if (dataID) {
+              const lobyId = (dataID);
+              this.setSubscribe();
+              const data = JSON.stringify({
+                type: "gameJoined",
+                lobyId: lobyId,
+                state: "subscribe",
+                wsCSRFToken:wsCSRFToken.token
+                });          
+              this.state.ws?.sendMessage(data);
+            }
+      } catch (error) {
+        console.error('Error fetching CSRF token for WebSocket:', error);
+      }
+    });
+  }    
 }
 
 if (!customElements.get('lobby-client-component'))

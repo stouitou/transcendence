@@ -22,7 +22,10 @@ export const getGames = async (pagination:Pagination,filter:Filter): Promise<{ga
 	const { limit = 10, offset = 0, order = 'ASC' } = pagination;
 	const { type ="remote" } = filter;
 	try {
-		const response = await fetch(`/api/game-management-service/games/pagination?limit=${limit}&offset=${offset}&order=${order}&filters={"type":"${type}","format":"classic"}&relations=tournament`);///games/pagination?limit=10&offset=2
+		//const response = await fetch(`/api/game-management-service/games/pagination?limit=${limit}&offset=${offset}&order=${order}&filters={"type":"${type}","format":"classic"}&relations=tournament`);///games/pagination?limit=10&offset=2
+	//	const response = await fetch(`/api/users/me/games/pagination?limit=${limit}&offset=${offset}&order=${order}&filters={"type":"${type}","format":"classic"}&relations=tournament`);///games/pagination?limit=10&offset=2
+		const response = await fetch(`/api/users/me/games?limit=${limit}&offset=${offset}&order=${order}&filters={"type":"${type}","format":"classic"}&relations=players`);///games/pagination?limit=10&offset=2
+
 		if (response.ok) {
 			const {data, meta} = await response.json();
         console.log('games list:', data);

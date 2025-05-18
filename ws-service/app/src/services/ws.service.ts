@@ -16,8 +16,8 @@ export interface WaitingPlayers {
 		score?: number,
 }
 export interface WebSocketGameConfig {
-	type : string,
-	format : string,
+	type : string, // "local" | "remote"
+	format : string, // "classic" | "tournament"
 	//gameType: string, // "pong" | "pong2" | "pong3"
 	tournamentId: number | null,
 	maxPlayers: number,

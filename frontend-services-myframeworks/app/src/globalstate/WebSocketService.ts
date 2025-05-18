@@ -61,7 +61,7 @@ export interface IWebSocketsService {
     wsGamesJoined: WebSocketGameJoinedReceivedMessage[];
     privateMessages: WebSocketPrivateReceivedMessage[];
     sendMessage: (message: string) => void;
-    sendLoginMessage: (id: string) => void;
+    sendLoginMessage: (id: string,authToken:string) => void;
     sendLogoutMessage: () => void;
     userId: string | null;
     isOnline: string[];
@@ -384,15 +384,15 @@ export class WebSocketsService {
   };
 
 // Envoi du message lors du login
-  sendLoginMessage =  (id:string) => {
+  sendLoginMessage =  (id:string,authToken:string) => {
       console.log('[WEBSOCKET]  sendLoginMessage', { type: "login", userId:this.userId , id});
       if (this._ws && this._ws.readyState === WebSocket.OPEN) {
-          const data = JSON.stringify({ type: "login", userId:this.userId , id});
+          const data = JSON.stringify({ type: "login", userId:this.userId , id,authToken});
           this._ws.send(data);
       }
       else {
           console.warn("⚠️ WebSocket pas encore prêt. Ajout du message en attente...");
-          setTimeout(() => this.sendLoginMessage(id), 100); // Réessaye après 100ms
+          setTimeout(() => this.sendLoginMessage(id,authToken), 100); // Réessaye après 100ms
       }
   };
 // Envoi du message lors du logout

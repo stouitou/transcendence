@@ -2,6 +2,7 @@
 import { BaseComponent } from "../frameworks/base-component";
 import { User, UserContext } from '../globalstate/GlobalState';
 import { disable2FA, enable2FA, get2FADetail, TwoFA } from "../services/api.2fa";
+import { updateProfile, uploadAvatar } from "../services/api.profile";
 
 type ProfileState = {
   user: User | null;
@@ -32,7 +33,11 @@ export class ProfileEdit extends BaseComponent<ProfileState> {
     
     setName(event: Event) {
       const input = event.target as HTMLInputElement;
-      this.setState({ ...this.state, user: { ...this.state.user, name: input.value } });
+      //en l'etat danger sur l'input.value: il faut sanitizer,
+      // on autorize uniquement les lettres, chiffres et espaces
+      // et @_-
+      const sanitizedValue = input.value.replace(/[^a-zA-Z0-9@_.-]/g, '');
+      this.setState({ ...this.state, user: { ...this.state.user, name: sanitizedValue } });
     }
     setAvatar(event: Event) {
       const input = event.target as HTMLInputElement;
@@ -146,7 +151,15 @@ export class ProfileEdit extends BaseComponent<ProfileState> {
     }
     formData.append('file', file);         
     try {
-        const response = await fetch(`/api/users/upload-avatar`, {
+      const response = await uploadAvatar(formData);
+      if (response) {
+        console.log('Avatar updated:', response);
+        this.setUser(response);
+      } else {
+        console.error('Failed to update avatar');
+      }
+
+      /*   const response = await fetch(`/api/users/upload-avatar`, {
             method: 'POST',
             body: formData
         });
@@ -157,34 +170,38 @@ export class ProfileEdit extends BaseComponent<ProfileState> {
             this.setUser(profileData);
         } else {
             console.error('Failed to update avatar');
-        }
+        } */
     } catch (error) {
         console.error('Error updating avatar:', error);
     }
   }
   
   handleUpdateProfile = async(e:Event)=> {
-
     e.preventDefault();
     try {
-        const response = await fetch(`/api/users/me`, {
+      //  const res = await fetch('/api/auth/csrf');
+      //  const { csrfToken } = await res.json();
+        const response = await updateProfile({ name: this.state.user?.name });
+        /* const response = await fetch(`/api/users/me`, {
             method: 'PUT',
             headers: {
-                'Content-Type': 'application/json'
+                'Content-Type': 'application/json',
+                'x-csrf-token': csrfToken,
             },
-            body: JSON.stringify({ name:this.state.user?.name/* , role, level, avatar */ })
-        });
-        console.log('response', response);
+            body: JSON.stringify({ name:this.state.user?.name
+            //, role, level, avatar
+             })
+        }); */
+       // console.log('response', response);
   
-        if (response.ok) {
-            const profileData = await response.json();
-            console.log('Profile updated:', profileData);
-             this.setUser(profileData);
+        if (response) {
+            console.log('Profile updated:', response);
+             this.setUser(response);
             //@TODO?
-            // Envoyer un message de mise à jour via WebSocket?
+            // Envoyer un message de mise à jour via WebSocket? par exemple si displayName
         } else {
-            console.log(name);
-            console.error('Failed to update profile');
+          //  console.log(name);
+            console.error('Failed to update profile', response);
         }
     } catch (error) {
     console.error('Error updating profile:', error);
@@ -209,7 +226,10 @@ export class TwoFactorSetup extends BaseComponent<{ user: User | null; twoFa: Tw
   connectedCallback() {
     console.log("TwoFactorSetup connectedCallback");
     this.state.user = UserContext().user();
-    this.fetch2FADetails();
+    this.fetch2FADetails().then(() => {
+      //this.render();
+      console.log("TwoFactorSetup connectedCallback fetch2FADetails");
+    });
   }
 
   async fetch2FADetails() {
@@ -217,6 +237,7 @@ export class TwoFactorSetup extends BaseComponent<{ user: User | null; twoFa: Tw
     if (!user) return;
 
     try {
+      console.log("Fetching 2FA details for user:", user.id);
       const data = await get2FADetail(user.id);
       this.setState({ ...this.state, twoFa: data ?? null });
       console.log("2FA data:", data);
@@ -359,7 +380,7 @@ async HandleDisable2FA() {
         const div = this.querySelector(".qrcode");
         if (div) {
           div.innerHTML = ` <h3 class="text-lg font-semibold">Scan the QR Code</h3>
-              <img src="/api/auth/2fa/qrcode?timestamp=${timestamp}" alt="QR Code for 2FA" class="qr-code-image" />
+              <img src="/api/users/me/2fa/qrcode?timestamp=${timestamp}" alt="QR Code for 2FA" class="qr-code-image" />
                <p class="text-center mt-4">Use an authenticator app like Google Authenticator to scan the QR code.</p>
             `; // Clear previous QR code
         }

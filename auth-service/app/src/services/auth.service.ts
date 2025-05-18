@@ -1,16 +1,13 @@
 import { FastifyInstance } from "fastify";
 import { OauthProviderResponse } from "../types/provider.types";
-//import { UserRepository } from "../repository/UserRepository";
 import { User } from "../models/User.models";
-//import { AuthProvider } from "../Entity/AuthProvider.entity";
-//import AuthProviderRepository from "../repository/AuthProvider.repository";
 import UserRepository from "../repository/User.repository";
 import bcrypt from "bcryptjs"
 import AuthProviderRepository from "@src/repository/AuthProvider.repository";
 
 import { generateTOTPSecret, verifyTOTP } from "@src/utils/totp";
 import { AuthProvider } from "@src/models/AuthProvider.models";
-import { decrypt } from "@src/utils/crypto";
+const defaultAvatar = "https://localhost:4433/uploads/defaultAvatar.jpg"; //@TODO : a changer
 /**
  * Service d'authentification
  * rappel: un service est une classe qui contient des méthodes qui effectuent des opérations spécifiques
@@ -45,10 +42,18 @@ export class AuthService {
    * @param user
    * @returns
    */
-  generateToken(user: { id: number,name:string,avatar?:string }) { //@TODO : changer le type de user et retourner un objet User complet
+  generateToken(user: { id: number,name:string,avatar?:string,role:string }) { //@TODO : changer le type de user et retourner un objet User complet
     return this.app.jwt.sign(
      // { id: user.id },
-      { ...user },//on envoie tout l'objet user
+    //  { ...user },//on envoie tout l'objet user
+    {
+      id: user.id,
+      name: user.name,
+      avatar: user.avatar,
+      role: user.role,
+      //email: user.email,
+      //authProviders: user.authProviders
+    },
       { expiresIn: "10h" } //@DEBUG
       //{ expiresIn: "1h" } 
       //{ expiresIn: "1m" } // 1 minute
@@ -113,7 +118,7 @@ export class AuthService {
   refreshToken(token: string) {
     try {
       const decoded = this.app.jwt.verify(token, "REFRESH_TOKEN_PUBLIC_KEY") as any;
-      return this.generateToken({ id: decoded.id,name:decoded.name, avatar:decoded.avatar });
+      return this.generateToken({ id: decoded.id,name:decoded.name, avatar:decoded.avatar, role:decoded.role });
     } catch (err) {
       throw new Error("Invalid token");
     }
@@ -134,7 +139,7 @@ export class AuthService {
     // 2- crypter le mot de passe
     const passwordHash = bcrypt.hashSync(password, 10);
     // 3- creer un nouvel utilisateur
-    const newuser = new User({name,avatar:"noAvatar", authProviders: [{provider: "local", provider_id: email, password:passwordHash}]});
+    const newuser = new User({name,avatar:defaultAvatar, authProviders: [{provider: "local", provider_id: email, password:passwordHash}]});
     
     // 4 - enregistrer le user dans la base de données
     const user = await this.UserRepository.create(newuser);

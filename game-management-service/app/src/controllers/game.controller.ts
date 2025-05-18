@@ -119,8 +119,8 @@ export class GameController {
 
     const { ...requestBody } = request.body;
  //   const {authorization,cookie} = request.headers;
-    const {type , format , mode} = request.params as {type:string,format:string,mode:string};
-    if (!type || !format || !mode) {
+    const {type , format /* , mode */} = request.params as {type:string,format:string/* ,mode:string */};
+    if (!type || !format /* || !mode */) {
       return reply.status(400).send({ error: 'Invalid request params' });
     }
     if (type !== 'local' && type !== 'remote') {
@@ -128,12 +128,12 @@ export class GameController {
     }
     if (format !== 'classic' && format !== 'tournament') {
       return reply.status(400).send({ error: 'Invalid game format' });
-    }
+    }/* 
     if (mode !== 'normal' && mode !== 'rapide') {
       return reply.status(400).send({ error: 'Invalid game mode' });
-    }
+    } */
 
-    const games = await this.gameRepository.create({...requestBody,type,format,mode});
+    const games = await this.gameRepository.create({...requestBody,type,format/* ,mode */});
     console.log("GameController createGame ",games?'ok':'ko');
     if (!games) {
       return reply.status(404).send({ error: 'Game creation failed' });
@@ -143,8 +143,8 @@ export class GameController {
   async createGame(request: FastifyRequest<{ Body: GameCreate }>, reply: FastifyReply) {  
     const { ...requestBody } = request.body;
  //   const {authorization,cookie} = request.headers;
-    const {type , format , mode} = request.params as {type:string,format:string,mode:string};
-    if (!type || !format || !mode) {
+    const {type , format/*  , mode */} = request.params as {type:string,format:string/* ,mode:string */};
+    if (!type || !format/*  || !mode */) {
       return reply.status(400).send({ error: 'Invalid request params' });
     }
     if (type !== 'local' && type !== 'remote') {
@@ -152,14 +152,14 @@ export class GameController {
     }
     if (format !== 'classic' && format !== 'tournament') {
       return reply.status(400).send({ error: 'Invalid game format' });
-    }
+    }/* 
     if (mode !== 'normal' && mode !== 'rapide') {
       return reply.status(400).send({ error: 'Invalid game mode' });
-    }
+    } */
     if (!request.authenticatedUser){
       return reply.status(401).send({ error: 'Unauthorized' });
     }
-    const games = await this.gameRepository.create({...requestBody,type,format,mode});
+    const games = await this.gameRepository.create({...requestBody,type,format/* ,mode */});
     console.log("GameController createGame ",games?'ok':'ko');
     if (!games) {
       return reply.status(404).send({ error: 'Game creation failed' });
@@ -169,11 +169,21 @@ export class GameController {
     return reply.status(201).send(games);
   }
 
-  async getGames(request: FastifyRequest, reply: FastifyReply) {  
+  async getGames(request: FastifyRequest, reply: FastifyReply) { 
+    try {
     console.log("--GameController getGames ");
-    const games = await  this.gameRepository.getAll();
+    /* const games = await  this.gameRepository.getAll();
         console.log("GameController getGames ",games);
-    return reply.send(games);
+    return reply.send(games); */
+     const query = request.query as IParams;
+       // const options = new BuildOptions(query).getOptions();
+        const games = await  this.gameRepository.getAllbyQuery(query);
+        console.log("gamesController getgames ",games);
+          return reply.send(games);
+    } catch (error) {
+      console.error("GameController getGames error ",error);
+      return reply.status(407).send({ error: 'Internal server error' });
+    }
   }
 
   async getGamesByQuery(request: FastifyRequest, reply: FastifyReply) {  

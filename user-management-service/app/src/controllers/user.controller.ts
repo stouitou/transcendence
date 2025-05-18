@@ -61,8 +61,15 @@ const helpersUpdateStats=( userStats: UserStats, addValue : Partial<UserStats>) 
   };
 }
 
+//@TODO importer le bon type de GAME
+interface Game {
+  id: number;
+  type: string;
+  format: string;
+  players: { id: number };
+}
 
-interface UpdateUserBody extends User{}
+export interface UpdateUserBody extends User{}
 
 
 export class UserController {
@@ -70,6 +77,7 @@ export class UserController {
   constructor() {
     this.userRepository = new UserRepository()
     this.createUser = this.createUser.bind(this);
+    this.getUserMe = this.getUserMe.bind(this);
     this.getUsers = this.getUsers.bind(this);
     this.getUserById = this.getUserById.bind(this);
     this.getUserStatsById = this.getUserStatsById.bind(this);
@@ -80,6 +88,8 @@ export class UserController {
     this.updateUserAvatar = this.updateUserAvatar.bind(this);
     this.addFriend = this.addFriend.bind(this);
     this.removeFriend = this.removeFriend.bind(this);
+
+    this.getUserGames = this.getUserGames.bind(this);
   }
   //constructor(private userService: UserService) {}
 
@@ -112,6 +122,18 @@ export class UserController {
     const users = await  this.userRepository.getAll();
         console.log("UserController getUsers ",users);
     return reply.send(users);
+  }
+
+  async getUserMe(request:  FastifyRequest, reply: FastifyReply) {
+    const authenticatedUser = request.authenticatedUser;
+    if (!authenticatedUser) {
+      return reply.status(401).send({ error: 'User not authenticated' });
+    }
+    const user = await this.userRepository.getById(authenticatedUser.id!);
+        if (!user) {
+      return reply.status(404).send({ error: 'User not found' });
+    }
+    return reply.send(user);
   }
 
 
@@ -238,7 +260,7 @@ export class UserController {
     await pump(data.file, createWriteStream(uploadPath));
 
    // const user = await this.userRepository.update({...request.authenticatedUser,avatar:`uploads/${userId}-${data.filename}`});
-    const user = await this.userRepository.update({id:userId, avatar:`uploads/${userId}-${data.filename}`});
+    const user = await this.userRepository.update({id:userId, avatar:`/uploads/${userId}-${data.filename}`});
       if (!user) {
         return reply.status(404).send({ error: 'User not found' });
       }
@@ -303,9 +325,23 @@ export class UserController {
      */
 
   async getUserGames(request: FastifyRequest, reply: FastifyReply) {
+    const authenticatedUser = request.authenticatedUser;
+    if (!authenticatedUser) {
+      return reply.status(401).send({ error: 'User not authenticated' });
+    }
+    const userId = authenticatedUser.id;
+    if (!userId) {
+      return reply.status(400).send({ error: 'Invalid user id' });
+    }
+    //add userId to query filters {"id":userId}
+        console.log("[UserController] getUserGames request.query ",request.query);
+        const query = request.query as IParams;
+        const builQuery = Helpers.buildQueryString<Game>(query,{players:{id:userId}});
+       
+
    try {
     const authHeader = request.headers.authorization;
-    const response = await fetch('http://game_management_service:3000/api/games', {
+    const response = await fetch(`http://game-management-service:3000/api/game-management-service/games?${builQuery}`, {
       method: 'GET',
       headers: {
         'Authorization': authHeader?? '',
@@ -313,7 +349,8 @@ export class UserController {
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch games: ${response.statusText}`);
+      console.error("Error fetching games:", response);
+      throw new Error(`[getUserGames] Failed to fetch games: ${response.statusText}`);
     }
 
     const games = await response.json();
@@ -327,7 +364,7 @@ async getUserGameById(request: FastifyRequest<{ Params: { id: string } }>, reply
   try {
     const authHeader = request.headers.authorization;
     const gameId = request.params.id;
-    const response = await fetch(`http://game_management_service:3000/api/games/${gameId}`, {
+    const response = await fetch(`http://game-management-service:3000/api/games/${gameId}`, {
       method: 'GET',
       headers: {
         'Authorization': authHeader?? '',
@@ -349,7 +386,7 @@ async getUserGameById(request: FastifyRequest<{ Params: { id: string } }>, reply
 async getUserFriends(request: FastifyRequest, reply: FastifyReply) {
     try {
       const authHeader = request.headers.authorization;
-      const response = await fetch('http://game_management_service:3000/api/tournaments', {
+      const response = await fetch('http://game-management-service:3000/api/tournaments', {
         method: 'GET',
         headers: {
           'Authorization': authHeader?? '',
@@ -369,9 +406,18 @@ async getUserFriends(request: FastifyRequest, reply: FastifyReply) {
   }
 
   async getUserTournaments(request: FastifyRequest, reply: FastifyReply) {
+    const authenticatedUser = request.authenticatedUser;
+    if (!authenticatedUser) {
+      return reply.status(401).send({ error: 'User not authenticated' });
+    }
+    const userId = authenticatedUser.id;
+    if (!userId) {
+      return reply.status(400).send({ error: 'Invalid user id' });
+    }
+    //add userId to query filters {"id":userId}
         console.log("[UserController] getUserTournaments request.query ",request.query);
         const query = request.query as IParams;
-        const builQuery = Helpers.buildQueryString(query);
+        const builQuery = Helpers.buildQueryString/* <Game> */(query,{players:{id:userId}});//@TODO Type Tournaments
     try {
       const authHeader = request.headers.authorization;
       const response = await fetch(`http://game-management-service:3000/api/game-management-service/tournaments?${builQuery}`, {

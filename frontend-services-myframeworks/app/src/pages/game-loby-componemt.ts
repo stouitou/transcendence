@@ -132,7 +132,7 @@ isCreateGame:boolean}>  {
 		${isCreateGame?`<game-setting-component></game-setting-component>`:''}
 	  `;
 	  this.updateList();// mise a jour de la liste des Loby disponible
-	  this.attachEvent(this, '#setGame', 'click', (event: Event) => {
+	  this.attachEvent(this, '#setGame', 'click', async (event: Event) => {
 		event.preventDefault();
 		const target = event.target as HTMLElement;
 		if (!target.matches('button')) return; // le clic provient d'un bouton
@@ -156,16 +156,33 @@ isCreateGame:boolean}>  {
 			//alert(`You clicked on button with data-id: ${dataID} game ${game}`);
 			if (!game) {
 			const id = this.state.user?.id;
-		 //   const waitingPlayers = { userId,id: id, name: message.name, avatar: message.avatar,state:message.state };
-		  const data = JSON.stringify({ type: "lobyJoined",
-			gameId: -1,// Number(dataID),
-			lobyId: lobyID,
-			name: this.state.user?.name,
-			avatar: this.state.user?.avatar,
-		   // waitingPlayers: {id: this.state.user?.id, name: this.state.user?.name, avatar: this.state.user?.avatar},
-			 state: "joined" });
-			 console.log('JSON.parse(data)',JSON.parse(data));
-			  this.state.ws?.sendMessage(data);
+		
+
+			try {
+				const response = await fetch(`/api/auth/ws-csrf`)
+				if (!response.ok) {
+				console.error('Failed to fetch CSRF token for WebSocket');
+				return;
+				}
+				const wsCSRFToken = await response.json();
+				//   const waitingPlayers = { userId,id: id, name: message.name, avatar: message.avatar,state:message.state };
+				const data = JSON.stringify({ type: "lobyJoined",
+					gameId: -1,// Number(dataID),
+					lobyId: lobyID,
+					name: this.state.user?.name,
+					avatar: this.state.user?.avatar,
+				// waitingPlayers: {id: this.state.user?.id, name: this.state.user?.name, avatar: this.state.user?.avatar},
+					state: "joined",
+					wsCSRFToken:wsCSRFToken.token
+					});
+
+				console.log('JSON.parse(data)',JSON.parse(data));
+				this.state.ws?.sendMessage(data);
+				//return;
+			} catch (error) {
+				console.error('Error fetching CSRF token for WebSocket:', error);
+			}
+ 
 			}
 			lobby.appendChild(lobbyComponent);
 		  }
@@ -177,48 +194,7 @@ isCreateGame:boolean}>  {
 	  this.attachEvent(this, '#createGame', 'click', (event: Event) => {
 		event.preventDefault();
 		this.setCreateGame();
-
 		console.log('create game', this.state.isCreateGame?"true":"false");
 	  });
-	 
-	  /* this.attachEvent(this, '#lobby', 'DOMNodeInserted', (event: Event) => {
-		event.preventDefault();
-		const lobyDiv =this.querySelector('#lobby') as HTMLElement;
-		if (lobyDiv) {
-		  console.log('lobyDiv',lobyDiv.getAttribute('data-type'));
-		  lobyDiv.getAttribute('data-type') === 'no' ? null : this.querySelector('game-setting-component')?.remove();;
-		  
-		}
-  
-	  }); *//* 
-	  const targetNode = document.querySelector('#lobby');
-	  if (!targetNode) return;
-
-// Options for the observer (which mutations to observe)
-const config = { attributes: true, childList: true, subtree: true };
-
-// Callback function to execute when mutations are observed
-const callback = (mutationList, observer) => {
-  for (const mutation of mutationList) {
-    if (mutation.type === "childList") {
-      console.log("A child node has been added or removed.");
-	  const lobyDiv =this.querySelector('#lobby') as HTMLElement;
-	  if (lobyDiv) {
-	  	lobyDiv.getAttribute('data-type') === 'no' ? null : this.querySelector('game-setting-component')?.remove();
-	  }
-    } else if (mutation.type === "attributes") {
-      console.log(`The ${mutation.attributeName} attribute was modified.`);
-	// lobyDiv.getAttribute('data-type') === 'no' ? null : this.querySelector('game-setting-component')?.remove();;
-//	mutation.attributeName === 'data-type' ? null : this.querySelector('game-setting-component')?.remove();
-    }
-  }
-};
-
-// Create an observer instance linked to the callback function
-const observer = new MutationObserver(callback);
-
-// Start observing the target node for configured mutations
-observer.observe(targetNode, config);
- */
 	}
 }

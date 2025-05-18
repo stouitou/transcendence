@@ -260,8 +260,8 @@ export class TournamentsController {
         const game = await gameRepository.create({
           ...db,
           type: tournament.type === "local" ? "local" : "remote",
-          format: "normal",
-          mode: "normal",
+          format: "tournament"//normal",
+       //   mode: "normal",
         });
     
         console.log("TournamentsController createTournamentForLoby()  --game--", game);
@@ -345,7 +345,7 @@ export class TournamentsController {
 
 
 
-  async getTournaments(request: FastifyRequest, reply: FastifyReply) {  
+  async getTournaments(request: FastifyRequest, reply: FastifyReply) {   
 /*     console.log("--TournamentsController getTournaments ");
     const tournaments = await  this.tournamentsRepository.getAll();
         console.log("TournamentsController getTournaments ",tournaments);
@@ -400,7 +400,7 @@ export class TournamentsController {
    //on recupere un tournois avec les players mais sans les games
    //de pus les players local ne sont pas setup
    //on va donc recupere le type local ou remote des queries
-   const {type:paramType, format: paramFormat} = request.params;
+   const {type:paramType, format: paramFormat} = request.params as {type:"local"|"remote", format:"classic"|"tournament"};
    console.log("TournamentsController createTournamentForLoby()  --paramType--",paramType, " --paramFormat--",paramFormat);
    console.log("TournamentsController createTournamentForLoby()  --requestBody--",requestBody);
    const {players, configPlayers,state,type,format,max_players} = requestBody;
@@ -409,7 +409,7 @@ export class TournamentsController {
     return reply.status(400).send({ error: 'No players in the tournament' });
   }
   if (players.length < 2 && paramType !== 'local') {
-    console.log("TournamentsController createTournamentForLoby()  --players.length < 2 && paramType !== 'local'--",players.length < 2 && paramType !== 'local');
+    console.log("TournamentsController createTournamentForLoby()  --players.length < 2 && paramType !== 'local'--",players.length < 2);
     return reply.status(400).send({ error: 'Not enough players to generate a tournament' });
   }
   console.log("TournamentsController createTournamentForLoby()  --{players:players, state:created,max_players, type, currentRound:0}--",{players:players, state:"created",max_players, type, currentRound:0});
@@ -497,8 +497,8 @@ export class TournamentsController {
           const game = await gameRepository.create({
             ...db,
             type: paramType === "local" ? "local" : "remote",
-            format: "normal",
-            mode: "normal",
+            format: paramFormat//"normal",
+           // mode: "normal",
           });
       
           console.log("TournamentsController createTournamentForLoby()  --game--", game);

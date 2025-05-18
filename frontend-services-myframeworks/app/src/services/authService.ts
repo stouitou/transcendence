@@ -8,10 +8,13 @@ export interface LoginData {
     password: string;
 }
 export const registerUser = async (data: RegisterData): Promise<void> => {
+    const res = await fetch('/api/auth/csrf');
+    const { csrfToken } = await res.json();
     const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-csrf-token': csrfToken,
         },
         body: JSON.stringify(data),
     });
@@ -26,10 +29,15 @@ export const registerUser = async (data: RegisterData): Promise<void> => {
 };
 
 export const loginUser = async (data: LoginData): Promise<{ twoFactorRequired: boolean|null, tempToken:any|null,token:any|null}> => {
+    
+  const res = await fetch('/api/auth/csrf');
+  const { csrfToken } = await res.json();
+    
     const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-csrf-token': csrfToken,
         },
         body: JSON.stringify(data),
     });

@@ -71,10 +71,10 @@ class ConfigGame {
   }
 }
 
-export class GameSetting extends BaseComponent<{ user: User | null; difficulty: number,type:string,format:string,mode:string,
+export class GameSetting extends BaseComponent<{ user: User | null; difficulty: number,type:string,format:string,/* mode:string, */
   max_players: number, players?: Players[] ,ws?: IWebSocketsService | null}> {
   constructor() {
-    super({ user: null, difficulty: 1,type:'local',format:'classic',mode:'normal', players:[{
+    super({ user: null, difficulty: 1,type:'local',format:'classic',/* mode:'normal', */ players:[{
     type: 'local',
     is_IA:false,
     avatar: "https://localhost:4433/uploads/1-avatartest.jpg",
@@ -86,26 +86,26 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
   }
   handlePost = async (e: Event) => {
     e.preventDefault();
-    const data = {
-      players: [this.state.user!.id],
-      gameHistory: {
+    const config = {
       players: this.state.players,
       type: this.state.type,
-      user: this.state.type === 'remote' ? this.state.user!.id : null,
+      format: this.state.format,
+      // mode: this.state.mode,
+      max_players: this.state.max_players,
+      isallowedRegistration: true,
     }
-  };
-  const config = {
-    players: this.state.players,
-    type: this.state.type,
-    format: this.state.format,
-    mode: this.state.mode,
-    max_players: this.state.max_players,
-    isallowedRegistration: true,
-  }
-
-  this.state.ws?.sendMessage(JSON.stringify({ type: "gameCreate", gameId: 1, config: config }));
-  return;
- 
+    try {
+      const response = await fetch(`/api/auth/ws-csrf`)
+      if (!response.ok) {
+        console.error('Failed to fetch CSRF token for WebSocket');
+        return;
+      }
+      const wsCSRFToken = await response.json();
+      this.state.ws?.sendMessage(JSON.stringify({ type: "gameCreate", gameId: 1, config: config ,wsCSRFToken:wsCSRFToken.token}));
+      return;
+    } catch (error) {
+      console.error('Error fetching CSRF token for WebSocket:', error);
+    } 
   };
 
 
@@ -206,7 +206,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
   }
 
   render() {
-    const { user, difficulty,type, format,mode,players } = this.state;
+    const { user, difficulty,type, format,/* mode, */players } = this.state;
     const percentage = (difficulty ) / (5) * 100; // Calculer la largeur initiale
     if (this.state.format === "classic" && this.state.max_players > 4) {
       this.state.max_players = 4;
@@ -235,15 +235,10 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
         <button class="btn mt-4 ${format === 'classic'? 'bg-blue-600 dark:bg-blue-600':'bg-red-600 dark:bg-red-600'}" data-type="classic">classic</button>
         <button class="btn mt-4 ${format != 'classic'? 'bg-blue-600 dark:bg-blue-600':'bg-red-600 dark:bg-red-600'}" data-type="tournament">tournament</button>
       </div>
-      <div id="setMode" class="mt-4 flex flex-row items-center">
-        <button class="btn mt-4 ${mode === 'normal'? 'bg-blue-600 dark:bg-blue-600':'bg-red-600 dark:bg-red-600'}" data-type="normal">Normal</button>
-        <button class="btn mt-4 ${mode === 'advanced'? 'bg-blue-600 dark:bg-blue-600':'bg-red-600 dark:bg-red-600'}" data-type="advanced">Advanced</button>
-      </div>
 
       <div class="mt-4">
         <p>Type de jeu: ${type}</p>
         <p>Format de jeu: ${format}</p>
-        <p>Mode de jeu: ${mode}</p>
         <p>Joueurs:</p>
         <table>
         <thead>

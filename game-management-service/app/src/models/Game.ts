@@ -8,7 +8,7 @@ export class Game{
   gameHistory?: GameHistory;
   difficulty: number;
   state: string;
-  mode: string;
+//  mode: string;
   players: User[] | number[];
   tournaments?: Tournaments;
   created_at: Date;
@@ -26,7 +26,7 @@ export class Game{
     this.gameHistory = undefined;
     this.difficulty = 1;
     this.state = "en attente";
-    this.mode = "normal";
+ //   this.mode = "normal";
     this.players = [];
     this.type = "local";
     this.format = "classic";
@@ -45,12 +45,12 @@ export type GameCreate = {
   difficulty: number;  
   max_players?: number;
   state: string;
-  mode: string;
+//  mode: string;
   players: number[];
   currentRound?: number;
   tournament?: number;
   type: "local" | "remote";
-  format: "classic" | "tournament" | "normal";
+  format: "classic" | "tournament" /* | "normal" */;
 }
 // 📌 Définition des modèles avec contraintes
 export type GameBody = {
@@ -58,7 +58,7 @@ export type GameBody = {
   gameHistory?: GameHistory;
   difficulty: number;
   state: string;
-  mode: "normal" | "rapid" | "tournament";
+//  mode: "normal" | "rapid" | "tournament";
   type?: "local" | "remote";
   format?: "classic" | "tournament";
   players: User[] | number[];
@@ -72,7 +72,7 @@ export type GameSafe = {
   gameHistory?: GameHistory;
   difficulty: number;
   state: string;
-  mode: string;
+//  mode: string;
   players: User[] | number[];
   created_at: Date;
   updated_at: Date;
@@ -85,7 +85,7 @@ export const GameBody: GameModel<GameBody> = {
   id: 0,
   difficulty: 1,
   state: "en attente",
-  mode: "normal",
+//  mode: "normal",
   players: [],
   tournaments: undefined,
   created_at: new Date(),
@@ -95,7 +95,7 @@ export const GameSafe: GameModel<GameSafe> = {
   id: 0,
   difficulty: 1,
   state: "en attente",
-  mode: "normal",
+//  mode: "normal",
   players: [],
   created_at: new Date(),
   updated_at: new Date(),
@@ -105,7 +105,7 @@ export const GameCreate: GameModel<GameCreate> = {
   players: [],
   difficulty: 1,
   state: "en attente",
-  mode: "normal",
+//  mode: "normal",
   currentRound: 0,
   tournament: undefined,
   type: "local",

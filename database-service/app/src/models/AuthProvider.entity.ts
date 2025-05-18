@@ -21,7 +21,7 @@ export class AuthProvider {
 
   //2FA
   //activation de l'authentification à deux facteurs
-  @Column({ type: "boolean", default: true })
+  @Column({ type: "boolean", default: false })
   two_factor_auth: boolean;
   //secret de l'authentification à deux facteurs
   // utilisé pour générer le code de vérification

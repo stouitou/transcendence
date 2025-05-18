@@ -37,3 +37,7 @@ export function decrypt(text: string): string {
   const decrypted = Buffer.concat([decipher.update(encryptedText), decipher.final()]);
   return decrypted.toString("utf8");
 }
+
+export function generateCSRFToken(): string {
+  return crypto.randomBytes(32).toString('hex');
+}

@@ -83,7 +83,7 @@ export class DatabaseManager {
 			tournament: tournamentId,
 			};
 		try {
-			const response = await fetch(`http://game-management-service:3000/docker/games/${match.config.type}/${match.config.format}/normal`, {
+			const response = await fetch(`http://game-management-service:3000/docker/games/${match.config.type}/${match.config.format}`, {
 
 			method: 'POST',
 			headers: {
@@ -197,11 +197,12 @@ export class DatabaseManager {
 			//const result = await fetch(`http://game-management-service:3000/docker/games/${match.config.type}/${match.config.format}/normal`, {
 				//
 
-				console.log("processDataBaseCreateTournament dataDB ",`http://game-management-service:3000/docker/tournaments/${config.type}/${config.format}/normal`);
+				console.log("processDataBaseCreateTournament dataDB ",`http://game-management-service:3000/docker/tournaments/${config.type}/${config.format}`);
 			
 
    		 try {
-				const response = await fetch(`http://game-management-service:3000/api/game-management-service/docker/tournaments/${config.type}/${config.format}/normal`, {
+			//	const response = await fetch(`http://game-management-service:3000/api/game-management-service/docker/tournaments/${config.type}/${config.format}/normal`, {
+				const response = await fetch(`http://game-management-service:3000/api/game-management-service/docker/tournaments/${config.type}/${config.format}`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',

@@ -7,6 +7,7 @@ import { AuthService } from "../services/auth.service";
 import  ServicesPlugin  from "../plugins/services"; 
 import { registerAuthPlugin } from "./auth.plugin";
 import { TwoFactorAuthService } from "@src/services/TwoFactorAuthServices";
+import internalRoutes from "@src/routes/internal.routes";
 
 interface AuthenticatedUser { role: string; id?: number; name?: string; display_name?:string;avatar?:string }
 declare module 'fastify' {
@@ -30,4 +31,5 @@ export async function registerPlugins(app: FastifyInstance) {
 	app.register(ServicesPlugin);
 	await registerAuthPlugin(app);
 	await app.register(authRoutes, { prefix: "/api/auth/" }); // register auth routes
+	await app.register(internalRoutes, { prefix: "/internal/auth/" }); // internal auth routes
 }

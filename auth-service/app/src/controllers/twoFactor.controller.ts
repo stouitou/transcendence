@@ -13,12 +13,7 @@ export class TwoFactorController extends BaseController {
   constructor(app: FastifyInstance) {
       super(app);
       this.UserRepository = new UserRepository();
-
-		if (!this.app.twoFactorAuthService) {
-			console.error("🔴 twoFactorAuthService is not initialized");
-		  } else {
-			console.log("🟢 twoFactorAuthService is initialized");
-		  }
+			console.log("🟢 TwoFactorController is initialized");
 		    this.verify2FA = this.verify2FA.bind(this);
         this.generate2FAQRcode = this.generate2FAQRcode.bind(this);
         this.enable2FA = this.enable2FA.bind(this);
@@ -77,6 +72,7 @@ export class TwoFactorController extends BaseController {
   async enable2FA(req: FastifyRequest, reply: FastifyReply) {
     try {
       console.log("[🔐enable2FA] --start--")
+      console.log("[🔐enable2FA] --req.session.csrfToken",req.session.csrfToken)
       const { method } = req.body as { method: "totp" | "email" };
       //1- Vérifier si la méthode est présente
       if (!method) {
@@ -245,10 +241,13 @@ export class TwoFactorController extends BaseController {
           return reply.status(400).send({ error: "User not found" });
         }
         const token = this.app.authService.generateToken(user);
+
+        //effacer le token authToken2FA
+        reply.clearCookie('authToken2FA');
           // Définir le cookie avec le token
         reply.setCookie('authToken', token, {
             httpOnly: true,
-            secure: process.env.NODE_ENV === 'production', // Utiliser 'secure' en production
+            secure: true,//process.env.NODE_ENV === 'production', // Utiliser 'secure' en production
             sameSite: 'strict',
             path: '/',
             maxAge: 3600 // 1 heure
@@ -260,5 +259,42 @@ export class TwoFactorController extends BaseController {
       return reply.status(500).send({ error: "Internal server error" });
     }
   }
+
+  /**
+   * changer le mot de passe de l'utilisateur
+   * neccessite de verifier si l'utilisateur a un authToken
+   * recoit l'ancien mot de passe et le nouveau mot de passe
+   * @param req 
+   * @param reply 
+   */
+  async changePassword(req: FastifyRequest, reply: FastifyReply) {
+    try {
+      console.log("[changePassword] --start--")
+      const { oldPassword, newPassword } = req.body as { oldPassword: string; newPassword: string };
+      //1- Vérifier si le mot de passe est présent
+      if (!oldPassword || !newPassword) {
+        return reply.status(400).send({ error: "Old password and new password are required" });
+      }
+      const authToken = req.cookies.authToken;
+      //2- Vérifier si le token d'authentification est présent
+      if (!authToken) {
+        console.log("[changePassword] unauthorized")
+        return reply.status(401).send({ error: "Unauthorized" });
+      }      
+      // Vérifier le token pour l'authentification
+      const decoded = this.app.jwt.verify(authToken, "ACCESS_TOKEN_PUBLIC_KEY") as {id: number};
+      const user = await this.UserRepository.getById(decoded.id);
+      if (!user) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+
+      //3- Vérifier si l'utilisateur a déjà un secret pour l'authentification à deux facteurs
+      
+    } catch (error) {
+      console.error("🔴[changePassword] error", error);
+      return reply.status(500).send({ error: "Internal server error" });
+    }
+  }
+
 
 }

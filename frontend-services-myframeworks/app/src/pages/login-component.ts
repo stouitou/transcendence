@@ -3,6 +3,7 @@ import { BaseComponent } from "../frameworks/base-component";
 import GlobalState, { UserContext } from "../globalstate/GlobalState";
 import { RouterConfig } from '../router/Router';
 import { LoginProvider } from '../components/login-provider-component';
+import { verify2FA } from '../services/api.2fa';
 type LoginState = {
   email: string;
   password: string;
@@ -25,35 +26,25 @@ export class Login extends BaseComponent<{login:LoginState}> {
   }
   handleVerify2FACode = async(e: Event)=> {
     e.preventDefault()
-    //const input = document.getElementById('2faCode') as HTMLInputElement;
-    //const code = input.value;
     const inputs = document.querySelectorAll<HTMLInputElement>(".code-input");
-  const code = Array.from(inputs).map((input) => input.value).join("");
+    const code = Array.from(inputs).map((input) => input.value).join("");
 
   if (code.length !== 6) {
     alert("Please fill in all fields");
     return;
   }
-/*     if (code === "") {
-      alert("Please fill in all fields");
-      return;
-    } */
     try {
-      const result = await fetch('/api/auth/2fa/verify', {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
-        body: JSON.stringify({ code }),
-      });
-      if (!result.ok) {
-        throw new Error('Failed to verify 2FA code');
+     const data2FA = await verify2FA(code);
+     if (!data2FA) {
+        return;
       }
-      const data2FA = await result.json();
       console.log('2FA verification successful:');
       const data = await fetchProfileData();
+      if (!data) {
+        return;
+      }
       UserContext().setUser(data);
-      UserContext().setLoginSuccess();
+      UserContext().setLoginSuccess(data2FA.token);
       const router = RouterConfig.getInstance();
       router.navigate('/');
     } catch (error) {
@@ -149,7 +140,7 @@ export class Login extends BaseComponent<{login:LoginState}> {
       }
 			const data = await fetchProfileData();
       UserContext().setUser(data);
-      UserContext().setLoginSuccess();
+      UserContext().setLoginSuccess(loginToken.token);
 
       console.log('Login successful');
       const router = RouterConfig.getInstance();
