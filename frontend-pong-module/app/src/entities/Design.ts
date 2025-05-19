@@ -63,10 +63,29 @@ export const DESIGN = {
         document.head.appendChild(css);
     }
 
-    /* Inter font */
-    if (!document.getElementById("inter-font")) {
-        const link = document.createElement("link");
-        link.id  = "inter-font";
+    /* grain overlay (optional aesthetic depth) */
+    if (!document.getElementById("ae‑grain")) {
+        const   grain = document.createElement("div");
+        grain.id = "ae‑grain";
+        Object.assign(grain.style, {
+            position        : "fixed",
+            inset           : "0",
+            pointerEvents   : "none",
+            zIndex          : "1",
+            backgroundImage:
+                "url(\"data:image/svg+xml;base64,"
+                + "PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxnIGZpbGw9JyMwMDAwMDAnIGZpbGwtb3BhY2l0eT0nLjA0Jz48cmVjdCB3aWR0aD0nMScgaGVpZ2h0PScxJy8+PC9nPjwvc3ZnPg==\")",
+            backgroundSize  : "4px 4px",
+            mixBlendMode    : "overlay",
+            opacity         : ".4",
+        } as Partial<CSSStyleDeclaration>);
+        document.body.appendChild(grain);
+    }
+
+    /* Google font */
+    if (!document.getElementById("poppins‑font")) {
+        const   link = document.createElement("link");
+        link.id  = "poppins‑font";
         link.rel = "stylesheet";
         link.href = "https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap";
         document.head.appendChild(link);

@@ -71,10 +71,10 @@ class ConfigGame {
   }
 }
 
-export class GameSetting extends BaseComponent<{ user: User | null; difficulty: number,type:string,format:string,mode:string,
+export class GameSetting extends BaseComponent<{ user: User | null; difficulty: number,type:string,format:string,/* mode:string, */
   max_players: number, players?: Players[] ,ws?: IWebSocketsService | null}> {
   constructor() {
-    super({ user: null, difficulty: 1,type:'local',format:'classic',mode:'normal', players:[{
+    super({ user: null, difficulty: 1,type:'local',format:'classic',/* mode:'normal', */ players:[{
     type: 'local',
     is_IA:false,
     avatar: "https://localhost:4433/uploads/1-avatartest.jpg",
@@ -86,26 +86,26 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
   }
   handlePost = async (e: Event) => {
     e.preventDefault();
-    const data = {
-      players: [this.state.user!.id],
-      gameHistory: {
+    const config = {
       players: this.state.players,
       type: this.state.type,
-      user: this.state.type === 'remote' ? this.state.user!.id : null,
+      format: this.state.format,
+      // mode: this.state.mode,
+      max_players: this.state.max_players,
+      isallowedRegistration: true,
     }
-  };
-  const config = {
-    players: this.state.players,
-    type: this.state.type,
-    format: this.state.format,
-    mode: this.state.mode,
-    max_players: this.state.max_players,
-    isallowedRegistration: true,
-  }
-
-  this.state.ws?.sendMessage(JSON.stringify({ type: "gameCreate", gameId: 1, config: config }));
-  return;
- 
+    try {
+      const response = await fetch(`/api/auth/ws-csrf`)
+      if (!response.ok) {
+        console.error('Failed to fetch CSRF token for WebSocket');
+        return;
+      }
+      const wsCSRFToken = await response.json();
+      this.state.ws?.sendMessage(JSON.stringify({ type: "gameCreate", gameId: 1, config: config ,wsCSRFToken:wsCSRFToken.token}));
+      return;
+    } catch (error) {
+      console.error('Error fetching CSRF token for WebSocket:', error);
+    } 
   };
 
 
@@ -168,10 +168,10 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     this.setState({ ...this.state, format });
     this.render();
   }
-  setMode(mode: string) {
+/*   setMode(mode: string) {
     this.setState({ ...this.state, mode });
     this.render();
-  }
+  } */
 
   handleDifficultyChange(event: Event) {
     event.preventDefault();
@@ -182,8 +182,6 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     console.log('Difficulty changed:', value);
     const progress = this.querySelector('#progress') as HTMLElement;
     if (progress) {
-    //  progress.style.width = `${(value - 1) * 20}%`;
-  //   const percentage = (value - 1) / (difficultyInput.max - 1) * 100;
      const percentage = (value ) / (5 ) * 100;
      progress.style.width = percentage + '%';
     }
@@ -191,22 +189,18 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
 
   handleMaxPlayerChange(event: Event) {
     event.preventDefault();
-    console.log('handleDifficultyChange');
     const input = event.target as HTMLInputElement;
     const value = parseInt(input.value, 10);
     this.setRemoteMaxPlayers(value);
-    console.log('Difficulty changed:', value);
     const progress = this.querySelector('#progressMaxPlayer') as HTMLElement;
     if (progress) {
-    //  progress.style.width = `${(value - 1) * 20}%`;
-  //   const percentage = (value - 1) / (difficultyInput.max - 1) * 100;
      const percentage = (value ) / (this.state.format==="tournament"?20:4)  * 100;
      progress.style.width = percentage + '%';
     }
   }
 
   render() {
-    const { user, difficulty,type, format,mode,players } = this.state;
+    const { user, difficulty,type, format,/* mode, */players } = this.state;
     const percentage = (difficulty ) / (5) * 100; // Calculer la largeur initiale
     if (this.state.format === "classic" && this.state.max_players > 4) {
       this.state.max_players = 4;
@@ -258,17 +252,17 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
         <button class="btn toggle-btn ${format!=='classic'? 'on':'off'}"  data-type="tournament">Tournament</button>
       </div>
 
-      <div id="setMode" class="toggle-row">
-        <button class="btn toggle-btn ${mode==='normal' ? 'on':'off'}"   data-type="normal">Normal</button>
-        <button class="btn toggle-btn ${mode==='advanced' ? 'on':'off'}" data-type="advanced">Advanced</button>
-      </div>
+     <!-- <div id="setMode" class="toggle-row">
+        <button class="btn toggle-btn {mode==='normal' ? 'on':'off'}"   data-type="normal">Normal</button>
+        <button class="btn toggle-btn {mode==='advanced' ? 'on':'off'}" data-type="advanced">Advanced</button>
+      </div> -->
     </div>
 
     <!-- ── 3. summary chips ───────────────────────────────────────────── -->
     <div class="block flex flex-wrap gap-3 justify-center">
       <span class="summary-chip">Type&nbsp;: <b>${type}</b></span>
       <span class="summary-chip">Format&nbsp;: <b>${format}</b></span>
-      <span class="summary-chip">Mode&nbsp;: <b>${mode}</b></span>
+     <!-- <span class="summary-chip">Mode&nbsp;: <b>{mode}</b></span> -->
     </div>
 
     <!-- ── 4. players table ───────────────────────────────────────────── -->
@@ -454,14 +448,14 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     }
   });
 
-  this.attachEvent(this, '#setMode', 'click', (event: Event) => {
+/*   this.attachEvent(this, '#setMode', 'click', (event: Event) => {
     const target = event.target as HTMLElement;
     if (!target.matches('button')) return; // le clic provient d'un bouton
     const type = target.getAttribute('data-type');
     if (type) {
       this.setMode(type);
     }
-  });
+  }); */
   this.attachEvent(this, '#addIA', 'click', (event: Event) => {
     const target = event.target as HTMLElement;
     if (!target.matches('button')) return; // le clic provient d'un bouton

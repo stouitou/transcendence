@@ -1,5 +1,5 @@
-import { BaseComponent } from "../frameworks/base-component.ts";
-import { Game, Round, Tournaments, User, UserContext } from "../globalstate/GlobalState.ts";
+import { BaseComponent } from "../frameworks/base-component";
+import { Game, Round, Tournaments, User, UserContext } from "../globalstate/GlobalState";
 
 
 export class TournamentHistory extends BaseComponent<{ user: User | null}> {

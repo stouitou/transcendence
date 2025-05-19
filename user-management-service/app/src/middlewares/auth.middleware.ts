@@ -8,6 +8,7 @@ export class AuthMiddleware {
     this.app = app;
     console.log("🔐 AuthMiddleware created");
     this.authMiddleware = this.authMiddleware.bind(this);
+    this.checkCSRFToken = this.checkCSRFToken.bind(this);
     
   }
 
@@ -28,7 +29,21 @@ export class AuthMiddleware {
 	}
   };
 
-
+  async checkCSRFToken(request: FastifyRequest, reply: FastifyReply) {
+    const csrfToken = request.headers['x-csrf-token'];
+    const res = await fetch('http://auth_services:3000/internal/auth/validate-csrf', {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json',
+        'cookie': request.headers.cookie ?? '',
+      },
+      body: JSON.stringify({ csrfToken })
+    });
+    if (!res.ok) {
+      console.error("[CSRF token validation failed]");
+      return reply.code(403).send({ error: 'Invalid CSRF token' });
+    }
+  }
 }
 
 

@@ -83,17 +83,19 @@ class GameRepository extends BaseRepository<Game,GameCreate> implements IReposit
   getAllbyQuery = async (query:IParams): Promise<Game[]> =>{
   const queryPagination = this.buildQueryString(query);
     //return data.map(User.fromJSON);
+   // const url = `${this.URL}?${queryPagination}`;
+  //  const url = `${this.URL}?${queryPagination}`;
     const url = `${this.URL}?${queryPagination}`;
     //const url = `${this.URL}${this.getRelations()}&${queryPagination}`;
     console.log("🔐 GameRepository.getAll()  --start-- fetch from: ", this.URL)
     const response = await fetch(url);
-    console.log("🔐 GameRepository.getAll()  --response--",response)
+  //  console.log("🔐 GameRepository.getAll()  --response--",response)
     const data = await response.json();
-    console.log("🔐 GameRepository.getAll()  --data--",data)
+    //console.log("🔐 GameRepository.getAll()  --data--",data)
    // const results = data.data//.map((user: User) => User.fromJSON(user));
     const results = data//.map((user: User) => User.fromJSON(user));
     //const results = data.data.map(User.fromJSON);
-    console.log("🔐 GameRepository.getAll()  --results--",results)
+    //console.log("🔐 GameRepository.getAll()  --results--",results)
     return {...results};
   }
   //read

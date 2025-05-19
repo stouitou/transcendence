@@ -265,7 +265,7 @@ export class GameLobyComponent extends BaseComponent<{
         this.updateList();
 
 		/* join / view buttons */
-        this.attachEvent(this, '#setGame', 'click', (event: Event) => {
+        this.attachEvent(this, '#setGame', 'click', async (event: Event) => {
             event.preventDefault();
 
             /* find the button even if the click came from a span/SVG inside it */
@@ -296,15 +296,26 @@ export class GameLobyComponent extends BaseComponent<{
             );
 
             if (!alreadyInLobby) {
-                const payload = JSON.stringify({
-                    type: 'lobyJoined',
-                    gameId: -1,
-                    lobyId: lobyID,
-                    name: this.state.user?.name,
-                    avatar: this.state.user?.avatar,
-                    state: 'joined',
-                });
+              try {
+                const response = await fetch(`/api/auth/ws-csrf`)
+                if (!response.ok) {
+                console.error('Failed to fetch CSRF token for WebSocket');
+                return;
+                }
+                const wsCSRFToken = await response.json();
+                        const payload = JSON.stringify({
+                            type: 'lobyJoined',
+                            gameId: -1,
+                            lobyId: lobyID,
+                            name: this.state.user?.name,
+                            avatar: this.state.user?.avatar,
+                            state: 'joined',
+                            wsCSRFToken:wsCSRFToken.token
+                        });
                 this.state.ws?.sendMessage(payload);
+              } catch (error) {
+                console.error('Error fetching CSRF token for WebSocket:', error);
+              }
             }
         });
 

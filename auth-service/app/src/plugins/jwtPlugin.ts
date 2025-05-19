@@ -15,21 +15,6 @@ export class JWT {
     });
   }
   verify(token: string, keyName: "ACCESS_TOKEN_PUBLIC_KEY" | "REFRESH_TOKEN_PUBLIC_KEY"): any {
-  //  console.log("🔐 token", this.decode(token,{}))
-    const decoded = this.decode(token,{})//jwt.decode(token, { complete: true }) as { [key: string]: any }
-    if (!decoded) {
-      throw new Error("Invalid token")
-    }
-
-          /**
-       * debug token info
-       * 
-       */
-          const iatDate = new Date(decoded.iat * 1000);
-          const expDate = new Date(decoded.exp * 1000);
-          console.log("class JWT::verify()");
-          console.log("Issued At:", iatDate);
-          console.log("Expires At:", expDate);
     if (keyName === "ACCESS_TOKEN_PUBLIC_KEY") {
       return jwt.verify(token, this.secret.public, { algorithms: ['RS256'] })
     }else if (keyName === "REFRESH_TOKEN_PUBLIC_KEY") {
