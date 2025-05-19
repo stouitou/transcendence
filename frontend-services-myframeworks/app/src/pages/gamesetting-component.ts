@@ -277,7 +277,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
                   <td><span class="name-cell">${p.display_name ?? '-'}</span></td>
                   <td>
                     <span class="ia-pill ${p.is_IA ? 'on':'human'}">
-                      ${p.is_IA ? 'IA' : 'Humain'}
+                      ${p.is_IA ? 'IA' : 'Human'}
                     </span>
                   </td>
                   <td class="avatar-cell">
