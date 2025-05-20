@@ -41,7 +41,8 @@ async function userRoutes(app: FastifyInstance) {
       const res = await fetch('http://auth_services:3000/api/auth/me', {
         method: 'GET',
         headers: {
-          'Authorization': authHeader
+          'Authorization': authHeader,
+          'cookie': request.headers.cookie?? "",
         }
       });
       //4- Vérification de la réponse
@@ -85,11 +86,11 @@ async function userRoutes(app: FastifyInstance) {
   }) */
 
   //3- Définition des routes
-  app.get('/me',{/* preHandler: [authMiddleware.authMiddleware],schema: UserSchema.me */}, async function (req, reply) {
-    console.log("🔗 userRoutes /me")
-    //console.log("🔗 userRoutes /me req.authenticatedUser",req.authenticatedUser)
-    return reply.code(200).send({ ... req.authenticatedUser })
-  })
+//  app.get('/me',{/* preHandler: [authMiddleware.authMiddleware],schema: UserSchema.me */}, async function (req, reply) {
+//    console.log("🔗 userRoutes /me")
+//    //console.log("🔗 userRoutes /me req.authenticatedUser",req.authenticatedUser)
+//    return reply.code(200).send({ ... req.authenticatedUser })
+//  })
 
 
 
@@ -109,9 +110,9 @@ async function userRoutes(app: FastifyInstance) {
   app.get("/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserById);
   app.get("/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserStatsById);
   app.put("/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.updateStatsById);
-  app.put("/me",/*  {schema: UserSchema.updateUser}, */ userController.updateMe);
-  app.put("/me/addFriend",/*  {schema: UserSchema.updateUser}, */ userController.addFriend);
-  app.put("/me/removeFriend",/*  {schema: UserSchema.updateUser}, */ userController.removeFriend);
+//  app.put("/me",/*  {schema: UserSchema.updateUser}, */ userController.updateMe);
+//  app.put("/me/addFriend",/*  {schema: UserSchema.updateUser}, */ userController.addFriend);
+//  app.put("/me/removeFriend",/*  {schema: UserSchema.updateUser}, */ userController.removeFriend);
   app.put("/:id", {schema: UserSchema.updateUser}, userController.updateUser);
   app.delete("/:id",/*  {schema: UserSchema.deleteUser}, */ userController.deleteUser);
  // app.post("/query", {schema: UserSchema.requestQuery}, userController.requestQuery);

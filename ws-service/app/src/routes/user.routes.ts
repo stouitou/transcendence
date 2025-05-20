@@ -38,7 +38,8 @@ async function userRoutes(app: FastifyInstance) {
       const res = await fetch('http://auth_services:3000/api/auth/me', {
         method: 'GET',
         headers: {
-          'Authorization': authHeader
+          'Authorization': authHeader,
+          'cookie': request.headers.cookie?? "",
         }
       });
       //4- Vérification de la réponse

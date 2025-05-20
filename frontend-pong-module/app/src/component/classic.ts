@@ -5,11 +5,14 @@ import { Match } from '../entities/Match';
 export let CANVAS_WIDTH = 800;
 export let CANVAS_HEIGHT = 600;
 
-// Export 'game-component' as a tagname in HTML
+/* ────────────────────────────────────────── */
+/* <game-component>                           */
+/* ────────────────────────────────────────── */
 @customElement('game-component')
-export class	classic extends LitElement {
-	@property({ type: String }) gameContainerId: string = 'gameWrapper';
-	@property({ type: Object }) data: { id: string } | null = null;
+export class  classic extends LitElement {
+// LitElement automatically create a shadow DOM
+  @property({ type: String }) gameContainerId: string = 'gameWrapper';
+  @property({ type: Object }) data: {id: string} | null = null;
 
 	private	_game!: Match;
 
@@ -89,33 +92,25 @@ export class	classic extends LitElement {
 		super.connectedCallback();
 		console.log('ConnectedCallback: Component added to the DOM');
 
+    /* turn OFF the colourful-ball background */
+    this.hideBackground();
+
 		this._game = new Match();
 		this._game.webSocketManager.lobyId = this.data?.id;
 	}
 
-	firstUpdated () {
-		console.log('firstUpdated: DOM is ready');
+  firstUpdated() {
+    console.log('firstUpdated: DOM is ready');
 
-		const	gameCanvas = this.shadowRoot?.querySelector('#gameCanvas') as HTMLCanvasElement;
-		if (!gameCanvas) {
-			throw new Error ('Game canvas not found');
-		}
-		const	gameDivUi = this.shadowRoot?.querySelector('#game-ui') as HTMLElement;
-		if (!gameDivUi) {
-			throw new Error ('Game UI not found');
-		}
-		const	gameDivAlert = this.shadowRoot?.querySelector('#alertBox') as HTMLElement;
-		if (!gameDivAlert) {
-			throw new Error ('Game UI alert not found');
-		}
-		const	gameDivHero = this.shadowRoot?.querySelector('#gameHero') as HTMLElement;
-		if (!gameDivHero) {
-			throw new Error ('Game hero not found');
-		}
-		const	gameDivHeroTree = this.shadowRoot?.querySelector('#gameHeroTree') as HTMLElement;
-		if (!gameDivHeroTree) {
-			throw new Error ('Game hero tree not found');
-		}
+    const gameCanvas   = this.shadowRoot?.querySelector('#gameCanvas')  as HTMLCanvasElement;
+    const gameDivUi    = this.shadowRoot?.querySelector('#game-ui')     as HTMLElement;
+    const gameDivAlert = this.shadowRoot?.querySelector('#alertBox')    as HTMLElement;
+    const gameDivHero  = this.shadowRoot?.querySelector('#gameHero')    as HTMLElement;
+    const gameDivHeroTree = this.shadowRoot?.querySelector('#gameHeroTree') as HTMLElement;
+
+    if (!gameCanvas || !gameDivUi || !gameDivAlert || !gameDivHero || !gameDivHeroTree) {
+      throw new Error('One or more game DOM nodes not found');
+    }
 
 		/* Set the canvas and UI elements in the game instance */
 		this._game.setCanvas(gameCanvas);
@@ -154,14 +149,33 @@ export class	classic extends LitElement {
 	disconnectedCallback () {
 		console.log('disconnectedCallback: Component removed from the DOM');
 		this._game?.stop();
-		// this._game.clear();
-		// this._game.removeRemoteMovementListener();
+    this._game.removeRemoteMovementListener();
+
+    /* restore the colourful-ball background */
+    this.showBackground();
+
+    super.disconnectedCallback();
 	}
+
+  /* ---------- background helpers ---------- */
+  private hideBackground () : void {
+    const bg = document.querySelector('background-canvas-component');
+    if (bg) { (bg as HTMLElement).style.display = 'none'; }
+  }
+  private showBackground (): void {
+    const bg = document.querySelector('background-canvas-component');
+    if (bg) { (bg as HTMLElement).style.display = ''; }
+  }
 }
 
 // Save the component with a customize tagname
 declare global {
-	interface HTMLElementTagNameMap {
-		'game-component': classic;
-	}
+  interface HTMLElementTagNameMap {
+	  'game-component': classic;
+  }
+}
+
+export function setCanvasSize (width: number, height: number) {
+  CANVAS_WIDTH = width;
+  CANVAS_HEIGHT = height;
 }

@@ -116,39 +116,45 @@ export class TournamentManager {
 	constructor(private databaseManager: DatabaseManager) {}
   
 	async createTournament(config: WebSocketGameConfig, lobyId: string): Promise<Match[]> {
-	  const { tournament, games } = await this.databaseManager.processDataBaseCreateTournament(config, lobyId);
-  
-	  if (!tournament || !games) {
-		console.error("Error creating tournament: No tournament or games found");
-		return [];
-	  }
-  
-	  return games.map((game) => {
-		const matchConfig: WebSocketGameConfig = {
-		  type: game.type,
-		  format: game.format,
-		  tournamentId: tournament.id,
-		  maxPlayers: game.max_players,
-		  isallowedRegistration: true,
-		  gameId: game.id,
-		  state: tournament.state,
-		  players: game.gameHistory.players.map((player) => ({
-			userId: player.user?.id ?? -1,
-			id: player.id,
-			name: player.display_name,
-			avatar: player.avatar,
-			state: "joined",
-			isInGame: true,
-			isIA: player.is_IA,
-		  })),
-		};
-		const match = new Match(lobyId, generateUID(), matchConfig);
-		match.setgameHistoryId(game.gameHistory.id);
-		console.log(`[TournamentManager] Match created with ID: ${match.id} and game ID: ${game.id}/ gameHistoryID: ${game.gameHistory} for tournament ${tournament.id}`);
+		try {
+			const { tournament, games } = await this.databaseManager.processDataBaseCreateTournament(config, lobyId);
 		
-		return match;
+			if (!tournament || !games) {
+				console.error("Error creating tournament: No tournament or games found");
+				throw new Error("No matches were created");
+				return [];
+			}
+		
+			return games.map((game) => {
+				const matchConfig: WebSocketGameConfig = {
+					type: game.type,
+					format: game.format,
+					tournamentId: tournament.id,
+					maxPlayers: game.max_players,
+					isallowedRegistration: true,
+					gameId: game.id,
+					state: tournament.state,
+					players: game.gameHistory.players.map((player) => ({
+							userId: player.user?.id ?? -1,
+							id: player.id,
+							name: player.display_name,
+							avatar: player.avatar,
+							state: "joined",
+							isInGame: true,
+							isIA: player.is_IA,
+						})),
+					};
+			const match = new Match(lobyId, generateUID(), matchConfig);
+			match.setgameHistoryId(game.gameHistory.id);
+			console.log(`[TournamentManager] Match created with ID: ${match.id} and game ID: ${game.id}/ gameHistoryID: ${game.gameHistory} for tournament ${tournament.id}`);
+			
+			return match;
 
-	  });
+			});
+		} catch (error) {
+			console.error(`[TournamentManager] Error creating tournament: ${error}`);
+			throw error; // Relancer l'erreur pour la propager
+		}
 	}
 
 
@@ -262,28 +268,34 @@ export class MatchManager {
 		configs.push(config);
 		return configs;
 	}
-	createMatches(configs: WebSocketGameConfig[], lobyId: string): Promise<void> {
+	async createMatches(configs: WebSocketGameConfig[], lobyId: string): Promise<void> {
 		if (configs[0].format === "classic") {
 			const matches = this.createMatchesForRound(configs, lobyId);
 			for (const match of matches) {
 				try {
-					this.databaseManager.processDataBaseCreateMatch(match);
+					await this.databaseManager.processDataBaseCreateMatch(match);
 					console.log("Match saved to database:", match);
 				} catch (error) {
-					console.error("Error saving match to database:", error);
+					console.error("[MatchManager][catch]createMatches Error saving match to database:", error);
+					throw error;
 				};	
 			}
 		}
 		else if (configs[0].format === "tournament") {
-			const tournamentCongig = this.createTournament(configs[0], lobyId);
-			return tournamentCongig;
+			try {
+			const tournamentCongig =await this.createTournament(configs[0], lobyId);
+				return tournamentCongig;
+			} catch (error) {
+				console.error("[MatchManager][catch]createMatches Error createTournament:", error);
+				throw error.message;
+			};	
 		}
 		  /* for (const config of configs) {
 			const match = new Match(lobyId, generateUID(), config);
 			this.roundManager.addMatch(round, match);
 
 		  } */
-		  return new Promise((resolve) => {	resolve(); });
+		 // return new Promise((resolve) => {	resolve(); });
 	  
 		 // await this.localMatchQueue.processQueue(this.startMatchAsync.bind(this));
 	}
@@ -303,14 +315,20 @@ export class MatchManager {
 	}
   
 	async createTournament(config: WebSocketGameConfig, lobyId: string): Promise<void> {
-	  const matches = await this.tournamentManager.createTournament(config, lobyId);
-	  console.log(`[MatchManager]createTournament() Tournament created with ${matches.length} matches`);
-	  matches.forEach((match) => this.roundManager.addMatch(this.roundManager.currentRound, match));
-	  if (this.lobyConfig.config._type === "local") {
-		//this.localMatchQueue.addMatch(matches[0]);
-		matches.forEach((match) => {
-		  this.localMatchQueue.addMatch(match)
-		});
+	
+		try {
+			const matches = await this.tournamentManager.createTournament(config, lobyId);
+			console.log(`[MatchManager]createTournament() Tournament created with ${matches.length} matches`);
+			matches.forEach((match) => this.roundManager.addMatch(this.roundManager.currentRound, match));
+			if (this.lobyConfig.config._type === "local") {
+				//this.localMatchQueue.addMatch(matches[0]);
+				matches.forEach((match) => {
+				this.localMatchQueue.addMatch(match)
+				});
+			}
+		} catch (error) {
+			console.error(`[MatchManager]createTournament() Error creating tournament: ${error}`);
+			throw new Error(`Failed to create a Tournament: ${error.message}`);;
 		}
 	}
 	async createTournamentNextRound(/* config: WebSocketGameConfig,  */lobyId: string): Promise<GameHistoryPlayer | null> {

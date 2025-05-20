@@ -31,7 +31,7 @@ export class GameManager {
 	}
 
 	createBall () {
-		this._ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 }, 5);
+		this._ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 }, 3);
 	}
 
 	private addPlayer (player: Player) {

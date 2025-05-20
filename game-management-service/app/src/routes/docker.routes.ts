@@ -20,7 +20,7 @@ async function dockerRoutes(app: FastifyInstance) {
   //  "/local/classic/normal
   //  "/remote/classic/normal"
   //  "/remote/tournament/normal"
-  app.post("/:type/:format/:mode"/* , {schema: UserSchema.createGame } */, gameController.createGameDocker);
+  app.post("/:type/:format"/* , {schema: UserSchema.createGame } */, gameController.createGameDocker);
   app.put("/remote/:format/id/:id"/* , {schema: UserSchema.createGame } */, gameController.joinGameById);
 
 }

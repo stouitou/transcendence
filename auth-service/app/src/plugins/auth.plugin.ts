@@ -3,6 +3,7 @@ import fastifyPassport from "@fastify/passport";
 import fastifySession from "@fastify/session";
 import fastifyCookie from "@fastify/cookie";
 import fastifyOauth2 from '@fastify/oauth2';
+import cors from '@fastify/cors';
 import { registerGoogleStrategy , registerGithubStrategy } from "./oauth/index";
 
 import { AuthSchema } from "../schemas/auth.schema";
@@ -10,13 +11,18 @@ import { AuthSchema } from "../schemas/auth.schema";
 //import { UserRepository } from "../repository/UserRepository";
 import  UserRepository  from "../repository/User.repository";
 export async function registerAuthPlugin(app: FastifyInstance) {
+/* 	app.register(cors, {
+  origin: ['http://frontend-container:3000', 'http://auth-service:3000','https://localhost:4433'], // Autorisez les domaines nécessaires
+  credentials: true, // Permet l'envoi des cookies
+}); */
 	// 🔹 Middleware pour les sessions
 	const safeSecret = "1223484dgjhfhkjgh;k,gjhkhghng,bldflbgh,ldf,bl,dl,nbldnl,dfl,glshdfkvihskd";
 	app.register(fastifyCookie)
 	app.register(fastifySession ,{
 		secret: safeSecret,
-		saveUninitialized: true,
-		cookie: {secure:false, httpOnly: true, sameSite: false, maxAge: 60 *60 *60}
+		saveUninitialized: false,//  true, //-> false = ne pas créer de session pour les utilisateurs non authentifiés
+		cookie: {secure:true, httpOnly: true, sameSite: 'strict', maxAge: 60 *60 *1000 }, // 1 heure
+		rolling: true, // Renouvelle la durée de vie du cookie à chaque requête
 	})
 	app.register(fastifyPassport.initialize())
 	// 🔹 Initialisation de Passport.js

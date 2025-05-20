@@ -9,6 +9,7 @@ import Helpers, { IParams } from "../repository/helpers";
 import { AuthProvider } from "../models/AuthProvider.models";
 import { IRepository } from "./Base/IRepository";
 import { BaseRepository } from "./Base/BaseRepository";
+import { encrypt } from "@src/utils/crypto";
 
 /**
  * AuthProviderRepository - Gestion des appels HTTP à la DB
@@ -67,12 +68,12 @@ class AuthProviderRepository extends BaseRepository<AuthProvider> implements IRe
     const url = `${this.URL}${this.getRelations()}`;
     console.log("🔐 AuthProviderRepository.getAll()  --start-- fetch from: ", this.URL)
     const response = await fetch(url);
-    console.log("🔐 AuthProviderRepository.getAll()  --response--",response)
+//    console.log("🔐 AuthProviderRepository.getAll()  --response--",response)
     const data = await response.json();
     console.log("🔐 AuthProviderRepository.getAll()  --data--",data)
     const results = data.data//.map((user: User) => User.fromJSON(user));
     //const results = data.data.map(User.fromJSON);
-    console.log("🔐 AuthProviderRepository.getAll()  --results--",results)
+//    console.log("🔐 AuthProviderRepository.getAll()  --results--",results)
     return {...results};
   }
 
@@ -106,9 +107,9 @@ class AuthProviderRepository extends BaseRepository<AuthProvider> implements IRe
     console.log("🔐 AuthProviderRepository.getByParams()  --queryString--",queryString)
     const url = `${this.URL}${queryString}`;
     const response = await fetch(url);
-    console.log("🔐 AuthProviderRepository.getByParams()  --response--",response)
+ //   console.log("🔐 AuthProviderRepository.getByParams()  --response--",response)
     const data = await response.json();
-    console.log("🔐 AuthProviderRepository.getByParams()  --data--",data)
+ //   console.log("🔐 AuthProviderRepository.getByParams()  --data--",data)
    // return data.map(User.fromJSON);
     return data.data?data.data[0]?data.data:null:null;
   }
@@ -120,9 +121,9 @@ class AuthProviderRepository extends BaseRepository<AuthProvider> implements IRe
       console.log("🔐 AuthProviderRepository.getByParams()  --queryString--",queryString)
       const url = `${this.URL}${queryString}`;
       const response = await fetch(url);
-      console.log("🔐 AuthProviderRepository.getByParams()  --response--",response)
+  //    console.log("🔐 AuthProviderRepository.getByParams()  --response--",response)
       const data = await response.json();
-      console.log("🔐 AuthProviderRepository.getByParams()  --data--",data)
+ //     console.log("🔐 AuthProviderRepository.getByParams()  --data--",data)
      // return data.map(User.fromJSON);
       return data.data?data.data[0]?data.data[0]:null:null;
     }
@@ -160,5 +161,43 @@ class AuthProviderRepository extends BaseRepository<AuthProvider> implements IRe
 
     return bcrypt.compare(password, hash);
     }
+
+  
+  set2FASecret = async (id: number, secret: string): Promise<AuthProvider | null> => {
+    const response = await fetch(`${this.URL}/id/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ 
+        two_factor_auth_method:'totp',
+        two_factor_auth_secret:secret,
+        two_factor_auth:true,
+        otpExpiration : null,
+        otp : null }),
+    });
+    const data = await response.json();
+//    console.log("🔐User.repository.ts UserRepository.set2FASecret()  --data--",data)
+    const userUpdated = data.data;
+    if (!userUpdated) {
+      throw new Error("User update failed");
+    }
+    return userUpdated;
+  }
+
+  set2FAEmailCode = async (id: number, code: string,otpExpiration:Date): Promise<AuthProvider | null> => {
+    
+    const otp = encrypt(code);
+    const response = await fetch(`${this.URL}/id/${id}`, {
+      method: "PUT",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ otp, otpExpiration}),
+    });
+    const data = await response.json();
+    const userUpdated = data.data;
+    if (!userUpdated) {
+      throw new Error("User update failed");
+    }
+    return userUpdated;
+
+  }
 }
 export default AuthProviderRepository;

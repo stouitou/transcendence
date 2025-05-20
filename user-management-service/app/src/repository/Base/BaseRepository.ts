@@ -46,4 +46,20 @@ export abstract class BaseRepository<T> {
     
       return `?${encodeFilter(params)}`;
     };
+
+     buildQueryString(params: IParams): string {
+    const searchParams = new URLSearchParams();
+    
+    for (const key in params) {
+      if (params[key] !== undefined && params[key] !== null) {
+      if (key === "filters" && Array.isArray(params[key])) {
+        // Encoder les filtres complexes en JSON
+        searchParams.append(key, encodeURIComponent(JSON.stringify(params[key])));
+      } else {
+        searchParams.append(key, String(params[key]));
+      }
+      }
+    }
+      return searchParams.toString();
+    }
 }

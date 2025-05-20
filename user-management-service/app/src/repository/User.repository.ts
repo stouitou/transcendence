@@ -84,7 +84,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
     console.log("🔐 UserRepository.getById()  --url--",url)
     const response = await fetch(url);
     const  result  = await response.json();
-    console.log("🔐User.repository.ts UserRepository.getById()  --data--",result)
+    console.log("🔐User.repository.ts UserRepository.getById()  --data--"/* ,result */)
    const { data } = result
     return data?? null;
   }

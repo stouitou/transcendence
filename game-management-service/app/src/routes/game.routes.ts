@@ -12,7 +12,7 @@ async function gameRoutes(app: FastifyInstance) {
    * onRequest : Hook qui est exécuté avant que Fastify ne commence à traiter la requête.
    * Il est utile pour les tâches qui doivent être effectuées pour chaque requête.
    */
-  app.addHook('onRequest', async (request, reply) => {
+/*   app.addHook('onRequest', async (request, reply) => {
     const authToken = request.cookies.authToken;
     if (authToken && !request.headers.authorization) {
       request.headers.authorization = `Bearer ${authToken}`;
@@ -29,10 +29,11 @@ async function gameRoutes(app: FastifyInstance) {
       }
 
       //3- Appel du service d'authentification pour vérifier le token
-      const res = await fetch('http://auth_services:3000/api/auth/me', {
+      const res = await fetch('http://auth_services:3000/internal/auth/me', {
         method: 'GET',
         headers: {
-          'Authorization': authHeader
+          'Authorization': authHeader,
+          'cookie': request.headers.cookie?? "",
         }
       });
       //4- Vérification de la réponse
@@ -56,7 +57,7 @@ async function gameRoutes(app: FastifyInstance) {
       console.error("🟥 userRoutes onRequest error",error)
       return reply.code(error.status).send({ error: error.message });
     }
-  })
+  }) */
 
   /**
    * preParsing : Hook qui est exécuté avant que Fastify ne commence à analyser le corps de la requête.

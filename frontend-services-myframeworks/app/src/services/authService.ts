@@ -8,10 +8,13 @@ export interface LoginData {
     password: string;
 }
 export const registerUser = async (data: RegisterData): Promise<void> => {
+    const res = await fetch('/api/auth/csrf');
+    const { csrfToken } = await res.json();
     const response = await fetch('/api/auth/register', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-csrf-token': csrfToken,
         },
         body: JSON.stringify(data),
     });
@@ -25,22 +28,28 @@ export const registerUser = async (data: RegisterData): Promise<void> => {
     console.log('Registration successful:', result);
 };
 
-export const loginUser = async (data: LoginData): Promise<void> => {
+export const loginUser = async (data: LoginData): Promise<{ twoFactorRequired: boolean|null, tempToken:any|null,token:any|null}> => {
+    
+  const res = await fetch('/api/auth/csrf');
+  const { csrfToken } = await res.json();
+    
     const response = await fetch('/api/auth/login', {
         method: 'POST',
         headers: {
             'Content-Type': 'application/json',
+            'x-csrf-token': csrfToken,
         },
         body: JSON.stringify(data),
     });
 
     if (!response.ok) {
-        throw new Error('Failed to register');
+        throw new Error('Failed to login');
     }
 
     // Handle the response as needed
     const result = await response.json();
     console.log('loginUser successful:', result);
+    return result;
 };
 
 

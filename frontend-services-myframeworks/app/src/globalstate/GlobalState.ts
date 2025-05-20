@@ -25,11 +25,12 @@ export interface GameHistory {
 export interface Game {
     id: number;
     difficulty: number;
-    mode: string;
+  //  mode: string;
     state: string;
     gameHistory: GameHistory | null;
     created_at: string;
     type: string;
+    format: string;
     //si local, les players sont un tableau de displaynames
     local_players: string[];
    /*  updated_at: string; */
@@ -276,7 +277,7 @@ export const UserContext = ()=>{
     const setUser = (user: User | null) => {
         globalState.setuser(user);
     };
-    const setLoginSuccess = () => {
+    const setLoginSuccess = (authToken:string) => {
         globalState.setLoginSuccess();
         globalState.setProfileData(user());
         const id = user()?.id;
@@ -284,7 +285,7 @@ export const UserContext = ()=>{
             console.error('User ID is undefined');
             return;
         }
-        globalState.ws?.sendLoginMessage(id.toString());
+        globalState.ws?.sendLoginMessage(id.toString(),authToken); 
 
     };
     const setUserLogout = () => {

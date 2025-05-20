@@ -18,7 +18,7 @@ export class Home extends BaseComponent<{user: User | null}> {
 
   render() {
     const { user } = this.state;
-    const disable = user === null;
+    const disable = user === null || user === undefined;
     this.innerHTML = `
       <section class=" px-4 py-8">
         <div class="max-w-7xl mx-auto">

@@ -1,10 +1,11 @@
+import { Game } from "../globalstate/GlobalState";
 import { Round } from "./tournament-test-composant";
 
     
   // --- Composant RoundAccordion ---
   export class RoundAccordion extends HTMLElement {
-	private round: Round | null = null;
-  
+	private round: Game[] | null = null;
+	private index: number | null = null;
 	constructor() {
 	  super();
 	  this.attachShadow({ mode: 'open' });
@@ -13,6 +14,7 @@ import { Round } from "./tournament-test-composant";
 	// Attente d'une propriété « data » 
 	set data(data: string) {
 		console.warn('data', data);
+		console.log('data', this.round);
 	  try {
 		this.round = JSON.parse(data);
 	  } catch (error) {
@@ -30,6 +32,7 @@ import { Round } from "./tournament-test-composant";
 		if (!this.round)
 		{
 			const data = this.getAttribute('data');
+			const index = this.getAttribute('index');
 			if (data) {
 				try {
 					this.round = JSON.parse(data);
@@ -37,6 +40,9 @@ import { Round } from "./tournament-test-composant";
 					console.error('Erreur de parsing des données du round', error);
 					this.round = null;
 				}
+			}
+			if (index) {
+				this.index = parseInt(index, 10);
 			}
 		}
 			
@@ -68,9 +74,9 @@ import { Round } from "./tournament-test-composant";
 		  }
 		</style>
 		<div class="accordion">
-		  <div class="accordion-header">Round #${this.round.id} - État : ${this.round.state}</div>
+		  <div class="accordion-header">Round #${this.index} - État : {this.round.state}</div>
 		  <div class="accordion-content">
-			${this.round.games.map(game => `<game-card data='${JSON.stringify(game)}'></game-card>`).join('')}
+			${this.round.map(game => `<game-card data='${JSON.stringify(game)}'></game-card>`).join('')}
 		  </div>
 		</div>
 	  `;

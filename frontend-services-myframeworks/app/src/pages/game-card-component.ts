@@ -135,7 +135,7 @@ getDisplayName(player: Players) {
             </div>
 
             <div class="flex justify-start">
-             <p >mode : ${this.game.mode}</p>
+             <p >format : ${this.game.format}</p>
             </div>
 
             <div class="flex justify-start">

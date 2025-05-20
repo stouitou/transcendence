@@ -81,7 +81,10 @@ async function gameRoutes(app: FastifyInstance) {
   app.delete("/:id",/*  {schema: UserSchema.deleteTournament}, */ tounamentsController.deleteTournament);
  // app.post("/query", {schema: UserSchema.requestQuery}, tounamentsController.requestQuery);
   //pour tester les users
-  app.post("/:type/:format/normal"/* , {schema: UserSchema.createGame } */, tounamentsController.createTournamentForLoby);
+  // type: "local" | "remote"
+  // format: "classic" | "tournament"
+  app.post("/:type/:format"/* , {schema: UserSchema.createGame } */, tounamentsController.createTournamentForLoby);
+//  app.post("/:type/:format/normal"/* , {schema: UserSchema.createGame } */, tounamentsController.createTournamentForLoby);
 //  app.post("/create/:type/:format", tounamentsController.createTournamentForLoby);
  // app.post("/"/* , {schema: UserSchema.createTournament } */, tounamentsController.createTournament);
 

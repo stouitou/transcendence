@@ -69,7 +69,7 @@ export class CollisionManager {
 				//update statistics //@TODO d autre statistiques
 				player._historyPlayer.bounceCount++;
 
-				ball.speed = 6;
+				ball.speed = 3;
 				ball.lastHit = player;
 				this.bounceOffPaddle(ball,player,paddle);
 			}

@@ -73,14 +73,14 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
    
     //return data.map(User.fromJSON);
     const url = `${this.URL}${this.getRelations()}`;
-    console.log("🔐 UserRepository.getAll()  --start-- fetch from: ", this.URL)
+ //   console.log("🔐 UserRepository.getAll()  --start-- fetch from: ", this.URL)
     const response = await fetch(url);
-    console.log("🔐 UserRepository.getAll()  --response--",response)
+ //   console.log("🔐 UserRepository.getAll()  --response--",response)
     const data = await response.json();
-    console.log("🔐 UserRepository.getAll()  --data--",data)
+  //  console.log("🔐 UserRepository.getAll()  --data--",data)
     const results = data.data//.map((user: User) => User.fromJSON(user));
     //const results = data.data.map(User.fromJSON);
-    console.log("🔐 UserRepository.getAll()  --results--",results)
+ //   console.log("🔐 UserRepository.getAll()  --results--",results)
     return {...results};
   }
 
@@ -112,9 +112,9 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
       console.log("🔐 UserRepository.getByParams()  --queryString--",queryString)
       const url = `${this.URL}${queryString}`;
       const response = await fetch(url);
-      console.log("🔐 UserRepository.getByParams()  --response--",response)
+  //    console.log("🔐 UserRepository.getByParams()  --response--",response)
       const data = await response.json();
-      console.log("🔐 UserRepository.getByParams()  --data--",data)
+ //     console.log("🔐 UserRepository.getByParams()  --data--",data)
      // return data.map(User.fromJSON);
       return data.data?data.data[0]?data.data:null:null;
     }
@@ -122,11 +122,11 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
       //  const queryString = Helpers.buildQueryString(params);
         const queryString = this.newfilters(params);
         console.log("🔐 UserRepository.getByParams()  --queryString--",queryString)
-        const url = `${this.URL}${queryString}`;
+        const url = `${this.URL}${queryString}&relations=authProviders`;
         const response = await fetch(url);
-        console.log("🔐 UserRepository.getByParams()  --response--",response)
+ //       console.log("🔐 UserRepository.getByParams()  --response--",response)
         const data = await response.json();
-        console.log("🔐 UserRepository.getByParams()  --data--",data)
+ //       console.log("🔐 UserRepository.getByParams()  --data--",data)
        // return data.map(User.fromJSON);
         return data.data?data.data[0]?data.data[0]:null:null;
       }
