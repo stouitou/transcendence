@@ -1,5 +1,6 @@
 import { BaseComponent } from "../../frameworks/base-component";
-import { User, UserContext } from "../../globalstate/GlobalState";
+import {  UserContext } from "../../globalstate/GlobalState";
+import { User } from "../../types/types";
 import { Logout } from "../button/logout-btn";
 import { MessageBtn } from "../button/message-btn";
 import { DropdownProfile } from "../DropdownProfile";

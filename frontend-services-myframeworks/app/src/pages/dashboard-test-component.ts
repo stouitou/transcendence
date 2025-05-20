@@ -1,5 +1,6 @@
 import { BaseComponent } from "../frameworks/base-component";
-import { User, UserContext, Tournaments,} from "../globalstate/GlobalState";
+import { UserContext } from "../globalstate/GlobalState";
+import { User, Tournaments } from "../types/types";
 import { DonutsChart } from "./charts-donuts-componenet";
 import { GameCardTest } from "./game-card-component";
 import { DashboardTournois, GameCard,  TournoiDetail } from "./tournament-test-composant";

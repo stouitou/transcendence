@@ -25,13 +25,21 @@ export class RouterConfig {
     return false;
   }
 
+  //rediriger les requete vers /api vers un unauthorized
+/*   public redirectUnauthorized(path:string) {
+    if (path.startsWith('/api')) {
+      return "/404";
+    }
+    return path;
+  } */
+
   // Naviguer vers une route
   public navigate(href: string ,replace: boolean = false) {
     const uri = new URL(href, window.location.origin); // Inclure l'origine pour éviter les erreurs
     const pathWithQuery = uri.pathname + uri.search; // Inclure les query strings
 
 
-    if (this._routes[uri.pathname]) {
+    /* if (this._routes[uri.pathname]) {
         this.loadComponent(uri.pathname,uri.searchParams); // Charger le composant avec les query strings
         if (replace) {
           window.history.replaceState({ path: pathWithQuery}, '', href); // Remplacer l'état initial
@@ -40,6 +48,17 @@ export class RouterConfig {
       }
     } else {
       console.error(`Route not found: ${href}`);
+    } */
+   if (this._routes[uri.pathname]) {
+        this.loadComponent(uri.pathname,uri.searchParams); // Charger le composant avec les query strings
+    } else {
+      console.error(`Route not found: ${href}`);
+      this.loadComponent("/404",uri.searchParams);
+    }
+    if (replace) {
+        window.history.replaceState({ path: pathWithQuery}, '', href); // Remplacer l'état initial
+    } else {
+        window.history.pushState({ path: pathWithQuery }, '', href); // Ajouter un nouvel état
     }
   }
 
@@ -89,6 +108,14 @@ routerConfig.addRoute('/about', () => document.createElement('about-component'))
 routerConfig.addRoute('/game', () => document.createElement('game-component'));//@TODO a rename
 //routerConfig.addRoute('/game', () => document.createElement('game-component-classic'));//@TODO a rename
 routerConfig.addRoute('/login', () => document.createElement('login-component'));
+routerConfig.addRoute('/login-2fa', () => document.createElement('login-two-factor-component'));
+//routerConfig.addRoute('/forgot-password', () => document.createElement('forgot-password-component'));
+routerConfig.addRoute('/forgot-password', () => document.createElement('forgot-password-request-component'));
+routerConfig.addRoute('/forgot-password-2fa', () => document.createElement('forgot-password-two-factor-component'));
+
+
+routerConfig.addRoute('/reset-password', () => document.createElement('reset-password-component'));
+//routerConfig.addRoute('/change-password', () => document.createElement('change-password-component'));
 routerConfig.addRoute('/profile', () => document.createElement('profile-component'));
 routerConfig.addRoute('/profile/edit', () => document.createElement('profile-edit-component'));
 routerConfig.addRoute('/register', () => document.createElement('register-component'));
@@ -98,6 +125,7 @@ routerConfig.addRoute('/messages', () => document.createElement('chat-component'
 routerConfig.addRoute('/dashboard', () => document.createElement('dashboard-component'));
 routerConfig.addRoute('/game-loby', () => document.createElement('game-loby-component'));
 
+routerConfig.addRoute('/404', () => document.createElement('error-404-component'));
 
 
 export class Router extends HTMLElement {

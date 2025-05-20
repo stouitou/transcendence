@@ -1,6 +1,7 @@
 
 import { BaseComponent } from "../frameworks/base-component";
-import { User, UserContext } from '../globalstate/GlobalState';
+import {  UserContext } from '../globalstate/GlobalState';
+import { User } from '../types/types';
 import { disable2FA, enable2FA, get2FADetail, TwoFA } from "../services/api.2fa";
 import { updateProfile, uploadAvatar } from "../services/api.profile";
 
@@ -238,7 +239,7 @@ export class TwoFactorSetup extends BaseComponent<{ user: User | null; twoFa: Tw
 
     try {
       console.log("Fetching 2FA details for user:", user.id);
-      const data = await get2FADetail(user.id);
+      const data = await get2FADetail(/* user.id */);
       this.setState({ ...this.state, twoFa: data ?? null });
       console.log("2FA data:", data);
       this.render();

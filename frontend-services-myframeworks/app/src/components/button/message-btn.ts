@@ -12,10 +12,10 @@ Messages
 
  */
 
-import { logoutUser } from '../../services/authService.ts';
-import { BaseComponent } from "../../frameworks/base-component.ts";
-import { UserContext } from '../../globalstate/GlobalState.ts';
-import { RouterConfig } from '../../router/Router.ts';
+import { logoutUser } from '../../services/api.auth';
+import { BaseComponent } from "../../frameworks/base-component";
+import { UserContext } from '../../globalstate/GlobalState';
+import { RouterConfig } from '../../router/Router';
 
 export class MessageBtn extends BaseComponent<{nbMsg:number}> {
   constructor() {

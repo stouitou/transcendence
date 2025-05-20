@@ -66,4 +66,17 @@
   /* .btn-nav {
     @apply 
   } */
+
+   .input-success {
+    box-shadow: 0 0 5px rgba(0, 128, 0, 0.5);
+  }
+  .input-error {
+    box-shadow: 0 0 5px rgb(255, 0, 0);
+  }
+  .input-warning {
+    box-shadow: 0 0 5px rgba(255, 166, 0, 0.934);
+  }
+  .input-info {
+    box-shadow: 0 0 5px rgba(0, 0, 255, 0.5);
+  }
 }

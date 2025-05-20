@@ -1,7 +1,7 @@
-import { BaseComponent } from "../frameworks/base-component.ts";
-import { LoginGoogle } from './button/login-google-btn.ts';
-import { LoginGithub } from './button/login-github-btn.ts';
-import { Login42Api } from './button/login-42Api-btn.ts';
+import { BaseComponent } from "../frameworks/base-component";
+import { LoginGoogle } from './button/login-google-btn';
+import { LoginGithub } from './button/login-github-btn';
+import { Login42Api } from './button/login-42Api-btn';
 
 if (!customElements.get('login-google-btn'))
 customElements.define('login-google-btn', LoginGoogle);

@@ -1,5 +1,6 @@
 import { BaseComponent } from "../frameworks/base-component";
-import { User, UserContext } from "../globalstate/GlobalState";
+import { UserContext } from "../globalstate/GlobalState";
+import { User } from '../types/types';
 
 export class Home extends BaseComponent<{user: User | null}> {
   constructor() {

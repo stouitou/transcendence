@@ -1,4 +1,4 @@
-import { logoutUser } from '../../services/authService';
+import { logoutUser } from '../../services/api.auth';
 import { BaseComponent } from "../../frameworks/base-component";
 import { UserContext } from '../../globalstate/GlobalState';
 

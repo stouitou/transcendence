@@ -1,8 +1,7 @@
 import { BaseComponent } from "../frameworks/base-component";
-import { Game, Players, User, UserContext } from "../globalstate/GlobalState";
+import { UserContext } from "../globalstate/GlobalState";
+import {User, Game, Players } from "../types/types";
 import { IWebSocketsService } from "../globalstate/WebSocketService";
-import { fetchProfileData } from "../services/authService";
-import { LobyComponentClient } from "./loby-component";
 class PlayerConfig {
   id?: number | null;
   name: string | null;

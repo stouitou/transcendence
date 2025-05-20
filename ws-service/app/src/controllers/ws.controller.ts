@@ -273,7 +273,7 @@ export class WsController {
           }
           else if (message.type === "login" && message.userId && message.id) {
             console.log("🔒new action login user id: ", message.id);
-            console.log("🔒 from ", message.userId);
+            //console.log("🔒 from ", message.userId);
 
              //on fetch l'utilisateur 
              authDecodeToken(req,message.authToken).then((user) => {
@@ -282,7 +282,7 @@ export class WsController {
                 socket.send(JSON.stringify({ error: "User not authenticated" }));
                 return;
               }
-              console.log("🔒 User authentifié", req.authenticatedUser);
+              console.log("🔒[Websocket authDecodeToken]: User authentifié", req.authenticatedUser);
               
               const newUserId = `User-${req.authenticatedUser.id}`;          
             //  wsService.updateClientId(userId, `User-${req.authenticatedUser?.id}`);//@TODO a ameliorer

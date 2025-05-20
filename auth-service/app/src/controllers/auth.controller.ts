@@ -33,6 +33,7 @@ export class AuthController extends BaseController {
       this.me = this.me.bind(this);
       this.logout = this.logout.bind(this);
       this.loginForgetPassword = this.loginForgetPassword.bind(this);
+      this.loginResetPassword = this.loginResetPassword.bind(this);
       this.decodeToken = this.decodeToken.bind(this);
 	  }
 
@@ -307,17 +308,17 @@ export class AuthController extends BaseController {
       return reply.status(201).send({ twoFactorRequired: true, method: 'email' });
    //   return reply.status(401).send({ error: "Invalid credentials" });//@TODO on devrait pas dire que les identifiants sont invalides
     }
-    console.log("🔐[LOGIN] user",user)
+    console.log("🔐[LOGIN] [loginForgetPassword]  user",user)
    // return reply.status(200).send({ user });
 
     // Vérifier si l'utilisateur a activé l'authentification à deux facteurs
     // Si oui, générer un token temporaire pour l'authentification à deux facteurs
-    const is2FAEnabled = user.authProviders && user.authProviders[0].two_factor_auth;
-    if (user.authProviders && is2FAEnabled ) {
+  //  const is2FAEnabled = user.authProviders && user.authProviders[0].two_factor_auth;
+    if (user.authProviders/*  && is2FAEnabled */ ) {
       //1- generer un token temporaire pour l'authentification à deux facteurs
       const {provider_id, two_factor_auth_method = "totp"} = user.authProviders[0];
       const tempToken = this.app.authService.generateTemp2FAToken(provider_id,two_factor_auth_method);
-      console.log("🔐[LOGIN] tempToken generate")
+      console.log("🔐[LOGIN][loginForgetPassword] tempToken generate")
       reply.setCookie('authToken2FA', tempToken, {
           httpOnly: true,
           secure: process.env.NODE_ENV === 'production', // Utiliser 'secure' en production
@@ -326,13 +327,15 @@ export class AuthController extends BaseController {
           maxAge: 350 //==> 5 minutes
       });
       //2- si la methode est email, envoyer un code de vérification par email
-      if (two_factor_auth_method === "email") {
-        const { otp, otpExpiration } = await this.app.twoFactorAuthService.generate2FAEmailCode(user);
+      if (two_factor_auth_method != "totp") {
+        console.log("🔐[LOGIN][loginForgetPassword] two_factor_auth_method",two_factor_auth_method)
+        const { otp, otpExpiration } = await this.app.twoFactorAuthService.generate2FAEmailCode(user,true);
         console.log("🔐 otp",otp)
         console.log("🔐 otpExpiration",otpExpiration)
         // Envoyer le code de vérification par email
          console.log("🔐[LOGIN] send2FAEmail to: ",email)
 
+ //@TODO a decommenter pour un envoie de mail
         await send2FAEmail(email, otp);
       }
       return reply.status(201).send({ twoFactorRequired: true, method: two_factor_auth_method });
@@ -345,12 +348,13 @@ export class AuthController extends BaseController {
         // Définir le cookie avec le token
       reply.setCookie('authForgetPasswordToken', token, {
           httpOnly: true,
-          secure: process.env.NODE_ENV === 'production', // Utiliser 'secure' en production
+          secure: true,//process.env.NODE_ENV === 'production', // Utiliser 'secure' en production
           sameSite: 'strict',
           path: '/',
           maxAge: 350 //==> 5 minutes
       });
-    return reply.status(201).send({ token: token });
+      console.log("🔐[LOGIN] [loginForgetPassword]  authForgetPasswordToken generate")
+    return reply.status(201).send({ twoFactorRequired: true, method: email });
   }
 
 //@BUG : a revoir
@@ -363,6 +367,7 @@ export class AuthController extends BaseController {
    * @returns 
    */
   async loginResetPassword(req: FastifyRequest, reply: FastifyReply) {
+    console.log("🔐[LOGIN] [loginResetPassword]  start---")
     const { password } = req.body as { password: string };
     if (!password) {
       return reply.status(400).send({ error: "Password is required" });
@@ -370,22 +375,32 @@ export class AuthController extends BaseController {
     //- recuperer le token de reinitialisation du mot de mot de passe depuis les cookies
     const authForgetPasswordToken = req.cookies.authForgetPasswordToken;
     if (!authForgetPasswordToken) {
+      console.log("🔴 loginResetPassword No token provided",req.cookies)
       return reply.status(401).send({ error: "No token provided" });
+    }
+    console.log("🔐[LOGIN] [loginResetPassword]  [authForgetPasswordToken] cookie ok")
+    try {
+      console.log("🔐[LOGIN] [loginResetPassword]  authForgetPasswordToken",this.app.jwt.decode(authForgetPasswordToken,{}))
+    } catch (err) {
+      console.error("🔴 loginResetPassword error",err)
     }
     //- verifier le token de reinitialisation du mot de mot de passe et y recuperer l'id de l'utilisateur
     const decoded = this.app.jwt.verify(authForgetPasswordToken,"ACCESS_TOKEN_PUBLIC_KEY") as {id: number};
     if (!decoded) {
       return reply.status(401).send({ error: "Invalid token" });
     }
+    console.log("🔐[LOGIN] [loginResetPassword]  decoded",decoded)
     //- recuperer l'utilisateur depuis la base de donnees
     const user = await this.UserRepository.getById(decoded.id);
     if (!user) {
       return reply.status(401).send({ error: "User not found" });
     }
+    console.log("🔐[LOGIN] [loginResetPassword]  user",user)
     //- verifier si l'utilisateur a un authProvider
     if (!user.authProviders || user.authProviders.length === 0) {
       return reply.status(401).send({ error: "User has no auth provider" });
     }
+    console.log("🔐[LOGIN] [loginResetPassword]  user.authProviders",user.authProviders)
     if (user.authProviders.length === 0) {
       return reply.status(401).send({ error: "User has no auth provider" });
     }
@@ -400,7 +415,17 @@ export class AuthController extends BaseController {
     }
     //- supprimer le cookie de reinitialisation du mot de passe
     reply.clearCookie('authForgetPasswordToken');
+    // - retourner le cookie defini avec le token
+    const token = this.app.authService.generateToken(user);
+    reply.setCookie('authToken', token, {
+                httpOnly: true,
+                secure: true,
+                sameSite: 'strict',
+                path: '/',
+                maxAge:3600 //  1 heure
+            });
+    console.log("🔐[LOGIN] [loginResetPassword]  Password changed successfully")
     //- retourner un message de succes
-    return reply.status(200).send({ message: "Password changed successfully" });
+    return reply.status(200).send({ token:token, message: "Password changed successfully" });
   }
 }

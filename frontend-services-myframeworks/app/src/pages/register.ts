@@ -1,88 +1,68 @@
-import { RegisterData, registerUser } from '../services/authService';
+import { registerUser } from '../services/api.auth';
 import { BaseComponent } from "../frameworks/base-component";
-import GlobalState, { UserContext } from "../globalstate/GlobalState";
-import { RouterConfig } from '../router/Router';
-type RegisterState = {
-  name: string;
-  email: string;
-  password: string;
-};
+import { registerconstraint } from '../utils/constraints';
+import { RegisterFormData } from '../types/forms.type';
 
-export class Register extends BaseComponent<{register:RegisterState,confirmPassword:string}> {
+export class Register extends BaseComponent<{},{formRegister:RegisterFormData}> {
   constructor() {
-    super({ register: { name:'', email: '', password: '' },confirmPassword:'' });
+    super({});
   }
 
-/*   connectedCallback() {
-    super.connectedCallback();
+  connectedCallback() {
     this.render();
-    
-  } */
+    // attach the form handler to the form
+    const formHandler = this.addForm('formRegister');
+    // add the validation constraints to the form handler
+    formHandler?.addValidation(registerconstraint);
+    // attach the event handler to the submit button    
+    this.attachEvent(this, '#formRegister', 'submit', this.handleSubmit.bind(this));
+    // attach a custom error handler for the form
+    this.setApiErrorHandler(400, {
+      message: 'Bad request. Please check your input.',
+     action: (error) => { this.showMessage(error.message, 'error'); }
+    });    
+  }
 
-  setName(event: Event) {
-    event.preventDefault();
-    const input = event.target as HTMLInputElement;
-    console.log('setName:', input.value);
-    this.setState({ register: { ...this.state.register, name: input.value } });
-  }
-  setEmail(event: Event) {
-    event.preventDefault();
-    const input = event.target as HTMLInputElement;
-    this.setState({ register: { ...this.state.register, email: input.value } });
-  }  
-  setPassword(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.setState({ register: { ...this.state.register, password: input.value } });
-  }
-  setconfirmPassword(event: Event) {
-    const input = event.target as HTMLInputElement;
-    this.setState({ confirmPassword: input.value });
-  }
   handleSubmit = async(e: Event)=> {
     e.preventDefault()
-    if (this.state.register.name === "" || this.state.register.email === "" || this.state.register.password === "") {
-			alert("Please fill in all fields");
-			return;
-		}
-    if (this.state.register.password !== this.state.confirmPassword) {
-      alert("Passwords do not match");
+    const formHandler = this.getFormHandler('formRegister');
+    if (!formHandler?.validateForm()) {
+      this.showMessage('Please fix the errors in the form.', 'error');
       return;
     }
     try {
-    //  const globalState = GlobalState;
-      const userContext = UserContext();
-      const { setUser,user } = userContext;
-			const registerData: RegisterData = { ...this.state.register };
-			await  registerUser(registerData);
-		//	const data = await fetchProfileData();
-     // setUser(data);
-      console.log('register successful:', user());
-		/* 	setUser(user);
-            //sendregisterMessage(); to WebSocket
-            sendregisterMessage(user.id); */
-			//Router.navigate('/profile');
-         // Rediriger vers la page profile
-    const router = RouterConfig.getInstance();
-    router.navigate('/login');
+       const formData = formHandler.getFormData();
+			await  registerUser(formData);
+      this.router.navigate('/login');
 		} catch (error) {
-			console.error('register failed:', error);
-			alert('register failed. Please try again.');
+			 //console.error('register failed:', error);
+       this.apiErrorHandler(error);
 		}
   }
+
+  /*
+   !! - for display the error message  from the api: 
+    <div id="message-box" class="font-bold text-center mb-4"></div>
+
+    !! - for display the error message for each field:
+    <div id="name-error" class="font-bold text-center mb-4"></div>
+    <input name="name" id="name" type="text" class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500" placeholder="SuP€rK@RoT" required />
+  */
 
   render() {
     this.innerHTML = `
       <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
         <div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-md">
-          <form id="formLogin" class="space-y-5">
+          <form id="formRegister" class="space-y-5">
             <h2 class="text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-6">Register</h2>
-            
+             <div id="message-box" class="font-bold text-center mb-4"></div>
             <div>
               <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name:</label>
+               <div id="name-error" class="font-bold text-center mb-4"></div>
               <input
-                id="name"
+                id="name"             
                 type="text"
-                value="${this.state.register.name}"
+                name="name"
                 class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="SuP€rK@RoT"
                 required
@@ -91,10 +71,11 @@ export class Register extends BaseComponent<{register:RegisterState,confirmPassw
   
             <div>
               <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email:</label>
+              <div id="email-error" class="font-bold text-center mb-4"></div>
               <input
                 id="email"
                 type="email"
-                value="${this.state.register.email}"
+                name="email"
                 class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="name@student.42.fr"
                 required
@@ -103,26 +84,32 @@ export class Register extends BaseComponent<{register:RegisterState,confirmPassw
   
             <div>
               <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password:</label>
+              <div id="password-error" class="font-bold text-center mb-4"></div>
               <input
                 id="password"
                 type="password"
-                value="${this.state.register.password}"
+                name="password"
                 class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="********"
+                required
               />
             </div>
   
             <div>
               <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password:</label>
+              <div id="confirmPassword-error" class="font-bold text-center mb-4"></div>
               <input
                 id="confirmPassword"
                 type="password"
-                value="${this.state.confirmPassword}"
+                name="confirmPassword"
                 class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                placeholder="********"
+                required
               />
             </div>
   
             <button
-              id="loginBtn"
+              id="registerBtn"
               type="submit"
               class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
             >
@@ -137,11 +124,6 @@ export class Register extends BaseComponent<{register:RegisterState,confirmPassw
       </div>
     `;
   
-    this.attachEvent(this, '#loginBtn', 'click', this.handleSubmit.bind(this));
-    this.attachEvent(this, '#name', 'input', this.setName.bind(this));
-    this.attachEvent(this, '#email', 'input', this.setEmail.bind(this));
-    this.attachEvent(this, '#password', 'input', this.setPassword.bind(this));
-    this.attachEvent(this, '#confirmPassword', 'input', this.setconfirmPassword.bind(this));
   }
   
 }

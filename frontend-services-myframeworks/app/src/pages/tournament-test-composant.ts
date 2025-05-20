@@ -1,6 +1,7 @@
 import { BaseComponent } from "../frameworks/base-component";
-import { User, UserContext } from "../globalstate/GlobalState";
-import { getTounaments, MetaPagination, Tournaments } from "../services/api";
+import { UserContext } from "../globalstate/GlobalState";
+import { getTournaments, MetaPagination,  } from "../services/api.users.game";
+import {User, Game, Players,Tournaments } from "../types/types";
 import { RoundAccordion } from "./round-Accordion-composant";
 
  function determinePageCount(offset:number,pagination: MetaPagination):{ currentPage: number, pageCount: number } {
@@ -68,7 +69,7 @@ import { RoundAccordion } from "./round-Accordion-composant";
 	winner: User | number | null;
   } */
   
-  export interface Round {
+ /*  export interface Round {
 	id: number;
 	games: Game[];
 	state: string;
@@ -77,7 +78,7 @@ import { RoundAccordion } from "./round-Accordion-composant";
 	updated_at: Date;
 	tournaments?: Partial<Tournaments>[];
 	current: number;
-  }
+  } */
   
 /*   export interface User {
 	id: number;
@@ -100,13 +101,14 @@ import { RoundAccordion } from "./round-Accordion-composant";
 	updated_at: string;
   }
   
-  export interface Game {
+ /*  export interface Game {
 	id: number;
 	difficulty: string;
 	state: string;
 	gameHistory: GameHistory | null;
 	created_at: string;
-  }
+	currentRound: number;
+  } */
   
   // --- Composant DashboardTournois ---
 export class DashboardTournois extends BaseComponent<{ user: User | null,
@@ -127,14 +129,14 @@ export class DashboardTournois extends BaseComponent<{ user: User | null,
 /* 	set data(tourneys: Tournaments[]) {
 	  this.tournaments = tourneys;
 	  this.render();
-	} */
+	} */ 
   
 	connectedCallback() {
 		this.state.user = UserContext().user();
-		getTounaments({limit:10},{type:"remote"}).then((data) => {
-			if (!data) return;
-			const {tournaments,meta} = data;
-			console.log('getTounaments(remote).then((data) tournaments', tournaments);
+		getTournaments({limit:10},{type:"remote"}).then((result) => {
+			if (!result || !result.success) return;
+			const {data:tournaments,meta} = result;
+			console.log('getTournaments(remote).then((result) tournaments', tournaments);
 			if (tournaments) {
 			
 			//this.state.games = {...this.state.games,...games};
@@ -145,11 +147,11 @@ export class DashboardTournois extends BaseComponent<{ user: User | null,
 			this.render();
 			}
 		}).catch((e) =>console.error(e));
-		getTounaments({limit:10},{type:"local"}).then((data) => {
-			if (!data) return;
-			const {tournaments,meta} = data;
-			console.log('getTounaments(local).then((data) tournaments', tournaments);
-			console.log('getTounaments(local).then((data) meta', meta);
+		getTournaments({limit:10},{type:"local"}).then((result) => {
+			if (!result || !result.success) return;
+			const {data:tournaments,meta} = result;
+			console.log('getTournaments(local).then((result) tournaments', tournaments);
+			console.log('getTournaments(local).then((result) meta', meta);
 			if (tournaments) {
 			
 			//this.state.games = {...this.state.games,...games};
@@ -460,6 +462,8 @@ export  class TournoiDetail extends HTMLElement {
 				}
 			}
 	  if ( !this.game) return;
+	  const gameHistory = this.game.gameHistory || null;
+	  const gameHistoryPlayers = gameHistory ? gameHistory.players : null;
 
   
 	  this.innerHTML = `
@@ -476,8 +480,9 @@ export  class TournoiDetail extends HTMLElement {
 		  <p>État: ${this.game.state}</p>
 		  <p>Date de création: ${new Date(this.game.created_at).toLocaleDateString()}</p>
 		  <p>Historique du jeu:</p>
-		  <p>Joueur 1: ${this.game.gameHistory?.players[0].display_name} score:  ${this.game.gameHistory?.players[0].score}</p>
-		  <p>Joueur 2: ${this.game.gameHistory?.players[1].display_name} score:  ${this.game.gameHistory?.players[1].score}</p>
+		  ${gameHistoryPlayers ? gameHistoryPlayers.map((player: Players,index) => `
+			<p>Joueur ${index + 1}: ${player.display_name} score: ${player.score}</p>
+		  `).join('') : ''}
 		  <p>winner: ${this.game.gameHistory?.winner}</p>
 		</div>
 	  `;

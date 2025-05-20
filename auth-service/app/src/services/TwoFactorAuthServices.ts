@@ -46,11 +46,11 @@ export class TwoFactorAuthService {
 	   console.log("🔐AuthService:  get2FASecret()  userWithAuthProvider updated : ",userUpdated)
 	  return {secret,otpauth};
 	}
-	 async generate2FAEmailCode(user: User): Promise<{ otp:string, otpExpiration:Date }> {
+	 async generate2FAEmailCode(user: User,isForce:boolean=false): Promise<{ otp:string, otpExpiration:Date }> {
 		//1- on verifie si l'utilisateur existe
 		if (!user) throw new Error("User not found");
 		//2- on verifie si l'utilisateur a activé l'authentification à deux facteurs
-		if (!user.authProviders[0].two_factor_auth) throw new Error("Two factor auth not enabled");
+		if (!isForce && user.authProviders[0].two_factor_auth) throw new Error("Two factor auth not enabled");
 		//3- on verifie si l'utilisateur a deja un code de verification
 		if (user.authProviders[0].otp && user.authProviders[0].otp !== "") {
 			//4- on verifie si le code de verification est encore valide
@@ -77,11 +77,11 @@ export class TwoFactorAuthService {
 	
 
 
-	  async verify2FAEmailCode(authProviders: AuthProvider|null, code: string): Promise<boolean> {
+	  async verify2FAEmailCode(authProviders: AuthProvider|null, code: string,isForce:boolean=false): Promise<boolean> {
 		//1- on verifie si l'utilisateur existe
 		if (!authProviders) throw new Error("User not found");
 		//2- on verifie si l'utilisateur a activé l'authentification à deux facteurs
-		if (!authProviders.two_factor_auth) throw new Error("Two factor auth not enabled");
+		if (!isForce && !authProviders.two_factor_auth) throw new Error("Two factor auth not enabled");
 		//3- on verifie si l'utilisateur a deja un code de verification
 		if (!authProviders.otp) throw new Error("No OTP code found");
 		//4- on verifie si le code de verification est encore valide
@@ -109,19 +109,20 @@ export class TwoFactorAuthService {
 	  }
 
 
-  async verify2FACode(userEmail: string, method: "totp" | "email", code: string) {
+  async verify2FACode(userEmail: string, method: "totp" | "email", code: string,isForce:boolean=false) {
     const authProvider = await this.authProviderRepository.getOneByParams({
       provider_id: userEmail,
       provider: "local",
     });
     if (!authProvider) {
+		console.log("🔴 verify2FACode user not found", userEmail,method,isForce)
       throw new Error("User not found");
     }
 
     if (method === "totp") {     
       return await this.verify2FATOTPCode(authProvider, code);
-    } else if (method === "email") {
-      return await this.verify2FAEmailCode(authProvider, code);
+    } else if (method === "email" || isForce) {
+      return await this.verify2FAEmailCode(authProvider, code,isForce);
     }
     return false;
   }

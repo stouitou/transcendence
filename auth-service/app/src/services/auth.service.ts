@@ -22,6 +22,8 @@ export class AuthService {
   constructor(private app: FastifyInstance) {
     this.UserRepository = new UserRepository();
     this.AuthProviderRepository = new AuthProviderRepository();
+    this.generateTemp2FAToken = this.generateTemp2FAToken.bind(this);
+    this.generateResetToken = this.generateResetToken.bind(this);
   }
 
   /**
@@ -234,6 +236,7 @@ async registerWithOauthProvider(profile:any, provider: string) {
    * @returns
    */
   generateTemp2FAToken(email:string,method:string) {
+    console.log("🔐AuthService:  generateTemp2FAToken()  email : ",email, 'method: ',method )
     //const method : 'totp' | 'email';
     return this.app.jwt.sign({
       email: email,

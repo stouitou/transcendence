@@ -1,5 +1,6 @@
-import { BaseComponent } from "../frameworks/base-component.ts";
-import { Game, User, UserContext } from "../globalstate/GlobalState.ts";
+import { BaseComponent } from "../frameworks/base-component";
+import { UserContext } from "../globalstate/GlobalState";
+import { Game, User } from "../types/types";
 
 
 export class Tournament extends BaseComponent<{ user: User | null; tournaments: Tournament[]| null }> {
@@ -77,13 +78,13 @@ export class Tournament extends BaseComponent<{ user: User | null; tournaments: 
   }
 
   gameDetailsView = (game:Game) => {
-	let victory:number|null = null;
+/* 	let victory:number|null = null;
 	if (game?.gameHistory)
 		{
 			if ( game?.gameHistory.score1 >  game?.gameHistory.score2 ) victory = game?.gameHistory.player1;
 			if ( game?.gameHistory.score2 > game?.gameHistory.score1 ) victory = game?.gameHistory.player2;
 			if ( game?.gameHistory.score1 ===  game?.gameHistory.score2 ) victory = null;
-		}
+		} */
 	console.log('game', game);
 	return (`
 	<tr class=" border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
@@ -113,8 +114,8 @@ export class Tournament extends BaseComponent<{ user: User | null; tournaments: 
 		</td>
 		<td class="px-6 py-4">
 			<div class="flex items-center">
-					<div class=${`h-2.5 w-2.5 rounded-full  ${victory === this.state.user?.id ? 'bg-green-500 ' : ''}`}></div>
-					<span>${victory === this.state.user?.id?"ME":`User-${victory}` }</span>
+					<div class=${`h-2.5 w-2.5 rounded-full `}></div>
+					<span>${game.gameHistory?.winner??''}</span>
 				
 			</div>
 		</td>

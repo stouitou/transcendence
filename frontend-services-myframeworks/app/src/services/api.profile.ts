@@ -1,4 +1,4 @@
-import { User } from "../globalstate/GlobalState";
+import { User } from "../types/types";
 
 export const uploadAvatar = async (formData: FormData): Promise<User | void> => {
   try {

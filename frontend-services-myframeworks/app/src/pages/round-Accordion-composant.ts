@@ -1,5 +1,4 @@
-import { Game } from "../globalstate/GlobalState";
-import { Round } from "./tournament-test-composant";
+import { Game } from '../types/types';
 
     
   // --- Composant RoundAccordion ---

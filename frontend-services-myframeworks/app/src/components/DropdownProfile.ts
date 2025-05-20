@@ -1,6 +1,7 @@
 import { BaseComponent } from "../frameworks/base-component";
-import { User, UserContext } from "../globalstate/GlobalState";
-import { logoutUser } from "../services/authService";
+import { UserContext } from "../globalstate/GlobalState";
+import { User } from "../types/types";
+import { logoutUser } from "../services/api.auth";
 
 export class DropdownProfile extends BaseComponent<{ isDrop: boolean, user:User|null }> {
   constructor() {

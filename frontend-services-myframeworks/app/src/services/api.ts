@@ -1,4 +1,4 @@
-import { Game } from "../globalstate/GlobalState";
+import { Game } from "../types/types";
 
 /**
  * getGames function to fetch the list of games from the server.
@@ -268,7 +268,7 @@ export const generateNextRound = async (tournamentId:number): Promise<Tournament
 	return result;
 }
 
-
+ 
 export const getTounaments = async (pagination:Pagination,filter:Filter): Promise<{tournaments:Tournaments[],meta:MetaPagination} | void> => {
 	//limit: 10, offset: 2, order: 'ASC'
 	const { limit = 10, offset = 0, order = 'ASC' } = pagination;

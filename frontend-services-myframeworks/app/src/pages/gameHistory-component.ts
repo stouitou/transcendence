@@ -1,56 +1,40 @@
 import { BaseComponent } from "../frameworks/base-component";
-import { Game, User, UserContext } from "../globalstate/GlobalState";
-import { getGames, MetaPagination } from "../services/api";
+import { UserContext } from "../globalstate/GlobalState";
+import { User, Game} from "../types/types";
+import { getGames , MetaPagination } from "../services/api.users.game";
 
 
 export class GameHistory extends BaseComponent<{ user: User | null,
-	//games: Game[] | null,
 	localGame: Game[] | null,
 	remoteGame: Game[] | null,
 	metaPagination:{localGame: MetaPagination| null, remoteGame: MetaPagination| null} }> {
   constructor() {
-	super({ user: null,/* games:null, */ localGame: null, remoteGame: null,metaPagination:{localGame: null, remoteGame: null} });
+	super({ user: null,localGame: null, remoteGame: null,metaPagination:{localGame: null, remoteGame: null} });
   }
 
   connectedCallback() {
-	//super.connectedCallback();
 	this.state.user = UserContext().user();
-	getGames({limit:10},{type:"remote"}).then((data) => {
-		if (!data) return;
-		const {games,meta} = data;
+	getGames({limit:10},{type:"remote"}).then((result) => { 
+		if (!result || !result.success) return;
+		const {data:games,meta} = result;
 		console.log('getGames(remote).then((data) games', games);
 	  if (games) {
-		
-		//this.state.games = {...this.state.games,...games};
-	//	this.state.games = games;
 		this.state.metaPagination.remoteGame= meta;
-		this.state.remoteGame = games//.filter((game) => game.type === 'remote');
-		//this.state.games = {...this.state.games, ...this.state.remoteGame};
+		this.state.remoteGame = games
 		this.render();
 		}
 	}).catch((e) =>console.error(e));
-	getGames({limit:10},{type:"local"}).then((data) => {
-		if (!data) return;
-		const {games,meta} = data;
+	getGames({limit:10},{type:"local"}).then((result) => {
+		if (!result || !result.success) return;
+		const {data:games,meta} = result;
 		console.log('getGames(local).then((data) games', games);
 	  if (games) {
-		//this.state.games = {...this.state.games,...games};
-		//this.state.games = games;
 		this.state.metaPagination.localGame = meta;
-		this.state.localGame = games//.filter((game) => game.type === 'local');
+		this.state.localGame = games
 		this.render();
 		}
 	}).catch((e) =>console.error(e));
-	//console.log('localGame', this.state.localGame);
-	//this.setFilteredGames(this.state.user?.games?? null);
 	this.render();
-	/* document.addEventListener('profile-data-updated', (e: Event) => {
-	  const customEvent = e as CustomEvent;
-	  console.log('profile-data-updated event received');
-	  this.state.user = customEvent.detail.profileData;
-	  this.setFilteredGames(this.state.user?.games?? null);
-	  this.render();
-	}); */
   }
 
 
@@ -116,7 +100,7 @@ export class GameHistory extends BaseComponent<{ user: User | null,
 	const { user , localGame, remoteGame,metaPagination} = this.state;
 
 	if (user) {
-		console.log('game', user.games);
+		//console.log('game', user.games);
 		const localPagination = metaPagination.localGame
 		? this.generatePagination(
 			this.determinePageCount(metaPagination.localGame.offset, metaPagination.localGame).currentPage,
@@ -270,9 +254,9 @@ export class GameHistory extends BaseComponent<{ user: User | null,
 			  if (!page || page < 1) return;
 			  if (!type) return;		  
 			  // Charger les données pour la page sélectionnée
-			  getGames({ limit: 10, offset: (page - 1) * 10 }, { type: type }).then((data) => {
-				if (!data) return;
-				const { games, meta } = data;
+			  getGames({ limit: 10, offset: (page - 1) * 10 }, { type: type }).then((result) => {
+				if (!result) return;
+				const { data:games, meta } = result;
 				if (type === 'remote') {
 				  this.state.metaPagination.remoteGame = meta;
 				  this.state.remoteGame = games;

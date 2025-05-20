@@ -1,6 +1,7 @@
 import  UserRepository  from "../repository/User.repository";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { BaseController } from "./BaseController";
+import { generateCSRFToken } from "@src/utils/crypto";
 
 
 /**
@@ -211,7 +212,15 @@ export class TwoFactorController extends BaseController {
   async verify2FA(req: FastifyRequest, reply: FastifyReply) {
     try {
       console.log("🔐[verify2FA] --start--")
-      const { code } = req.body as { code: string };
+      const { code, isforce = false } = req.body as { code: string; isforce?: boolean };
+      if (!code || typeof code !== 'string' || code.length != 6) {
+        return reply.status(400).send({ error: "Invalid or missing code" });
+      }
+      if (typeof isforce !== 'boolean') {
+        return reply.status(400).send({ error: "Invalid isforce parameter" });
+      }
+      console.log("🔐[verify2FA] --req.session.csrfToken",req.session.csrfToken)
+      console.log("🔐[verify2FA] --code : ",code,isforce)
       //1- Vérifier si le code est présent
       if (!code) {
         return reply.status(400).send({ error: "Code is required" });
@@ -223,11 +232,15 @@ export class TwoFactorController extends BaseController {
         return reply.status(401).send({ error: "[verify2FA] Unauthorized" });
       }
       // Vérifier le token temporaire pour l'authentification à deux facteurs
+      console.log("🔐[verify2FA] --authToken2FA : ",authToken2FA)
       const decoded = this.app.jwt.verify(authToken2FA, "ACCESS_TOKEN_PUBLIC_KEY") as {
           email: string;
           method: "totp" | "email";
         };
-        const isValid = await this.app.twoFactorAuthService.verify2FACode(decoded.email, decoded.method, code);
+        console.log("🔐[verify2FA] --decoded : ",decoded, isforce)
+        const isValid = await this.app.twoFactorAuthService.verify2FACode(decoded.email, decoded.method, code,isforce);
+        console.log("🔐[verify2FA] --isValid : ",isValid)
+          // Vérifier si le code est valide
         if (!isValid) {
             return reply.status(400).send({ error: "Invalid 2FA code" });
           }
@@ -238,6 +251,7 @@ export class TwoFactorController extends BaseController {
         const params = {authProviders:{provider_id:decoded.email, provider:"local"}};
         const user = await this.UserRepository.getOneByParams(params);
         if (!user) {
+          console.log("[verify2FA] user not found")
           return reply.status(400).send({ error: "User not found" });
         }
         const token = this.app.authService.generateToken(user);
@@ -245,13 +259,36 @@ export class TwoFactorController extends BaseController {
         //effacer le token authToken2FA
         reply.clearCookie('authToken2FA');
           // Définir le cookie avec le token
+     if (!isforce) {
         reply.setCookie('authToken', token, {
             httpOnly: true,
             secure: true,//process.env.NODE_ENV === 'production', // Utiliser 'secure' en production
             sameSite: 'strict',
             path: '/',
-            maxAge: 3600 // 1 heure
+            maxAge:/*  isforce? 5*60 : */ 3600 //  isforce? 5 minutes : 1 heure
         });
+      }
+
+        //si force est true, on instancie la session
+        if (isforce) {
+          // Instancier la session avec user.id et un crsfToken
+          req.session.userID = user.id;
+          req.session.csrfToken = generateCSRFToken();
+          req.session.csrfTokenExpiration = Date.now() +  60 * 1000;
+
+          // Définir le cookie de reset de mot de passe
+                  // 3- generer un token JWT forgot password
+              const token = this.app.authService.generateToken(user);//@TODO
+                //  console.log("🟢 token ",token)
+                      // Définir le cookie avec le token
+                    reply.setCookie('authForgetPasswordToken', token, {
+                        httpOnly: true,
+                        secure: true,
+                        sameSite: 'strict',
+                        path: '/',
+                        maxAge: 350 //==> 5 minutes
+                    });
+        }
       return reply.status(201).send({ token: token });
     }
     catch (error) {

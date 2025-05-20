@@ -1,5 +1,5 @@
-import { loginWithProvider } from '../../services/authService.ts';
-import { BaseComponent } from "../../frameworks/base-component.ts";
+import { loginWithProvider } from '../../services/api.auth';
+import { BaseComponent } from "../../frameworks/base-component";
 
 export class Login42Api extends BaseComponent {
   constructor() {

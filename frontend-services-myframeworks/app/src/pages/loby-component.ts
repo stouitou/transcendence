@@ -1,5 +1,6 @@
 import { BaseComponent } from "../frameworks/base-component";
-import { User, UserContext } from "../globalstate/GlobalState";
+import { UserContext } from "../globalstate/GlobalState";
+import { User } from '../types/types';
 import {IWebSocketsService, Match} from "../globalstate/WebSocketService";
 interface WaitingPlayers {
   userId: string,

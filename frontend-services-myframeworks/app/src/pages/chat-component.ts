@@ -1,6 +1,6 @@
 import { BaseComponent } from "../frameworks/base-component";
-import { User, UserContext } from "../globalstate/GlobalState";
-import {IWebSocketsService, WebSocketsService} from "../globalstate/WebSocketService";
+import {  UserContext } from "../globalstate/GlobalState";
+import {IWebSocketsService} from "../globalstate/WebSocketService";
 import { Logout } from "../components/button/logout-btn";
 
 if (!customElements.get('logout-btn'))

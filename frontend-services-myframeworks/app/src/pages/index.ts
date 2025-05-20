@@ -1,25 +1,21 @@
 import { GameHistory } from "./gameHistory-component";
 import { GameSetting } from "./gamesetting-component";
 import { Login } from "./login-component";
-//import { Profile } from "./profile-component";
 import { ProfilePage } from "./profile-component";
 import { Register } from "./register";
 
 import { ChatComponent } from './chat-component';
-import { TournamentHistory } from "./tounamentHistory-component";
 import { Dashboard } from "./dashboard-test-component";
 import { GameLobyComponent } from "./game-loby-componemt";
 import { Home } from "./home-component";
 import { GameMenu } from "../components/GameMenu";
+import { ResetPassword } from "./reset-password-component";
+import { Error404 } from "./error-pages/error-404-component";
+import { ForgotPasswordRequest } from "./forgot-password-request-component";
+import { ForgotPasswordTwoFactor } from "./forgot-password-two-factor-component";
+import { LoginTwoFactor } from "./login-two-factor-component";
 
 
-/* class HomeComponent extends HTMLElement {
-	connectedCallback() {
-	  this.innerHTML = `<h1>Welcome to the Home Page</h1>
-	  <p>Click the links below to navigate:</p>
-	 `;
-	}
-  } */
   
   class AboutComponent extends HTMLElement {
 	connectedCallback() {
@@ -36,9 +32,9 @@ import { GameMenu } from "../components/GameMenu";
 if (!customElements.get('game-history-component')) {
 	customElements.define('game-history-component', GameHistory);
 }
-if (!customElements.get('tournament-history-component')) {
+/* if (!customElements.get('tournament-history-component')) {
 	customElements.define('tournament-history-component', TournamentHistory);
-}
+} */
 if (!customElements.get('profile-component')) {
 	customElements.define('profile-component', ProfilePage);
 }
@@ -47,8 +43,24 @@ if (!customElements.get('login-component')) {
 	customElements.define('login-component', Login);
 }
 
+if (!customElements.get('login-two-factor-component')) {
+	customElements.define('login-two-factor-component', LoginTwoFactor);
+}
 if (!customElements.get('register-component')) {
 	customElements.define('register-component', Register);
+}
+
+/* if (!customElements.get('forgot-password-component')) {
+	customElements.define('forgot-password-component', ForgotPassword);
+} */
+if (!customElements.get('forgot-password-request-component')) {
+	customElements.define('forgot-password-request-component', ForgotPasswordRequest);
+} 
+if (!customElements.get('forgot-password-two-factor-component')) {
+	customElements.define('forgot-password-two-factor-component', ForgotPasswordTwoFactor);
+} 
+if (!customElements.get('reset-password-component')) {
+	customElements.define('reset-password-component', ResetPassword);
 }
 
 if (!customElements.get('game-setting-component')) {
@@ -66,4 +78,8 @@ if (!customElements.get('dashboard-component')) {
 
 if (!customElements.get('game-loby-component')) {
 	customElements.define('game-loby-component', GameLobyComponent);
+}
+
+if (!customElements.get('error-404-component')) {
+	customElements.define('error-404-component', Error404);
 }

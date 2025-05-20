@@ -1,7 +1,8 @@
-import { BaseComponent } from "../frameworks/base-component.ts";
-import { RouterConfig } from '../router/Router.ts';
+import { BaseComponent } from "../frameworks/base-component";
+//import { RouterConfig } from '../router/Router';
 
-import { User, UserContext } from '../globalstate/GlobalState.ts';
+import { UserContext } from '../globalstate/GlobalState';
+import { User } from '../types/types';
 
 type ProfileState = {
   user: User | null;
@@ -63,6 +64,6 @@ export class ProfileView extends BaseComponent<ProfileState> {
                     View Game History
                 </button>
                 `;
-                this.attachEvent(this, '#viewGameHistoryBtn', 'click', () => RouterConfig.getInstance().navigate('/game-history'));
+                this.attachEvent(this, '#viewGameHistoryBtn', 'click', () => this.router.navigate('/game-history'));
       } 
 }

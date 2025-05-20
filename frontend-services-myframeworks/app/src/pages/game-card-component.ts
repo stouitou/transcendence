@@ -1,5 +1,5 @@
 import { BaseComponent } from "../frameworks/base-component";
-import { Game, Players, User, UserContext } from "../globalstate/GlobalState";
+import { Game, Players, User } from "../types/types";
 /* import { ProfileEdit } from '../components/ProfileEdit.ts';
 import { ProfileView } from '../components/ProfileView.ts'; */
 

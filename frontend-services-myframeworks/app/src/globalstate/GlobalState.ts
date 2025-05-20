@@ -1,6 +1,7 @@
-import { fetchProfileData } from "../services/authService";
+import { fetchProfileData } from "../services/api.auth";
+import { User } from "../types/types";
 import WebSocketService, {WebSocketsService, IWebSocketsService } from "./WebSocketService";
-export interface Players {
+/* export interface Players {
   id?: number;
   type: string;
   is_IA:boolean,
@@ -33,7 +34,7 @@ export interface Game {
     format: string;
     //si local, les players sont un tableau de displaynames
     local_players: string[];
-   /*  updated_at: string; */
+   //  updated_at: string; 
 }
 
 export interface UserStats {
@@ -124,12 +125,12 @@ export interface Round {
 	updated_at: Date;
 	tournaments?: Partial<Tournaments>[];
 	current: number;
-}
+} */
 
-type UserContextType = {
+/* type UserContextType = {
     user: User | null;
     setUser: (user: User | null) => void;
-}
+} */
 
 /**
  * Singleton pour gérer l'état global de l'application
