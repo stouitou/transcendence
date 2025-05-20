@@ -2,13 +2,15 @@ import { Player } from "../Player";
 import { Ball } from '../Ball';
 
 export class ScoreManager {
+
   private players: Player[];
   canvas = { width: 800, height: 600 };
-  maxScore = 1;
+  maxScore = 10;
   isFinished = false;
   constructor(players: Player[]) {
     this.players = players;
   }
+
   updateScore(ball: Ball) {
 	//le joueur marque un point
 	// la ball a touché un mur defendu par un joueur

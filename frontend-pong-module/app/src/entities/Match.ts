@@ -3,8 +3,6 @@ import { GameManager } from "./managers/GameManager";
 import { Renderer } from "./managers/Renderer";
 import { WebSocketManager } from "./managers/WebSocketManager";
 import { StatisticsManager } from "./managers/StatisticsManager";
-import { Position } from "../Interfaces/Position.interface";
-import { Size } from "../Interfaces/Size.interface";
 import { DataMatch } from "../Interfaces/DataMatch.interface";
 
 export class	Match {

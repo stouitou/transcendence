@@ -25,26 +25,24 @@ export class GameManager {
 	get ball ()		{ return this._ball ; }
 	get players()	{ return this._players ; }
 
-	setDataconfig(dataMatch: DataMatch){
+	setDataconfig (dataMatch: DataMatch) {
 		this.dataconfig = dataMatch;
-		return this
+		return this ;
 	}
 
-	createBall() {
-		this._ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 }, 4);
+	createBall () {
+		this._ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 }, 5);
 	}
 
-	private addPlayer(player: Player) {
+	private addPlayer (player: Player) {
 		this._players.push(player);
 		console.log('addPlayer', this._players);
 	}
 
-	addPlayers() {
-		const dataMatch = this.dataconfig;
-		if (!dataMatch) {
-			console.error('No dataMatch available');
-			return;
-		}
+	addPlayers () {
+		const	dataMatch = this.dataconfig;
+		if (!dataMatch)	{ console.error('No dataMatch available'); return ; }
+
 		dataMatch.players.forEach((player, index) => {
 			console.log('player:', index,player.id);
 			const jsonData = {

@@ -40,8 +40,8 @@ export class	Renderer {
 
 	createDivDisplayScore (playerName: string, playerScore: number, indexLocation: number) {
 		const	setGrid	= [
-			{ gridCol:"1", gridRow:"2" }, { gridCol:"3", gridRow:"2" },
-			{ gridCol:"2", gridRow:"1" }, { gridCol:"2", gridRow:"3" },
+			{ gridCol:"3", gridRow:"2" }, { gridCol:"1", gridRow:"2" },
+			{ gridCol:"2", gridRow:"3" }, { gridCol:"2", gridRow:"1" },
 		]
 		const	divPlayerScore = document.createElement('div');
 

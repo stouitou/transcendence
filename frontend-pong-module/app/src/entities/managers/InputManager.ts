@@ -18,10 +18,10 @@ const	localMappings: localMapping[] = [
 	},
 ]
 const	localBindMappings = {
-	up:		{ dx: 0, dy: -5},	// up
-	down:	{ dx: 0, dy: 5},	// down
-	left:	{ dx: -5, dy: 0 },	// left
-	right:	{ dx: 5, dy: 0 }	// right
+	up:		{ dx: 0, dy: -3},	// up
+	down:	{ dx: 0, dy: 3},	// down
+	left:	{ dx: -3, dy: 0 },	// left
+	right:	{ dx: 3, dy: 0 }	// right
 }
 
 export class	InputManager {

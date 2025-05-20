@@ -4,7 +4,7 @@ import { Paddle } from '../Paddle';
 
 export class CollisionManager {
 
-	canvas = { width: 800, height: 600 };
+	private readonly	_canvas = { width: 800, height: 600 };
 
 	handleCollisions(ball: Ball, players: Player[]) {
 		// Gérer les collisions avec les murs
@@ -23,30 +23,35 @@ export class CollisionManager {
 			console.log('Score updated for player:', ball.lastHit.name, 'New score:', ball.lastHit.score);
 			//	ball.lastHit = null; // Réinitialiser le dernier joueur ayant touché la balle
 			//	ball.lastWallBounce = null; // Réinitialiser le dernier mur touché
-			console.log('[collisionManager] this.canvas:',this.canvas);
-			//ball.resetBall(this.canvas);
+			console.log('[collisionManager] this._canvas:', this._canvas);
+			//ball.resetBall(this._canvas);
 		}
 	}
 
 	private checkWallCollision (ball: Ball) {
-		if (ball.position.x <= (0 +ball.size.width)) {
-			ball.velocity.x *= -1; // Inverser la direction horizontale
-			ball.lastWallBounce = 0;
-			return;
-		}
-		if (ball.position.x + ball.size.width >= this.canvas.width) {
+		if (ball.position.x <= (0 + ball.size.width)) {
 			ball.velocity.x *= -1; // Inverser la direction horizontale
 			ball.lastWallBounce = 1;
-			}
-		if (ball.position.y <= (0 +ball.size.height)) {
-			ball.velocity.y *= -1; // Inverser la direction verticale
-			ball.lastWallBounce = 2;
-			return;
+			ball.position = {x: ball.position.x + ball.velocity.x * ball.size.width, y: ball.position.y + ball.velocity.y * ball.size.height};
+			return ;
 		}
-		if ((ball.position.y + ball.size.height) >= this.canvas.height) {
+		if (ball.position.x + ball.size.width >= this._canvas.width) {
+			ball.velocity.x *= -1; // Inverser la direction horizontale
+			ball.lastWallBounce = 0;
+			ball.position = {x: ball.position.x + ball.velocity.x * ball.size.width, y: ball.position.y + ball.velocity.y * ball.size.height};
+			return ;
+		}
+		if (ball.position.y <= (0 + ball.size.height)) {
 			ball.velocity.y *= -1; // Inverser la direction verticale
 			ball.lastWallBounce = 3;
-			return;
+			ball.position = {x: ball.position.x + ball.velocity.x * ball.size.width, y: ball.position.y + ball.velocity.y * ball.size.height};
+			return ;
+		}
+		if ((ball.position.y + ball.size.height) >= this._canvas.height) {
+			ball.velocity.y *= -1; // Inverser la direction verticale
+			ball.lastWallBounce = 2;
+			ball.position = {x: ball.position.x + ball.velocity.x * ball.size.width, y: ball.position.y + ball.velocity.y * ball.size.height};
+			return ;
 		}
 	}
 
@@ -63,24 +68,25 @@ export class CollisionManager {
 			if (paddle && this.isCollidingWithPaddle(ball,paddle)) {
 				//update statistics //@TODO d autre statistiques
 				player._historyPlayer.bounceCount++;
-	
-				ball.speed = 5;
+
+				ball.speed = 6;
 				ball.lastHit = player;
 				this.bounceOffPaddle(ball,player,paddle);
 			}
 		});
 	}
+
 	/**
 	 * Vérifie si la balle entre en collision avec la raquette
 	 * @param ball 
 	 * @param paddle 
 	 * @returns boolean
 	 */
-	private isCollidingWithPaddle(ball:Ball,paddle: Paddle): boolean {    
+	private isCollidingWithPaddle (ball:Ball, paddle: Paddle) : boolean {    
 		return (
-		ball.position.x < paddle.position.x + paddle.size.width +ball.size.width && //
+		ball.position.x < paddle.position.x + paddle.size.width + ball.size.width &&
 		ball.position.x + ball.size.width > paddle.position.x &&
-		ball.position.y < paddle.position.y + paddle.size.height  + ball.size.height&&
+		ball.position.y < paddle.position.y + paddle.size.height + ball.size.height &&
 		ball.position.y + ball.size.height > paddle.position.y
 		);
 	}
