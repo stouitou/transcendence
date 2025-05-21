@@ -16,7 +16,7 @@ export class	Bot {
 	}
 
 	move (ball: Ball) {
-		switch (this._player._location) {
+		switch (this._player.location) {
 			case 0:
 			case 1:
 				this.followBallVertical(ball);
@@ -38,8 +38,8 @@ export class	Bot {
 	
 		// Go back to the center of the canvas if ball go away
 		if (
-			ball.velocity.y < 0 && this._player._location === 2 ||
-			ball.velocity.y > 0 && this._player._location === 3
+			ball.velocity.y < 0 && this._player.location === 2 ||
+			ball.velocity.y > 0 && this._player.location === 3
 		) {
 			this.repositionToCenterHorizontal();
 			return ;
@@ -68,8 +68,8 @@ export class	Bot {
 	
 		// Go back to the center of the canvas if ball go away
 		if (
-			ball.velocity.x < 0 && this._player._location === 0 ||
-			ball.velocity.x > 0 && this._player._location === 1
+			ball.velocity.x < 0 && this._player.location === 0 ||
+			ball.velocity.x > 0 && this._player.location === 1
 		) {
 			this.repositionToCenterVertical();
 			return;

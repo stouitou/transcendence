@@ -6,36 +6,36 @@ export class	CollisionManager {
 
 	private readonly	_canvas = { width: 800, height: 600 };
 
-	handleCollisions(ball: Ball, players: Player[]) {
-		this.checkWallCollision(ball);
-		this.checkPaddleCollision(ball,players);
+	handleCollisions (ball: Ball, players: Player[]) {
+		this.checkWallCollision(ball, players.length);
+		this.checkPaddleCollision(ball, players);
 	}
 
-	private checkWallCollision (ball: Ball) {
+	private checkWallCollision (ball: Ball, nbOfPlayers: number) {
 		if (ball.position.x + ball.size.width >= this._canvas.width) {
 			ball.lastWallBounce = 0;
-			if (ball.lastHit)	{ return ; }
+			if (ball.lastHit && ball.lastWallBounce < nbOfPlayers)	{ return ; }
 			ball.velocity.x *= -1;	// reverse horizontal direction
 			ball.position = {x: ball.position.x + ball.velocity.x * ball.size.width, y: ball.position.y + ball.velocity.y * ball.size.height};
 			return ;
 		}
 		if (ball.position.x <= (0 + ball.size.width)) {
 			ball.lastWallBounce = 1;
-			if (ball.lastHit)	{ return ; }
+			if (ball.lastHit && ball.lastWallBounce < nbOfPlayers)	{ return ; }
 			ball.velocity.x *= -1;	// reverse horizontal direction
 			ball.position = {x: ball.position.x + ball.velocity.x * ball.size.width, y: ball.position.y + ball.velocity.y * ball.size.height};
 			return ;
 		}
 		if ((ball.position.y + ball.size.height) >= this._canvas.height) {
 			ball.lastWallBounce = 2;
-			if (ball.lastHit)	{ return ; }
+			if (ball.lastHit && ball.lastWallBounce < nbOfPlayers)	{ return ; }
 			ball.velocity.y *= -1;	// reverse vertical direction
 			ball.position = {x: ball.position.x + ball.velocity.x * ball.size.width, y: ball.position.y + ball.velocity.y * ball.size.height};
 			return ;
 		}
 		if (ball.position.y <= (0 + ball.size.height)) {
 			ball.lastWallBounce = 3;
-			if (ball.lastHit)	{ return ; }
+			if (ball.lastHit && ball.lastWallBounce < nbOfPlayers)	{ return ; }
 			ball.velocity.y *= -1;	// reverse vertical direction
 			ball.position = {x: ball.position.x + ball.velocity.x * ball.size.width, y: ball.position.y + ball.velocity.y * ball.size.height};
 			return ;
@@ -47,7 +47,7 @@ export class	CollisionManager {
 			const	paddle = player.paddle;
 			if (paddle && this.isCollidingWithPaddle(ball, paddle)) {
 				//update statistics //@TODO d autre statistiques
-				player._historyPlayer.bounceCount++;
+				player.historyPlayer.bounceCount++;
 				ball.lastHit = player;
 				this.bounceOffPaddle(ball, paddle);
 			}

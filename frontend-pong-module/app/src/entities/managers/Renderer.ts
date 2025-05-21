@@ -1,7 +1,6 @@
 import { Ball } from '../Ball';
 import { Player } from '../Player';
 import * as Design from "../Design";
-import { Ground } from '../../Interfaces/Ground.interface';
 import { StatisticsManager } from './StatisticsManager';
 import { CANVAS_HEIGHT, CANVAS_WIDTH } from '../../component/classic';
 export class	Renderer {
@@ -12,7 +11,6 @@ export class	Renderer {
 	private _gameHero: HTMLElement | null = null;
 	private	_gameHeroTree: HTMLElement | null = null;
 
-	private	_ground!: Ground;
 	private	_score!: HTMLDivElement;
 	private _gameAlert: HTMLElement | null = null;
 
@@ -65,12 +63,6 @@ export class	Renderer {
 		// 	CANVAS_WIDTH = 500;
 		this._canvas.width = CANVAS_WIDTH//CANVAS_WIDTH;//@TODO a recuperer dynamiquement !!!
 
-		this._ground = {
-			field:	this._ctx!,
-			width:	this._canvas.width,
-			height:	this._canvas.height
-		}
-
 		this._score = Design.createAppendix(/* this._players.length */4 - 1);
 
 		this._score.style.width = '100%';
@@ -120,7 +112,7 @@ export class	Renderer {
 	draw (ball: Ball, players: Player[]) {
 		this.clear();
 
-		Design.drawBackground(this._ground.field);
+		Design.drawBackground(this._ctx);
 
 		this.drawBall(ball);		// draw ball
 		players.forEach(player => {	// draw paddles
@@ -136,7 +128,9 @@ export class	Renderer {
 	}
 
 	private drawBall(ball: Ball) {
-		const	ctx = this._ground.field;
+		if (!this._ctx)	{ return ; }
+
+		const	ctx = this._ctx;
 		const	r = ball.size.width;	// Radius
 		const	x = ball.position.x;	// Centre X
 		const	y = ball.position.y;	// Centre Y

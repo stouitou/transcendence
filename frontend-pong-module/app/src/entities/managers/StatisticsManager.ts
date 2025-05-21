@@ -23,11 +23,11 @@ export class StatisticsManager {
 	this._gameHistory.maxBounceCount = ball.maxBounceCountRound;
 	//Le joueur qui s'est pris le plus de buts 
 	const goalsConceded = players.reduce((prev, current) => {
-		return (prev._historyPlayer.goalsConceded > current._historyPlayer.goalsConceded) ? prev : current;
+		return (prev.historyPlayer.goalsConceded > current.historyPlayer.goalsConceded) ? prev : current;
 	});
 	this._gameHistory.mostGoalsConcededPlayer = {
 		name: goalsConceded.name,
-		goalsConceded: goalsConceded._historyPlayer.goalsConceded,
+		goalsConceded: goalsConceded.historyPlayer.goalsConceded,
 	};
 	//@TODO ajouter d'autres stats
   }

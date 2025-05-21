@@ -1,55 +1,41 @@
 import { Ball } from './Ball';
-//import { HistoriqueGame } from "../Interfaces/HistoriqueGame.interface";
-//import { Paddle } from "./Paddle";
 import { InputManager } from "./managers/InputManager";
 import { Bot } from "./Bot";
-import { Position } from "../Interfaces/Position.interface";
 import { Paddle } from './Paddle';
 
 type	Direction = "left" | "right" | "top" | "bottom";
 const	directions: Direction[] = [ 'left', 'right', 'top', 'bottom' ];
 export class	Player {
 
-	//id: string;
-	private readonly	_isIA: boolean;
-	state: string = 'waiting'; // waiting, playing, finished
-	//name: string = 'host';
-	isRemote: boolean = false;
-	isInGame: boolean = false;
-	//paddle: Paddle;
-	//direction: Direction;
-	private	_score: number = 0;
-	position: Position = { x: 0, y: 0 };
+	private readonly	_id: string;
+	private readonly	_name: string;
 
-	private readonly		_id: string;
-	private readonly		_name: string;
-	public					inputManager: InputManager;
+	private readonly	_isIA: boolean;
+	private				_state: string = 'waiting';	// waiting, playing, finished
+	private readonly	_isRemote: boolean = false;
+	private				_isInGame: boolean = false;
+	
+	public				inputManager: InputManager;
+	private				_score: number = 0;
 
 	private				_paddle: Paddle | null = null;
-	/* private */			_location: number = 0;
-	//private				_points: number; -> score
-	private				_direction: Direction /* | null = null */;
+	private				_location: number = 0;
+	private				_direction: Direction;
 
-//	private				_keyPressed: Set<string> = new Set();
-	//private				_display: HTMLDivElement;
 	private				_lastWin: boolean = false;
 
-	//private				_historiqueGame: HistoriqueGame;
-
-	_historyPlayer = {bounceCount: 0, goalsConceded: 0};
-	bot:Bot | null = null;
+	private readonly	_historyPlayer = {bounceCount: 0, goalsConceded: 0};
+	public				bot: Bot | null = null;
 
 	constructor (json: any, index: number, inputManager: InputManager) {
-
 		this.inputManager = inputManager;
-		//this._historiqueGame = { maxBounceCount: 0, mostGoalsConcededPlayer: 0, playerWithMostPointsLost: 0, totalBouncesPerPlayer: 0};
 		this.paddle = new Paddle(json.paddle.position, json.paddle.size);
-		this.direction = directions[index];
+		this._direction = directions[index];
 		this._id = json.id;
 		this._name = json.name;
-		this.isRemote = json.isRemote;
+		this._isRemote = json.isRemote;
 		this._isIA = json.isIA;
-		this.isInGame = json.isInGame;
+		this._isInGame = json.isInGame;
 		this._score = json.score?? 0;
 		this._direction = directions[index];
 		this._location = index;
@@ -62,22 +48,16 @@ export class	Player {
 	get paddle () : Paddle | null	{ return this._paddle ; }
 	get location ()					{ return this._location ; }
 	get score ()					{ return this._score ; }
-	//get points ()					{ return this._points ; } -> score
 	get direction (): string | null	{ return this._direction ; }
-//	get keyPressed ()				{ return this._keyPressed ; } -> gerer par InputManager
-//	get display ()					{ return this._display ; } -> gerer par Renderer
 	get lastWin ()					{ return this._lastWin ; }
-//	get historiqueGame ()			{ return this._historiqueGame ; }
+	get historyPlayer ()			{ return this._historyPlayer ; }
 
 	/* ---------- setters ---------- */
+	set state (state: string)					{ this._state = state; }
+	set isInGame (isInGame: boolean)			{ this._isInGame = isInGame; }
 	set paddle (paddle: Paddle)					{ this._paddle = paddle; }
-	set location (location: number)				{ this._location = location; }
-	//set points (points: number)					{ this._points = points; }
-	set	direction (direction: Direction/* string | null */)	{ this._direction = direction; }
 	set lastWin (lastWin: boolean)				{ this._lastWin = lastWin; }
-	//set historiqueGame (historiqueGame: HistoriqueGame)			{ this._historiqueGame = historiqueGame }
-
-	set score (score: number) { this._score = score; }
+	set score (score: number)					{ this._score = score; }
 
 	updateMovement (ball: Ball) {
 		if (this._isIA) {
@@ -94,11 +74,11 @@ export class	Player {
 	toJSON () {
 		return {
 			id: this._id,
-			state: this.state,
+			state: this._state,
 			name: this._name,
-			isRemote: this.isRemote,
+			isRemote: this._isRemote,
 			isIA: this._isIA,
-			isInGame: this.isInGame,
+			isInGame: this._isInGame,
 			score: this._score,
 			paddle: {
 				position: this.paddle?.position,

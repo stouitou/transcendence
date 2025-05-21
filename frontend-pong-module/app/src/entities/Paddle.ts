@@ -1,7 +1,7 @@
 import { Position } from "../Interfaces/Position.interface";
 import { Size } from "../Interfaces/Size.interface";
 
-export class Paddle {
+export class	Paddle {
 
 	private				_position:	Position;
 	private readonly	_size:		Size;

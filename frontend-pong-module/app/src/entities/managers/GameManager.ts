@@ -6,61 +6,54 @@ import { ScoreManager } from './ScoreManager';
 import { Ball } from '../Ball';
 import { DataMatch } from '../../Interfaces/DataMatch.interface';
 
-export class GameManager {
+export class	GameManager {
 
-	private	_players: Player[] = [];
-	private	_ball: Ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 }, 0.4);;
-	private	_collisionManager:CollisionManager = new CollisionManager();
-
-	private scoreManager: ScoreManager |null = null;
-	private statisticsManager: StatisticsManager = new StatisticsManager();
-	dataconfig: DataMatch | null = null;
-
-	inputManagers: Map<string, InputManager> = new Map(); // par joueur id
+	private				_players: Player[] = [];
+	private readonly	_ball: Ball;
+	
+	private				_dataConfig: DataMatch | null = null;
+	private readonly	_collisionManager: CollisionManager = new CollisionManager();
+	private 			_scoreManager: ScoreManager | null = null;
+	private readonly	_statisticsManager: StatisticsManager = new StatisticsManager();
+	private readonly	_inputManagers: Map< string, InputManager > = new Map(); // par joueur id
 
 	constructor () {
-		this.createBall();
+		this._ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 }, 4);
 	}
 
-	get ball ()		{ return this._ball ; }
-	get players()	{ return this._players ; }
+	get players ()							{ return this._players ; }
+	get ball ()								{ return this._ball ; }
+	get dataConfig () : DataMatch | null	{ return this._dataConfig ; }
 
 	setDataconfig (dataMatch: DataMatch) {
-		this.dataconfig = dataMatch;
+		this._dataConfig = dataMatch;
 		return this ;
-	}
-
-	createBall () {
-		this._ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 }, 3);
 	}
 
 	private addPlayer (player: Player) {
 		this._players.push(player);
-		console.log('addPlayer', this._players);
 	}
 
 	addPlayers () {
-		const	dataMatch = this.dataconfig;
+		const	dataMatch = this._dataConfig;
 		if (!dataMatch)	{ console.error('No dataMatch available'); return ; }
 
 		dataMatch.players.forEach((player, index) => {
-			console.log('player:', index,player.id);
-			const jsonData = {
-						id: player.id,
-						name: player.name,
-						isRemote: dataMatch?.config.type === 'remote',
-						isInGame: player.isInGame,
-						isIA: player.isIA,	
-						score: player.score,
-						paddle: {
-							position: player.position,
-							size: player.size,
-						},
-						
-					}
+			const	jsonData = {
+				id: player.id,
+				name: player.name,
+				isRemote: dataMatch?.config.type === 'remote',
+				isInGame: player.isInGame,
+				isIA: player.isIA,	
+				score: player.score,
+				paddle: {
+					position: player.position,
+					size: player.size,
+				},
+			}
 			const	inputManager = new InputManager(index, !player.isIA);
 			const	newPlayer = new Player(jsonData, index, inputManager)
-			this.inputManagers.set(player.id.toString(), inputManager);
+			this._inputManagers.set(player.id.toString(), inputManager);
 
 			this.addPlayer(newPlayer);
 		});
@@ -68,7 +61,6 @@ export class GameManager {
 
 	clearPlayers () {
 		if (this._players.length > 0) {
-			//this._players.forEach((player) => {})
 			this._players = [];
 		}
 	}
@@ -77,13 +69,9 @@ export class GameManager {
 		this.clearPlayers();
 		this._ball.reset();
 		this.addPlayers();
-		this.scoreManager = new ScoreManager(this._players);
+		this._scoreManager = new ScoreManager(this._players);
 	}
 
-	/**
-	 * * Met à jour l'état du jeu, y compris la position de la balle et des joueurs.
-	 * * Vérifie les collisions et met à jour le score.
-	 */
 	update () {
 		// Update players
 		this.updatePlayersMovement();
@@ -95,11 +83,11 @@ export class GameManager {
 		this._collisionManager.handleCollisions(this._ball, this._players);
 
 		// Update statistics, StatisticsManager Class responsability
-		this.statisticsManager.updateStatistics(this._ball, this._players);
+		this._statisticsManager.updateStatistics(this._ball, this._players);
 
 		// Update score, ScoreManager Class responsability
-		if (this.scoreManager) {
-			this.scoreManager.updateScore(this._ball);		
+		if (this._scoreManager) {
+			this._scoreManager.updateScore(this._ball);		
 		}
 	}
 
@@ -107,13 +95,13 @@ export class GameManager {
 	 * * Vérifie si un joueur a atteint le score maximum.
 	 * * Si oui, arrête le jeu et envoie un message via WebSocket.
 	 */
-	checkMaxScore(wsMessageHandler: (data: any) => void) : boolean {
-	if (this.scoreManager) {
-		if (!this.dataconfig)	return true;//stop game
-		return this.scoreManager.checkMaxScore(wsMessageHandler,this.dataconfig?.lobyId!,(this.dataconfig.id));
+	checkMaxScore (wsMessageHandler : (data: any) => void) : boolean {
+		if (this._scoreManager) {
+			if (!this._dataConfig)	{ return true ; }	// stop game
+			return this._scoreManager.checkMaxScore(wsMessageHandler, this._dataConfig?.lobyId!, (this._dataConfig.id));
+		}
+		return true ;	//stop game
 	}
-	return true;//stop game
- }
 
 
 	// Met à jour l'état du jeu avec les données reçues du serveur.	@param game 

@@ -7,38 +7,47 @@ export class	ScoreManager {
 	private readonly	_players: Player[];
 	private readonly	_canvas = { width: CANVAS_WIDTH, height: CANVAS_HEIGHT };
 	private readonly	_maxScore = 10;
-	isFinished = false;
+	private				_isFinished = false;
 
-	constructor(players: Player[]) {
+	constructor (players: Player[]) {
 		this._players = players;
 	}
 
-	updateScore(ball: Ball) {
+	get isFinished ()	{ return this._isFinished ; }
+
+	updateScore (ball: Ball) {
 		if (ball.lastHit && ball.lastWallBounce != null && ball.lastWallBounce < this._players.length &&
 			(ball.position.x + ball.size.width < 0 ||
 			ball.position.x > this._canvas.width ||
 			ball.position.y + ball.size.height < 0 ||
 			ball.position.y > this._canvas.height)
 		) {
-			ball.lastHit.score++;
-			this._players[ball.lastWallBounce]._historyPlayer.goalsConceded++;
+			if (this._players.length === 2) {
+				const	winnerIndex = ball.lastWallBounce === 0 ? 1 : 0;
+				this._players[winnerIndex].score++;
+			} else {
+				if (ball.lastHit.location === ball.lastWallBounce && ball.lastHit.score > 0)
+					ball.lastHit.score--;
+				else if (ball.lastHit.location != ball.lastWallBounce)
+					ball.lastHit.score++;
+			}
+			this._players[ball.lastWallBounce].historyPlayer.goalsConceded++;
 			ball.reset();
 		}
 	}
 
-	// Vérifier si un joueur a atteint le score maximum
-	checkMaxScore (wsMessageHandler: (data: any) => void,lobyId:string,gameId:string) : boolean {
+	checkMaxScore (wsMessageHandler: (data: any) => void, lobyId:string, gameId:string) : boolean {
 		for (const player of this._players) {
 			if (player.score >= this._maxScore) {
 				console.log(`Player ${player.name} wins!`);
-				this.isFinished = true;
+				this._isFinished = true;
 
-				//mise a jour du score via websocket
+				// Update score via Web Socket
 				this._players.forEach((player) => {
 					player.state = "finished";
 					player.isInGame = false;
 				});
-				const dataMessage = {
+				const	dataMessage = {
 					type: "UPDATESCORE",
 					gameId: gameId,
 					lobyId: lobyId,
@@ -48,19 +57,19 @@ export class	ScoreManager {
 				};
 				wsMessageHandler(dataMessage);
 
-				return true; // Un joueur a gagné
+				return true ;	// A player has won
 			}
 		}
-		return false; // Aucun joueur n'a atteint le score maximum
+		return false ;			// no player with maximum score
 	}
 
-	awardPointToPlayer(playerIndex: number) {
-		const player = this._players[playerIndex];
+	awardPointToPlayer (playerIndex: number) {
+		const	player = this._players[playerIndex];
 		player.score++;
 		console.log(`Player ${player.name} scored! New score: ${player.score}`);
 	}
 
-	resetScores() {
+	resetScores () {
 		this._players.forEach(player => { player.score = 0; });
 	}
 }

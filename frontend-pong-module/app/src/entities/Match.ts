@@ -60,7 +60,7 @@ export class	Match {
 		this._gameManager?.setupGame();						// setup game
 		this._renderer.setupDisplay();						// initialise graphics
 		this._renderer.render(this._gameManager!.players);	// display initial user interface: players, score, ground
-		if (this._gameManager?.dataconfig?.config.type === 'remote') {
+		if (this._gameManager?.dataConfig?.config.type === 'remote') {
 			this.attachRemoteMovementListener();			// attach event listeners for moves
 			this.start();									// remote
 		} else {
@@ -75,7 +75,7 @@ export class	Match {
 	}
 
 	removeRemoteMovementListener () {
-		if (this._gameManager?.dataconfig && this._gameManager?.dataconfig.config.type === 'remote') {
+		if (this._gameManager?.dataConfig && this._gameManager?.dataConfig.config.type === 'remote') {
 			document.removeEventListener('keydown', this.handleKeyDown);
 			document.removeEventListener('keyup', this.handleKeyUp);
 		}
