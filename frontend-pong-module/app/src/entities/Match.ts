@@ -7,7 +7,7 @@ import { DataMatch } from "../Interfaces/DataMatch.interface";
 
 export class	Match {
 
-	private	_isRunning: boolean = false;
+	private				_isRunning: boolean = false;
 
 	private readonly	_gameManager: GameManager | null = new GameManager();
 	private readonly	_renderer: Renderer = new Renderer();

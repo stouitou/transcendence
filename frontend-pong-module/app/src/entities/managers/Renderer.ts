@@ -16,7 +16,7 @@ export class	Renderer {
 
 	constructor () { }
 
-		/* ---------- getters / setters UI ---------- */
+	/* ---------- getters / setters UI ---------- */
 	get gameCanvas () : HTMLCanvasElement | null	{ return this._canvas ; }
 	get gameDivUi () : HTMLElement | null			{ return this._gameUi ; }
 	get gameDivAlert () : HTMLElement | null		{ return this._gameAlert ; }
@@ -30,7 +30,6 @@ export class	Renderer {
 	private displayScore (Players: Player[] = []) {
 		this._score.innerHTML = '';
 		Players.forEach((player,index) => {
-			//const divPlayerScore = this.createDivDisplayScore(player.name, player.points, player.location);
 			const	divPlayerScore = this.createDivDisplayScore(player.name, player.score, index);
 			this._score.appendChild(divPlayerScore);
 		});
@@ -58,10 +57,10 @@ export class	Renderer {
 		if (!this._canvas)	{ throw new Error('Game canvas not found'); }
 
 		this._canvas.style.verticalAlign = 'top';
-		this._canvas.height = CANVAS_HEIGHT//CANVAS_HEIGHT; //@TODO a recuperer dynamiquement !!!
+		this._canvas.height = CANVAS_HEIGHT;
 		// if (this._players.length > 2)
 		// 	CANVAS_WIDTH = 500;
-		this._canvas.width = CANVAS_WIDTH//CANVAS_WIDTH;//@TODO a recuperer dynamiquement !!!
+		this._canvas.width = CANVAS_WIDTH;
 
 		this._score = Design.createAppendix(/* this._players.length */4 - 1);
 
@@ -82,32 +81,10 @@ export class	Renderer {
 		Design.drawCountdownFrame(this._ctx, countdown.toString());
 	}
 
-	render(players: Player[]) {//@TODO a renommer
-	console.log('Renderer: render');
-	this.setupDisplay();
-	 this.displayScore(players);
-	//	this.clear(); 
-//	Design.drawBackground(this._ctx!);
-//	this.drawBall(ball);
-/* this.displayCountdown().then(() => {
-		Design.drawBackground(this._ground.field);
-	//this.drawBall(ball);
-	//this.drawTest(ball,players);
-	console.log('Renderer: render: displayCountdown Resolved');
-}); */
-
+	render (players: Player[]) {//@TODO a renommer
+		this.setupDisplay();
+		this.displayScore(players);
 	}
-/* private async displayCountdown(): Promise<void> {
-		const frames = ["3", "2", "1", "GO"];
-		return new Promise(resolve => {
-			frames.forEach((f, i) => {
-				setTimeout(() => {
-					Design.drawCountdownFrame(this._ground.field, f);
-					if (i === frames.length - 1) resolve();
-				}, i * 1000);
-			});
-		});
-	} */
 
 	draw (ball: Ball, players: Player[]) {
 		this.clear();
@@ -167,7 +144,7 @@ export class	Renderer {
 		);
 	}
 
-	renderGameHeroDiv(data: PREPARE_MATCHES_STARTED_ROUND_GAME) {
+	renderGameHeroDiv (data: PREPARE_MATCHES_STARTED_ROUND_GAME) {
 		console.log('Renderer: renderGameHeroDiv data:',data);
 		const div = this._gameHero as HTMLDivElement;
 				if (div) {
@@ -182,25 +159,22 @@ export class	Renderer {
 				}, 5000);
 	}
 
-	renderGameHeroTreeDiv(data: PREPARE_MATCHES_STARTED_ROUND[]) {
+	renderGameHeroTreeDiv (data: PREPARE_MATCHES_STARTED_ROUND[]) {
 		const div = this._gameHeroTree as HTMLDivElement;
-				if (div) {
-					div.innerHTML = '';
-					displayPrepareMatchesStartedTournament(div,data);
-				}
-		//effacer le div au bout de 5 secondes
-				setTimeout(() => {
-					if (div) {
-						div.innerHTML = '';
-					}
-				}
-				, 5000);
-
+		if (div) {
+			div.innerHTML = '';
+			displayPrepareMatchesStartedTournament(div, data);
+		}
+		// Remove the div after 5 seconds
+		setTimeout(() => {
+			if (div) {
+				div.innerHTML = '';
+			}
+		}, 5000);
 	}
 
-	displayHistoriqueGame(statisticsManager:StatisticsManager,players: Player[]) {
-	{
-		const menuHistoriqueGame = document.createElement('div');
+	displayHistoriqueGame (statisticsManager: StatisticsManager, players: Player[]) {
+		const	menuHistoriqueGame = document.createElement('div');
 		menuHistoriqueGame.style.position =	'absolute';
 		menuHistoriqueGame.style.width = '250px';
 		menuHistoriqueGame.style.height = '400px';
@@ -216,7 +190,7 @@ export class	Renderer {
 		menuHistoriqueGame.style.background = 'rgb(0, 0, 0)';
 		menuHistoriqueGame.style.color = 'rgb(255, 0, 0)';
 		menuHistoriqueGame.style.whiteSpace = 'pre-line';
-		let text: string = 'Le plus grand nombre de rebonds ' + statisticsManager._gameHistory.maxBounceCount + "\n\n";
+		let	text: string = 'Le plus grand nombre de rebonds ' + statisticsManager._gameHistory.maxBounceCount + "\n\n";
 /* 		let mostGoalsConcededPlayer: number = 0;
 		let playerWithMostPointsLost: number = 0; */
 
@@ -230,7 +204,7 @@ export class	Renderer {
 			if (players[x].historiqueGame.firstPointScorer)
 				text += "Le premier joueur à avoir marqué un point est " + players[x].name + "\n\n";
 		} */
-			const {name, goalsConceded} = statisticsManager._gameHistory.mostGoalsConcededPlayer;
+		const	{name, goalsConceded} = statisticsManager._gameHistory.mostGoalsConcededPlayer;
 		//text += " Le joueur qui s'est pris le plus de buts " + players[mostGoalsConcededPlayer].name + " avec " + players[mostGoalsConcededPlayer].historiqueGame.mostGoalsConcededPlayer + "\n\n";
 		text += ` Le joueur qui s'est pris le plus de buts ${name} avec ${goalsConceded}\n\n`;
 	//	text += "Le joueur ayant perdu le plus de points " + players[playerWithMostPointsLost].name + " avec " + players[playerWithMostPointsLost].historiqueGame.playerWithMostPointsLost + "\n\n";
@@ -245,7 +219,6 @@ export class	Renderer {
 		menuHistoriqueGame.textContent = text;
 		this._gameAlert?.appendChild(menuHistoriqueGame);
 		this._gameAlert?.classList.add('show');
-		}
 	}
 }
 
@@ -278,8 +251,8 @@ type PREPARE_MATCHES_STARTED_ROUND_GAME = {
 	isFinished: boolean,//true
 }
 
-const displayPrepareMatchesStartedRoundGame = (div: HTMLDivElement,data:PREPARE_MATCHES_STARTED_ROUND_GAME) => {
-	const {players,winner} = data;
+const	displayPrepareMatchesStartedRoundGame = (div: HTMLDivElement, data:PREPARE_MATCHES_STARTED_ROUND_GAME) => {
+	const	{players,winner} = data;
 	div.innerHTML = `
 	<div class="mx-auto text-center">
 			<div class="game-card-container-background">
@@ -347,7 +320,7 @@ const displayPrepareMatchesStartedRoundGame = (div: HTMLDivElement,data:PREPARE_
 	matches:PREPARE_MATCHES_STARTED_ROUND_GAME[]
 }
 	
-const displayPrepareMatchesStartedTournament = (div: HTMLDivElement,data:PREPARE_MATCHES_STARTED_ROUND[]) => {
+const	displayPrepareMatchesStartedTournament = (div: HTMLDivElement,data:PREPARE_MATCHES_STARTED_ROUND[]) => {
 	div.innerHTML = `
 	<div>
 	 <p>Click the links below to navigate:</p>

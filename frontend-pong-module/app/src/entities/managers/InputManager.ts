@@ -18,10 +18,10 @@ const	localMappings: localMapping[] = [
 	},
 ]
 const	localBindMappings = {
-	up:		{ dx: 0, dy: -2},	// up
-	down:	{ dx: 0, dy: 2},	// down
-	left:	{ dx: -2, dy: 0 },	// left
-	right:	{ dx: 2, dy: 0 }	// right
+	up:		{ dx: 0, dy: -3},	// up
+	down:	{ dx: 0, dy: 3},	// down
+	left:	{ dx: -3, dy: 0 },	// left
+	right:	{ dx: 3, dy: 0 }	// right
 }
 
 export class	InputManager {
@@ -90,12 +90,6 @@ export class	InputManager {
 			dx += this._controlBindMapping[this._directionReceived].dx;
 			dy += this._controlBindMapping[this._directionReceived].dy;
 		}
-		// for (const direction of this._directionReceived) {
-		// 	if (this._controlBindMapping[direction]) {
-		// 		dx += this._controlBindMapping[direction].dx;
-		// 		dy += this._controlBindMapping[direction].dy;
-		// 	}
-		// }
 		return { dx, dy } ;
 	}
 }
