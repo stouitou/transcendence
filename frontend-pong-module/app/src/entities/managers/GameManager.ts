@@ -107,7 +107,7 @@ export class GameManager {
 	 * * Vérifie si un joueur a atteint le score maximum.
 	 * * Si oui, arrête le jeu et envoie un message via WebSocket.
 	 */
-	checkMaxScore(wsMessageHandler: (data: any) => void):boolean {
+	checkMaxScore(wsMessageHandler: (data: any) => void) : boolean {
 	if (this.scoreManager) {
 		if (!this.dataconfig)	return true;//stop game
 		return this.scoreManager.checkMaxScore(wsMessageHandler,this.dataconfig?.lobyId!,(this.dataconfig.id));
@@ -133,7 +133,6 @@ export class GameManager {
 	private updatePlayersMovement () {
 		for (const player of this._players) {
 				player.updateMovement(this._ball);
-		}	
-	}	
-
+		}
+	}
 }

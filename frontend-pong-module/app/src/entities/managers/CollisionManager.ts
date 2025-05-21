@@ -2,128 +2,78 @@ import { Ball } from '../Ball';
 import { Player } from '../Player';
 import { Paddle } from '../Paddle';
 
-export class CollisionManager {
+export class	CollisionManager {
 
 	private readonly	_canvas = { width: 800, height: 600 };
 
 	handleCollisions(ball: Ball, players: Player[]) {
-		// Gérer les collisions avec les murs
 		this.checkWallCollision(ball);
-
-		// Gérer les collisions avec les paddles
 		this.checkPaddleCollision(ball,players);
-		//this.clampBall(canvas)
-	//metre a jour le score
-	//this.updateScore(ball);
-	}
-
-	updateScore(ball: Ball) {
-		if (ball.lastHit && ball.lastWallBounce!=null) {
-			ball.lastHit.score++;
-			console.log('Score updated for player:', ball.lastHit.name, 'New score:', ball.lastHit.score);
-			//	ball.lastHit = null; // Réinitialiser le dernier joueur ayant touché la balle
-			//	ball.lastWallBounce = null; // Réinitialiser le dernier mur touché
-			console.log('[collisionManager] this._canvas:', this._canvas);
-			//ball.resetBall(this._canvas);
-		}
 	}
 
 	private checkWallCollision (ball: Ball) {
-		if (ball.position.x <= (0 + ball.size.width)) {
-			ball.velocity.x *= -1; // Inverser la direction horizontale
-			ball.lastWallBounce = 1;
-			ball.position = {x: ball.position.x + ball.velocity.x * ball.size.width, y: ball.position.y + ball.velocity.y * ball.size.height};
-			return ;
-		}
 		if (ball.position.x + ball.size.width >= this._canvas.width) {
-			ball.velocity.x *= -1; // Inverser la direction horizontale
 			ball.lastWallBounce = 0;
+			if (ball.lastHit)	{ return ; }
+			ball.velocity.x *= -1;	// reverse horizontal direction
 			ball.position = {x: ball.position.x + ball.velocity.x * ball.size.width, y: ball.position.y + ball.velocity.y * ball.size.height};
 			return ;
 		}
-		if (ball.position.y <= (0 + ball.size.height)) {
-			ball.velocity.y *= -1; // Inverser la direction verticale
-			ball.lastWallBounce = 3;
+		if (ball.position.x <= (0 + ball.size.width)) {
+			ball.lastWallBounce = 1;
+			if (ball.lastHit)	{ return ; }
+			ball.velocity.x *= -1;	// reverse horizontal direction
 			ball.position = {x: ball.position.x + ball.velocity.x * ball.size.width, y: ball.position.y + ball.velocity.y * ball.size.height};
 			return ;
 		}
 		if ((ball.position.y + ball.size.height) >= this._canvas.height) {
-			ball.velocity.y *= -1; // Inverser la direction verticale
 			ball.lastWallBounce = 2;
+			if (ball.lastHit)	{ return ; }
+			ball.velocity.y *= -1;	// reverse vertical direction
+			ball.position = {x: ball.position.x + ball.velocity.x * ball.size.width, y: ball.position.y + ball.velocity.y * ball.size.height};
+			return ;
+		}
+		if (ball.position.y <= (0 + ball.size.height)) {
+			ball.lastWallBounce = 3;
+			if (ball.lastHit)	{ return ; }
+			ball.velocity.y *= -1;	// reverse vertical direction
 			ball.position = {x: ball.position.x + ball.velocity.x * ball.size.width, y: ball.position.y + ball.velocity.y * ball.size.height};
 			return ;
 		}
 	}
 
-	/**
-	 * Vérifie si la balle entre en collision avec les raquettes
-	 * et met à jour les statistiques des joueurs
-	 * fait rebondir la balle sur la raquette
-	 * @param ball 
-	 * @param players 
-	 */
-	private checkPaddleCollision(ball: Ball, players: Player[]) {
+	private checkPaddleCollision (ball: Ball, players: Player[]) {
 		players.forEach(player => {
-			const paddle = player.paddle;
-			if (paddle && this.isCollidingWithPaddle(ball,paddle)) {
+			const	paddle = player.paddle;
+			if (paddle && this.isCollidingWithPaddle(ball, paddle)) {
 				//update statistics //@TODO d autre statistiques
 				player._historyPlayer.bounceCount++;
-
-				ball.speed = 3;
 				ball.lastHit = player;
-				this.bounceOffPaddle(ball,player,paddle);
+				this.bounceOffPaddle(ball, paddle);
 			}
 		});
 	}
 
-	/**
-	 * Vérifie si la balle entre en collision avec la raquette
-	 * @param ball 
-	 * @param paddle 
-	 * @returns boolean
-	 */
 	private isCollidingWithPaddle (ball:Ball, paddle: Paddle) : boolean {    
 		return (
-		ball.position.x < paddle.position.x + paddle.size.width + ball.size.width &&
-		ball.position.x + ball.size.width > paddle.position.x &&
-		ball.position.y < paddle.position.y + paddle.size.height + ball.size.height &&
-		ball.position.y + ball.size.height > paddle.position.y
+			ball.position.x < paddle.position.x + paddle.size.width &&
+			ball.position.x + ball.size.width > paddle.position.x &&
+			ball.position.y < paddle.position.y + paddle.size.height &&
+			ball.position.y + ball.size.height > paddle.position.y
 		);
 	}
 
-	/**
-	 * Fait rebondir la balle sur la raquette
-	 * @param ball
-	 * @param player
-	 * @param paddle
-	 */
-	private bounceOffPaddle(ball:Ball,player:Player,paddle: Paddle) {
-		//this._rebound = true;
+	private bounceOffPaddle (ball: Ball, paddle: Paddle) {
 		ball.lastWallBounce = null;
-		ball.lastHit = player;
 
-		let	side: string = '';
-		if (ball.position.x < paddle.position.x) {
-			side = 'left';
-		}
-		else if (ball.position.x > paddle.position.x + paddle.size.width) {
-			side = 'right';
-		}
-		else if (ball.position.y < paddle.position.y) {
-			side = 'top';
-		}
-		else if (ball.position.y > paddle.position.y + paddle.size.height) {
-			side = 'bottom';
-		}
-		//	alert("side: " + side);
-		//	console.log('in ball bounce, side:', side);
+		const	side = this.getSideCollision(ball, paddle);
 
 		let	impactRatio = 0;
 		if (side === 'left' || side === 'right') {
 			impactRatio = (ball.position.y - (paddle.position.y + paddle.size.height / 2)) / (paddle.size.height / 2);
 		}
 		else if (side === 'top' || side === 'bottom') {
-			impactRatio = ((ball.position.x - (paddle.position.x + paddle.size.height / 2)) / (paddle.size.height / 2));
+			impactRatio = ((ball.position.x - (paddle.position.x + paddle.size.width / 2)) / (paddle.size.width / 2));
 		}
 		impactRatio = Math.max(-0.9, Math.min(0.9, impactRatio));
 		
@@ -146,5 +96,28 @@ export class CollisionManager {
 		const	offset = ball.size.width + 0.1;
 		ball.position.x += ball.velocity.x * offset;
 		ball.position.y += ball.velocity.y * offset;
+	}
+
+	// Get the side of the paddle that has been touched by the ball
+	private getSideCollision (ball: Ball, paddle: Paddle) {
+		const	dxLeft = Math.abs(ball.position.x - paddle.position.x);
+		const	dxRight = Math.abs(ball.position.x - (paddle.position.x + paddle.size.width));
+		const	dyTop = Math.abs(ball.position.y - paddle.position.y);
+		const	dyBottom = Math.abs(ball.position.y - (paddle.position.y + paddle.size.height));
+
+		const	possibleSides: { side: string, dist: number }[] = [];
+
+		if (ball.velocity.x > 0)	possibleSides.push({ side: 'left', dist: dxLeft });
+		if (ball.velocity.x < 0)	possibleSides.push({ side: 'right', dist: dxRight });
+		if (ball.velocity.y > 0)	possibleSides.push({ side: 'top', dist: dyTop });
+		if (ball.velocity.y < 0)	possibleSides.push({ side: 'bottom', dist: dyBottom });
+
+		if (possibleSides.length === 0)	{ return 'left' ; }
+
+		let	best = possibleSides[0];
+		for (const side of possibleSides) {
+			if (side.dist < best.dist)	{ best = side; }
+		}
+		return best.side ;
 	}
 }
