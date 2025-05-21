@@ -27,3 +27,48 @@ export interface TwoFactorAuthFormData {
   code_5: string;
   code_6: string;
 }
+
+export interface EditNameFormData {
+    name: string;
+}
+export interface EditRoleFormData {
+    role: string;
+}
+export interface EditAvatarFormData {
+  avatar: File;
+}
+export interface EditDeleteUserFormData {
+  id: string;
+  confirm: boolean;
+}
+export interface EditToggleTwoFAFormData {
+  id: string;
+  confirm: boolean;
+}
+export type AdminUsersFormData = {
+  formEditName: EditNameFormData;
+  formEditRole: EditRoleFormData;
+  formEditAvatar: EditAvatarFormData;
+  formToggle2FA: EditToggleTwoFAFormData;
+  formDeleteUser: EditDeleteUserFormData;
+};
+
+
+export interface ProfileUpdateNameFormData  {
+  name: string;
+};
+export interface ProfileUpdatePasswordFormData  {
+  oldPassword: string;
+  newPassword: string;
+  confirmPassword: string;
+};
+
+export interface ProfileUpdateDeleteFormData  {
+  confirm: boolean;
+};
+export type ProfileUpdateFormData ={
+  formUpdateName: ProfileUpdateNameFormData,
+  formUpdateAvatar: EditAvatarFormData,
+  formUpdatePassword: ProfileUpdatePasswordFormData,
+  formDeleteUser: ProfileUpdateDeleteFormData,
+}

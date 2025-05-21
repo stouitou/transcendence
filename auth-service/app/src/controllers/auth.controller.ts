@@ -35,6 +35,8 @@ export class AuthController extends BaseController {
       this.loginForgetPassword = this.loginForgetPassword.bind(this);
       this.loginResetPassword = this.loginResetPassword.bind(this);
       this.decodeToken = this.decodeToken.bind(this);
+
+      this.updateMePassword = this.updateMePassword.bind(this);
 	  }
 
   /**
@@ -427,5 +429,77 @@ export class AuthController extends BaseController {
     console.log("🔐[LOGIN] [loginResetPassword]  Password changed successfully")
     //- retourner un message de succes
     return reply.status(200).send({ token:token, message: "Password changed successfully" });
+  }
+
+
+
+
+  async updateMePassword(req: FastifyRequest, reply: FastifyReply) {
+    const { oldPassword, newPassword } = req.body as { oldPassword: string; newPassword: string };
+    if (!oldPassword || !newPassword) {
+      return reply.status(400).send({ error: "Old password and new password are required" });
+    }
+    if (oldPassword === newPassword) {
+      return reply.status(400).send({ error: "Old password and new password are the same" });
+    }
+    try {
+      console.log("[updateMePassword] --start--")
+      const authToken = req.cookies.authToken;
+      //2- Vérifier si le token d'authentification est présent
+      if (!authToken) {
+        console.log("[updateMePassword] no authToken")
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      // Vérifier le token pour l'authentification
+      const decoded = this.app.jwt.verify(authToken, "ACCESS_TOKEN_PUBLIC_KEY") as {id: number};
+     
+       console.log("[updateMePassword] decoded");
+      const user = await this.UserRepository.getById(decoded.id);
+      if (!user) {
+       console.log("[updateMePassword] !user");
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      //3- Vérifier si l'utilisateur a déjà un secret pour l'authentification à deux facteurs
+      const {authProviders} = user;
+      if (!authProviders || authProviders.length === 0) {
+
+       console.log("[updateMePassword] !authProviders || authProviders.length === 0");
+        return reply.status(400).send({ error: "User has no authProviders" });
+      }
+      const authProvider = authProviders[0];
+
+       console.log("[updateMePassword] authProvider",authProvider);
+      if (!authProvider) {
+        return reply.status(400).send({ error: "User has no authProviders" });
+      }
+      const {id, provider, provider_id, password } = authProvider;
+      if (!id ||provider !== "local") {//@TODO corriger le type
+        return reply.status(400).send({ error: "User has no authProviders" });
+      }
+      console.log("[updateMePassword] provider_id",provider_id);
+      /* if (provider !== "local") {
+        return reply.status(400).send({ error: "User has no authProviders of type local" });
+      } */
+      //4- Vérifier si le mot de passe est correct
+    //  const isValid = await this.app.authService.validateUser(provider_id, oldPassword);
+      const isValid = await this.app.authService.isValidResetPassword(provider_id, oldPassword, password);
+      console.log("[updateMePassword] isValidResetPassword",isValid)
+      if (!isValid) {
+        return reply.status(400).send({ error: "Invalid credentials" });
+      }
+      //5- Changer le mot de passe
+      const updatedUser = await this.app.authService.updatePassword(id, newPassword);
+      console.log("[updateMePassword] updatedUser",updatedUser)
+      if (!updatedUser) {
+        return reply.status(400).send({ error: "User not found" });
+      }
+      //return no content
+      console.log("[updateMePassword] --end--")
+      return reply.status(204).send();
+    } catch (error) {
+      console.error("🔴[updateMePassword] error", error);
+      return reply.status(500).send({ error: "Internal server error" });
+    }
+    
   }
 }

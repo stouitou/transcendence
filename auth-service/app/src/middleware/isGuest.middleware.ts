@@ -29,6 +29,13 @@ export async function  isGuest(req: FastifyRequest, reply: FastifyReply) {
     } else {
       console.log("🟡 No authToken found, invalidating session");
       req.session.destroy();
+      //clear les cookies
+      reply.clearCookie("authToken");
+      reply.clearCookie("authToken2FA");
+      reply.clearCookie("authForgetPasswordToken");
+      reply.clearCookie("authForgetPasswordToken2FA");
+      reply.clearCookie("sessionId");
+      
     }
   }
 }

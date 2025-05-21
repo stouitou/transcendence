@@ -31,6 +31,7 @@ export class Home extends BaseComponent<{user: User | null}> {
             ${this.card("Classement", "Consultez le classement général", "/leaderboard", "🏆",disable)}
             ${this.card("Paramètres", "Réglez vos préférences", "/settings", "⚙️")}
             ${this.card("Support", "Besoin d’aide ?", "/support", "❓")}
+            ${user?.role === 'admin' ? this.card("Admin", "Gérez les utilisateurs et le contenu", "/admin", "👨‍💼") : ''}
           </div>
         </div>
       </section>

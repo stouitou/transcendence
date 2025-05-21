@@ -17,3 +17,9 @@ export const emailValidator = (value: string): string[] => {
 
   return errors;
 };
+
+export const checkboxValidator = (value: string): string[] => {
+  const errors: string[] = [];
+  if (!value) errors.push("Le champ est requis.");
+  return errors;
+}

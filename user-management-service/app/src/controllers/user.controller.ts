@@ -6,6 +6,8 @@ import { promisify } from 'util';
 import { createWriteStream } from 'node:fs';
 import { UserStats } from '../models/User';
 import Helpers, { IParams } from '@src/repository/helpers';
+import { AuthServiceController } from './authService.controller';
+import { chmod } from 'node:fs/promises';
 const pump = promisify(pipeline);
 
 export type User = {
@@ -86,6 +88,7 @@ export class UserController {
     this.updateMe = this.updateMe.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
     this.updateUserAvatar = this.updateUserAvatar.bind(this);
+    this.updateUserAvatarById = this.updateUserAvatarById.bind(this);
     this.addFriend = this.addFriend.bind(this);
     this.removeFriend = this.removeFriend.bind(this);
 
@@ -117,11 +120,18 @@ export class UserController {
     }
 
   async getUsers(request: FastifyRequest, reply: FastifyReply) {  
-    console.log("--UserController getUsers ");
+   try {
+     console.log("--UserController getUsers ");
        // const users = await UserRepository.getAll();
-    const users = await  this.userRepository.getAll();
+        const query = request.query as IParams;
+       // const options = new BuildOptions(query).getOptions();
+        const users = await  this.userRepository.getAllbyQuery(query);
+ //   const users = await  this.userRepository.getAll();
         console.log("UserController getUsers ",users);
-    return reply.send(users);
+    return reply.send(users);  } catch (error) {
+      console.error("UserController getUsers error ",error);
+      return reply.status(407).send({ error: 'Internal server error' });
+    }
   }
 
   async getUserMe(request:  FastifyRequest, reply: FastifyReply) {
@@ -193,7 +203,12 @@ export class UserController {
     return reply.send(userUpdated);
   }
 
-  async updateUser(request: FastifyRequest<{ Params: { id: string }, Body: UpdateUserBody }>, reply: FastifyReply) {
+  async updateUser(request: FastifyRequest<{ Params: { id: string }, Body: UpdateUserBody&{role?:string} }>, reply: FastifyReply) {
+    const admin = request.authenticatedUser?.role === 'admin';
+    if (!admin) {
+      return reply.status(403).send({ error: 'Unauthorized'/* ,admin:request.authenticatedUser?.role */ });
+    }
+    
     const userId = Number(request.params.id);
     if (!userId) {
       return reply.status(400).send({ error: 'Invalid user id' });
@@ -202,11 +217,11 @@ export class UserController {
       return reply.status(400).send({ error: 'Invalid request body' });
     }
     const { ...requestBody } = request.body;
-    const { id,name,avatar,password,providers} = requestBody;
+    const { id,name,avatar,password,providers,role} = requestBody;
 
     //check if user exists
    // const user = await UserRepository.update(userId,requestBody);
-    const user = await this.userRepository.update({id:userId,name,avatar,password});//@TODO providers??
+    const user = await this.userRepository.update({id:userId,name,avatar,password,role});//@TODO providers??
     console.log("UserController updateUser ",user);
 
     if (!user) {
@@ -243,8 +258,81 @@ export class UserController {
     }
     return reply.send(user);
   }
+
+
+
+  async updateMePassword(request: FastifyRequest, reply: FastifyReply) {
+     const userId = Number(request.authenticatedUser?.id);
+    if (!userId) {
+      return reply.status(400).send({ error: 'Invalid user id' });
+    }
+    if (!request.body) {
+      return reply.status(400).send({ error: 'Invalid request body' });
+    }
+    const { ...requestBody } = request.body as { oldPassword: string, newPassword: string };
+    const { oldPassword, newPassword} = requestBody;
+    try {
+      const authServiceController = new AuthServiceController();
+      const result = await authServiceController.updateMePassword(request/* , reply */);
+      return reply.code(204).send();
+    } catch (error) {
+      console.error('Error fetching 2FA status:', error);
+      return reply.status(500).send({ error: error.message });
+    }
+  }
+
+  
   async updateUserAvatar(request: FastifyRequest, reply: FastifyReply) {
+    try {
     const userId = request.authenticatedUser?.id;
+    console.log("UserController updateUserAvatar ",userId);
+    if (!userId) {      
+      return reply.status(400).send({ error: 'Invalid user id' });
+    }
+    const data = await request.file();
+    console.log("UserController updateUserAvatar ",data);
+    if (!data) {
+      console.log("UserController updateUserAvatar  no file");
+      return reply.status(400).send({ error: 'Aucun fichier envoyégk' });
+    }
+    //get extension
+    const fileExtension = data.filename.split('.').pop();
+    if (!fileExtension) {
+      console.log("UserController updateUserAvatar  no file extension");
+      return reply.status(400).send({ error: 'Aucun fichier envoyégk' });
+    }
+    //const uploadPath = `${process.cwd()}/uploads/${userId}-${data.filename}`;
+    const uploadPath = `${process.cwd()}/uploads/${userId}-avatar.${fileExtension}`;
+    console.log("UserController updateUserAvatar ",uploadPath);
+    await pump(data.file, createWriteStream(uploadPath));
+// Fix permissions (lecture-écriture pour le propriétaire, lecture pour les autres)
+await chmod(uploadPath, 0o644);
+   // const user = await this.userRepository.update({...request.authenticatedUser,avatar:`uploads/${userId}-${data.filename}`});
+    const user = await this.userRepository.update({id:userId, avatar:`/uploads/${userId}-avatar.${fileExtension}`});
+      if (!user) {
+        return reply.status(404).send({ error: 'User not found' });
+      }
+      return reply.send(user);
+    }
+    catch (error) {
+      console.error('Error uploading avatar:', error);
+      return reply.status(500).send({ error: 'Error uploading avatar' });
+    }
+  }
+  /**
+   * admin updateUserAvatar
+   * @param request
+   * @param reply
+   * @returns
+   * @TODO
+   * */
+  async updateUserAvatarById(request: FastifyRequest, reply: FastifyReply) {
+    const admin = request.authenticatedUser?.role === 'admin';
+    if (!admin) {
+      return reply.status(403).send({ error: 'Unauthorized'/* ,admin:request.authenticatedUser?.role */ });
+    }
+    
+    const userId = (request.params as {id:number}).id;
     console.log("UserController updateUserAvatar ",userId);
     if (!userId) {      
       return reply.status(400).send({ error: 'Invalid user id' });
@@ -266,7 +354,6 @@ export class UserController {
       }
       return reply.send(user);
     }
-
     //add Friend
     async addFriend(request: FastifyRequest<{/*  Params: { id: string}, */Body:{ friendId:string} }>, reply: FastifyReply) {
      // const userId = parseInt(request.params.id);

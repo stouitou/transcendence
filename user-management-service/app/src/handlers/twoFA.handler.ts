@@ -12,6 +12,15 @@ export async function get2FAStatus(req: FastifyRequest, reply: FastifyReply) {
     return reply.status(500).send({ error: error.message });
   }
 }
+export async function get2FAStatusById(req: FastifyRequest, reply: FastifyReply) {
+  try {
+    const result = await authServiceController.status2FA(req);
+    return reply.send(result);
+  } catch (error) {
+    console.error('Error fetching 2FA status:', error);
+    return reply.status(500).send({ error: error.message });
+  }
+}
 
 export async function enable2FA(req: FastifyRequest, reply: FastifyReply) {
   try {
@@ -29,6 +38,16 @@ export async function disable2FA(req: FastifyRequest, reply: FastifyReply) {
     return reply.send(result);
   } catch (error) {
     console.error('Error disabling 2FA:', error);
+    return reply.status(500).send({ error: error.message });
+  }
+}
+
+export async function disable2FAById(req: FastifyRequest, reply: FastifyReply) {
+  try {
+    const result = await authServiceController.disable2FAById(req);
+    return reply.send(result);
+  } catch (error) {
+    console.error('Error disabling 2FA by id:', error);
     return reply.status(500).send({ error: error.message });
   }
 }

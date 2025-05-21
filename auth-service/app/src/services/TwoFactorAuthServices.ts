@@ -49,8 +49,9 @@ export class TwoFactorAuthService {
 	 async generate2FAEmailCode(user: User,isForce:boolean=false): Promise<{ otp:string, otpExpiration:Date }> {
 		//1- on verifie si l'utilisateur existe
 		if (!user) throw new Error("User not found");
+		console.log("🔐AuthService:  generate2FAEmailCode()  user : ",user)
 		//2- on verifie si l'utilisateur a activé l'authentification à deux facteurs
-		if (!isForce && user.authProviders[0].two_factor_auth) throw new Error("Two factor auth not enabled");
+		if (!isForce && !user.authProviders[0].two_factor_auth) throw new Error("[generate2FAEmailCode] Two factor auth not enabled");
 		//3- on verifie si l'utilisateur a deja un code de verification
 		if (user.authProviders[0].otp && user.authProviders[0].otp !== "") {
 			//4- on verifie si le code de verification est encore valide
@@ -81,7 +82,7 @@ export class TwoFactorAuthService {
 		//1- on verifie si l'utilisateur existe
 		if (!authProviders) throw new Error("User not found");
 		//2- on verifie si l'utilisateur a activé l'authentification à deux facteurs
-		if (!isForce && !authProviders.two_factor_auth) throw new Error("Two factor auth not enabled");
+		if (!isForce && !authProviders.two_factor_auth) throw new Error("[verify2FAEmailCode]Two factor auth not enabled");
 		//3- on verifie si l'utilisateur a deja un code de verification
 		if (!authProviders.otp) throw new Error("No OTP code found");
 		//4- on verifie si le code de verification est encore valide
@@ -99,7 +100,7 @@ export class TwoFactorAuthService {
 		//1- on verifie si l'utilisateur existe
 		if (!authProviders) throw new Error("User not found");
 		//2- on verifie si l'utilisateur a activé l'authentification à deux facteurs
-		if (!authProviders.two_factor_auth) throw new Error("Two factor auth not enabled");
+		if (!authProviders.two_factor_auth) throw new Error("[verify2FATOTPCode] Two factor auth not enabled");
 		//3- on verifie si l'utilisateur a deja un code de verification
 		console.log("🔐AuthService:  verify2FATOTPCode()  authProviders.two_factor_auth_secret : ",authProviders.two_factor_auth_secret)
 		if (!authProviders.two_factor_auth_secret) throw new Error("No two_factor_auth_secret code found");

@@ -21,7 +21,8 @@ export const apiRequest = async <T, B = unknown>(
   method: "GET" | "POST" | "PUT" | "DELETE" = "GET",
   body?: B,
   headers: Record<string, string> = {},
-  csrfProtection: boolean = true
+  csrfProtection: boolean = true,
+  contentType: boolean = true,
 ): Promise<T> => {
   try {
     const finalHeaders: Record<string, string> = {
@@ -31,6 +32,10 @@ export const apiRequest = async <T, B = unknown>(
 
     const needsCSRF = csrfProtection && ["POST", "PUT", "DELETE"].includes(method);
     const hasCSRFHeader = "x-csrf-token" in finalHeaders;
+    //remove content-type if contentType is false
+    if (!contentType) {
+      delete finalHeaders["Content-Type"];
+    }
 
     if (needsCSRF && !hasCSRFHeader) {
       try {
@@ -52,7 +57,20 @@ export const apiRequest = async <T, B = unknown>(
     };
 
     if (body) {
-      options.body = JSON.stringify(body);
+      if (contentType) {
+        options.body = JSON.stringify(body);
+      } else if (
+        typeof body === "string" ||
+        body instanceof Blob ||
+        body instanceof FormData ||
+        body instanceof URLSearchParams ||
+        body instanceof ArrayBuffer ||
+        body instanceof ReadableStream
+      ) {
+        options.body = body as BodyInit;
+      } else {
+        throw new ApiError(400, "Invalid body type for fetch request when contentType is false");
+      }
     }
 
     const response = await fetch(url, options);

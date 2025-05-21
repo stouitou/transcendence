@@ -1,3 +1,5 @@
+import { UserContext } from "../globalstate/GlobalState";
+
 export class RouterConfig {
   private static instance: RouterConfig; // Instance unique
   private _routes: { [path: string]: () => HTMLElement } = {};
@@ -72,6 +74,17 @@ export class RouterConfig {
       return;
     }
 
+    // Vérifier si l'utilisateur a le rôle admin pour les routes admin
+    // 1 -  Vérifier si la route commence par /admin
+    if (path.startsWith('/admin')) {
+      // 1 - Vérifier si l utilisateur a un role admin
+      const user = UserContext().user();
+      if ((user && user.role != 'admin') || !user) {
+        //2 - Rediriger vers la page 401
+        path ='/401';
+      }
+    }
+
     // Démonter le composant actuel
     if (this._currentComponent) {
       app.removeChild(this._currentComponent);
@@ -126,7 +139,10 @@ routerConfig.addRoute('/dashboard', () => document.createElement('dashboard-comp
 routerConfig.addRoute('/game-loby', () => document.createElement('game-loby-component'));
 
 routerConfig.addRoute('/404', () => document.createElement('error-404-component'));
+routerConfig.addRoute('/401', () => document.createElement('error-401-component'));
 
+routerConfig.addRoute('/admin', () => document.createElement('admin-pannel'));
+routerConfig.addRoute('/admin/users', () => document.createElement('admin-users'));
 
 export class Router extends HTMLElement {
   private routerConfig: RouterConfig;
@@ -161,6 +177,17 @@ export class Router extends HTMLElement {
       const href = (target as HTMLAnchorElement).getAttribute('href');
       if (href && !href.startsWith('http')) {
         event.preventDefault(); // Empêcher le comportement par défaut
+/*         // Vérifier si la route commence par /admin
+        if (href.startsWith('/admin')) {
+          // Vérifier si l utilisateur a un role admin
+          const user = UserContext().user();
+          if (user && user.role != 'admin') {
+            // Rediriger vers la page 401
+            this.routerConfig.navigate('/401');
+            return;
+          }
+        } */
+
         this.routerConfig.navigate(href); // Naviguer via RouterConfig
       }
     }

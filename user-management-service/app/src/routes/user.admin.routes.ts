@@ -13,12 +13,14 @@ import {
   enable2FA,
   disable2FA,
   generate2FAQrCode,
+  get2FAStatusById,
+  disable2FAById,
 } from '../handlers/twoFA.handler';
 /**
  * Ensemble des routes de l'API utilisateur actuellement connecté
  * @param app 
  */
-async function userMeRoutes(app: FastifyInstance) {
+async function userAdminRoutes(app: FastifyInstance) {
   
   //1- Création d'une instance de UserController
   const userController = new UserController();
@@ -35,18 +37,18 @@ async function userMeRoutes(app: FastifyInstance) {
   /* 
     recuperer les donnees du profil de l'utilisateur connecté
   */
-  app.get('/',{ preHandler: [verifyAuth] }, userController.getUserMe) /* async function (req, reply) {
+  app.get('/',{ preHandler: [verifyAuth] }, userController.getUsers) /* async function (req, reply) {
 
   /*
    metre a jour les donnees de l'utilisateur connecté
    */
   app.put<{ Body: UpdateUserBody }>("/", { preHandler: [verifyAuth,verifyCSRF] },userController.updateMe);
   /* metre a jour l'avatar de l'utilisateur connecté*/
-   app.post('/upload-avatar', { //@TODO : à rename /avatar
+   app.post('/:id/upload-avatar', { //@TODO : à rename /avatar
   schema: {
     consumes: ['multipart/form-data'],
   },preHandler: [verifyAuth,verifyCSRF]
-}, userController.updateUserAvatar);
+}, userController.updateUserAvatarById);
   /* 
    recuperer les amis de l'utilisateur connecté
   */
@@ -64,14 +66,13 @@ async function userMeRoutes(app: FastifyInstance) {
   /* metre a jour les amis de l'utilisateur connecté*/
   app.put("/addFriend",/*  {schema: UserSchema.updateUser}, */ userController.addFriend);
   app.put("/removeFriend",/*  {schema: UserSchema.updateUser}, */ userController.removeFriend);
-  app.put("/updatePassword",{ preHandler: [verifyAuth] },/*  {schema: UserSchema.updateUser}, */ userController.updateMePassword);
 
   //app.get("/", {/* preHandler: [loggerMiddleware], *//* schema: UserSchema.getUsers */}, userController.getUsers);
   //app.get("/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserById);
   app.get("/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserStatsById);
   //app.put("/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.updateStatsById);
-  //app.put("/:id", {schema: UserSchema.updateUser}, userController.updateUser);
-  //app.delete("/:id",/*  {schema: UserSchema.deleteUser}, */ userController.deleteUser);
+  app.put<{ Params: { id: string }, Body: UpdateUserBody&{role?:string} }>("/:id",{preHandler: [verifyAuth,verifyCSRF]},/*  {schema: UserSchema.updateUser} ;*/ userController.updateUser);
+  app.delete<{ Params: { id: string }}>("/:id",{preHandler: [verifyAuth,verifyCSRF]},/*  {schema: UserSchema.deleteUser}, */ userController.deleteUser);
  // app.post("/query", {schema: UserSchema.requestQuery}, userController.requestQuery);
   //pour tester les users
 
@@ -97,14 +98,14 @@ async function userMeRoutes(app: FastifyInstance) {
 
 
   // Vérifier le statut 2FA
-  app.get('/2fa/status', { preHandler: [verifyAuth] }, get2FAStatus);
+  app.get('/:id/2fa/status', { preHandler: [verifyAuth] }, get2FAStatusById);
   // Activer le 2FA
   app.put('/2fa/enable', { preHandler: [verifyAuth] }, enable2FA);
   // Désactiver le 2FA
-  app.put('/2fa/disable', { preHandler: [verifyAuth] }, disable2FA);
+  app.put('/:id/2fa/disable', { preHandler: [verifyAuth] }, disable2FAById);
   // Générer un QR code pour le 2FA
   app.get('/2fa/qrcode', { preHandler: [verifyAuth] }, generate2FAQrCode);
 
 }
 
-export default userMeRoutes;
+export default userAdminRoutes;

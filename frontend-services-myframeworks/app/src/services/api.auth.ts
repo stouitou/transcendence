@@ -29,7 +29,7 @@ export const fetchProfileData = async (): Promise<any |void> => {
     return apiRequest('/api/users/me', 'GET');
 };
 export const logoutUser = async (): Promise<void> => {
-    return apiRequest('/api/auth/logout', 'POST');
+    return apiRequest('/api/auth/logout', 'POST',{});
 };
 
 export type LoginProvider = 'google' | 'github' | '42api';

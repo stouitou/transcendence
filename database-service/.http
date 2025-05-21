@@ -143,3 +143,6 @@ GET  https://localhost:4433/api/v2/database/myDb/table/user?relations=authProvid
 ###
 
 GET  https://localhost:4433/api/v2/database/myDb/table/user?relations=authProviders&filters={"id":"4"} HTTP/1.1
+
+
+### curl -X PUT http://localhost:3000/api/v2/database/myDb/table/user/id/3 \-H "Content-Type: application/json" \-d '{"role": "admin"}'

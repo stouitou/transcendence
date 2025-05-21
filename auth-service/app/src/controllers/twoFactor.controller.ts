@@ -19,7 +19,9 @@ export class TwoFactorController extends BaseController {
         this.generate2FAQRcode = this.generate2FAQRcode.bind(this);
         this.enable2FA = this.enable2FA.bind(this);
         this.disable2FA = this.disable2FA.bind(this);
+        this.disable2FAById = this.disable2FAById.bind(this);
         this.getStatus2FA = this.getStatus2FA.bind(this);
+        this.getStatus2FAById = this.getStatus2FAById.bind(this);
 	  }
   async getStatus2FA(req: FastifyRequest, reply: FastifyReply) {
     try {
@@ -33,6 +35,54 @@ export class TwoFactorController extends BaseController {
       // Vérifier le token pour l'authentification
       const decoded = this.app.jwt.verify(authToken, "ACCESS_TOKEN_PUBLIC_KEY") as {id: number};
       const user = await this.UserRepository.getById(decoded.id);
+      if (!user) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      //3- Vérifier si l'utilisateur a déjà un secret pour l'authentification à deux facteurs
+      const {authProviders} = user;
+      if (!authProviders || authProviders.length === 0) {
+        return reply.status(400).send({ error: "User has no authProviders" });
+      }
+      const authProvider = authProviders[0];
+      if (!authProvider) {
+        return reply.status(400).send({ error: "User has no authProviders" });
+      }
+      const {provider, provider_id, two_factor_auth, two_factor_auth_method } = authProvider;
+      const twaFAStatus = {
+        provider,
+        provider_id,
+        two_factor_auth,
+        two_factor_auth_method,
+      };
+     return reply.status(200).send({ ...twaFAStatus });
+    } catch (error) {
+      console.error("🔴[enable2FA] error", error);
+      return reply.status(500).send({ error: "Internal server error" });
+    }
+    
+  }
+
+    async getStatus2FAById(req: FastifyRequest, reply: FastifyReply) {
+    try {
+      const userId = (req.params as { id: number }).id;
+      if (!userId) {
+        return reply.status(400).send({ error: "User ID is required" });
+      }
+      console.log("[getStatus2FA] --start--")
+      const authToken = req.cookies.authToken;
+      //2- Vérifier si le token d'authentification est présent
+      if (!authToken) {
+        console.log("[getStatus2FA] 2FA QR code no authToken")
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      // Vérifier le token pour l'authentification
+      const decoded = this.app.jwt.verify(authToken, "ACCESS_TOKEN_PUBLIC_KEY") as {id: number,role: string};
+      //verifier le role de l'utilisateur
+      if (decoded.role !== "admin") {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+
+      const user = await this.UserRepository.getById(userId);
       if (!user) {
         return reply.status(401).send({ error: "Unauthorized" });
       }
@@ -164,6 +214,54 @@ export class TwoFactorController extends BaseController {
     
   }
 
+
+    async disable2FAById(req: FastifyRequest, reply: FastifyReply) {
+    try {
+       const userId = (req.params as { id: number }).id;
+      if (!userId) {
+        return reply.status(400).send({ error: "User ID is required" });
+      }
+      console.log("[disable2FA] --start--")
+      const authToken = req.cookies.authToken;
+      //2- Vérifier si le token d'authentification est présent
+      if (!authToken) {
+        console.log("[🔐enable2FA] 2FA QR code no authToken")
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      // Vérifier le token pour l'authentification
+      const decoded = this.app.jwt.verify(authToken, "ACCESS_TOKEN_PUBLIC_KEY") as {id: number,role: string};
+            //verifier le role de l'utilisateur
+      if (decoded.role !== "admin") {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      const user = await this.UserRepository.getById(userId);
+      if (!user) {
+        return reply.status(401).send({ error: "Unauthorized" });
+      }
+      //3- Vérifier si l'utilisateur a déjà un secret pour l'authentification à deux facteurs
+      const {authProviders} = user;
+      if (!authProviders || authProviders.length === 0) {
+        return reply.status(400).send({ error: "User has no authProviders" });
+      }
+      const authProvider = authProviders[0];
+      if (!authProvider) {
+        return reply.status(400).send({ error: "User has no authProviders" });
+      }
+      const { provider_id, two_factor_auth } = authProvider;
+      if (!two_factor_auth) {
+        return reply.status(400).send({ error: "User already has 2FA disable" });
+      }
+      
+      //4- Activer l'authentification à deux facteurs
+     const result = await this.app.twoFactorAuthService.disable2FA(provider_id);
+     console.log("[disable2FA] success")
+     return reply.status(200).send({ message: "2FA disable" });
+    } catch (error) {
+      console.error("🔴[enable2FA] error", error);
+      return reply.status(500).send({ error: "Internal server error" });
+    }
+    
+  }
   /**
    * Générer le QR code pour l'authentification à deux facteurs
    * pour l'authentification par application mobile

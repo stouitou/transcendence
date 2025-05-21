@@ -65,6 +65,19 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
   };
 
   //read
+    getAllbyQuery = async (query:IParams): Promise<User[]> =>{
+  const queryPagination = this.buildQueryString(query);
+    //return data.map(User.fromJSON);
+   // const url = `${this.URL}?${queryPagination}`;
+  //  const url = `${this.URL}?${queryPagination}`;
+    const url = `${this.URL}?${queryPagination}`;
+    //const url = `${this.URL}${this.getRelations()}&${queryPagination}`;
+    console.log("🔐 UserRepository.getAllbyQuery()  --start-- fetch from: ", this.URL)
+    const response = await fetch(url);
+    const data = await response.json();
+    const results = data
+    return {...results};
+  }
   getAll = async (): Promise<User[]> =>{
    
     const url = `${this.URL}${this.getRelations()}`;

@@ -4,11 +4,21 @@ export interface FieldConstraint {
   maxLength?: number;
   allowedPattern?: string /* | RegExp */; // Pour les caractères autorisés (ex: email, password)
   match?: string; // Pour vérifier si un champ correspond à un autre (ex: confirmPassword)
+  missMatch?: string; // Pour vérifier si un champ ne correspond pas à un autre (ex: confirmPassword)
+  min?: number; // Pour les nombres (ex: age)
+  max?: number; // Pour les nombres (ex: age)
+  minDate?: Date; // Pour les dates
+  maxDate?: Date; // Pour les dates
+  // Pour les fichiers
+  minFileSize?: number; // en octets
+  maxFileSize?: number; // en octets
+  allowedMimeTypes?: string[]; // ex: ['image/png', 'image/jpeg']
+  maxFiles?: number;
 }
 
 export interface FieldValidation {
   required?: boolean;
-  type?: 'email' | 'password' | 'text';
+  type?: 'email' | 'password' | 'text' | 'number' | 'tel' | 'url' | 'checkbox' | 'file' | 'select' | 'textarea';
   constraint?: FieldConstraint;
   message: string;
   messageConstraint?: boolean;
@@ -62,7 +72,39 @@ export class FormHandler<TFormData extends Record<string,any>> {
 
     if (!field || !validation) return true;
 
+    // Gestion spécifique pour les fichiers
+  if (field.type === 'file') {
+    const files = field.files;
+    const { required, constraint } = validation;
+
+    if (required && (!files || files.length === 0)) {
+      this.setError(fieldName, validation.message || 'This field is required.');
+      return false;
+    }
+
+    if (files && files.length > 0 && constraint) {
+      if (constraint.maxFiles && files.length > constraint.maxFiles) {
+        this.setError(fieldName, `You can upload up to ${constraint.maxFiles} files.`);
+        return false;
+      }
+      for (let i = 0; i < files.length; i++) {
+        const file = files[i];
+        if (constraint.maxFileSize && file.size > constraint.maxFileSize) {
+          this.setError(fieldName, `File size must be less than ${Math.round(constraint.maxFileSize/1024)} KB.`);
+          return false;
+        }
+        if (constraint.allowedMimeTypes && !constraint.allowedMimeTypes.includes(file.type)) {
+          this.setError(fieldName, `File type not allowed.`);
+          return false;
+        }
+      }
+    }
+    this.clearError(fieldName);
+    return true;
+  }
+
     const value = field.value.trim();
+    console.log('value:', value);
 
     // Vérifier si le champ est requis
     if (validation.required && value === '') {
@@ -72,7 +114,7 @@ export class FormHandler<TFormData extends Record<string,any>> {
 
     // Vérifier les contraintes
     if (validation.constraint) {
-      const { minLength, maxLength, allowedPattern, match } = validation.constraint;
+      const { minLength, maxLength, allowedPattern, match, missMatch } = validation.constraint;
 
       if (minLength && value.length < minLength) {
         this.setError(fieldName, `Minimum length is ${minLength} characters.`);
@@ -97,6 +139,13 @@ export class FormHandler<TFormData extends Record<string,any>> {
         const matchField = this.formElement.querySelector<HTMLInputElement>(`[name="${match}"]`);
         if (matchField && value !== matchField.value) {
           this.setError(fieldName, `This field must match ${match}.`);
+          return false;
+        }
+      }
+      if (missMatch) {
+        const missMatchField = this.formElement.querySelector<HTMLInputElement>(`[name="${missMatch}"]`);
+        if (missMatchField && value === missMatchField.value) {
+          this.setError(fieldName, `This field must not match ${missMatch}.`);
           return false;
         }
       }
@@ -127,14 +176,32 @@ export class FormHandler<TFormData extends Record<string,any>> {
   }
 
   // Récupérer les données du formulaire
-  getFormData(): TFormData /* { [key: string]: string }*/  {
+/*   getFormData(): TFormData {
     const formData= {} as TFormData;//: { [key: string]: string } = {};
     const inputs = this.formElement.querySelectorAll<HTMLInputElement>('input, textarea, select');
     inputs.forEach((input) => {
       formData[input.name as keyof TFormData] = input.value.trim() as TFormData[keyof TFormData];
     });
     return formData;
-  }
+  } */
+ getFormData(): TFormData {
+  const formData = {} as TFormData;
+  const inputs = this.formElement.querySelectorAll<HTMLInputElement | HTMLSelectElement | HTMLTextAreaElement>('input, textarea, select');
+  inputs.forEach((input) => {
+    if (input.type === 'checkbox') {
+      formData[input.name as keyof TFormData] = (input as HTMLInputElement).checked as any;
+    } else if (input.type === 'file') {
+      const files = (input as HTMLInputElement).files;
+      formData[input.name as keyof TFormData] = files && files.length > 0 ? files[0] : null as any;
+    } else if (input instanceof HTMLSelectElement && input.multiple) {
+      const selected = Array.from(input.selectedOptions).map(opt => opt.value);
+      formData[input.name as keyof TFormData] = selected as any;
+    } else {
+      formData[input.name as keyof TFormData] = input.value.trim() as any;
+    }
+  });
+  return formData;
+}
 
   // Afficher un message d'erreur pour un champ
   private setError(fieldName:  keyof TFormData, message: string) {

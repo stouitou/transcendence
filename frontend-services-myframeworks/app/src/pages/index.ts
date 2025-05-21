@@ -10,10 +10,14 @@ import { GameLobyComponent } from "./game-loby-componemt";
 import { Home } from "./home-component";
 import { GameMenu } from "../components/GameMenu";
 import { ResetPassword } from "./reset-password-component";
-import { Error404 } from "./error-pages/error-404-component";
 import { ForgotPasswordRequest } from "./forgot-password-request-component";
 import { ForgotPasswordTwoFactor } from "./forgot-password-two-factor-component";
 import { LoginTwoFactor } from "./login-two-factor-component";
+import { Admin } from "./admin/dashboard";
+import { AdminUsers } from "./admin/users";
+
+import { Error401 } from "./error-pages/error-401-component";
+import { Error404 } from "./error-pages/error-404-component";
 
 
   
@@ -82,4 +86,15 @@ if (!customElements.get('game-loby-component')) {
 
 if (!customElements.get('error-404-component')) {
 	customElements.define('error-404-component', Error404);
+}
+
+if (!customElements.get('error-401-component')) {
+	customElements.define('error-401-component', Error401);
+}
+
+if (!customElements.get('admin-pannel')) {
+	customElements.define('admin-pannel', Admin);
+}
+if (!customElements.get('admin-users')) {
+	customElements.define('admin-users', AdminUsers);
 }

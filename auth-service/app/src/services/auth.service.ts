@@ -24,6 +24,8 @@ export class AuthService {
     this.AuthProviderRepository = new AuthProviderRepository();
     this.generateTemp2FAToken = this.generateTemp2FAToken.bind(this);
     this.generateResetToken = this.generateResetToken.bind(this);
+    this.isValidResetPassword = this.isValidResetPassword.bind(this);
+
   }
 
   /**
@@ -34,8 +36,32 @@ export class AuthService {
    * @returns 
    */
   private async isValidPassword(password: string, hash: string) {
-    console.log("🔐 AuthService: isValidPassword()  --",await bcrypt.compare(password, hash),"--  password ",password, " hash ",hash)
+    console.log("🔐 AuthService: isValidPassword()  --",await bcrypt.compare(password, hash))
     return await bcrypt.compare(password, hash);
+  }
+  async isValidResetPassword(newPassword: string,oldPassword:string, hash: string| undefined) {
+  
+    try {
+      if (!hash) {
+        return false; // Le mot de passe n'est pas défini
+      }
+      // Vérifier si le mot de passe est valide
+      const isValid = await bcrypt.compare(newPassword, hash);
+      console.log("🔐 AuthService: bcrypt.compare(newPassword, hash)  --",isValid)
+      if (!isValid) {
+        const isOldPassword = await bcrypt.compare(oldPassword, hash);
+        console.log("🔐 AuthService: bcrypt.compare(oldPassword, hash)  --",isOldPassword)
+        if (!isOldPassword) {
+          return false; // Le nouveau mot de passe est le même que l'ancien
+        }
+        return true; // Le nouveau mot de passe est valide
+      } else {
+        return false; // Le mot de passe est invalide
+      }
+    } catch (error) {
+      console.error("Erreur lors de la vérification du mot de passe :", error);
+      return false; // En cas d'erreur, on considère que le mot de passe est invalide
+    }
   }
 
   /**

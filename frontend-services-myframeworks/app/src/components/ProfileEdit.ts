@@ -3,17 +3,13 @@ import { BaseComponent } from "../frameworks/base-component";
 import {  UserContext } from '../globalstate/GlobalState';
 import { User } from '../types/types';
 import { disable2FA, enable2FA, get2FADetail, TwoFA } from "../services/api.2fa";
-import { updateProfile, uploadAvatar } from "../services/api.profile";
+import { updatePassword , updateProfileDeleteMe, updateProfileName, uploadProfileAvatar } from "../services/api.profile";
+import { ProfileUpdateFormData } from "../types/forms.type";
+import { profileUpdateAvatarconstraint, profileUpdateDeleteconstraint, profileUpdateNameconstraint, profileUpdatePasswordconstraint } from "../utils/constraints";
 
-type ProfileState = {
-  user: User | null;
-  files: FileList | null;
-};
-
-
-export class ProfileEdit extends BaseComponent<ProfileState> {
+export class ProfileEdit extends BaseComponent<{user: User | null},ProfileUpdateFormData> {
   constructor() {
-    super({ user: null,files:null });
+    super({ user: null});
   }
   handleListenerProfileUpdate = (e: Event) => {
     const customEvent = e as CustomEvent;
@@ -21,38 +17,32 @@ export class ProfileEdit extends BaseComponent<ProfileState> {
     this.renderProfileEdit(this);
   };
 
-    connectedCallback() {
-      console.log('ProfileEdit connectedCallback');
-      this.state.user = UserContext().user();
-      this.render();
-      this.listenCustomEvent("profile-data-updated", this.handleListenerProfileUpdate.bind(this));
-    }
-    setUser(user: User) {
-      this.setState({ ...this.state, user });
-      this.renderProfileEdit(this);
-    }
-    
-    setName(event: Event) {
-      const input = event.target as HTMLInputElement;
-      //en l'etat danger sur l'input.value: il faut sanitizer,
-      // on autorize uniquement les lettres, chiffres et espaces
-      // et @_-
-      const sanitizedValue = input.value.replace(/[^a-zA-Z0-9@_.-]/g, '');
-      this.setState({ ...this.state, user: { ...this.state.user, name: sanitizedValue } });
-    }
-    setAvatar(event: Event) {
-      const input = event.target as HTMLInputElement;
-      this.setState({ ...this.state, user: { ...this.state.user, avatar: input.value } });
-    }
-    setFiles(event: Event) {
-      const input = event.target as HTMLInputElement;
-      console.log('files', input.files);
-      this.setState({ ...this.state,  files: input.files  });
-    }
-
-  attributeChangedCallback(name: string, oldValue: string, newValue: string) {
-    console.log('attributeChangedCallback', name, oldValue, newValue);
+  connectedCallback() {
+    this.state.user = UserContext().user();
+    this.render();
+    this.listenCustomEvent("profile-data-updated", this.handleListenerProfileUpdate.bind(this));
   }
+
+  handleSubmitUpdatePassword = async(e: Event)=> {
+    e.preventDefault()
+    const formHandler = this.getFormHandler('formUpdatePassword');
+    if (!formHandler?.validateForm()) {
+      this.showMessage('Please fix the errors in the form.', 'error');
+      return;
+    }
+    try {
+       const formData = formHandler.getFormData();
+      await  updatePassword(formData);
+    } catch (error) {
+       this.apiErrorHandler(error);
+    }
+  }
+
+  setUser(user: User) {
+    this.setState({ ...this.state, user });
+    this.renderProfileEdit(this);
+  }
+
   render(): void {
     const div = this;
     this.renderProfileEdit(div);
@@ -80,152 +70,240 @@ export class ProfileEdit extends BaseComponent<ProfileState> {
     div.innerHTML = `
     <two-factor-setup-component></two-factor-setup-component>
     <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-6">
-    <div class="flex items-center space-x-4">
-         <form class="mt-4" id="editProfileForm">
-            <label for="name" class="mb-2">Name:</label>
+    <div class="flex  space-x-4">
+      <div>
+        <h2 class="text-3xl font-bold mb-6">Edit Profile</h2>
+        <div id="message-box" class="font-bold text-center mb-4"></div>
+        <p class="text-gray-500 dark:text-gray-400">Edit your profile information below.</p>
+        <p class="text-gray-500 dark:text-gray-400">You can update your name, avatar, and password.</p>
+        <img referrerPolicy="no-referrer" src=${avatar?.startsWith('http')?avatar:avatar?`https://localhost:4433/${avatar}`:undefined} alt="avatar" width="100" height="100"/>
+        <p class="text-gray-500 dark:text-gray-400">Name: ${user.name}</p>
+        <p class="text-gray-500 dark:text-gray-400">Role: ${user.role}</p>            
+      </div>
+			<form id="formUpdateName">
+        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Name:</label>
+        <input 
+          id="name"
+          type="text"
+          name="name" value="${user.name}" 
+          class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        />
+        <div id="name-error" class="font-bold text-center mb-4"></div>
+        <button type="submit" class="btn">Update Name</button>
+			</form>
+			<form id="formUpdateAvatar">
+      <img id="avatar-preview"
+        src=''
+        alt="Avatar Preview, select a file to see the preview"
+        style="max-width: 120px;"
+        referrerPolicy="no-referrer"
+      />
+				<label for="avatar" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New avatar:</label>
+				<input					
+					id="avatar"
+					name="avatar"
+					type="file"
+					accept="image/png, image/jpeg"
+					class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+					placeholder="Avatar"
+				 />
+				<div id="avatar-error" class="font-bold text-center mb-4"></div>
+				<button type="submit" class="btn">Update Avatar</button>
+			</form>
+        <form class="mt-4" id="formUpdatePassword">
+            <h2 class="text-3xl font-bold mb-6">Update Password</h2>
+            <label for="oldPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">oldPassword:</label>
+            <div id="oldPassword-error" class="font-bold text-center mb-4"></div>
             <input
-                type="text"
-                id="name"
-                value=${user.name}
-                placeholder="Enter your name"
+                type="password"
+                id="oldPassword"
+                name="oldPassword"
+                placeholder="Old Password"
                 class="form-text-input"
             />
-            <div class="flex justify-between items-center mb-4">
-                <label class="block mb-2">Role:</label>
-                <span>${user.role}</span>
-            </div>
-            <div class="flex justify-between items-center mb-4">
-                <img referrerPolicy="no-referrer" src=${avatar?.startsWith('http')?avatar:avatar?`https://localhost:4433/${avatar}`:undefined} alt="avatar" width="100" height="100"/>
-                <div id="editAvatarProfileForm" >
-                        <div class="form-group">
-                            <label for="file">Upload Avatar :</label>
-                            <input
-                                type="file"
-                                id="file"
-                                name="file"
-                                class="form-text-input"/>
-                        </div>
-                        <button
-                            id="uploadAvatarBtn"
-                            type="submit"
-                            class="btn py-3"
-                          
-                         >Update Avatar</button>
-                    </div>
-            </div>
-            
-            <label class="mb-2">Avatar URL:</label>
+           <label for="newPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">newPassword:</label>
+             <div id="newPassword-error" class="font-bold text-center mb-4"></div>
             <input
-                type="text"
-                id="avatar"
-                value=${avatar}
-                placeholder="Enter your avatar URL"
+                type="password"
+                id="newPassword"
+                name="newPassword"
+                placeholder="New Password"
+                class="form-text-input"
+            />
+           <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">confirmPassword:</label>
+            <div id="confirmPassword-error" class="font-bold text-center mb-4"></div>
+            <input
+                type="password"
+                id="confirmPassword"
+                name="confirmPassword"
+                placeholder="Confirm New Password"
                 class="form-text-input"
             />
             <button
                 type="submit"
-                class="btn"
+                class="btn py-3"
             >
-                Save
+                Update Password
             </button>
         </form>
+
+       <form id="formDeleteUser">
+				<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+					Are you sure you want to delete this user?
+				</label>
+				<label class="switch"> 
+					<input type="checkbox"  name="confirm" required/>
+					<span class="slider round"></span>
+				</label>
+				<button type="submit" class="btn">Delete User</button>
+			</form>
     </div>
     </div>
     `;
-    this.attachEvent(this, '#name', 'change', this.setName.bind(this));
-    this.attachEvent(this, '#avatar', 'change', this.setAvatar.bind(this));
-    this.attachEvent(this, '#file', 'change', this.setFiles.bind(this));
-    this.attachEvent(this, '#editProfileForm', 'submit', this.handleUpdateProfile.bind(this));
-    this.attachEvent(this, '#uploadAvatarBtn', 'click', this.handleUploadImage.bind(this));
+	  this.attachAllForm();
+    this.previewImage();
   }
 
+  previewImage = () => {
+    const input = this.querySelector('#formUpdateAvatar input[type="file"]') as HTMLInputElement;
+    if (!input) return;
 
-
-
-  handleUploadImage = async(event:Event)=> {
-    event.preventDefault();
-     const formData = new FormData();
-     const file = this.state.files![0];
-     console.log('file', file);
-     if (!file) {
-        return;
+    let preview = this.querySelector('#avatar-preview') as HTMLImageElement;
+    if (!preview) {
+      preview = document.createElement('img');
+      preview.id = 'avatar-preview';
+      preview.style.maxWidth = '120px';
+      preview.style.display = 'block';
+      preview.referrerPolicy = 'no-referrer';
+      input.parentNode?.insertBefore(preview, input.nextSibling);
     }
-    formData.append('file', file);         
-    try {
-      const response = await uploadAvatar(formData);
-      if (response) {
-        console.log('Avatar updated:', response);
-        this.setUser(response);
-      } else {
-        console.error('Failed to update avatar');
+
+    input.addEventListener('change', () => {
+      const file = input.files?.[0];
+      if (!file) return;
+
+      // ⚠️ Sécurité de base
+      const allowedTypes = ['image/jpeg', 'image/png'];
+      if (!allowedTypes.includes(file.type)) {
+        alert('Type de fichier non supporté (jpeg, png uniquement).');
+        input.value = '';
+        return;
       }
 
-      /*   const response = await fetch(`/api/users/upload-avatar`, {
-            method: 'POST',
-            body: formData
-        });
-  
-        if (response.ok) {
-            const profileData = await response.json();
-            console.log('Avatar updated:', profileData);
-            this.setUser(profileData);
-        } else {
-            console.error('Failed to update avatar');
-        } */
+      if (file.size < 1024) {
+        alert('Fichier trop petit ou vide.');
+        input.value = '';
+        return;
+      }
+
+      // ✅ Teste la validité réelle via URL.createObjectURL
+      const blobUrl = URL.createObjectURL(file);
+
+      // Teste si l’image se charge bien
+      const testImg = new Image();
+      testImg.onload = () => {
+        preview.src = blobUrl;
+        preview.onload = () => URL.revokeObjectURL(blobUrl); // nettoyage
+      };
+      testImg.onerror = () => {
+        alert('Impossible d\'afficher cette image. Fichier invalide ou corrompu.');
+        input.value = '';
+        preview.src = '';
+        URL.revokeObjectURL(blobUrl);
+      };
+      testImg.src = blobUrl;
+    });
+  };
+
+  handleSubmitUpdateName = async(e: Event)=> {
+    e.preventDefault()
+    const formHandler = this.getFormHandler('formUpdateName');
+    if (!formHandler?.validateForm()) {
+      this.showMessage('Please fix the errors in the form.', 'error');
+      return;
+    }
+    try {
+      const formData = formHandler.getFormData();
+      const response = await  updateProfileName({name:formData.name});
+      if (response) {
+        this.setUser(response);
+        this.showMessage(`Name updated! ${formData.name}`, 'success');
+      }
     } catch (error) {
-        console.error('Error updating avatar:', error);
+        //console.error('register failed:', error);
+      this.apiErrorHandler(error);
     }
   }
-  
-  handleUpdateProfile = async(e:Event)=> {
-    e.preventDefault();
+
+  handleSubmitUpdateAvatar = async(e: Event)=> {
+    e.preventDefault()
+    const formHandler = this.getFormHandler('formUpdateAvatar');
+    if (!formHandler?.validateForm()) {
+      this.showMessage('Please fix the errors in the form.', 'error');
+      console.log('formHandler.getFormData()', formHandler?.getFormData());
+      return;
+    }
     try {
-      //  const res = await fetch('/api/auth/csrf');
-      //  const { csrfToken } = await res.json();
-        const response = await updateProfile({ name: this.state.user?.name });
-        /* const response = await fetch(`/api/users/me`, {
-            method: 'PUT',
-            headers: {
-                'Content-Type': 'application/json',
-                'x-csrf-token': csrfToken,
-            },
-            body: JSON.stringify({ name:this.state.user?.name
-            //, role, level, avatar
-             })
-        }); */
-       // console.log('response', response);
-  
-        if (response) {
-            console.log('Profile updated:', response);
-             this.setUser(response);
-            //@TODO?
-            // Envoyer un message de mise à jour via WebSocket? par exemple si displayName
-        } else {
-          //  console.log(name);
-            console.error('Failed to update profile', response);
-        }
+      const formData = formHandler.getFormData();
+        const newformData = new FormData();
+      newformData.append('file', formData.avatar); 
+      const response = await  uploadProfileAvatar( newformData);
+      if (response) {
+      this.setUser(response);
+      this.showMessage('avatar updated!', 'success');
+      }
     } catch (error) {
-    console.error('Error updating profile:', error);
+        //console.error('register failed:', error);
+      this.apiErrorHandler(error);
+    }
   }
+
+  handleSubmitDelete = async(e: Event)=> {
+    e.preventDefault()
+    const formHandler = this.getFormHandler('formDeleteUser');
+    if (!formHandler?.validateForm()) {
+      this.showMessage('Please fix the errors in the form.', 'error');
+      return;
+    }
+    try {         
+      await  updateProfileDeleteMe();
+      this.router.navigate('/logout');
+    } catch (error) {
+      this.apiErrorHandler(error);
+    }
   }
-  
+
+
+  attachAllForm() {
+    // attach the form handler to the form
+    const formHandlerEditName = this.addForm('formUpdateName');
+    const formHandlerEditAvatar = this.addForm('formUpdateAvatar');
+    const formHandlerEditPassword = this.addForm('formUpdatePassword');
+    const formHandlerDeleteUser = this.addForm('formDeleteUser');
+    
+    // add the validation constraints to the form handler
+    formHandlerEditName?.addValidation(profileUpdateNameconstraint);
+    formHandlerEditAvatar?.addValidation(profileUpdateAvatarconstraint);
+    formHandlerEditPassword?.addValidation(profileUpdatePasswordconstraint);
+    formHandlerDeleteUser?.addValidation(profileUpdateDeleteconstraint);
+
+    // attach the event handler to the form
+    this.attachEvent(this, '#formUpdateName', 'submit', this.handleSubmitUpdateName.bind(this));
+    this.attachEvent(this, '#formUpdateAvatar', 'submit', this.handleSubmitUpdateAvatar.bind(this));
+    this.attachEvent(this, '#formUpdatePassword', 'submit', this.handleSubmitUpdatePassword.bind(this));
+    this.attachEvent(this, '#formDeleteUser', 'submit', this.handleSubmitDelete.bind(this));
+  }
+
 }
-/* export type TwoFA = {
-	id: 4,
-	otp?: string,
-	otpExpiration?: string,
-	provider: "local",
-	provider_id: string,
-	two_factor_auth: boolean,
-	two_factor_auth_method: "email"|"totp",
-} */
+
+
 export class TwoFactorSetup extends BaseComponent<{ user: User | null; twoFa: TwoFA | null }> {
   constructor() {
     super({ user: null, twoFa: null });
   }
 
   connectedCallback() {
-    console.log("TwoFactorSetup connectedCallback");
     this.state.user = UserContext().user();
     this.fetch2FADetails().then(() => {
       //this.render();
@@ -270,27 +348,6 @@ async HandleDisable2FA() {
     }
   }
 
-/*   async HandleToggle2FA() {
-    const { user, twoFa } = this.state;
-    if (!user) return;
-
-    try {
-      const response = await fetch(`/api/users/me/2fa/toggle`, {
-        method: "PUT",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ enable: twoFa?.two_factor_auth, method: twoFa?.two_factor_auth_method }),
-      });
-
-      if (response.ok) {
-        console.log("2FA toggled successfully");
-        this.fetch2FADetails(); // Refresh the 2FA state
-      } else {
-        console.error("Failed to toggle 2FA");
-      }
-    } catch (error) {
-      console.error("Error toggling 2FA:", error);
-    }
-  } */
   setEnable2FA() {
     const { twoFa } = this.state;
     if (!twoFa) return;
@@ -383,7 +440,7 @@ async HandleDisable2FA() {
           div.innerHTML = ` <h3 class="text-lg font-semibold">Scan the QR Code</h3>
               <img src="/api/users/me/2fa/qrcode?timestamp=${timestamp}" alt="QR Code for 2FA" class="qr-code-image" />
                <p class="text-center mt-4">Use an authenticator app like Google Authenticator to scan the QR code.</p>
-            `; // Clear previous QR code
+            `;
         }
     } catch (error) {
       console.error("Error generating 2FA QR code:", error);

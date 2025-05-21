@@ -2,6 +2,7 @@ import { server } from "./server";
 import  {registerPlugins}  from "./plugins/fastifyRegisterPlugins";
 import userRoutes from "./routes/user.routes";
 import userMeRoutes from "./routes/userMe.routes";
+import userAdminRoutes from "./routes/user.admin.routes";
 
 const app = server();
 
@@ -9,6 +10,7 @@ async function start() {
   //1- Enregistrement des plugins
   await registerPlugins(app);
   //2- Enregistrer les routes
+	await app.register(userAdminRoutes, { prefix: "/api/users/admin/users" });
 	await app.register(userMeRoutes, { prefix: "/api/users/me" });
 	await app.register(userRoutes, { prefix: "/api/users" });
   //3- Recuperer les variables d'environnement

@@ -26,20 +26,6 @@ export interface WebSocketGame {
     state: string, // "waiting" | "playing" | "finished"
     players: WaitingPlayers[],
     waitingList: WaitingPlayers[],
-
-/*     gameStarted: boolean,
-    gameFinished: boolean,
-    gameOver: boolean,
-    gamePaused: boolean,
-    gameResumed: boolean,
-    gameEnded: boolean,
-    gameCancelled: boolean,
-    gameAbandoned: boolean,
-    gameDeleted: boolean,
-    gameCreated: boolean,
-    gameUpdated: boolean,
-    gameStartedAt: string,
-    gameFinishedAt: string, */
   }
 }
 interface WebSocketGames {

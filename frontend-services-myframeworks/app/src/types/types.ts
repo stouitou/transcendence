@@ -1,25 +1,3 @@
-/* export interface Players {
-  id?: number;
-  type: string;
-  is_IA:boolean,
-  avatar?:string,
-  display_name?:string,
-  score:number
-  user: User | number | null;
-} */
-
-/* export interface GameHistory {
-    id: number;
-    score1: number;
-    player1: number;
-    score2: number;
-    player2: number;
-    created_at: string;
-    updated_at: string;
-    players?: Players[];
-    winner?: string | null;
-} */
-
 export interface Game {
     id: number;
     gameHistory: GameHistory | null;

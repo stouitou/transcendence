@@ -1,34 +1,45 @@
+import { apiRequest } from "../frameworks/apiRequest";
 import { User } from "../types/types";
 
-export const uploadAvatar = async (formData: FormData): Promise<User | void> => {
-  try {
-	const res = await fetch('/api/auth/csrf');
-	const { csrfToken } = await res.json();
-	const response = await fetch('/api/users/me/upload-avatar', { ///api/users/me/avatar'
-		method: 'POST',
-		headers: {
-			'x-csrf-token': csrfToken,
-		},
-		body: formData,
-	});
-
-	if (response.ok) {
-	  const data = await response.json();
-	  return data;
-	} else {
-	  throw new Error('Failed to upload avatar');
-	}
-  } catch (error) {
-	console.error('Error uploading avatar:', error);
-	throw new Error('Error uploading avatar');
-  }
+/**
+ * Profile Users Update Name
+ */
+export const updateProfileName = async (user: Partial<User>): Promise<User | void> => {
+  const url = `/api/users/me`;
+  return apiRequest<User | void>(url, 'PUT', user);
 }
 
-export const updateProfile = async (data: Partial<User>): Promise<User | void> => {
+/**
+ * Profile Users Update Avatar
+ */
+export const uploadProfileAvatar = async (formData: FormData): Promise<User | void> => {
+	  const url = `/api/users/me/upload-avatar`;
+	  console.log("uploadProfileAvatar",formData)
+	  return apiRequest<User | void>(url, 'POST', formData,{},true,false);
+}
+
+/**
+ * Profile Users Delete
+ */
+export const  updateProfileDeleteMe = async (): Promise<User | void> => {
+  const url = `/api/users/me`;
+  return apiRequest<User | void>(url, 'DELETE', {});
+}
+
+export interface UpdatePassword {
+	oldPassword: string;
+	newPassword: string;
+}
+/**
+ * Update user password
+ * @param data :UpdatePassword {oldPassword: string,newPassword: string}
+ * @returns void or { message:string } 
+ */
+export const updatePassword = async (data: Partial<UpdatePassword>): Promise<{message:string} | void> => {
 	try {
 		const res = await fetch('/api/auth/csrf');
         const { csrfToken } = await res.json();
-		const response = await fetch(`/api/users/me`, {
+		const response = await fetch(`/api/users/me/updatePassword`, {
             method: 'PUT',
             headers: {
                 'Content-Type': 'application/json',
@@ -37,6 +48,10 @@ export const updateProfile = async (data: Partial<User>): Promise<User | void> =
             body: JSON.stringify({ ...data }),
         });
 		if (response.ok) {
+			//204 no content
+			if (response.status === 204) {
+				return { message: 'Password updated successfully' };
+			}
             const profileData = await response.json();
             console.log('[updateProfile]Profile updated:', profileData);
             return profileData;
