@@ -72,18 +72,9 @@ export const DESIGN = {
             inset           : "0",
             pointerEvents   : "none",
             zIndex          : "1",
-            //prevent Content-Security-Policy : ERROR
-            //use utf8 encoding instead of base64
-            //base64 encoding , XSS vulnerability; less compatible            
-            backgroundImage: `url("data:image/svg+xml;utf8,
-                <svg xmlns='http://www.w3.org/2000/svg' width='1' height='1'>
-                <g fill='#000000' fill-opacity='.04'>
-                    <rect width='1' height='1'/>
-                </g>
-                </svg>")`,
-           /*  backgroundImage:
+            backgroundImage:
                 "url(\"data:image/svg+xml;base64,"
-                + "PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxnIGZpbGw9JyMwMDAwMDAnIGZpbGwtb3BhY2l0eT0nLjA0Jz48cmVjdCB3aWR0aD0nMScgaGVpZ2h0PScxJy8+PC9nPjwvc3ZnPg==\")", */
+                + "PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxnIGZpbGw9JyMwMDAwMDAnIGZpbGwtb3BhY2l0eT0nLjA0Jz48cmVjdCB3aWR0aD0nMScgaGVpZ2h0PScxJy8+PC9nPjwvc3ZnPg==\")",
             backgroundSize  : "4px 4px",
             mixBlendMode    : "overlay",
             opacity         : ".4",
@@ -198,9 +189,7 @@ export function animateScore(el: HTMLElement) {
 }
 
 /* ---------- core drawing helpers ---------- */
-export function drawBackground (ctx: CanvasRenderingContext2D | null) {
-    if (!ctx)   { return ; }
-
+export function drawBackground(ctx: CanvasRenderingContext2D) {
     ctx.fillStyle = DESIGN.fieldColor;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
