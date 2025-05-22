@@ -24,7 +24,7 @@ export class	Player {
 
 	private				_lastWin: boolean = false;
 
-	private readonly	_historyPlayer = {bounceCount: 0, goalsConceded: 0};
+	private readonly	_history = {bounceCount: 0, goalsConceded: 0, distance: 0};
 	public				bot: Bot | null = null;
 
 	constructor (json: any, index: number, inputManager: InputManager) {
@@ -50,7 +50,7 @@ export class	Player {
 	get score ()					{ return this._score ; }
 	get direction (): string | null	{ return this._direction ; }
 	get lastWin ()					{ return this._lastWin ; }
-	get historyPlayer ()			{ return this._historyPlayer ; }
+	get history ()					{ return this._history ; }
 
 	/* ---------- setters ---------- */
 	set state (state: string)					{ this._state = state; }
@@ -65,9 +65,11 @@ export class	Player {
 			const	movement = this.inputManager.getMovementByDirection();
 			this.inputManager.clearDirection();
 			this._paddle?.move(movement.dx, movement.dy);
+			this._history.distance += Math.abs(movement.dx) + Math.abs(movement.dy);
 		} else {
 			const	movement = this.inputManager.getDirectionMovement();
 			this._paddle?.move(movement.dx, movement.dy);
+			this._history.distance += Math.abs(movement.dx) + Math.abs(movement.dy);
 		}
 	}
 

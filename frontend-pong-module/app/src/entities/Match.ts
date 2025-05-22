@@ -26,7 +26,7 @@ export class	Match {
 		this._webSocketManager.on("PREPARE_MATCHES_STARTED_ROUND_GAME", (data) => this.renderGameHeroDiv(data.data));	//envoi du match qui va debuter dans 10secondes
 		this._webSocketManager.on("STOP", () => this.stop());	//signal de stop du serveur
 		this._webSocketManager.on("CURRENTPHASE_UPDATE_LOBBY", (data) => console.log("[CURRENTPHASE_UPDATE_LOBBY]",data));	//phase actuelle
-		}
+	}
 
 	get webSocketManager ()	{ return this._webSocketManager ; }
 
@@ -163,7 +163,7 @@ export class	Match {
 		if (this._gameManager!.checkMaxScore(this._webSocketManager.sendMessage.bind(this._webSocketManager))) {
 			this.stop();
 			//afficher l'historique du jeu en fin de partie
-			this._renderer.displayHistoriqueGame(this._statisticsManager, this._gameManager!.players);
+			this._renderer.displayHistoriqueGame(this._gameManager!.statisticsManager, this._gameManager!.players);
 		}	
 	
 		// call next frame

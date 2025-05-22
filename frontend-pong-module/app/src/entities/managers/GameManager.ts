@@ -18,12 +18,13 @@ export class	GameManager {
 	private readonly	_inputManagers: Map< string, InputManager > = new Map(); // par joueur id
 
 	constructor () {
-		this._ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 }, 4);
+		this._ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 });
 	}
 
 	get players ()							{ return this._players ; }
 	get ball ()								{ return this._ball ; }
 	get dataConfig () : DataMatch | null	{ return this._dataConfig ; }
+	get statisticsManager ()				{ return this._statisticsManager ; }
 
 	setDataconfig (dataMatch: DataMatch) {
 		this._dataConfig = dataMatch;
@@ -86,9 +87,7 @@ export class	GameManager {
 		this._statisticsManager.updateStatistics(this._ball, this._players);
 
 		// Update score, ScoreManager Class responsability
-		if (this._scoreManager) {
-			this._scoreManager.updateScore(this._ball);		
-		}
+		this._scoreManager?.updateScore(this._ball);		
 	}
 
 	/**
