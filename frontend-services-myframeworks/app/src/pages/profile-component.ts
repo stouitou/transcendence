@@ -1,21 +1,42 @@
 import { BaseComponent } from "../frameworks/base-component";
 import { UserContext } from "../globalstate/GlobalState";
+import { get2FADetail, TwoFA } from "../services/api.2fa";
 import { User } from '../types/types';
 
-export class ProfilePage extends BaseComponent<{user: User | null}> {
+export class ProfilePage extends BaseComponent<{user: User | null,twoFa: TwoFA | null}> {
   constructor() {
-    super({user: null});
+    super({user: null,twoFa: null});
   }
 
   handleListenerProfileUpdate = (e: Event) => {
     const customEvent = e as CustomEvent;
     this.state.user = customEvent.detail.profileData;
     this.render();
+    this.fetch2FADetails().then(() => {
+    });
   };
+
   connectedCallback() {
     this.state.user = UserContext().user();
     this.render();
+    this.fetch2FADetails().then(() => {
+    //  console.log("2FA details fetched");
+    });
     this.listenCustomEvent("profile-data-updated", this.handleListenerProfileUpdate.bind(this));
+  }
+
+  async fetch2FADetails() {
+    const { user } = this.state;
+    if (!user) return;
+
+    try {
+      const data = await get2FADetail();
+      this.setState({ ...this.state, twoFa: data ?? null });
+    //  console.log("2FA data:", data);
+     this.update2FaRender();
+    } catch (error) {
+      console.error("Error fetching 2FA details:", error);
+    }
   }
 
   render() {
@@ -45,18 +66,10 @@ export class ProfilePage extends BaseComponent<{user: User | null}> {
                     class="w-16 h-16 rounded-full object-cover">
               <div>
                 <h2 class="text-lg font-semibold">${user.name}</h2>
+                <br>
+                <div id="twofa-display-status"></div>
               </div>
             </div>
-
-           <!-- <div>
-              <label class="block text-sm font-medium mb-1" for="name">Nom</label>
-              <input id="name" type="text" value="Bonnie Green" class="w-full rounded-lg px-3 py-2 border dark:border-gray-700 dark:bg-gray-900">
-            </div>
-
-            <div>
-              <label class="block text-sm font-medium mb-1" for="email">Email</label>
-              <input id="email" type="email" value="name@flowbite.com" class="w-full rounded-lg px-3 py-2 border dark:border-gray-700 dark:bg-gray-900">
-            </div> -->
 
             <a href="/profile/edit" class="flex justify-end">
               <button class="bg-green-600 hover:bg-green-700 text-white px-4 py-2 rounded-lg transition">Mettre à jour</button>
@@ -65,5 +78,23 @@ export class ProfilePage extends BaseComponent<{user: User | null}> {
         </div>
       </section>
     `;
+    this.update2FaRender();
+  }
+  
+  update2FaRender() {
+    const { twoFa } = this.state;
+    const twoFaDisplayStatus = this.querySelector("#twofa-display-status");
+    if (twoFaDisplayStatus) {
+      if (twoFa && twoFa.provider !== "local") {
+        twoFaDisplayStatus.innerHTML = `<p class="text-sm text-gray-500">Provider: ${twoFa.provider}</p>`;
+      } else {
+        twoFaDisplayStatus.innerHTML = `
+        <p class="text-lg font-bold">Two-Factor Authentication 
+          ${twoFa?.two_factor_auth ? `<span class="text-green-500">enable</span>` : `<span class="text-red-500">disable</span>`}
+          </p>
+          <span class="text-sm text-gray-500">(${twoFa?.two_factor_auth ? "You can disable it in your profile settings." : "You can enable it in your profile settings."})</span>
+         `;
+      }
+    }
   }
 }
