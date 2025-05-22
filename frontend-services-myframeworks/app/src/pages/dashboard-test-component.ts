@@ -116,7 +116,7 @@ export class Dashboard extends BaseComponent<{ user: User | null,tournamentsData
   
 	private renderDashboard() {
 		this.innerHTML = `
-		  <div class="min-h-screen w-full px-6 py-10 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
+		  <div class="min-h-screen w-full px-6 py-10 text-gray-900 dark:text-white">
 			<div class="max-w-7xl mx-auto space-y-10">
 			  
 			  <!-- Profile & Chat Row -->

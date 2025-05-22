@@ -36,7 +36,7 @@
             
   }
   .btn {
-    @apply  w-full bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition dark:bg-gray-800 dark:hover:bg-gray-400 dark:text-white;
+    @apply  w-full bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition  dark:hover:bg-gray-400 dark:text-white;
   }
 
   /*chat module*/

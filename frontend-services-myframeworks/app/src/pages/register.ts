@@ -72,64 +72,65 @@ export class Register extends BaseComponent<{register:RegisterState,confirmPassw
 
   render() {
     this.innerHTML = `
-      <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
-        <div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-md">
-          <form id="formLogin" class="space-y-5">
+      <div class="min-h-screen flex items-center justify-center  px-4 ">
+        <div class="w-full max-w-md bg-white dark:bg-gray-800 rounded-2xl shadow-md">
+          <form id="formLogin" class="space-y-5 dark:bg-gray-800 p-8 rounded-lg">
             <h2 class="text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-6">Register</h2>
             
             <div>
-              <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Name:</label>
+              <label for="name" class="block text-sm font-medium text-gray-700 text-gray-300 mb-1">Name:</label>
               <input
                 id="name"
                 type="text"
                 value="${this.state.register.name}"
-                class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50  dark:bg-gray-700 text-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="SuP€rK@RoT"
                 required
               />
             </div>
   
             <div>
-              <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email:</label>
+              <label for="email" class="block text-sm font-medium text-gray-700 text-gray-300 mb-1">Email:</label>
               <input
                 id="email"
                 type="email"
                 value="${this.state.register.email}"
-                class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="name@student.42.fr"
                 required
               />
             </div>
   
             <div>
-              <label for="password" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Password:</label>
+              <label for="password" class="block text-sm font-medium text-gray-700 text-gray-300 mb-1">Password:</label>
               <input
                 id="password"
                 type="password"
                 value="${this.state.register.password}"
-                class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50  dark:bg-gray-700 text-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
   
             <div>
-              <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Confirm Password:</label>
+              <label for="confirmPassword" class="block text-sm font-medium text-gray-700 text-gray-300 mb-1">Confirm Password:</label>
               <input
                 id="confirmPassword"
                 type="password"
                 value="${this.state.confirmPassword}"
-                class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+                class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50  dark:bg-gray-700 text-gray-900 text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
               />
             </div>
   
             <button
               id="loginBtn"
               type="submit"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+              class="w-full bg-gradient-to-br
+                 from-indigo-500 via-violet-500 to-fuchsia-500 hover:bg--700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
             >
               Register
             </button>
   
-            <p class="text-sm text-center text-gray-600 dark:text-gray-400 mt-4">
+            <p class="text-sm text-center text-gray-600 text-gray-400 mt-4">
               Already have an account? <a href="/login" class="text-blue-500 hover:underline">Login</a>
             </p>
           </form>

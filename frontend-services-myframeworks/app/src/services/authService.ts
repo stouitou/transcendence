@@ -44,6 +44,25 @@ export const loginUser = async (data: LoginData): Promise<void> => {
 };
 
 
+export async function updateProfileData(formData: FormData) {
+    const token = localStorage.getItem("accessToken");
+    const res = await fetch("https://localhost:4433/api/users/me", {
+      method: "PUT",
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+      body: formData,
+    });
+  
+    if (!res.ok) {
+      throw new Error("Échec de la mise à jour");
+    }
+  
+    return res.json();
+  }
+  
+  
+
 export const fetchProfileData = async (): Promise<any |void> => {
 
 	try {

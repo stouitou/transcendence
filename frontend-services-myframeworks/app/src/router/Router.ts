@@ -74,6 +74,9 @@ routerConfig.addRoute('/game-setting', () => document.createElement('game-settin
 routerConfig.addRoute('/messages', () => document.createElement('chat-component'));
 routerConfig.addRoute('/dashboard', () => document.createElement('dashboard-component'));
 routerConfig.addRoute('/settings', () => document.createElement('settings-component'));
+routerConfig.addRoute('/support', () => document.createElement('support-component'));
+routerConfig.addRoute('/leaderboard', () => document.createElement('leaderboard-component'));
+routerConfig.addRoute('/language', () => document.createElement('language-component'));
 
 
 

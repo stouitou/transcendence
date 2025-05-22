@@ -56,10 +56,10 @@ export class Login extends BaseComponent<{login:LoginState}> {
 
   render() {
     this.innerHTML = `
-      <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
+      <div class="min-h-screen flex items-center justify-center px-4">
         <div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-md">
           <form id="formLogin" class="space-y-6">
-            <h2 class="text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-6">Login</h2>
+            <h2 class="text-3xl font-extrabold text-center text-dark-900 dark:text-white mb-6">Login</h2>
             
             <div>
               <label for="email" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Email:</label>
@@ -86,7 +86,8 @@ export class Login extends BaseComponent<{login:LoginState}> {
             <button
               id="loginBtn"
               type="submit"
-              class="w-full bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
+              class="w-full bg-gradient-to-br
+                 from-indigo-500 via-violet-500 to-fuchsia-500 hover:bg-fuchsia-500 text-white font-semibold py-2 px-4 rounded-lg transition duration-200"
             >
               Login
             </button>
