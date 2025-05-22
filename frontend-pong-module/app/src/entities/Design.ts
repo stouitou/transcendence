@@ -7,7 +7,7 @@
    • fancy dusk gradient bg (vertical scroll intact)
    ========================================================= */
 
-import { CANVAS_HEIGHT, CANVAS_WIDTH } from "./Match";
+import { CANVAS_HEIGHT, CANVAS_WIDTH, setCanvasSize } from "../component/classic.ts";
 import { Player } from "./Player";
 
 
@@ -198,7 +198,9 @@ export function animateScore(el: HTMLElement) {
 }
 
 /* ---------- core drawing helpers ---------- */
-export function drawBackground(ctx: CanvasRenderingContext2D) {
+export function drawBackground (ctx: CanvasRenderingContext2D | null) {
+    if (!ctx)   { return ; }
+
     ctx.fillStyle = DESIGN.fieldColor;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 

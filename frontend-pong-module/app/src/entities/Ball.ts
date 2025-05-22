@@ -1,69 +1,54 @@
-
+import { CANVAS_HEIGHT, CANVAS_WIDTH } from "../component/classic";
+import { Position } from "../Interfaces/Position.interface";
 import { Size } from "../Interfaces/Size.interface";
 import { Player } from "./Player";
-import { Position } from "../Interfaces/Position.interface";
 
-export class Ball {
-  position: Position;
-  size: Size;
-  velocity: Position;
-  /* private */ speed: number;
-  /* private */ lastHit: Player | null = null;
-  lastWallBounce: number|null = null;
-  _maxBounceCountRound: number = 0;
+export class	Ball {
 
-  constructor(initialPosition: Position, size: Size, initialVelocity: Position, speed: number = 0.4) {
-    this.position = { ...initialPosition };
-    this.size = { ...size };
-    this.velocity = { ...initialVelocity };
-	this.normalize()
-    this.speed = speed //@TODO: set speed to ??
+	private				_position: Position;
+	private readonly	_size: Size;
+	private				_speed: number;
+	private				_velocity: Position;
+	private				_lastHit: Player | null = null;
+	private				_lastWallBounce: number | null = null;
+	private readonly	_maxBounceCountRound: number = 0;
+
+	constructor (position: Position, size: Size, velocity: Position, speed: number) {
+		this._position = position;
+		this._size = size;
+		this._velocity = velocity;
+		this.normalize();
+		this._speed = speed;
 	}
 
-  update() {
-//	this.speed = 3
-    // Déplacer la balle en fonction de sa vitesse et de sa direction
-   this.position.x += this.velocity.x * this.speed;
-    this.position.y += this.velocity.y * this.speed;
-  }
-  /**
-   * clamp la position de la balle pour qu'elle reste dans le canvas
-   * @param canvas 
-   */
-  /* private */ clampBall(canvas: { width: number; height: number }) {
-	this.position.x = Math.max(0, Math.min(this.position.x, canvas.width - this.size.width));
-   this.position.y = Math.max(0, Math.min(this.position.y, canvas.height - this.size.height));
-  }
-	private magnitude = () => Math.sqrt(Math.pow(this.velocity.x, 2) + Math.pow(this.velocity.y, 2));
-	/* private */ normalize = () => {
-		const	magnitude = this.magnitude();
-		if (magnitude === 0) {
-			console.warn('Cannot normalize a zero vector');
-			return;
-		  }
-		this.velocity.x = this.velocity.x / magnitude;
-		this.velocity.y = this.velocity.y / magnitude;
-	}
-  reset(position: Position, velocity: Position = this.velocity) {
-    this.position = { ...position };
-    this.velocity = { ...velocity };
-    this.lastHit = null;
-  }
-  /**
-   * Réinitialiser le dernier joueur ayant touché la balle
-   * Réinitialiser le dernier mur touché
-   * Réinitialiser la position de la balle
-   */
-  resetBall(canvas: { width: number; height: number }) {
-	this.lastHit = null;
-	this.lastWallBounce = null; 
-	this.spawn(canvas);
-  }
+	get position ()							{ return this._position ; }
+	get size ()								{ return this._size ; }
+	get speed ()							{ return this._speed ; }
+	get velocity ()							{ return this._velocity ; }
+	get lastHit () : Player | null			{ return this._lastHit ; }
+	get lastWallBounce () : number | null	{ return this._lastWallBounce ; }
+	get maxBounceCountRound ()				{ return this._maxBounceCountRound ; }
 
-	spawn (canvas: { width: number; height: number }) {
-		const	x = canvas.width  / 2;
-		const	y = (33 + (Math.random() * 100) / 3) / 100 * canvas.height;
-		this.position = { x: x, y: y };
+	set position (position: Position)			{ this._position = position; }
+	set speed (speed: number)					{ this._speed = speed; }
+	set lastHit (player: Player)				{ this._lastHit = player; }
+	set lastWallBounce (wall: number | null)	{ this._lastWallBounce = wall; }
+
+	update () {
+		this._position.x += this._velocity.x * this._speed;
+		this._position.y += this._velocity.y * this._speed;
+	}
+	
+	reset () {
+		this.spawn();
+		this._lastHit = null;
+		this._lastWallBounce = null;
+	}
+
+	private spawn () {
+		const	x = CANVAS_WIDTH / 2;
+		const	y = (33 + (Math.random() * 100) / 3) / 100 * CANVAS_HEIGHT;
+		this._position = { x: x, y: y };
 
 		const	add = Math.random() * 30;
 		let		vx = Math.sin((45 + add) * Math.PI / 180);
@@ -72,10 +57,19 @@ export class Ball {
 		if (base < 2)				vx *= -1;
 		if (base >= 1 && base < 3)	vy *= -1;
 
-		this.velocity = {
-			x: vx,
-			y: vy
-		};
+		this._velocity = { x: vx, y: vy };
 		this.normalize();
+	}
+	
+	normalize () {
+		const	magnitude = this.magnitude();
+
+		if (magnitude === 0) { this._velocity = { x: 0, y: 0 }; return ; }
+		this._velocity.x = this._velocity.x / magnitude;
+		this._velocity.y = this._velocity.y / magnitude;
+	}
+
+	private magnitude () {
+		return Math.sqrt(Math.pow(this._velocity.x, 2) + Math.pow(this._velocity.y, 2)) ;
 	}
 }

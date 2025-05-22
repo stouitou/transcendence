@@ -1,11 +1,11 @@
-import { Alert } from "./Alert";
-import { Ball } from "./Ball";
+import { Alert } from "../entities/Alert";
+import { Ball } from "../entities/Ball";
 import { Ground } from "../Interfaces/Ground.interface";
 import { Limits } from "../Interfaces/Limits.interface";
 import { HistoriqueGame } from "../Interfaces/HistoriqueGame.interface";
-import { Paddle } from "./Paddle";
-import { Player } from "./Player";
-import * as Design from "./Design";
+import { Paddle } from "../entities/Paddle";
+import { Player } from "../entities/Player";
+import * as Design from "../entities/Design";
 
 export let CANVAS_WIDTH = 700;
 export let CANVAS_HEIGHT = 500;
@@ -31,7 +31,7 @@ export let CANVAS_HEIGHT = 500;
 // -Gestionnaire WebSocket :WebSocketManager
 
 
-export class Match {
+export class Match2 {
 	//private _dataConfig?:DataMatch;
 	/* ---------- render div (unchanged) ---------- */
 

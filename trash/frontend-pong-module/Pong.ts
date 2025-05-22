@@ -18,7 +18,7 @@ export class Paddle {
 	  this.position = { ...initialPosition };
 	  this.size = { ...size };
 	}
-	clamp(canvas:{ width: number, height: number }) {
+	clamp (canvas:{ width: number, height: number }) {
 		if (this.position.x < 0) this.position.x = 0;
 		if (this.position.y < 0) this.position.y = 0;
 		if (this.position.x + this.size.width > canvas.width)

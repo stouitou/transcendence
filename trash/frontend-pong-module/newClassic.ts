@@ -102,6 +102,7 @@ export class  classic extends LitElement {
   /* CONSTRUCTOR */
 	constructor () {
     super();
+    console.log('--------------------------------- hey in new classic ---------------------------------');
   }
   set params (params: {id: string}) {
     this.data = params;
@@ -169,13 +170,13 @@ export class  classic extends LitElement {
             isIA: player.isIA,  
             score: player.score,        
           }
-          return new Player(jsonData,new Paddle(player.paddle.position!, player.paddle.size!),index)
+          return new Player(jsonData, new Paddle(player.paddle.position!, player.paddle.size!), index)
         }
       ) as Player[];
 
       const inputs: InputManager[] = this.dataConfig?.players.map((player,index) => new InputManager(index,!player.isIA)) as InputManager[];
      
-      this._game.addPlayers(players,inputs);
+      this._game.addPlayers(players, inputs);
      /*  players.map((player, index) => {
         console.log('player:', index,player.id);
         this._game?.addPlayer(player, inputs[index]);

@@ -1,57 +1,45 @@
-import { Ball } from "./Ball";
-//import { HistoriqueGame } from "../Interfaces/HistoriqueGame.interface";
-import { Paddle, Position } from "./Pong";
-//import { Paddle } from "./Paddle";
+import { Ball } from './Ball';
 import { InputManager } from "./managers/InputManager";
 import { Bot } from "./Bot";
+import { Paddle } from './Paddle';
 
-type Direction = "left" | "right" | "top" | "bottom"
-const directions:Direction[] = ['left', 'right', 'top', 'bottom'];
-export /* abstract */ class	Player{
+type	Direction = "left" | "right" | "top" | "bottom";
+const	directions: Direction[] = [ 'left', 'right', 'top', 'bottom' ];
+export class	Player {
 
-		//id: string;
-		state: string = 'waiting'; // waiting, playing, finished
-		//name: string = 'host';
-		isRemote: boolean = false;
-		isIA: boolean = false;
-		isInGame: boolean = false;
-		//paddle: Paddle;
-		//direction: Direction;
-		score: number = 0;
-		position: Position = { x: 0, y: 0 };
+	private readonly	_id: string;
+	private readonly	_name: string;
 
-	protected readonly		_id: string;
-	protected readonly		_name: string;
+	private readonly	_isIA: boolean;
+	private				_state: string = 'waiting';	// waiting, playing, finished
+	private readonly	_isRemote: boolean = false;
+	private				_isInGame: boolean = false;
+	
+	public				inputManager: InputManager;
+	private				_score: number = 0;
 
-	protected				_paddle: Paddle | null = null;
-	/* protected */			_location: number = 0;
-	//protected				_points: number; -> score
-	protected				_direction: Direction /* | null = null */;
+	private				_paddle: Paddle | null = null;
+	private				_location: number = 0;
+	private				_direction: Direction;
 
-//	protected				_keyPressed: Set<string> = new Set();
-	//protected				_display: HTMLDivElement;
-	protected				_lastWin: boolean = false;
+	private				_lastWin: boolean = false;
 
-	//private				_historiqueGame: HistoriqueGame;
+	private readonly	_historyPlayer = {bounceCount: 0, goalsConceded: 0};
+	public				bot: Bot | null = null;
 
-	_historyPlayer = {bounceCount: 0, goalsConceded: 0};
-	bot:Bot | null = null;
-
-	constructor (json: any,index: number,public inputManager: InputManager) {
-		
-		//this._historiqueGame = { maxBounceCount: 0, mostGoalsConcededPlayer: 0, playerWithMostPointsLost: 0, totalBouncesPerPlayer: 0};
+	constructor (json: any, index: number, inputManager: InputManager) {
+		this.inputManager = inputManager;
 		this.paddle = new Paddle(json.paddle.position, json.paddle.size);
-		this.direction = directions[index];
-			this._id = json.id;
-			this._name = json.name;
-			this.isRemote = json.isRemote;
-			this.isIA = json.isIA;
-			this.isInGame = json.isInGame;
-			this.score = json.score?? 0;
-			this._direction = directions[index];
-			this._location = index;
-			this.bot = new Bot(1, this);
-		
+		this._direction = directions[index];
+		this._id = json.id;
+		this._name = json.name;
+		this._isRemote = json.isRemote;
+		this._isIA = json.isIA;
+		this._isInGame = json.isInGame;
+		this._score = json.score?? 0;
+		this._direction = directions[index];
+		this._location = index;
+		this.bot = new Bot(1, this);
 	}
 
 	/* ---------- getters ---------- */
@@ -59,45 +47,39 @@ export /* abstract */ class	Player{
 	get name ()						{ return this._name ; }
 	get paddle () : Paddle | null	{ return this._paddle ; }
 	get location ()					{ return this._location ; }
-	//get points ()					{ return this._points ; } -> score
+	get score ()					{ return this._score ; }
 	get direction (): string | null	{ return this._direction ; }
-//	get keyPressed ()				{ return this._keyPressed ; } -> gerer par InputManager
-//	get display ()					{ return this._display ; } -> gerer par Renderer
 	get lastWin ()					{ return this._lastWin ; }
-//	get historiqueGame ()			{ return this._historiqueGame ; }
+	get historyPlayer ()			{ return this._historyPlayer ; }
 
 	/* ---------- setters ---------- */
+	set state (state: string)					{ this._state = state; }
+	set isInGame (isInGame: boolean)			{ this._isInGame = isInGame; }
 	set paddle (paddle: Paddle)					{ this._paddle = paddle; }
-	set location (location: number)				{ this._location = location; }
-	//set points (points: number)					{ this._points = points; }
-	set	direction (direction: Direction/* string | null */)	{ this._direction = direction; }
 	set lastWin (lastWin: boolean)				{ this._lastWin = lastWin; }
-	//set historiqueGame (historiqueGame: HistoriqueGame)			{ this._historiqueGame = historiqueGame }
+	set score (score: number)					{ this._score = score; }
 
-	setScore(score: number) {
-		this.score = score;
+	updateMovement (ball: Ball) {
+		if (this._isIA) {
+			this.bot?.move(ball);
+			const	movement = this.inputManager.getMovementByDirection();
+			this.inputManager.clearDirection();
+			this._paddle?.move(movement.dx, movement.dy);
+		} else {
+			const	movement = this.inputManager.getDirectionMovement();
+			this._paddle?.move(movement.dx, movement.dy);
+		}
 	}
 
-	updateMovement(ball: Ball) {
-		if (this.isIA) {
-		  this.bot?.move(ball);
-		  const movement = this.inputManager.getMovementByDirection();
-		 this.inputManager.clearDirection();
-		  this._paddle?.move(movement.dx, movement.dy);
-		} else if (this.inputManager) {
-		  const movement = this.inputManager.getDirectionMovement();
-		  this._paddle?.move(movement.dx, movement.dy);
-		}
-	  }
-	toJSON() {
+	toJSON () {
 		return {
 			id: this._id,
-			state: this.state,
+			state: this._state,
 			name: this._name,
-			isRemote: this.isRemote,
-			isIA: this.isIA,
-			isInGame: this.isInGame,
-			score: this.score,
+			isRemote: this._isRemote,
+			isIA: this._isIA,
+			isInGame: this._isInGame,
+			score: this._score,
 			paddle: {
 				position: this.paddle?.position,
 				size: this.paddle?.size,
@@ -105,5 +87,4 @@ export /* abstract */ class	Player{
 			position: this.paddle?.position,
 		};
 	}
-
 }
