@@ -18,6 +18,10 @@ import { AdminUsers } from "./admin/users";
 
 import { Error401 } from "./error-pages/error-401-component";
 import { Error404 } from "./error-pages/error-404-component";
+import { Settings } from "./settings-component";
+import { SettingsLanguage } from "./settingsLanguage";
+import { PopupCookies } from "./popup-cookies";
+import { Support } from "./support";
 
 
   
@@ -79,7 +83,13 @@ if (!customElements.get('dashboard-component')) {
 	customElements.define('dashboard-component', Dashboard);
 }
 
+if (!customElements.get('settings-component')) {
+	customElements.define('settings-component', Settings);
+}
 
+if (!customElements.get('language-component')) {
+	customElements.define('language-component', SettingsLanguage);
+}
 if (!customElements.get('game-loby-component')) {
 	customElements.define('game-loby-component', GameLobyComponent);
 }
@@ -97,4 +107,13 @@ if (!customElements.get('admin-pannel')) {
 }
 if (!customElements.get('admin-users')) {
 	customElements.define('admin-users', AdminUsers);
+}
+
+
+if (!customElements.get('support-component')) {
+	customElements.define('support-component', Support);
+}
+
+if (!customElements.get('popup-cookies')) {
+	customElements.define('popup-cookies', PopupCookies);
 }

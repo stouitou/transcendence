@@ -1,6 +1,6 @@
 import { FieldValidation } from '../frameworks/base-form';
-import { EditAvatarFormData, EditDeleteUserFormData, EditNameFormData, EditRoleFormData, EditToggleTwoFAFormData, ForgotPasswordFormData, LoginFormData, ProfileUpdateDeleteFormData, ProfileUpdateNameFormData, ProfileUpdatePasswordFormData, RegisterFormData, ResetPasswordFormData, TwoFactorAuthFormData } from '../types/forms.type';
-import { checkboxValidator, emailValidator, passwordValidator } from './validators';
+import { EditAvatarFormData, EditDeleteUserFormData, EditNameFormData, EditRoleFormData, EditToggleTwoFAFormData, ForgotPasswordFormData, LoginFormData, ProfileUpdateDeleteFormData, ProfileUpdateNameFormData, ProfileUpdatePasswordFormData, RegisterFormData, ResetPasswordFormData, SettingsUpdateLangFormData, TwoFactorAuthFormData } from '../types/forms.type';
+import { checkboxValidator, emailValidator, passwordValidator, SettingLangValidator } from './validators';
 
 
 /*
@@ -337,6 +337,16 @@ export const profileUpdateDeleteconstraint: { [fieldName in keyof ProfileUpdateD
 		type: 'checkbox',
 		customValidator: checkboxValidator,
 		message: 'Please confirm the deletion.',
+		messageConstraint: true,
+	}
+}
+
+export const settingsditLangconstraint: { [fieldName in keyof SettingsUpdateLangFormData]: FieldValidation } = {
+	lang: {
+		required: true,
+		type: 'text',
+		customValidator: SettingLangValidator,
+		message: 'Please enter a valid role.',
 		messageConstraint: true,
 	}
 }

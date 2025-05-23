@@ -6,6 +6,17 @@
   <title>Pong Game</title>
   <link rel="stylesheet" href="/src/css/input.css" />
   <link rel="icon" type="image/x-icon" href="/src/img/react.svg">
+  <script>
+  // Détection de la langue préférée de l'utilisateur
+  const supportedLangs = ['fr', 'en'];
+  let lang = localStorage.getItem('lang');
+  if (!lang) {
+    lang = navigator.language.slice(0, 2); // ex: 'fr'
+    if (!supportedLangs.includes(lang)) lang = 'en'; // fallback
+    localStorage.setItem('lang', lang);
+  }
+  document.documentElement.setAttribute('lang', lang);
+</script>
   <script >
     // On page load or when changing themes, best to add inline in `head` to avoid FOUC
     if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
@@ -39,6 +50,7 @@
             
             <!-- page courante injectée dans le router View -->
             <router-view></router-view>
+            <popup-cookies></popup-cookies>
           </app-router>
           <is-online-component></is-online-component>
       </div>

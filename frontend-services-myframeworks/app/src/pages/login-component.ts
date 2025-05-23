@@ -57,10 +57,10 @@ export class Login extends BaseComponent<{}, { formLogin: LoginFormData }> {
 		}
   }
 
-  render() {
+  render() {    
       this.innerHTML = `
       <form id=formLogin class="form-container">
-            <h2 class="text-3xl font-bold text-center mb-6">Login</h2>
+            <h2 class="text-3xl font-bold text-center mb-6">${this.t('AUTH.LOGIN')}</h2>
          <div id="message-box" class="font-bold text-center mb-4"></div>
             <label for="email" class="block  mb-2">Email:</label>
         <div id="email-error" class="font-bold text-center mb-4"></div>

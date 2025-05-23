@@ -35,6 +35,7 @@ export class BackgroundCanvas extends BaseComponent {
   }
 
   render() {
+    this.cleanup();
     this.innerHTML = `         
       <div id="canvasContainer" class="fixed top-0 left-0 w-full h-full z-0">
           <canvas id="canvasContent" class="absolute top-0 left-0 w-full h-full"></canvas>

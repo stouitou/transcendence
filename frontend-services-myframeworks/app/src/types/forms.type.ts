@@ -72,3 +72,10 @@ export type ProfileUpdateFormData ={
   formUpdatePassword: ProfileUpdatePasswordFormData,
   formDeleteUser: ProfileUpdateDeleteFormData,
 }
+
+export interface SettingsUpdateLangFormData  {
+  lang: "fr" | "en";
+};
+export type SettingsFormData ={
+  formUpdateLang: SettingsUpdateLangFormData,
+}

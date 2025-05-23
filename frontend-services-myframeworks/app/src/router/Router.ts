@@ -136,6 +136,9 @@ routerConfig.addRoute('/game-history', () => document.createElement('game-histor
 routerConfig.addRoute('/game-setting', () => document.createElement('game-setting-component'));
 routerConfig.addRoute('/messages', () => document.createElement('chat-component'));
 routerConfig.addRoute('/dashboard', () => document.createElement('dashboard-component'));
+routerConfig.addRoute('/settings', () => document.createElement('settings-component'));
+routerConfig.addRoute('/support', () => document.createElement('support-component'));
+//routerConfig.addRoute('/mentions-legales', () => document.createElement('mentions-legales-component'));
 routerConfig.addRoute('/game-loby', () => document.createElement('game-loby-component'));
 
 routerConfig.addRoute('/404', () => document.createElement('error-404-component'));
