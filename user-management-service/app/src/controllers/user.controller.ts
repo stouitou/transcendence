@@ -82,6 +82,7 @@ export class UserController {
     this.getUserMe = this.getUserMe.bind(this);
     this.getUsers = this.getUsers.bind(this);
     this.getUserById = this.getUserById.bind(this);
+    this.getUserMeById = this.getUserMeById.bind(this);
     this.getUserStatsById = this.getUserStatsById.bind(this);
     this.updateStatsById = this.updateStatsById.bind(this);
     this.updateUser = this.updateUser.bind(this);
@@ -156,6 +157,15 @@ export class UserController {
       return reply.status(404).send({ error: 'User not found' });
     }
     return reply.send(user);
+  }
+    async getUserMeById(request:  FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+    const userId = Number(request.params.id);
+    const user = await this.userRepository.getById(userId);
+        if (!user) {
+      return reply.status(404).send({ error: 'User not found' });
+    }
+    const {id,avatar,name,role,created_at} = user;
+    return reply.send({id,avatar,name,role,created_at});
   }
 
   async getUserStatsById(request:  FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {

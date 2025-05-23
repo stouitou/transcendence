@@ -1,5 +1,5 @@
 import { apiRequest } from "../frameworks/apiRequest";
-import { User } from "../types/types";
+import { User, UserStats } from "../types/types";
 
 /**
  * Profile Users Update Name
@@ -63,4 +63,21 @@ export const updatePassword = async (data: Partial<UpdatePassword>): Promise<{me
    		console.error('[updateProfile] Error updating profile:', error);
 		throw new Error('[updateProfile] Error to update profile');
   }
+}
+
+
+/**
+ * Profile Users Update Name
+ */
+export const getProfileStat = async (id:number): Promise<UserStats | void> => {
+  const url = `/api/users/me/stats/${id}`;
+  return apiRequest<UserStats | void>(url, 'GET');
+}
+
+/**
+ * Profile Users Update Name
+ */
+export const getProfileById = async (id:string): Promise<User | void> => {
+  const url = `/api/users/me/users/${id}`;
+  return apiRequest<User | void>(url);
 }

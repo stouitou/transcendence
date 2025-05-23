@@ -1,31 +1,57 @@
 import { BaseComponent } from "../frameworks/base-component";
 import { UserContext } from "../globalstate/GlobalState";
 import { get2FADetail, TwoFA } from "../services/api.2fa";
+import { getProfileById } from "../services/api.profile";
 import { User } from '../types/types';
 
-export class ProfilePage extends BaseComponent<{user: User | null,twoFa: TwoFA | null}> {
+export class ProfilePage extends BaseComponent<{user: User | null,userProfile: User | null,twoFa: TwoFA | null}> {
+  static get observedAttributes() { return ['id']; }
+  private data: { id?: string } = { id: undefined };
   constructor() {
-    super({user: null,twoFa: null});
+    super({user: null,userProfile:null,twoFa: null});
   }
-
+  set params (params: { id: string })	{ 
+    console.error("params",params);
+    this.data = params; }
   handleListenerProfileUpdate = (e: Event) => {
     const customEvent = e as CustomEvent;
     this.state.user = customEvent.detail.profileData;
     this.render();
     this.fetch2FADetails().then(() => {
     });
+    this.fetchUserProfile().then((data) => {
+    });
   };
 
   connectedCallback() {
+    console.error("ProfilePage connectedCallback");
     this.state.user = UserContext().user();
     this.render();
     this.fetch2FADetails().then(() => {
     //  console.log("2FA details fetched");
     });
     this.listenCustomEvent("profile-data-updated", this.handleListenerProfileUpdate.bind(this));
+    this.fetchUserProfile().then((data) => {
+      console.log("User profile fetched", data);
+    });
+  
   }
 
+  async fetchUserProfile() {
+     const { user } = this.state;
+    if (!user) return;
+    if (!this.data.id) return;
+      try {
+      const data = await getProfileById(this.data.id);
+      this.setState({ ...this.state, userProfile: data ?? null });
+     this.renderUserProfile();
+    } catch (error) {
+      this.router.navigate("/404");
+    }
+  }
+  
   async fetch2FADetails() {
+    if (this.data.id)return;
     const { user } = this.state;
     if (!user) return;
 
@@ -39,9 +65,7 @@ export class ProfilePage extends BaseComponent<{user: User | null,twoFa: TwoFA |
     }
   }
 
-  render() {
-    const { user } = this.state;
-    if (!user) {
+  renderSpinner() {
       this.innerHTML = ` 
         <div role="status">
             <svg aria-hidden="true" class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -51,6 +75,11 @@ export class ProfilePage extends BaseComponent<{user: User | null,twoFa: TwoFA |
             <span class="sr-only">Loading... waiting ProfileData</span>
         </div>
         `;
+    }
+  render() {
+    const { user } = this.state;
+    if (!user ) {
+      this.renderSpinner();
       return;
     }
     this.innerHTML = `
@@ -77,11 +106,43 @@ export class ProfilePage extends BaseComponent<{user: User | null,twoFa: TwoFA |
           </div>
         </div>
       </section>
+			  <profil-stats-component id=${user.id}></profil-stats-component>
     `;
     this.update2FaRender();
   }
-  
+
+  renderUserProfile() {
+    const { userProfile:user  } = this.state;
+     if (!user ) {
+      this.renderSpinner();
+      return;
+    }
+    this.innerHTML = `
+      <section class=" px-4 py-8 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
+        <div class="max-w-3xl mx-auto">
+          <h1 class="text-3xl font-bold mb-6 text-center">Profile ${user.name}</h1>
+          <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-6">
+            <div class="flex items-center space-x-4">
+              <img referrerPolicy="no-referrer"
+                    src=${user.avatar ==""?undefined:user.avatar}
+                    alt="Avatar"
+                    class="w-16 h-16 rounded-full object-cover">
+              <div>
+                <h2 class="text-lg font-semibold">${user.name}</h2>
+                <br>
+              </div>
+            </div>
+          </div>
+        </div>
+      </section>
+			  <profil-stats-component id=${user.id}></profil-stats-component>
+    `;
+  }
+
+
+
   update2FaRender() {
+    if (this.data.id) return;
     const { twoFa } = this.state;
     const twoFaDisplayStatus = this.querySelector("#twofa-display-status");
     if (twoFaDisplayStatus) {

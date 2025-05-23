@@ -72,7 +72,7 @@ export async function registerAuthPlugin(app: FastifyInstance) {
 	  },
 	checkStateFunction: (request) => {
 	 console.log("🔓 checkStateFunction", request.session.state, (request.query as { state?: string }).state);
-	 return request.session.state === (request.query as { state?: string }).state;
+	 return  request.cookies['oauth2-redirect-state'] === (request.query as { state?: string }).state;
 	},
   });
 }

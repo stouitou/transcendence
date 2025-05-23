@@ -12,19 +12,8 @@ import {User} from '../types/types';
 	title: string;
 	legende: {label: string, color: string }[];
 };
-/* example of data
- const data: DonutSegment[] = [
-	 { label: "Red", value: 30, color: "#f87171" }, // Rouge
-	{ label: "Blue", value: 40, color: "#60a5fa" }, // Bleu
-	{ label: "Green", value: 20, color: "#34d399" }, // Vert
-	{ label: "Yellow", value: 10, color: "#fbbf24" }, // Jaune
-	{ label: "lose", value: 10, color: "#f87171" }, // Rouge
-	{ label: "win", value: 90, color: "#60a5fa" }, // Bleu
-  ]; */
-  
 
-
-  export class DonutsChart extends BaseComponent<{ user: User | null}> {
+  export class DonutsChart extends BaseComponent<{ user: User | null}> { 
 	  private dataChart: DonutsType;
 	  private svg: SVGSVGElement | null = null;
 		private label: HTMLElement | null = null;
@@ -61,27 +50,15 @@ import {User} from '../types/types';
 	
 	private renderDashboard() {
 	  this.innerHTML = `
-	  
-		<div class="max-w-sm mx-auto p-6 bg-white rounded-lg shadow-md dark:bg-gray-800">
-  <h2 class="chart-title text-xl font-bold text-center mb-4 text-gray-800 dark:text-white">${this.dataChart.title}</h2>
-  <div class="relative w-64 h-64">
-    <svg class="w-full h-full" viewBox="0 0 36 36">
-      <!-- Les segments du donut seront ajoutés ici dynamiquement -->
-    </svg>
-  </div>
-  <div class="mt-4 text-center">
-	<span class="text-sm text-gray-600 dark:text-gray-400">légende :</span>
-	<div class="flex justify-center mt-2">
-	${this.dataChart.legende.map((item) => `
-	  <div class="flex items-center mr-4">
-		<div class="w-4 h-4 ${item.color} rounded-full mr-2"></div>
-		<span class="text-sm text-gray-800 dark:text-white">${item.label}</span>
-	  </div>`).join('')}
-
-	<div>
-      <span  class="donutLabel text-xl font-bold text-gray-800 dark:text-white"></span>
-    </div>
-</div>
+		<div class="max-w-sm mx-auto p-6 bg-white rounded-lg shadow-md dark:bg-gray-800 flex flex-col h-72">
+			<h2 class="flex-grow chart-title text-xl font-bold text-center mb-4 text-gray-800 dark:text-white flex items-end justify-center">
+				${this.dataChart.title}
+			</h2>
+			<svg class="flex-shrink-0" viewBox="0 0 36 36" style="height: 120px; width: 100%;">
+				<!-- Les segments du donut seront ajoutés ici dynamiquement -->
+			</svg>
+			<span class="donutLabel text-xl font-bold text-gray-800 dark:text-white"></span>
+		</div>
 	  `;
 
 	  this.createDonutChart();
@@ -91,7 +68,10 @@ import {User} from '../types/types';
 		this.svg = this.querySelector('svg') as SVGSVGElement;
 		this.label = this.querySelector(".donutLabel") as HTMLElement;
 		this.total = this.dataChart.dataset.reduce((sum, segment) => sum + segment.value, 0);
-		this.renderCharts();
+		//svg viewbox get
+		const viewBox = this.svg.getAttribute('viewBox');
+		const viewBoxValues = viewBox ? viewBox.split(' ').map(Number) : [0, 0, 36, 36];
+		this.renderCharts(viewBoxValues);
 	  }
 	  
 	
@@ -117,16 +97,19 @@ import {User} from '../types/types';
 		].join(" ");
 	  }
 
-	  private renderCharts() {
+	  private renderCharts(viewBoxValues:number[]) {
 		let startAngle = 0;
+		  // Rayon dynamique (ex: 80% du demi-côté)
+		const radius =viewBoxValues[2]/2 * 0.8// (size / 2) * 0.8;
+		const center =viewBoxValues[2]/2 // size / 2; // la moitier de la viewBox
 	
 		this.dataChart.dataset.forEach((segment) => {
 			    // Vérifier si le segment représente 100%
 				if (segment.value === this.total) {
 					const circle = document.createElementNS("http://www.w3.org/2000/svg", "circle");
-					circle.setAttribute("cx", "18");
-					circle.setAttribute("cy", "18");
-					circle.setAttribute("r", "15");
+					circle.setAttribute("cx", center.toString());
+					circle.setAttribute("cy", center.toString());
+					circle.setAttribute("r", radius.toString());
 					circle.setAttribute("fill", segment.color);
 
 					circle.setAttribute("data-label", segment.label);
@@ -143,7 +126,8 @@ import {User} from '../types/types';
 		  const endAngle = startAngle + (segment.value / this.total) * 360;
 	
 		  const path = document.createElementNS("http://www.w3.org/2000/svg", "path");
-		  path.setAttribute("d", this.describeArc(18, 18, 15, startAngle, endAngle));
+		//  path.setAttribute("d", this.describeArc(18, 18, 15, startAngle, endAngle));
+		  path.setAttribute("d", this.describeArc(center, center, radius, startAngle, endAngle));
 		  path.setAttribute("fill", segment.color);
 		  //add on mouseover event on title
 		  path.setAttribute("data-label", segment.label);

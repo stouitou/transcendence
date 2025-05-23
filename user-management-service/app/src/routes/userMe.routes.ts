@@ -57,10 +57,12 @@ async function userMeRoutes(app: FastifyInstance) {
 //  app.get("/invitations",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserInvitationsById);
   /* recuperer les invitations de l'utilisateur connecté*/
 //  app.get("/invitations/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserInvitationById);
-  /* 
+  app.get<{ Params: { id: string; }; }>("/users/:id",{ preHandler: [verifyAuth] },/*  {schema: UserSchema.getUserById} ,*/ userController.getUserMeById); 
+  
+/* 
    recuperer les stats de l'utilisateur connecté
   */
-  app.get("/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserStatsById);
+  app.get("/stats/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserStatsById); 
   /* metre a jour les amis de l'utilisateur connecté*/
   app.put("/addFriend",/*  {schema: UserSchema.updateUser}, */ userController.addFriend);
   app.put("/removeFriend",/*  {schema: UserSchema.updateUser}, */ userController.removeFriend);
@@ -68,7 +70,7 @@ async function userMeRoutes(app: FastifyInstance) {
 
   //app.get("/", {/* preHandler: [loggerMiddleware], *//* schema: UserSchema.getUsers */}, userController.getUsers);
   //app.get("/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserById);
-  app.get("/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserStatsById);
+  app.get("/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserStatsById);//@TODO remove
   //app.put("/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.updateStatsById);
   //app.put("/:id", {schema: UserSchema.updateUser}, userController.updateUser);
   //app.delete("/:id",/*  {schema: UserSchema.deleteUser}, */ userController.deleteUser);
