@@ -17,7 +17,7 @@ export const DESIGN = {
     lineColor   : "#ffffff",
     accentColor : "#00faff",     // vivid aqua
     buttonColor : "#ffffff",
-    textColor   : "#472525",     // soft light grey
+    textColor   : "#321414",     // soft light grey
     fontFamily  : "'Inter', 'Helvetica Neue', Arial, sans-serif",
 };
 
@@ -71,7 +71,7 @@ export const DESIGN = {
             position        : "fixed",
             inset           : "0",
             pointerEvents   : "none",
-            zIndex          : "1",
+            zIndex          : "2",
             backgroundImage:
                 "url(\"data:image/svg+xml;base64,"
                 + "PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxnIGZpbGw9JyMwMDAwMDAnIGZpbGwtb3BhY2l0eT0nLjA0Jz48cmVjdCB3aWR0aD0nMScgaGVpZ2h0PScxJy8+PC9nPjwvc3ZnPg==\")",

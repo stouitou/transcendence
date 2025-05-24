@@ -26,6 +26,19 @@ export class	Renderer {
 	set gameAlert (div: HTMLElement)		{ this._gameAlert = div; }
 	set gameHero (div: HTMLElement)			{ this._gameHero = div; }
 	set gameHeroTree (div: HTMLElement)		{ this._gameHeroTree = div; }
+	private _ballImg: HTMLImageElement | null = null;
+
+	private loadBallSprite() {
+		if (this._ballImg) return;      // already cached
+
+		const img = new Image();
+		img.src = "/uploads/balls/ball6.png";        // sprite path at site root
+
+		img.onload  = () => console.log("ball sprite loaded");
+		img.onerror = () => console.error("ball sprite failed to load npppppp");
+
+		this._ballImg = img;
+	}
 
 	private displayScore (Players: Player[] = []) {
 		this._score.innerHTML = '';
@@ -34,6 +47,7 @@ export class	Renderer {
 			this._score.appendChild(divPlayerScore);
 		});
 	}
+
 
 	createDivDisplayScore (playerName: string, playerScore: number, indexLocation: number) {
 		const	setGrid	= [
@@ -61,7 +75,7 @@ export class	Renderer {
 		// if (this._players.length > 2)
 		// 	CANVAS_WIDTH = 500;
 		this._canvas.width = CANVAS_WIDTH;
-
+		this.loadBallSprite();
 		this._score = Design.createAppendix(/* this._players.length */4 - 1);
 
 		this._score.style.width = '100%';
@@ -100,39 +114,25 @@ export class	Renderer {
 	}
 
 	private clear () {
-		if (!this._ctx || !this._canvas) { console.error('Game context is not set.'); return; }	// if context is undefined, impossible to clear canvas 
+		if (!this._ctx || !this._canvas) { console.error('Game context is not set.'); return; }	// if context is undefined, impossible to clear canvas
 			this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
 	}
 
 	private drawBall(ball: Ball) {
-		if (!this._ctx)	{ return ; }
+		const ctx = this._ctx;
+		const img = this._ballImg;
+		if (!ctx || !img) return;
 
-		const	ctx = this._ctx;
-		const	r = ball.size.width;	// Radius
-		const	x = ball.position.x;	// Centre X
-		const	y = ball.position.y;	// Centre Y
+		// only draw when the sprite really loaded
+		if (!img.complete || img.naturalWidth === 0) return;
 
-		/* Radial gradient for glossy depth */
-		const	g = ctx.createRadialGradient(x - r * 0.4, y - r * 0.4, r * 0.1, x, y, r);
-		g.addColorStop(0,	 "#ff768e");
-		g.addColorStop(0.55, Design.DESIGN.accentColor);
-		g.addColorStop(1,	 "#4c000d");
-		ctx.fillStyle = g;
+		const r = ball.size.width;
+		const { x, y } = ball.position;
 
-		/* blur pass for soft glow / motion feel */
-		ctx.save();
-		ctx.filter = "blur(2px)";
-		ctx.beginPath();
-		ctx.arc(x, y, r, 0, Math.PI * 2);
-		ctx.fill();
-		ctx.restore();
-
-		/* specular highlight */
-		ctx.fillStyle = "rgba(255,255,255,.65)";
-		ctx.beginPath();
-		ctx.ellipse(x - r * 0.35, y - r * 0.35, r * 0.15, r * 0.10, 0, 0, Math.PI * 2);
-		ctx.fill();
+		ctx.drawImage(img, x - r, y - r, r * 2, r * 2);
 	}
+
+
 
 	private drawPaddle(position: { x: number; y: number }, size: { width: number; height: number }) {
 		Design.drawPaddle(
@@ -143,6 +143,7 @@ export class	Renderer {
 			size.height
 		);
 	}
+
 
 	renderGameHeroDiv (data: PREPARE_MATCHES_STARTED_ROUND_GAME) {
 		console.log('Renderer: renderGameHeroDiv data:',data);
@@ -208,7 +209,7 @@ export class	Renderer {
 		//text += " Le joueur qui s'est pris le plus de buts " + players[mostGoalsConcededPlayer].name + " avec " + players[mostGoalsConcededPlayer].historiqueGame.mostGoalsConcededPlayer + "\n\n";
 		text += ` Le joueur qui s'est pris le plus de buts ${name} avec ${goalsConceded}\n\n`;
 	//	text += "Le joueur ayant perdu le plus de points " + players[playerWithMostPointsLost].name + " avec " + players[playerWithMostPointsLost].historiqueGame.playerWithMostPointsLost + "\n\n";
-		
+
 		players.forEach(player => {
 			text += ` Nombre de rebond de ${player.name} est de {player.totalBouncesPerPlayer} \n`;
 		});
@@ -222,132 +223,109 @@ export class	Renderer {
 	}
 }
 
-//component affichage du PREPARE_MATCHES_STARTED_ROUND_GAME
-type PREPARE_MATCHES_STARTED_ROUND_GAME = {
 
-	id:string, //"9jqjw4k74ytmacj5nq4",
-	players:
-		{
-			id: number,//352,
-			userId: number,//-1,
-			name: string,//"IA-4",
-			avatar: string,//"https://localhost:4433/uploads/1-avatartest.jpg",
-			score: number,//0,
-			isInGame: boolean,//true,
-			isIA: boolean,//true
-		} [],
-	gameHistoryId: number,//171,
-	gameId: number,//171,
-	winner: {
-			id: number,//353,
-			userId: number,//-1,
-			name: string,//"IA-3",
-			avatar: string,//"https://localhost:4433/uploads/1-avatartest.jpg",
-			state: string,//"finished",
-			isInGame: boolean,//true,
-			isIA: boolean,//true,
-			score: number,//5
-		} | null,
-	isFinished: boolean,//true
+/* -------------------------------------------------------------------------- */
+/*  Public DTOs – keep identical to back‑end payloads, but no duplicates!       */
+/* -------------------------------------------------------------------------- */
+
+export interface PrepareMatchGame {
+	id: string;
+	players: Player[];            // imported Player model
+	gameHistoryId: number;
+	gameId: number;
+	winner: Player | null;
+	isFinished: boolean;
 }
 
-const	displayPrepareMatchesStartedRoundGame = (div: HTMLDivElement, data:PREPARE_MATCHES_STARTED_ROUND_GAME) => {
-	const	{players,winner} = data;
+export interface PrepareMatchRound {
+	round: number;
+	matches: PrepareMatchGame[];
+}
+
+export type PREPARE_MATCHES_STARTED_ROUND_GAME = PrepareMatchGame;
+export type PREPARE_MATCHES_STARTED_ROUND      = PrepareMatchRound;
+
+/* -------------------------------------------------------------------------- */
+/*  Chip factories                                                             */
+/* -------------------------------------------------------------------------- */
+
+// Large pill for hero card
+const heroChip = (player: Player) => `
+  <div class="inline-flex items-center gap-2 rounded-full px-6 py-2 bg-zinc-100/80 dark:bg-zinc-800/60 shadow ring-1 ring-black/5">
+    <span class="font-semibold truncate max-w-[8rem]">${player.name}</span>
+    <span class="text-lg font-bold text-emerald-600">${player.score}</span>
+  </div>`;
+
+// Small pill for tree view
+const miniChip = (player: Player) => `
+  <div class="inline-flex items-center gap-1 rounded-full px-3 py-1 bg-zinc-50 dark:bg-zinc-800/50 ring-1 ring-gray-200 dark:ring-zinc-700 text-xs">
+    <span class="truncate max-w-[6rem]">${player.name}</span>
+    <span class="font-semibold text-emerald-600">${player.score}</span>
+  </div>`;
+
+/* -------------------------------------------------------------------------- */
+/*  Single‑game hero card                                                      */
+/* -------------------------------------------------------------------------- */
+
+export function displayPrepareMatchesStartedRoundGame(
+	div: HTMLDivElement,
+	data: PrepareMatchGame,
+): void {
+	// debug banner so you *see* the right bundle
+	console.log("💎 Chips UI active – hero card", data.id);
+
+	const { players, winner } = data;
+
 	div.innerHTML = `
-	<div class="mx-auto text-center">
-			<div class="game-card-container-background">
-	
-			<div class="game-card-container-row">
-			 <p class="text-3xl font-bold text-center mb-6">Game ID: #${data.id}</p>
-			</div>
-	
-			
-			<div class="game-card-container-row">
-				<div class="flex flex-col items-center justify-center min-w-[220px]">
-				${players.map((player,i) =>
-				i%2 === 0 ? `
-				<div class="flex flex-col items-center justify-center min-w-[220px] py-4">
-					<img referrerPolicy="no-referrer"
-							src=${player.avatar}
-							alt="User Avatar"
-							class="w-24 h-24 mx-auto rounded-full border-4 border-gray-300 mb-4"
-						/>
-							<h2 class="text-2xl font-semibold">${player.name}</h2>
-	
-							<br>
-							<h3 class="text-lg font-semibold">Games Score</h3>
-							<p class="text-green-600 text-9xl">${player.score}</p>
-	
-				</div>`:``
-			).join('')}
-	
-				</div>
-				<div class="flex flex-col items-center justify-center">
-				<p class="text-blue-600 text-8xl px-3">VS</p>
-				</div>
-	
-	
-				<div class="flex flex-col items-center justify-center min-w-[220px]">
-					${players.map((player,i) => 
-					i%2 === 1 ? `
-					<div class="flex flex-col items-center justify-center min-w-[220px] py-4">
-						<img referrerPolicy="no-referrer"
-								src=${player.avatar}
-								alt="User Avatar"
-								class="w-24 h-24 mx-auto rounded-full border-4 border-gray-300 mb-4"
-							/>
-								<h2 class="text-2xl font-semibold">${player.name}</h2>
-	
-								<br>
-								<h3 class="text-lg font-semibold">Games Score</h3>
-								<p class="text-green-600 text-9xl">${player.score}</p>
-	
-					</div>`:``
-				).join('')}
-	
-				</div>
-			</div>
-				<p>Winner: </p>
-				<p class="text-3xl font-bold text-center mb-6 text-green-600">${winner?winner.name:''}</p>
-			</div>
-			 
-		 </div>
-	 `;
-	}
+    <section class="mx-auto max-w-screen-md px-4 sm:px-6 lg:px-8">
+      <div class="rounded-2xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md shadow-lg ring-1 ring-black/5 p-8 text-center space-y-10">
+        <h3 class="text-lg font-semibold tracking-wide">
+          Game ID LOL;<span class="text-gray-900 dark:text-white">#${data.id}</span>
+        </h3>
 
-	type PREPARE_MATCHES_STARTED_ROUND={
-	round:number,
-	matches:PREPARE_MATCHES_STARTED_ROUND_GAME[]
+        <div class="flex flex-wrap justify-center items-center gap-6">
+          ${players.filter((_, i) => i % 2 === 0).map(heroChip).join("")}
+          <span class="text-3xl font-extrabold text-blue-600 select-none">VS</span>
+          ${players.filter((_, i) => i % 2 === 1).map(heroChip).join("")}
+        </div>
+
+        ${winner ? `<p class="text-base font-medium text-emerald-600">Winner: <span class="font-semibold">${winner.name}</span></p>` : ""}
+      </div>
+    </section>`;
 }
-	
-const	displayPrepareMatchesStartedTournament = (div: HTMLDivElement,data:PREPARE_MATCHES_STARTED_ROUND[]) => {
+
+/* -------------------------------------------------------------------------- */
+/*  Tournament tree                                                            */
+/* -------------------------------------------------------------------------- */
+
+export function displayPrepareMatchesStartedTournament(
+	div: HTMLDivElement,
+	data: PrepareMatchRound[],
+): void {
+	console.log("🌳 Chips UI active – tournament tree (rounds)");
+
 	div.innerHTML = `
-	<div>
-	 <p>Click the links below to navigate:</p>
-		${data.map((round, index) => `
-		<div class="flex flex-col">
-				<p>Round ${index+1}</p>
-				${round.matches.map((match) =>	`
-				<div class="flex flex-row">					 
-					${match.players.map((player) =>	`
-						<div class="flex flex-col">								
-							<div class="w-20">
-							<img referrerPolicy="no-referrer"
-									src=${player.avatar}
-									alt="User Avatar"
-									class="w-5 h-5 mx-auto rounded-full border-4 border-gray-300 mb-4"
-								/>
-							</div>
-							<h2 class="text-xl font-semibold">${player.name}</h2>
-							<br>
-							<h3 class="text-lg font-semibold">Games Score</h3>
-							<p class="text-green-600 text-lg">${player.score}</p>
-						</div>`
-					).join('')}
-				</div>
-				<br>
-				`).join('')}
-			</div>
-		`).join('')}
-	</div>`
+    <div class="space-y-4">
+      ${data
+		.map(
+			(round, idx) => `
+            <details${idx === 0 ? " open" : ""} class="rounded-xl overflow-hidden ring-1 ring-gray-200 dark:ring-zinc-700 shadow-sm">
+              <summary class="cursor-pointer select-none px-4 py-2 bg-gray-50 dark:bg-zinc-800 font-medium">
+                Round ${idx + 1}
+              </summary>
+              <div class="px-4 py-4 space-y-6 bg-white dark:bg-zinc-900">
+                ${round.matches
+				.map(
+					(match) => `
+                      <div class="flex flex-wrap justify-center items-center gap-3">
+                        ${match.players.map(miniChip).join("")}
+                      </div>`
+				)
+				.join("")}
+              </div>
+            </details>`
+		)
+		.join("")}
+    </div>`;
 }
+
