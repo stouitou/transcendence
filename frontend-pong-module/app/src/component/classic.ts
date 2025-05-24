@@ -16,68 +16,114 @@ export class  classic extends LitElement {
 
 	private	_game!: Match;
 
-	static	styles = css `
-		.game-container {
-			position:		relative;
-			width:			${CANVAS_WIDTH}px;
-			height:			${CANVAS_HEIGHT}px;
-			margin:			0 auto;
-			margin-top:		20px;
-			display:		flex;
-			flex-direction:	column;
-		}
-		.game-ui {
-			flex:				1;
-			display:			flex;
-			justify-content:	center;
-			align-items:		center;
-		}
-		.game-canvas {
-			flex:				1;
-			display:			flex
-			justify-content:	center;
-			align-items:		center;
-		}
-		.canvas {
-			width:	100%;
-			height:	100%;
-		}
-		.alert {
-			position:		absolute;
-			top:			50%;
-			left:			50%;
-			transform:		translate(-50%, -50%);
-			min-width:		200px;
-			max-width:		300px;
-			padding:		16px;
-			color:			white;
-			font-size:		18px;
-			text-align:		center;
-			border-radius:	8px;
-			z-index:		1000;
-			display:		none;
-		}
-		.player-score {
-			position:		relative;
-			display:		flex;
-			justify-items:	space-between;
-			align-items:	space-between;
-			width:			80%;
-			height:			auto;
-			margin:			5px;
-		}
-		.score-cell {
-			padding:	0;
-		}
-		.score-cell.score-cell-points {
-			padding:	0 20px;
-		}
-		.alert.show {
-			display:	block;
-		}
-	`
+	static	styles = css`
+	/* ---------- outer layout wrappers ---------- */
+	.game-container {
+		position:        relative;
+		width:           ${CANVAS_WIDTH}px;
+		height:          ${CANVAS_HEIGHT}px;
+		margin:          0 auto;
+		margin-top:      20px;
+		display:         flex;
+		flex-direction:  column;
+	}
 
-	constructor ()	{ super(); console.log('game component constructor') }
+	/* ---------- canvas block ---------- */
+	.game-canvas {
+		flex:            1;
+		display:         flex;
+		justify-content: center;
+		align-items:     center;
+	}
+	.canvas { width: 100%; height: 100%; }
+
+	/* ========================================================
+	   ◉  SCOREBOARD
+	   ======================================================== */
+
+	/* (1) wrapper that holds the chips */
+
+        .game-ui {
+            /* keep the wrapper itself transparent & centered */
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-bottom: 40px; /* gap above canvas */
+        }
+
+        /* ── override the bar div produced by createAppendix ── */
+
+        .game-ui > div { /* ← that bar element */
+            background: transparent !important;
+            border: none !important;
+            box-shadow: none !important;
+            width: auto !important;
+            height: auto !important;
+            padding: 0 !important;
+
+            display: flex !important;
+            flex-wrap: wrap; /* second row for 3-4 players */
+            justify-content: center;
+            align-items: center;
+            gap: 24px; /* space between chips */
+        }
+
+        /* pill chip */
+
+        .player-score {
+            display: inline-flex;
+            align-items: center;
+            gap: 12px;
+            padding: 8px 22px;
+            background: rgba(255, 255, 255, 0.9);
+            border: 1px solid #e4e4e4;
+            border-radius: 9999px;
+            box-shadow: 0 4px 14px rgba(0, 0, 0, .10);
+            width: auto;
+            max-width: 320px;
+        }
+
+        /* name */
+
+        .score-cell {
+            margin: 0; /* ← was 56px; reset */
+            font-weight: 600;
+            color: #472525;
+            padding: 0;
+        }
+
+        /* score bubble */
+
+        .score-cell.score-cell-points {
+            font-weight: 800;
+            color: #00faff;
+            background: #00faff22;
+            padding: 4px 16px;
+            border-radius: 9999px;
+        }
+
+	/* ---------- alert pop-up (unchanged) ---------- */
+	.alert {
+		position:      absolute;
+		top:           50%;
+		left:          50%;
+		transform:     translate(-50%, -50%);
+		min-width:     200px;
+		max-width:     300px;
+		padding:       16px;
+		color:         white;
+		font-size:     18px;
+		text-align:    center;
+		border-radius: 8px;
+		z-index:       1000;
+		display:       none;
+	}
+	.alert.show { display: block; }
+`
+
+
+
+constructor ()	{ super(); console.log('game component constructor') }
 
 	set params (params: { id: string })	{ this.data = params; }
 

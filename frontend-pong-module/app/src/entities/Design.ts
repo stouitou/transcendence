@@ -259,13 +259,13 @@ export function drawBall(
 const style = document.createElement("style");
 style.textContent = `
   .score-cell{
-    margin:0;
+    margin: 56px;
     color:${DESIGN.accentColor};
     text-align:center;
     white-space:nowrap;
     overflow:visible;
     text-overflow:clip;
     width:100%;
-    line-height:26px;
+    line-height: 34px;
   }`;
 document.head.appendChild(style);
