@@ -117,7 +117,7 @@ export class TournamentManager {
   
 	async createTournament(config: WebSocketGameConfig, lobyId: string): Promise<Match[]> {
 		try {
-			const { tournament, games } = await this.databaseManager.processDataBaseCreateTournament(config, lobyId);
+			const { tournament, games } = await this.databaseManager.processDataBaseCreateTournament(config, lobyId); 
 		
 			if (!tournament || !games) {
 				console.error("Error creating tournament: No tournament or games found");
@@ -369,7 +369,7 @@ export class MatchManager {
 		  if (beforeMatchCallback) {
 			await beforeMatchCallback(match); // Exécuter le callback avant chaque match
 		  }
-		  this.startMatch(match); // Démarrer le match
+		await  this.startMatchAsync(match); // Démarrer le match
 		});
 	  
 		await Promise.all(matchPromises); // Attendre que tous les matchs soient démarrés

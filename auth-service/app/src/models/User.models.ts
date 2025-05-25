@@ -9,40 +9,40 @@ export interface UserStats {
   id?: number;
 
 //nombre de parties jouées
-  total_game_played: number;
+  classic_total_game_played: number;
  //nombre de parties gagnées
-  total_game_won: number;
+  classic_total_game_won: number;
  //nombre de parties perdues
-  total_game_lost: number;
+  classic_total_game_lost: number;
  //nombre de parties nulles
-  total_game_draw: number;
+  classic_total_game_draw: number;
 
  //nombre de parties jouées en local
-  local_game_played: number;
+  classic_local_game_played: number;
  //nombre de parties gagnées en local
-  local_game_won: number;
+  classic_local_game_won: number;
  //nombre de parties perdues en local
-  local_game_lost: number;
+  classic_local_game_lost: number;
  //nombre de parties nulles en local
-  local_game_draw: number;
+  classic_local_game_draw: number;
 
  //nombre de parties jouées en remote
-  remote_game_played: number;
+  classic_remote_game_played: number;
  //nombre de parties gagnées en remote
-  remote_game_won: number;
+  classic_remote_game_won: number;
  //nombre de parties perdues en remote
-  remote_game_lost: number;
+  classic_remote_game_lost: number;
  //nombre de parties nulles en remote
-  remote_game_draw: number;
+  classic_remote_game_draw: number;
 
  //nombre de parties jouées en tournoi
-  tournament_game_played: number;
+  tournament_total_game_played: number;
  //nombre de parties gagnées en tournoi
-  tournament_game_won: number;
+  tournament_total_game_won: number;
  //nombre de parties perdues en tournoi
-  tournament_game_lost: number;
+  tournament_total_game_lost: number;
  //nombre de parties nulles en tournoi
-  tournament_game_draw: number;
+  tournament_total_game_draw: number;
 
  //nombre de parties jouées en tournoi local
   tournament_local_game_played: number;
@@ -117,22 +117,23 @@ export class User/*  extends BaseModel<User>  */{
 		this.updated_at = user.updated_at ?? new Date();
     //@TODO reset test value
     this.userStats = user.userStats ?? {
-      total_game_played: 10,
-      total_game_won: 5,
-      total_game_lost: 5,
-      total_game_draw: 0,
-      local_game_played: 0,
-      local_game_won: 0,
-      local_game_lost: 0,
-      local_game_draw: 0,
-      remote_game_played: 0,
-      remote_game_won: 0,
-      remote_game_lost: 0,
-      remote_game_draw: 0,
-      tournament_game_played: 0,
-      tournament_game_won: 0,
-      tournament_game_lost: 0,
-      tournament_game_draw: 0,
+      classic_total_game_played: 0,
+      classic_total_game_won: 0,
+      classic_total_game_lost: 0,
+      classic_total_game_draw: 0,
+      classic_local_game_played: 0,
+      classic_local_game_won: 0,
+      classic_local_game_lost: 0,
+      classic_local_game_draw: 0,
+      classic_remote_game_played: 0,
+      classic_remote_game_won: 0,
+      classic_remote_game_lost: 0,
+      classic_remote_game_draw: 0,
+
+      tournament_total_game_played: 0,
+      tournament_total_game_won: 0,
+      tournament_total_game_lost: 0,
+      tournament_total_game_draw: 0,
       tournament_local_game_played: 0,
       tournament_local_game_won: 0,
       tournament_local_game_lost: 0,

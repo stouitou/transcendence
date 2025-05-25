@@ -95,6 +95,7 @@ export class ProfilePage extends BaseComponent<{user: User | null,userProfile: U
                     class="w-16 h-16 rounded-full object-cover">
               <div>
                 <h2 class="text-lg font-semibold">${user.name}</h2>
+                <p class="text-lg font-semibold">level : ${user.level}</p>
                 <br>
                 <div id="twofa-display-status"></div>
               </div>
@@ -129,6 +130,7 @@ export class ProfilePage extends BaseComponent<{user: User | null,userProfile: U
                     class="w-16 h-16 rounded-full object-cover">
               <div>
                 <h2 class="text-lg font-semibold">${user.name}</h2>
+                <p class="text-lg font-semibold">level : ${user.level}</p>
                 <br>
               </div>
             </div>

@@ -15,6 +15,24 @@ export class	Match {
 	private readonly	_statisticsManager: StatisticsManager = new StatisticsManager();
 	
 	constructor () {
+		// attach all contexts .bind(this) to the Match instance
+		this.handleKeyDown = this.handleKeyDown.bind(this);
+		this.handleKeyUp = this.handleKeyUp.bind(this);
+		this.renderCountdownHandler = this.renderCountdownHandler.bind(this);
+		this.updateGameStateHandler = this.updateGameStateHandler.bind(this);
+		this.setGameManager = this.setGameManager.bind(this);
+		this.attachRemoteMovementListener = this.attachRemoteMovementListener.bind(this);
+		this.removeRemoteMovementListener = this.removeRemoteMovementListener.bind(this);
+		this.renderGameHeroDiv = this.renderGameHeroDiv.bind(this);
+		this.renderGameHeroTreeDiv = this.renderGameHeroTreeDiv.bind(this);
+		this.gameLoop = this.gameLoop.bind(this);
+		this.gameLoopLocal = this.gameLoopLocal.bind(this);
+		this.stop = this.stop.bind(this);
+		this.start = this.start.bind(this);
+		this.startLocal = this.startLocal.bind(this);
+		this.updateGameStateHandler = this.updateGameStateHandler.bind(this);
+		this.setGameManager = this.setGameManager.bind(this);
+		this.renderCountdownHandler = this.renderCountdownHandler.bind(this);
 		// Register to Web Socket events
 		this._webSocketManager.on("welcometogame", (data) => console.log(data));
 		this._webSocketManager.on("me", (data) => console.log(data));

@@ -125,28 +125,28 @@ import { UserStats } from "../types/types";
 		const userStats = this.state.userStats;
 		//cree un objet manipulable pour chaque type de jeu
 		const gamePlayedTotal = {
-			total: userStats?.total_game_played || 0,
-			win: userStats?.total_game_won || 0,
-			lose: userStats?.total_game_lost || 0,
-			draw: userStats?.total_game_draw || 0,
+			total: userStats?.classic_total_game_played || 0,
+			win: userStats?.classic_total_game_won || 0, 
+			lose: userStats?.classic_total_game_lost || 0,
+			draw: userStats?.classic_total_game_draw || 0,
 		}
 		const gamePlayedLocal = {
-			total: userStats?.local_game_played || 0,
-			win: userStats?.local_game_won || 0,
-			lose: userStats?.local_game_lost || 0,
-			draw: userStats?.local_game_draw || 0,
+			total: userStats?.classic_local_game_played || 0,
+			win: userStats?.classic_local_game_won || 0,
+			lose: userStats?.classic_local_game_lost || 0,
+			draw: userStats?.classic_local_game_draw || 0,
 		}
 		const gamePlayedRemote = {
-			total: userStats?.remote_game_played || 0,
-			win: userStats?.remote_game_won || 0,
-			lose: userStats?.remote_game_lost || 0,
-			draw: userStats?.remote_game_draw || 0,
+			total: userStats?.classic_remote_game_played || 0,
+			win: userStats?.classic_remote_game_won || 0,
+			lose: userStats?.classic_remote_game_lost || 0,
+			draw: userStats?.classic_remote_game_draw || 0,
 		}
 		const gamePlayedTournament = {
-			total: userStats?.tournament_game_played || 0,
-			win: userStats?.tournament_game_won || 0,
-			lose: userStats?.tournament_game_lost || 0,
-			draw: userStats?.tournament_game_draw || 0,
+			total: userStats?.tournament_total_game_played || 0,
+			win: userStats?.tournament_total_game_won || 0,
+			lose: userStats?.tournament_total_game_lost || 0,
+			draw: userStats?.tournament_total_game_draw || 0,
 		}
 		const gamePlayedTournamentLocal = {
 			total: userStats?.tournament_local_game_played || 0,
@@ -164,10 +164,11 @@ import { UserStats } from "../types/types";
 		// creation des objet Data pour les charts
 		const gamePlayedTotalData = {
 			title: "Game Played Total",
+			total: gamePlayedTotal.total,
 			dataset:[
 				{ label: "lose", value: gamePlayedTotal.lose, color: "#f87171" }, // Rouge
 				{ label: "win", value: gamePlayedTotal.win, color: "#60a5fa" },
-				{ label: "draw", value: gamePlayedTotal.draw, color: "#fbbf24" }
+				{ label: "draw", value: gamePlayedTotal.draw, color: "#fbbf24" },
 			],
 			legende: [
 				{label: "lose", color: "bg-red-500" },
@@ -177,6 +178,7 @@ import { UserStats } from "../types/types";
 		}
 		const gamePlayedLocalData = {
 			title: "Game Played Local",
+			total: gamePlayedLocal.total,
 			dataset:[
 				{ label: "lose", value: gamePlayedLocal.lose, color: "#f87171" }, // Rouge
 				{ label: "win", value: gamePlayedLocal.win, color: "#60a5fa" },
@@ -190,6 +192,7 @@ import { UserStats } from "../types/types";
 		}
 		const gamePlayedRemoteData = {
 			title: "Game Played Remote",
+			total: gamePlayedRemote.total,
 			dataset:[
 				{ label: "lose", value: gamePlayedRemote.lose, color: "#f87171" }, // Rouge
 				{ label: "win", value: gamePlayedRemote.win, color: "#60a5fa" },
@@ -203,6 +206,7 @@ import { UserStats } from "../types/types";
 		}
 		const gamePlayedTournamentData = {
 			title: "Game Played Tournament",
+			total: gamePlayedTournament.total,
 			dataset:[
 				{ label: "lose", value: gamePlayedTournament.lose, color: "#f87171" }, // Rouge
 				{ label: "win", value: gamePlayedTournament.win, color: "#60a5fa" },
@@ -216,6 +220,7 @@ import { UserStats } from "../types/types";
 		}
 		const gamePlayedTournamentLocalData = {
 			title: "Game Played Tournament Local",
+			total: gamePlayedTournamentLocal.total,
 			dataset:[
 				{ label: "lose", value: gamePlayedTournamentLocal.lose, color: "#f87171" }, // Rouge
 				{ label: "win", value: gamePlayedTournamentLocal.win, color: "#60a5fa" },
@@ -229,6 +234,7 @@ import { UserStats } from "../types/types";
 		}
 		const gamePlayedTournamentRemoteData = {
 			title: "Game Played Tournament Remote",
+			total: gamePlayedTournamentRemote.total,
 			dataset:[
 				{ label: "lose", value: gamePlayedTournamentRemote.lose, color: "#f87171" }, // Rouge
 				{ label: "win", value: gamePlayedTournamentRemote.win, color: "#60a5fa" },

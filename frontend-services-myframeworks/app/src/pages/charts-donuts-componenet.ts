@@ -8,6 +8,7 @@ import {User} from '../types/types';
 	color: string;
   }; 
   type DonutsType ={
+	total?: number;
 	dataset: DonutSegment[];
 	title: string;
 	legende: {label: string, color: string }[];
@@ -21,6 +22,7 @@ import {User} from '../types/types';
 	constructor() {
 		super({ user: null});
 		this.dataChart = {
+		  total: 0,
 		  dataset: [],
 		  title: '',
 		  legende: []
@@ -67,7 +69,23 @@ import {User} from '../types/types';
 	createDonutChart() {
 		this.svg = this.querySelector('svg') as SVGSVGElement;
 		this.label = this.querySelector(".donutLabel") as HTMLElement;
-		this.total = this.dataChart.dataset.reduce((sum, segment) => sum + segment.value, 0);
+		const totalGames = this.dataChart.total||0 // total réel (avec ou sans résultat)
+
+
+		const resultSum = this.dataChart.dataset.reduce((sum, seg) => sum + seg.value, 0);
+				//si le total est 0, on ne fait rien on suprime les dataset existant
+		if (resultSum === 0) {
+			this.dataChart.dataset = [];
+		}
+		if (resultSum < totalGames ||resultSum === 0) {
+			this.dataChart.dataset.push({
+				label: "No Result",
+				value: totalGames - resultSum,
+				color: "#2A3439" // gris ou couleur neutre
+			});
+		}
+		//this.total = this.dataChart.dataset.reduce((sum, segment) => sum + segment.value, 0);
+		this.total = totalGames;
 		//svg viewbox get
 		const viewBox = this.svg.getAttribute('viewBox');
 		const viewBoxValues = viewBox ? viewBox.split(' ').map(Number) : [0, 0, 36, 36];

@@ -5,7 +5,7 @@ import { UserStats } from '../models/User';
 import { BuildOptions, UrlSearchParams } from '@src/utils/BuildOptions';
 import { IParams } from '@src/repository/helpers';
 
-const handlefetchStats = async (authorization:string|undefined,cookie : string|undefined,userId:number, dataStats:Partial<UserStats>) => {
+/* const handlefetchStats = async (authorization:string|undefined,cookie : string|undefined,userId:number, dataStats:Partial<UserStats>) => {
   try {
       const response = await fetch(`http://user-management-service:3000/api/users/${userId}/stats`, {
     method: 'PUT',
@@ -70,7 +70,7 @@ const handleSetStats = async (type:string,format:string,request:FastifyRequest<{
      
          }
      
-         if (type === "local" && format === "tournament") {
+         if (type === "local" && format === "tournament") {//@BUG a revoir!!!
           // const playerId = requestBody.players.at(0) as number;
            const updatedStats = await handlefetchStats(authorization,cookie,playerId,{
              tournament_game_played: 1,
@@ -99,19 +99,19 @@ const handleSetStats = async (type:string,format:string,request:FastifyRequest<{
                }
             // }
          }
-        }
+        } */
 
 export class GameController {
   private gameRepository = new GameRepository();
     constructor() {
       this.gameRepository = new GameRepository()
-      this.createGame = this.createGame.bind(this);
+   //   this.createGame = this.createGame.bind(this);
       this.getGames = this.getGames.bind(this);
       this.getGameById = this.getGameById.bind(this);
       this.getGamesByQuery = this.getGamesByQuery.bind(this);
       this.updateGame = this.updateGame.bind(this);
       this.deleteGame = this.deleteGame.bind(this);
-      this.joinGameById = this.joinGameById.bind(this);
+   //   this.joinGameById = this.joinGameById.bind(this);
       this.createGameDocker = this.createGameDocker.bind(this);
     }
 
@@ -140,11 +140,11 @@ export class GameController {
     }
     return reply.status(201).send(games);
   }
-  async createGame(request: FastifyRequest<{ Body: GameCreate }>, reply: FastifyReply) {  
+/*   async createGame(request: FastifyRequest<{ Body: GameCreate }>, reply: FastifyReply) {  
     const { ...requestBody } = request.body;
  //   const {authorization,cookie} = request.headers;
-    const {type , format/*  , mode */} = request.params as {type:string,format:string/* ,mode:string */};
-    if (!type || !format/*  || !mode */) {
+    const {type , format} = request.params as {type:string,format:string};
+    if (!type || !format) {
       return reply.status(400).send({ error: 'Invalid request params' });
     }
     if (type !== 'local' && type !== 'remote') {
@@ -152,14 +152,11 @@ export class GameController {
     }
     if (format !== 'classic' && format !== 'tournament') {
       return reply.status(400).send({ error: 'Invalid game format' });
-    }/* 
-    if (mode !== 'normal' && mode !== 'rapide') {
-      return reply.status(400).send({ error: 'Invalid game mode' });
-    } */
+    }
     if (!request.authenticatedUser){
       return reply.status(401).send({ error: 'Unauthorized' });
     }
-    const games = await this.gameRepository.create({...requestBody,type,format/* ,mode */});
+    const games = await this.gameRepository.create({...requestBody,type,format});
     console.log("GameController createGame ",games?'ok':'ko');
     if (!games) {
       return reply.status(404).send({ error: 'Game creation failed' });
@@ -167,7 +164,7 @@ export class GameController {
     //  - update user state
     handleSetStats(type,format,request,reply);
     return reply.status(201).send(games);
-  }
+  } */
 
   async getGames(request: FastifyRequest, reply: FastifyReply) { 
     try {
@@ -231,7 +228,7 @@ export class GameController {
   }
 
 
-  async joinGameById(request: FastifyRequest<{Body:undefined, Params: { id: string }/* , Body: {state:string} */ }>, reply: FastifyReply) {
+/*   async joinGameById(request: FastifyRequest<{Body:undefined, Params: { id: string } }>, reply: FastifyReply) {
     const gameId = Number(request.params.id);
     if (!gameId) {
       return reply.status(400).send({ error: 'Invalid gameId id' });
@@ -255,7 +252,7 @@ export class GameController {
   //  - update user state
   handleSetStats(game.type,game.format,request,reply);
   return reply.send(game);
-  }
+  } */
 
 }
 

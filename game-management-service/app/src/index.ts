@@ -1,10 +1,8 @@
 import { server } from "./server";
 import { registerPlugins }  from "./plugins/fastifyRegisterPlugins";
-import gameRoutes from "./routes/game.routes";
 import tournamentsRoutes from "./routes/tounament.routes";
 import gameHistoryRoutes from "./routes/gameHistory.routes";
-import roundRoutes from "./routes/round.routes";
-import dockerRoutes from "./routes/docker.routes";
+import gameRoutes from "./routes/game.routes";
 
 const app = server();
 
@@ -12,21 +10,19 @@ async function start() {
   //1- Enregistrement des plugins
   await registerPlugins(app);
   //2- Enregistrer les routes
-	await app.register(gameRoutes, { prefix: "/api/game-management-service/games" });
-	await app.register(dockerRoutes, { prefix: "/api/game-management-service/docker/games" });
-	await app.register(gameHistoryRoutes, { prefix: "/docker/gameHistory" });
+	await app.register(gameHistoryRoutes, { prefix: "/internal/gameHistory" });
+	await app.register(gameRoutes, { prefix: "/internal/games" });
+	await app.register(tournamentsRoutes, { prefix: "/internal/tournaments" });
 
-	await app.register(dockerRoutes, { prefix: "/docker/games" });
-	await app.register(tournamentsRoutes, { prefix: "/api/game-management-service/tournaments" });
-	await app.register(tournamentsRoutes, { prefix: "/api/game-management-service/docker/tournaments" });
-	await app.register(gameHistoryRoutes, { prefix: "/api/game-management-service/gameHistory" });
-	await app.register(roundRoutes, { prefix: "/api/game-management-service/rounds" });
   //3- Recuperer les variables d'environnement
   const host = app.env.BACKEND_SERVER_NAME_API;
   const port = app.env.BACKEND_SERVER_SSH_PORT
   //4- Démarrer le serveur
   try {
     await app.listen({ port: 3000, host: "0.0.0.0" });
+    //!! Warning only internal routes; isolated from local network and not exposed to the public
+    //!! this service is only accessible from other services in the docker network
+    console.warn("⚠️ Warning: This service is only accessible from other services in the docker network. It is not exposed to the public.");
     console.log(`🚀 Server running on node container http://localhost:3000`);
     console.log(`📄 Documentation Swagger: https://${host}:${port}/api/game-management-service/docs`);
   } catch (err) {

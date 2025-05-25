@@ -1,3 +1,5 @@
+//@TODO encore utiliser ce fichier???
+
 import { WsPlayers } from "../../types/gameUtils.type";
 
 import { Ball } from "../../models/gameClass/Ball";
@@ -479,9 +481,7 @@ export class Match {
 				//user: type === 'remote' ? mePlayersId : null,
 				}
 			};
-		//const result = await fetch(`http://database-services:3000/api/v2/database/myDb/table/game?relations=players`, {
-		//const result = await fetch(`http://game-management-service:3000/api/game-management-service/games/${type}/${format}/${mode}`, {
-			const result = await fetch(`http://game-management-service:3000/docker/games/${this.config.type}/${this.config.format}/normal`, {
+			const result = await fetch(`http://game-management-service:3000/internal/games/${this.config.type}/${this.config.format}/normal`, {
 
 			method: 'POST',
 			headers: {
@@ -519,7 +519,7 @@ export class Match {
 			throw new Error("Error creating game");
 		}
 	}
-	processDataBaseSaveMatchResult = async() => {
+	processDataBaseSaveMatchResult = async() => { 
 		console.log("[Match]processDataBaseSaveMatchResult gameId ",this.config.gameId);
 		console.log("[Match]processDataBaseSaveMatchResult gameHistoryId ",this.gameHistoryId);
 
@@ -541,7 +541,7 @@ export class Match {
 		
 		try {
 		//const result = await fetch(`https://localhost:4433/api/game-management-service/gameHistory/${this.gameHistoryId}`, {
-		const result = await fetch(`http://game-management-service:3000/docker/gameHistory/${this.gameHistoryId}`, {
+		const result = await fetch(`http://game-management-service:3000/internal/gameHistory/${this.gameHistoryId}`, {
 
 			method: 'PUT',
 				headers: {

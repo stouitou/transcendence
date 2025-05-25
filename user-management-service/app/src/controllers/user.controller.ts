@@ -33,7 +33,7 @@ export type AutProvider = {
   user: User;
 }
 
-const helpersUpdateStats=( userStats: UserStats, addValue : Partial<UserStats>) => {
+/* const helpersUpdateStats=( userStats: UserStats, addValue : Partial<UserStats>) => {
   return {
       id: userStats.id,
       total_game_played: addValue.total_game_played? addValue.total_game_played + userStats.total_game_played: userStats.total_game_played,
@@ -61,7 +61,7 @@ const helpersUpdateStats=( userStats: UserStats, addValue : Partial<UserStats>) 
       tournament_remote_game_lost : addValue.tournament_remote_game_lost? addValue.tournament_remote_game_lost + userStats.tournament_remote_game_lost: userStats.tournament_remote_game_lost,
       tournament_remote_game_draw : addValue.tournament_remote_game_draw? addValue.tournament_remote_game_draw + userStats.tournament_remote_game_draw: userStats.tournament_remote_game_draw
   };
-}
+} */
 
 //@TODO importer le bon type de GAME
 interface Game {
@@ -177,6 +177,7 @@ export class UserController {
     return reply.send(user.userStats);
   }
 
+  //@TODO updateStatsById est ce que c'est utile de le conserver ?
   async updateStatsById(request:  FastifyRequest<{ Params: { id: string },Body:Partial<UserStats> }>, reply: FastifyReply) {
     const userId = Number(request.params.id);
     if (!userId) {
@@ -203,7 +204,7 @@ export class UserController {
       // Mettre à jour les statistiques de l'utilisateur
     const userUpdated = await this.userRepository.update({
       id: userId,
-      userStats: helpersUpdateStats(userStats, requestBody),
+      //userStats: helpersUpdateStats(userStats, requestBody),
     });
   
     if (!userUpdated) {
@@ -438,7 +439,7 @@ await chmod(uploadPath, 0o644);
 
    try {
     const authHeader = request.headers.authorization;
-    const response = await fetch(`http://game-management-service:3000/api/game-management-service/games?${builQuery}`, {
+    const response = await fetch(`http://game-management-service:3000/internal/games?${builQuery}`, {
       method: 'GET',
       headers: {
         'Authorization': authHeader?? '',
@@ -517,7 +518,7 @@ async getUserFriends(request: FastifyRequest, reply: FastifyReply) {
         const builQuery = Helpers.buildQueryString/* <Game> */(query,{players:{id:userId}});//@TODO Type Tournaments
     try {
       const authHeader = request.headers.authorization;
-      const response = await fetch(`http://game-management-service:3000/api/game-management-service/tournaments?${builQuery}`, {
+      const response = await fetch(`http://game-management-service:3000/internal/tournaments?${builQuery}`, {
         method: 'GET',
         headers: {
           'Authorization': authHeader?? '',
