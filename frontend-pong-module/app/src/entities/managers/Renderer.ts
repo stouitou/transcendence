@@ -209,53 +209,71 @@ export class	Renderer {
 	}
 
 
-	displayHistoriqueGame (statisticsManager: StatisticsManager, players: Player[]) {
-		const	menuHistoriqueGame = document.createElement('div');
-		menuHistoriqueGame.style.position =	'absolute';
-		menuHistoriqueGame.style.width = '250px';
-		menuHistoriqueGame.style.height = '400px';
-		menuHistoriqueGame.style.backgroundColor = 'blue';
-		menuHistoriqueGame.style.display = 'flex';
-		menuHistoriqueGame.style.justifyContent = 'center';
-		menuHistoriqueGame.style.alignItems = 'center';
-		menuHistoriqueGame.style.color = 'white';
-		menuHistoriqueGame.style.fontSize = '15px';
-		menuHistoriqueGame.style.fontFamily = 'Arial';
-		menuHistoriqueGame.style.borderRadius = '8px';
-		menuHistoriqueGame.style.border = '5px solid rgb(255, 0, 0)';
-		menuHistoriqueGame.style.background = 'rgb(0, 0, 0)';
-		menuHistoriqueGame.style.color = 'rgb(255, 0, 0)';
-		menuHistoriqueGame.style.whiteSpace = 'pre-line';
-		let	text: string = 'Le plus grand nombre de rebonds ' + statisticsManager._gameHistory.maxBounceCount + "\n\n";
-/* 		let mostGoalsConcededPlayer: number = 0;
-		let playerWithMostPointsLost: number = 0; */
+	displayHistoriqueGame(statisticsManager: StatisticsManager, players: Player[]) {
+		const menu = document.createElement('div');
 
-		/* for (let x: number = 0; x < players.length; x++)
-		{
-			console.log("players[x].historiqueGame.firstPointScorer ", "players[x].historiqueGame.firstPointScorer?.name");
-			if (players[x]._historyPlayer.goalsConceded > players[mostGoalsConcededPlayer].historiqueGame.mostGoalsConcededPlayer)
-				mostGoalsConcededPlayer = x;
-			if (players[x].historiqueGame.playerWithMostPointsLost > players[playerWithMostPointsLost].historiqueGame.playerWithMostPointsLost)
-				playerWithMostPointsLost = x;
-			if (players[x].historiqueGame.firstPointScorer)
-				text += "Le premier joueur à avoir marqué un point est " + players[x].name + "\n\n";
-		} */
-		const	{name, goalsConceded} = statisticsManager._gameHistory.mostGoalsConcededPlayer;
-		//text += " Le joueur qui s'est pris le plus de buts " + players[mostGoalsConcededPlayer].name + " avec " + players[mostGoalsConcededPlayer].historiqueGame.mostGoalsConcededPlayer + "\n\n";
-		text += ` Le joueur qui s'est pris le plus de buts ${name} avec ${goalsConceded}\n\n`;
-	//	text += "Le joueur ayant perdu le plus de points " + players[playerWithMostPointsLost].name + " avec " + players[playerWithMostPointsLost].historiqueGame.playerWithMostPointsLost + "\n\n";
+		// ─── PANEL LAYOUT ────────────────────────────────────────────
+		Object.assign(menu.style, {
+			position:       'absolute',
+			top:            '50%',
+			left:           '50%',
+			transform:      'translate(-50%, -50%)',
+			width:          '320px',            // wider to fit all text
+			padding:        '16px 24px',
+			background:     'rgba(255,255,255,0.6)',
+			backdropFilter: 'blur(4px)',
+			border:         '1px solid rgba(0,0,0,0.05)',
+			borderRadius:   '12px',
+			boxShadow:      '0 4px 12px rgba(0,0,0,0.06)',
+			fontFamily:     'Inter, Arial, sans-serif',
+			fontSize:       '14px',
+			lineHeight:     '1.5',
+			color:          '#333',
+			textAlign:      'left',
+			overflow:       'visible',         // show all at once
+			zIndex:         '1000',
+		} as Partial<CSSStyleDeclaration>);
 
-		players.forEach(player => {
-			text += ` Nombre de rebond de ${player.name} est de {player.totalBouncesPerPlayer} \n`;
-		});
-		/* for (let x: number = 0; x < players.length; x++)
-		{
-			text += "Nombre de rebond de " + players[x].name + " est de " + players[x].historiqueGame.totalBouncesPerPlayer + "\n";
-		} */
-		menuHistoriqueGame.textContent = text;
-		this._gameAlert?.appendChild(menuHistoriqueGame);
+		// ─── LOBBY BUTTON (top) ─────────────────────────────────────
+		menu.innerHTML = `
+    <div style="text-align:right; margin-bottom:12px;">
+      <a
+        href="https://localhost:4433/game-loby"
+        style="
+          display:inline-block;
+          padding:6px 12px;
+          background:rgba(200,230,255,0.7);
+          color:#333;
+          text-decoration:none;
+          border-radius:6px;
+          font-weight:600;
+          box-shadow:0 2px 8px rgba(0,0,0,0.08);
+        "
+      >
+        ◀ Retour au Lobby
+      </a>
+    </div>
+    <ul style="list-style:none; padding:0; margin:0;">
+      <li><strong>Rebonds max :</strong> ${statisticsManager._gameHistory.maxBounceCount}</li>
+      <li>
+        <strong>Plus de buts encaissés :</strong>
+        ${statisticsManager._gameHistory.mostGoalsConcededPlayer.name}
+        (${statisticsManager._gameHistory.mostGoalsConcededPlayer.goalsConceded})
+      </li>
+      ${players.map(p =>
+			`<li><strong>${p.name} rebonds :</strong> ${p.totalBouncesPerPlayer}</li>`
+		).join("")}
+    </ul>
+  `;
+
+		this._gameAlert?.appendChild(menu);
 		this._gameAlert?.classList.add('show');
 	}
+
+
+
+
+
 }
 
 
