@@ -26,19 +26,7 @@ export class	Renderer {
 	set gameAlert (div: HTMLElement)		{ this._gameAlert = div; }
 	set gameHero (div: HTMLElement)			{ this._gameHero = div; }
 	set gameHeroTree (div: HTMLElement)		{ this._gameHeroTree = div; }
-	private _ballImg: HTMLImageElement | null = null;
 
-	private loadBallSprite() {
-		if (this._ballImg) return;      // already cached
-
-		const img = new Image();
-		img.src = "/uploads/balls/ball6.png";        // sprite path at site root
-
-		img.onload  = () => console.log("ball sprite loaded");
-		img.onerror = () => console.error("ball sprite failed to load npppppp");
-
-		this._ballImg = img;
-	}
 
 	private displayScore (Players: Player[] = []) {
 		this._score.innerHTML = '';
@@ -75,7 +63,7 @@ export class	Renderer {
 		// if (this._players.length > 2)
 		// 	CANVAS_WIDTH = 500;
 		this._canvas.width = CANVAS_WIDTH;
-		this.loadBallSprite();
+
 		this._score = Design.createAppendix(/* this._players.length */4 - 1);
 
 		this._score.style.width = '100%';
@@ -119,18 +107,69 @@ export class	Renderer {
 	}
 
 	private drawBall(ball: Ball) {
+		if (!this._ctx) return;
 		const ctx = this._ctx;
-		const img = this._ballImg;
-		if (!ctx || !img) return;
 
-		// only draw when the sprite really loaded
-		if (!img.complete || img.naturalWidth === 0) return;
+		const r = ball.size.width;   // radius
+		const x = ball.position.x;   // center X
+		const y = ball.position.y;   // center Y
 
-		const r = ball.size.width;
-		const { x, y } = ball.position;
+		// 1) build fancy radial gradient
+		const g = ctx.createRadialGradient(
+			x - r * 0.4, y - r * 0.4, r * 0.1,
+			x,            y,            r
+		);
+		g.addColorStop(0,   "#ffffff");                // bright core
+		g.addColorStop(0.25, Design.DESIGN.accentColor); // your accent
+		g.addColorStop(1,   "rgba(228,0,27,0.35)");                // deep edge
 
-		ctx.drawImage(img, x - r, y - r, r * 2, r * 2);
+
+		// 2) shadow/glow behind the ball
+		ctx.save();
+		ctx.shadowColor = Design.DESIGN.accentColor;
+		ctx.shadowBlur  = 12;
+		ctx.shadowOffsetX = 0;
+		ctx.shadowOffsetY = 0;
+
+		// 3) blur-pass for extra bloom
+		ctx.filter = "blur(2px)";
+
+		ctx.beginPath();
+		ctx.arc(x, y, r, 0, Math.PI * 2);
+		ctx.fillStyle = g;
+		ctx.fill();
+		ctx.restore();
+
+		// 4) main fill without filter to sharpen
+		ctx.save();
+		ctx.beginPath();
+		ctx.arc(x, y, r, 0, Math.PI * 2);
+		ctx.fillStyle = g;
+		ctx.fill();
+		ctx.restore();
+
+		// 5) inner specular highlight
+		ctx.save();
+		ctx.fillStyle = "rgba(255,255,255,0.6)";
+		ctx.beginPath();
+		ctx.ellipse(
+			x - r * 0.35, y - r * 0.35,
+			r * 0.2,      r * 0.12,
+			0,           0,           Math.PI * 2
+		);
+		ctx.fill();
+		ctx.restore();
+
+		// 6) edge stroke for definition
+		ctx.save();
+		ctx.lineWidth   = 2;
+		ctx.strokeStyle = "rgba(255,255,255,0.2)";
+		ctx.beginPath();
+		ctx.arc(x, y, r - 1, 0, Math.PI * 2);
+		ctx.stroke();
+		ctx.restore();
 	}
+
 
 
 
@@ -145,34 +184,30 @@ export class	Renderer {
 	}
 
 
-	renderGameHeroDiv (data: PREPARE_MATCHES_STARTED_ROUND_GAME) {
-		console.log('Renderer: renderGameHeroDiv data:',data);
+	renderGameHeroDiv(data: PREPARE_MATCHES_STARTED_ROUND_GAME) {
 		const div = this._gameHero as HTMLDivElement;
-				if (div) {
-					div.innerHTML = '';
-					displayPrepareMatchesStartedRoundGame(div,data);
-				}
-		//effacer le div au bout de 5 secondes
-				setTimeout(() => {
-					if (div) {
-						div.innerHTML = '';
-					}
-				}, 5000);
+		if (!div) return;
+
+		// wipe & re-render
+		div.innerHTML = '';
+		displayPrepareMatchesStartedRoundGame(div, data);
+
+		// completely remove the container after 5s (no empty frame)
+		setTimeout(() => div.remove(), 5000);
 	}
 
-	renderGameHeroTreeDiv (data: PREPARE_MATCHES_STARTED_ROUND[]) {
+	renderGameHeroTreeDiv(data: PREPARE_MATCHES_STARTED_ROUND[]) {
 		const div = this._gameHeroTree as HTMLDivElement;
-		if (div) {
-			div.innerHTML = '';
-			displayPrepareMatchesStartedTournament(div, data);
-		}
-		// Remove the div after 5 seconds
-		setTimeout(() => {
-			if (div) {
-				div.innerHTML = '';
-			}
-		}, 5000);
+		if (!div) return;
+
+		// wipe & re-render
+		div.innerHTML = '';
+		displayPrepareMatchesStartedTournament(div, data);
+
+		// completely remove the container after 5s
+		setTimeout(() => div.remove(), 5000);
 	}
+
 
 	displayHistoriqueGame (statisticsManager: StatisticsManager, players: Player[]) {
 		const	menuHistoriqueGame = document.createElement('div');
@@ -250,18 +285,17 @@ export type PREPARE_MATCHES_STARTED_ROUND      = PrepareMatchRound;
 /* -------------------------------------------------------------------------- */
 
 // Large pill for hero card
-const heroChip = (player: Player) => `
-  <div class="inline-flex items-center gap-2 rounded-full px-6 py-2 bg-zinc-100/80 dark:bg-zinc-800/60 shadow ring-1 ring-black/5">
-    <span class="font-semibold truncate max-w-[8rem]">${player.name}</span>
-    <span class="text-lg font-bold text-emerald-600">${player.score}</span>
+// Large pill for hero card
+const heroChip = (p: Player) => `
+  <div class="chip hero-chip">
+    <span class="name">${p.name}</span>
   </div>`;
 
-// Small pill for tree view
-const miniChip = (player: Player) => `
-  <div class="inline-flex items-center gap-1 rounded-full px-3 py-1 bg-zinc-50 dark:bg-zinc-800/50 ring-1 ring-gray-200 dark:ring-zinc-700 text-xs">
-    <span class="truncate max-w-[6rem]">${player.name}</span>
-    <span class="font-semibold text-emerald-600">${player.score}</span>
+const miniChip = (p: Player) => `
+  <div class="chip mini-chip">
+    <span class="name">${p.name}</span>
   </div>`;
+
 
 /* -------------------------------------------------------------------------- */
 /*  Single‑game hero card                                                      */
@@ -279,10 +313,6 @@ export function displayPrepareMatchesStartedRoundGame(
 	div.innerHTML = `
     <section class="mx-auto max-w-screen-md px-4 sm:px-6 lg:px-8">
       <div class="rounded-2xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md shadow-lg ring-1 ring-black/5 p-8 text-center space-y-10">
-        <h3 class="text-lg font-semibold tracking-wide">
-          Game ID LOL;<span class="text-gray-900 dark:text-white">#${data.id}</span>
-        </h3>
-
         <div class="flex flex-wrap justify-center items-center gap-6">
           ${players.filter((_, i) => i % 2 === 0).map(heroChip).join("")}
           <span class="text-3xl font-extrabold text-blue-600 select-none">VS</span>

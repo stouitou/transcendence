@@ -225,7 +225,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
                class="slider-thumb w-full h-full opacity-0 cursor-pointer">
       </div>
 
-      <p class="mt-2 text-sm">Difficulté actuelle&nbsp;: <b>${difficulty}</b></p>
+      <p class="mt-2 text-sm">Difficulté actuelle: <b>${difficulty}</b></p>
     </div>
 
     <!-- ── 2. toggles (IDs unchanged so old listeners keep working) ────── -->
