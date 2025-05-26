@@ -120,7 +120,7 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
         <div class="font-semibold">Tournament&nbsp;ID:</div>            <div>${game?.config.tournamentId}</div>
         <div class="font-semibold">Allow&nbsp;registration:</div>       <div>${game?.config.isallowedRegistration}</div>
       </div>
-
+        
       <div class="text-center">
         <a class="chip !px-8 !py-3 inline-block mt-4"
            href="/game?id=${game?.lobyId}">Join game</a>

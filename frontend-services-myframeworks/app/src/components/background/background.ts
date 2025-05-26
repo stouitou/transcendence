@@ -13,22 +13,16 @@ import {
   Mesh,
 } from "babylonjs";
 
-export const getThemeColor=()=> {
-    if (localStorage.getItem('color-theme')) {
-        if (localStorage.getItem('color-theme') === 'light') {
-            return 'light';
-        }
-        return 'dark';
-    }
-    return 'light';
-}
+export const getThemeColor = (): 'light' | 'dark' => {
+  const theme = localStorage.getItem('color-theme');
+  return theme === 'dark' ? 'dark' : 'light';
+};
 
 export class BackgroundCanvas extends BaseComponent {
   private engine: Engine | null = null;
   private scene: Scene | null = null;
   private camera: FreeCamera | null = null;
   private canvas: HTMLCanvasElement | null = null;
-
 
   disconnectedCallback() {
     this.cleanup();
@@ -39,25 +33,46 @@ export class BackgroundCanvas extends BaseComponent {
       <div id="canvasContainer" class="fixed top-0 left-0 w-full h-full z-0">
           <canvas id="canvasContent" class="absolute top-0 left-0 w-full h-full"></canvas>
       </div>
-  `;
+    `;
 
-  const container = this.querySelector('#canvasContainer')! as HTMLDivElement;
-  const canvas = this.querySelector('#canvasContent') as HTMLCanvasElement;
-  this.initBackground(container, canvas);
+    const container = this.querySelector('#canvasContainer')! as HTMLDivElement;
+    const canvas = this.querySelector('#canvasContent')! as HTMLCanvasElement;
+    this.canvas = canvas;
+    this.initBackground(container, canvas);
   }
 
   initBackground(container: HTMLElement, canvas: HTMLCanvasElement) {
     if (!container || !canvas) return;
-    // Create a canvas for the background
-   /*  this.canvas = document.createElement("canvas");
-    this.canvas.className = "absolute top-0 left-0 w-full h-full block";
-    container.appendChild(this.canvas); */
 
-    // Babylon engine & scene
-    this.engine = new Engine(canvas, true);
+    // Put your PNG behind the transparent canvas
+    Object.assign(container.style, {
+      backgroundImage:    `linear-gradient(
+     rgba(255,255,255,0.8),    /* 50% white fade */
+     rgba(255,255,255,0.8)
+   ), 
+   url("/uploads/bg10.png")`,
+      backgroundSize:    'cover',
+      backgroundPosition:'center',
+      backgroundRepeat:  'no-repeat',
+
+    } as Partial<CSSStyleDeclaration>);
+
+    // Babylon engine & scene (with alpha framebuffer)
+    this.engine = new Engine(canvas, true, {
+      antialias:            true,
+      preserveDrawingBuffer: true,
+      stencil:               true,
+      alpha:                 true,
+    });
     this.scene = new Scene(this.engine);
-   // this.scene.clearColor = new Color4(1, 1, 1, 1); // Default background color
-    this.scene.clearColor = getThemeColor()==='light'? new Color4(1, 1, 1, 1): new Color4(0.2, 0.2, 0.2, 1); // Default background color
+
+    // Transparent clear so background shows through
+    const lightClear = new Color4(1, 1, 1, 0);
+    const darkClear  = new Color4(0.2, 0.2, 0.2, 0);
+    this.scene.clearColor = getThemeColor() === 'light' ? lightClear : darkClear;
+
+    // Ensure the <canvas> itself is transparent in CSS
+    canvas.style.backgroundColor = 'transparent';
 
     // Orthographic camera
     this.camera = new FreeCamera("camera", new Vector3(0, 0, 50), this.scene);
@@ -70,10 +85,10 @@ export class BackgroundCanvas extends BaseComponent {
       const rect = this.engine.getRenderingCanvasClientRect();
       if (!rect) return;
       const aspect = rect.width / rect.height;
-      this.camera.orthoTop = 30;
+      this.camera.orthoTop    = 30;
       this.camera.orthoBottom = -30;
-      this.camera.orthoLeft = -30 * aspect;
-      this.camera.orthoRight = 30 * aspect;
+      this.camera.orthoLeft   = -30 * aspect;
+      this.camera.orthoRight  = 30 * aspect;
     };
     updateCameraOrtho();
     window.addEventListener("resize", () => {
@@ -88,15 +103,14 @@ export class BackgroundCanvas extends BaseComponent {
     // Create spheres
     this.spawnBalls(30, 1.0);
 
-    // Écouter les changements de thème
+    // Listen for theme changes to adjust clear color & materials
     const themeObserver = new MutationObserver(() => {
-        this.scene!.clearColor = getThemeColor() === 'light' ? new Color4(1, 1, 1, 1) : new Color4(0.2, 0.2, 0.2, 1);
-        this.updateMaterials(); // Mettre à jour les matériaux des sphères
+      this.scene!.clearColor = getThemeColor() === 'light' ? lightClear : darkClear;
+      this.updateMaterials();
     });
-
     themeObserver.observe(document.documentElement, {
-        attributes: true,
-        attributeFilter: ['data-theme'],
+      attributes: true,
+      attributeFilter: ['data-theme'],
     });
 
     // Render loop
@@ -113,15 +127,14 @@ export class BackgroundCanvas extends BaseComponent {
 
     for (let i = 0; i < count; i++) {
       const sphere = MeshBuilder.CreateSphere(
-        `sphere_${i}`,
-        { diameter: sphereRadius * 2, segments: 24 },
-        this.scene
+          `sphere_${i}`,
+          { diameter: sphereRadius * 2, segments: 24 },
+          this.scene
       );
       const randomMat = materials[Math.floor(Math.random() * materials.length)];
       sphere.material = randomMat;
 
       const { left, right, top, bottom } = this.getCameraBounds(this.camera);
-      if (!left || !right || !top || !bottom) return;
       sphere.position.x = this.randomRange(left + sphereRadius, right - sphereRadius);
       sphere.position.y = this.randomRange(bottom + sphereRadius, top - sphereRadius);
       sphere.position.z = 0;
@@ -132,88 +145,54 @@ export class BackgroundCanvas extends BaseComponent {
       balls.push({ mesh: sphere, vx, vy, radius: sphereRadius });
     }
 
-    // Animate collisions, bounces, etc.
     this.scene.onBeforeRenderObservable.add(() => {
-      const dt = this.engine?.getDeltaTime()! * 0.001;
+      const dt = (this.engine!.getDeltaTime()! * 0.001) * 60;
       const { left, right, top, bottom } = this.getCameraBounds(this.camera!);
-      if (!left || !right || !top || !bottom) return;
 
       for (const b of balls) {
-        b.mesh.position.x += b.vx * dt * 60;
-        b.mesh.position.y += b.vy * dt * 60;
+        b.mesh.position.x += b.vx * dt;
+        b.mesh.position.y += b.vy * dt;
 
-        // Bounce checks
-        if (b.mesh.position.x > right - b.radius) {
-          b.mesh.position.x = right - b.radius;
-          b.vx *= -1;
-        } else if (b.mesh.position.x < left + b.radius) {
-          b.mesh.position.x = left + b.radius;
-          b.vx *= -1;
-        }
-        if (b.mesh.position.y > top - b.radius) {
-          b.mesh.position.y = top - b.radius;
-          b.vy *= -1;
-        } else if (b.mesh.position.y < bottom + b.radius) {
-          b.mesh.position.y = bottom + b.radius;
-          b.vy *= -1;
-        }
+        if (b.mesh.position.x > right - b.radius || b.mesh.position.x < left + b.radius) b.vx *= -1;
+        if (b.mesh.position.y > top - b.radius   || b.mesh.position.y < bottom + b.radius) b.vy *= -1;
       }
-      // Ball-ball collisions (2D)
+
       for (let i = 0; i < balls.length; i++) {
         for (let j = i + 1; j < balls.length; j++) {
-            resolveCollision2D(balls[i], balls[j]);
+          resolveCollision2D(balls[i], balls[j]);
         }
-    }
+      }
     });
   }
 
   createDefaultMaterials(scene: Scene): StandardMaterial[] {
-    const colors = getThemeColor()==='light'? ["#ff0063", "#ff0000", "#00ffa1", "#0032ff", "#d7b5ff", "#FFD1BA"]:
-     ["#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff"];
+    const colors = getThemeColor() === 'light'
+        ? ["#ff0063", "#ff0000", "#00ffa1", "#0032ff", "#d7b5ff", "#FFD1BA"]
+        : ["#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff"];
     return colors.map((color, index) => {
       const mat = new StandardMaterial(`mat${index}`, scene);
-      mat.diffuseColor = Color3.FromHexString(color);
+      mat.diffuseColor  = Color3.FromHexString(color);
       mat.specularColor = new Color3(0.3, 0.3, 0.3);
       return mat;
     });
   }
 
-  /**
-   * updateMaterials
-   * Updates the materials of the spheres in the scene based on the current theme color.
-   * If the theme is light, it uses a set of light colors; otherwise, it uses a set of dark colors.
-   * This function is called to refresh the materials when the theme changes.
-   * @returns {void}
-   */
   updateMaterials() {
     if (!this.scene) return;
-  
-    const colors = getThemeColor() === 'light'
-      ? ["#ff0063", "#ff0000", "#00ffa1", "#0032ff", "#d7b5ff", "#FFD1BA"]
-      : ["#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff"];
-  
-    const materials = colors.map((color, index) => {
-      const mat = new StandardMaterial(`mat${index}`, this.scene!);
-      mat.diffuseColor = Color3.FromHexString(color);
-      mat.specularColor = new Color3(0.3, 0.3, 0.3);
-      return mat;
-    });
-  
-    // Mettre à jour les matériaux des sphères existantes
+    const newMats = this.createDefaultMaterials(this.scene);
     this.scene.meshes.forEach((mesh) => {
       if (mesh.name.startsWith('sphere_')) {
-        const randomMat = materials[Math.floor(Math.random() * materials.length)];
-        mesh.material = randomMat;
+        (mesh as Mesh).material = newMats[Math.floor(Math.random() * newMats.length)];
       }
     });
   }
 
   getCameraBounds(camera: FreeCamera) {
     return {
-      left: camera.orthoLeft,
-      right: camera.orthoRight,
-      top: camera.orthoTop,
-      bottom: camera.orthoBottom,
+      left:   camera.orthoLeft!,
+      right:  camera.orthoRight!,
+      top:    camera.orthoTop!,
+      bottom: camera.orthoBottom!,
     };
   }
 
@@ -222,7 +201,6 @@ export class BackgroundCanvas extends BaseComponent {
   }
 
   cleanup() {
-    // Cleanup resources when the component is removed
     if (this.engine) {
       this.engine.stopRenderLoop();
       this.scene?.dispose();
@@ -233,37 +211,39 @@ export class BackgroundCanvas extends BaseComponent {
       this.canvas.parentNode.removeChild(this.canvas);
     }
     this.canvas = null;
-    this.scene = null;
+    this.scene  = null;
     this.camera = null;
   }
 }
 
-function resolveCollision2D(a: { mesh: Mesh; vx: number; vy: number; radius: number }, b: { mesh: Mesh; vx: number; vy: number; radius: number }) {
-    const dx = b.mesh.position.x - a.mesh.position.x;
-    const dy = b.mesh.position.y - a.mesh.position.y;
-    const distSq = dx * dx + dy * dy;
-    const radiusSum = a.radius + b.radius;
+function resolveCollision2D(
+    a: { mesh: Mesh; vx: number; vy: number; radius: number },
+    b: { mesh: Mesh; vx: number; vy: number; radius: number }
+) {
+  const dx = b.mesh.position.x - a.mesh.position.x;
+  const dy = b.mesh.position.y - a.mesh.position.y;
+  const distSq = dx * dx + dy * dy;
+  const radiusSum = a.radius + b.radius;
 
-    if (distSq <= radiusSum * radiusSum) {
-        const dist = Math.sqrt(distSq) || 0.00001;
-        const nx = dx / dist;
-        const ny = dy / dist;
+  if (distSq <= radiusSum * radiusSum) {
+    const dist = Math.sqrt(distSq) || 0.00001;
+    const nx = dx / dist;
+    const ny = dy / dist;
 
-        const vaDot = a.vx * nx + a.vy * ny;
-        const vbDot = b.vx * nx + b.vy * ny;
-        const aFactor = vbDot - vaDot;
-        const bFactor = vaDot - vbDot;
+    const vaDot = a.vx * nx + a.vy * ny;
+    const vbDot = b.vx * nx + b.vy * ny;
+    const aFactor = vbDot - vaDot;
+    const bFactor = vaDot - vbDot;
 
-        a.vx += aFactor * nx;
-        a.vy += aFactor * ny;
-        b.vx += bFactor * nx;
-        b.vy += bFactor * ny;
+    a.vx += aFactor * nx;
+    a.vy += aFactor * ny;
+    b.vx += bFactor * nx;
+    b.vy += bFactor * ny;
 
-        // Slight separation
-        const overlap = radiusSum - dist;
-        a.mesh.position.x -= (overlap * 0.5) * nx;
-        a.mesh.position.y -= (overlap * 0.5) * ny;
-        b.mesh.position.x += (overlap * 0.5) * nx;
-        b.mesh.position.y += (overlap * 0.5) * ny;
-    }
+    const overlap = radiusSum - dist;
+    a.mesh.position.x -= (overlap * 0.5) * nx;
+    a.mesh.position.y -= (overlap * 0.5) * ny;
+    b.mesh.position.x += (overlap * 0.5) * nx;
+    b.mesh.position.y += (overlap * 0.5) * ny;
+  }
 }

@@ -12,14 +12,26 @@ import { Player } from "./Player";
 
 
 /* ---------- palette / fonts ---------- */
+/* Design.ts */
+
 export const DESIGN = {
-    fieldColor  : "#171d29",     // deep charcoal-blue
-    lineColor   : "#ffffff",
-    accentColor : "#00faff",     // vivid aqua
-    buttonColor : "#ffffff",
-    textColor   : "#472525",     // soft light grey
-    fontFamily  : "'Inter', 'Helvetica Neue', Arial, sans-serif",
+    // a deep, pool-green court you can see through
+    fieldColor:    "rgba(173,138,227,0.25)",
+
+    // crisp, slightly translucent white lines
+    lineColor:     "rgba(255, 255, 255, 0.8)",
+    lineWidth:     20,    // thinner, more realistic court lines
+
+    lineWidth2: 2,
+    // a bright tennis-ball yellow accent
+    accentColor:   "rgb(255,147,222)",
+
+    // everything else stays white or near-black
+    buttonColor:   "#ffffff",
+    textColor:     "#231e1e",
+    fontFamily:    "'Inter', 'Helvetica Neue', Arial, sans-serif",
 };
+
 
 /* ---------- global page styling ---------- */
 (() => {
@@ -71,19 +83,10 @@ export const DESIGN = {
             position        : "fixed",
             inset           : "0",
             pointerEvents   : "none",
-            zIndex          : "1",
-            //prevent Content-Security-Policy : ERROR
-            //use utf8 encoding instead of base64
-            //base64 encoding , XSS vulnerability; less compatible            
-            backgroundImage: `url("data:image/svg+xml;utf8,
-                <svg xmlns='http://www.w3.org/2000/svg' width='1' height='1'>
-                <g fill='#000000' fill-opacity='.04'>
-                    <rect width='1' height='1'/>
-                </g>
-                </svg>")`,
-           /*  backgroundImage:
+            zIndex          : "2",
+            backgroundImage:
                 "url(\"data:image/svg+xml;base64,"
-                + "PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxnIGZpbGw9JyMwMDAwMDAnIGZpbGwtb3BhY2l0eT0nLjA0Jz48cmVjdCB3aWR0aD0nMScgaGVpZ2h0PScxJy8+PC9nPjwvc3ZnPg==\")", */
+                + "PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxnIGZpbGw9JyMwMDAwMDAnIGZpbGwtb3BhY2l0eT0nLjA0Jz48cmVjdCB3aWR0aD0nMScgaGVpZ2h0PScxJy8+PC9nPjwvc3ZnPg==\")",
             backgroundSize  : "4px 4px",
             mixBlendMode    : "overlay",
             opacity         : ".4",
@@ -198,24 +201,31 @@ export function animateScore(el: HTMLElement) {
 }
 
 /* ---------- core drawing helpers ---------- */
-export function drawBackground (ctx: CanvasRenderingContext2D | null) {
-    if (!ctx)   { return ; }
-
+export function drawBackground(ctx: CanvasRenderingContext2D) {
+    // 1) Court fill
     ctx.fillStyle = DESIGN.fieldColor;
     ctx.fillRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
-    ctx.strokeStyle = DESIGN.lineColor;
-    ctx.lineWidth   = 3;
+    // 2) Outer border
+    ctx.strokeStyle =  "rgba(255,195,123,0.41)";
+    ctx.lineWidth   = DESIGN.lineWidth;   // e.g. 30px
+    ctx.setLineDash([]);                  // solid
     ctx.strokeRect(0, 0, CANVAS_WIDTH, CANVAS_HEIGHT);
 
+    // 3) Center “net” line
     ctx.beginPath();
-    ctx.setLineDash([10, 10]);
-    ctx.strokeStyle = "#b0b9c9";
+    ctx.strokeStyle = DESIGN.lineColor;   // can reuse same color
+    ctx.lineWidth   =  2, // e.g. 30px * 0.3 = 9px
+    ctx.setLineDash([10, 10]);            // dashed
     ctx.moveTo(CANVAS_WIDTH / 2, 0);
     ctx.lineTo(CANVAS_WIDTH / 2, CANVAS_HEIGHT);
     ctx.stroke();
+
+    // 4) Reset dash for anything else you draw later
     ctx.setLineDash([]);
 }
+
+
 
 export function drawCountdownFrame(
     ctx: CanvasRenderingContext2D,
@@ -241,42 +251,63 @@ export function drawPaddle(
     ctx: CanvasRenderingContext2D,
     x: number, y: number, w: number, h: number
 ) {
-    ctx.fillStyle   = DESIGN.accentColor;
-    ctx.shadowColor = "rgba(0,0,0,.50)";
-    ctx.shadowBlur  = 8;
-    ctx.fillRect(x, y, w, h);
-    ctx.shadowBlur  = 0;
-}
+    const radius = 6;  // corner rounding
 
-export function drawBall(
-    ctx: CanvasRenderingContext2D,
-    x: number, y: number, r: number
-) {
-    if (x + r < 0 || x - r > CANVAS_WIDTH || y + r < 0 || y - r > CANVAS_HEIGHT)
-        return;
+    ctx.save();
 
-    const g = ctx.createRadialGradient(x - r * 0.3, y - r * 0.3, r * 0.1, x, y, r);
-    g.addColorStop(0,   "#ffffff");
-    g.addColorStop(0.4, "#c4c4c4");
-    g.addColorStop(1,   "#7a7a7a");
-    ctx.fillStyle = g;
+    // 1) subtle drop-shadow behind the paddle
+    ctx.shadowColor    = "rgba(0,0,0,0.3)";
+    ctx.shadowBlur     = 6;
+    ctx.shadowOffsetX  = 2;
+    ctx.shadowOffsetY  = 2;
 
+    // 2) build a rounded-rect path
     ctx.beginPath();
-    ctx.arc(x, y, r, 0, Math.PI * 2);
+    ctx.moveTo(x + radius, y);
+    ctx.lineTo(x + w - radius, y);
+    ctx.arcTo(x + w, y,     x + w, y + radius, radius);
+    ctx.lineTo(x + w, y + h - radius);
+    ctx.arcTo(x + w, y + h, x + w - radius, y + h, radius);
+    ctx.lineTo(x + radius, y + h);
+    ctx.arcTo(x,     y + h, x,           y + h - radius, radius);
+    ctx.lineTo(x,     y + radius);
+    ctx.arcTo(x,     y,     x + radius,  y,            radius);
+    ctx.closePath();
+
+    // 3) vertical gradient fill (lighter at top)
+    const grad = ctx.createLinearGradient(x, y, x, y + h);
+    grad.addColorStop(0, "rgba(243,7,7,0.3)");
+    grad.addColorStop(1, DESIGN.accentColor);
+    ctx.fillStyle = grad;
     ctx.fill();
+
+    // 4) turn off shadow for the stroke
+    ctx.shadowColor   = "transparent";
+    ctx.shadowBlur    = 0;
+    ctx.shadowOffsetX = 0;
+    ctx.shadowOffsetY = 0;
+
+    // 5) subtle highlight outline
+    ctx.lineWidth   = 2;
+    ctx.strokeStyle = "rgba(255,255,255,0.2)";
+    ctx.stroke();
+
+    ctx.restore();
 }
+
+
 
 /* ---------- scoreboard cell helper ---------- */
 const style = document.createElement("style");
 style.textContent = `
   .score-cell{
-    margin:0;
+    margin: 56px;
     color:${DESIGN.accentColor};
     text-align:center;
     white-space:nowrap;
     overflow:visible;
     text-overflow:clip;
     width:100%;
-    line-height:26px;
+    line-height: 34px;
   }`;
 document.head.appendChild(style);
