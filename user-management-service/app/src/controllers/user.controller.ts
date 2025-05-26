@@ -91,10 +91,14 @@ export class UserController {
     this.updateUserAvatar = this.updateUserAvatar.bind(this);
     this.updateUserAvatarById = this.updateUserAvatarById.bind(this);
     this.addFriend = this.addFriend.bind(this);
+    this.addFriendByUserName = this.addFriendByUserName.bind(this);
     this.removeFriend = this.removeFriend.bind(this);
     this.getUsersLeaderboard = this.getUsersLeaderboard.bind(this);
 
     this.getUserGames = this.getUserGames.bind(this);
+    this.getUserGameById = this.getUserGameById.bind(this);
+
+    this.getUserTournamentsByUserId = this.getUserTournamentsByUserId.bind(this);
   }
   //constructor(private userService: UserService) {}
 
@@ -373,6 +377,29 @@ await chmod(uploadPath, 0o644);
       return reply.send(user);
     }
     //add Friend
+    async addFriendByUserName(request: FastifyRequest<{/*  Params: { id: string}, */Body:{ friendName:string} }>, reply: FastifyReply) {
+     // const userId = parseInt(request.params.id);
+     try {
+        const userId = Number(request.authenticatedUser?.id);
+        if (!userId) {
+          return reply.status(400).send({ error: 'Invalid user id' });
+        }
+          const friendName = request.body.friendName;
+
+          const friend = await this.userRepository.getOneByParams({ name: friendName })
+          if (!friend) {
+            return reply.status(404).send({ error: 'Friend not found' });
+          }
+          //const user = await this.userService.deleteUser(userId);
+        // const user = await UserRepository.delete(userId);
+          const user = await this.userRepository.addFriend(userId,friend.id);
+          return reply.send(user);
+      } catch (error) {
+          console.error('Error adding friend by username:', error);
+          return reply.status(500).send({ error: 'Failed to add friend' });
+      }
+    }
+
     async addFriend(request: FastifyRequest<{/*  Params: { id: string}, */Body:{ friendId:string} }>, reply: FastifyReply) {
      // const userId = parseInt(request.params.id);
      const userId = Number(request.authenticatedUser?.id);
@@ -386,18 +413,25 @@ await chmod(uploadPath, 0o644);
       return reply.send(user);
     }
     //remove Friend
-    async removeFriend(request: FastifyRequest<{/*  Params: { id: string }, */Body:{ friendId:string}  }>, reply: FastifyReply) {
-     // const userId = parseInt(request.params.id);
+    async removeFriend(request: FastifyRequest<{Body:{ friendId:string}  }>, reply: FastifyReply) {
+     try {
      const userId = Number(request.authenticatedUser?.id);
      if (!userId) {
-       return reply.status(400).send({ error: 'Invalid user id' });
+       return reply.status(400).send({ error: 'Invalid user id user not authenticated' });
      }
       const friendId = parseInt(request.body.friendId);
+      console.log("UserController removeFriend ",userId,friendId);
+      console.log("UserController removeFriend request.body",userId,request.body);
       //const user = await this.userService.deleteUser(userId);
      // const user = await UserRepository.delete(userId);
       const user = await this.userRepository.removeFriend(userId,friendId);
       return reply.send(user);
     }
+    catch (error) {
+      console.error('Error removing friend:', error);
+      return reply.status(500).send({ error: 'Failed to remove friend' });
+    }
+  }
 
 
   async deleteUser(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
@@ -442,6 +476,46 @@ await chmod(uploadPath, 0o644);
         console.log("[UserController] getUserGames request.query ",request.query);
         const query = request.query as IParams;
         const builQuery = Helpers.buildQueryString<Game>(query,{players:{id:userId}});
+       
+
+   try {
+    const authHeader = request.headers.authorization;
+    const response = await fetch(`http://game-management-service:3000/internal/games?${builQuery}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': authHeader?? '',
+      },
+    });
+
+    if (!response.ok) {
+      console.error("Error fetching games:", response);
+      throw new Error(`[getUserGames] Failed to fetch games: ${response.statusText}`);
+    }
+
+    const games = await response.json();
+    return reply.code(200).send(games);
+  } catch (error) {
+    console.error("Error fetching games:", error);
+    return reply.code(500).send({ error: "Failed to fetch games" });
+  }
+}
+  async getUserGamesByPlayerId(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+    const authenticatedUser = request.authenticatedUser;
+    if (!authenticatedUser) {
+      return reply.status(401).send({ error: 'User not authenticated' });
+    }
+    const userId = authenticatedUser.id;
+    if (!userId) {
+      return reply.status(400).send({ error: 'Invalid user id' });
+    }
+    const playerId = parseInt(request.params.id);
+    if (!playerId) {
+      return reply.status(400).send({ error: 'Invalid player id' });
+    }
+    //add userId to query filters {"id":userId}
+        console.log("[UserController] getUserGames request.query ",request.query);
+        const query = request.query as IParams;
+        const builQuery = Helpers.buildQueryString<Game>(query,{players:{id:playerId}});
        
 
    try {
@@ -523,6 +597,43 @@ async getUserFriends(request: FastifyRequest, reply: FastifyReply) {
         console.log("[UserController] getUserTournaments request.query ",request.query);
         const query = request.query as IParams;
         const builQuery = Helpers.buildQueryString/* <Game> */(query,{players:{id:userId}});//@TODO Type Tournaments
+    try {
+      const authHeader = request.headers.authorization;
+      const response = await fetch(`http://game-management-service:3000/internal/tournaments?${builQuery}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': authHeader?? '',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch tournament: ${response.statusText}`);
+      }
+  
+      const tournament = await response.json();
+      return reply.code(200).send(tournament);
+    } catch (error) {
+      console.error("Error fetching tournament:", error);
+      return reply.code(500).send({ error: "Failed to fetch tournament" });
+    }
+  }
+    async getUserTournamentsByUserId(request: FastifyRequest<{Params:{id:string}}>, reply: FastifyReply) {
+    const authenticatedUser = request.authenticatedUser;
+    if (!authenticatedUser) {
+      return reply.status(401).send({ error: 'User not authenticated' });
+    }
+    const userId = authenticatedUser.id;
+    if (!userId) {
+      return reply.status(400).send({ error: 'Invalid user id' });
+    }
+     const playerId = parseInt(request.params.id);
+    if (!playerId) {
+      return reply.status(400).send({ error: 'Invalid player id' });
+    }
+    //add userId to query filters {"id":userId}
+        console.log("[UserController] getUserTournaments request.query ",request.query);
+        const query = request.query as IParams;
+        const builQuery = Helpers.buildQueryString/* <Game> */(query,{players:{id:playerId}});//@TODO Type Tournaments
     try {
       const authHeader = request.headers.authorization;
       const response = await fetch(`http://game-management-service:3000/internal/tournaments?${builQuery}`, {

@@ -1,5 +1,5 @@
 import { FieldValidation } from '../frameworks/base-form';
-import { EditAvatarFormData, EditDeleteUserFormData, EditNameFormData, EditRoleFormData, EditToggleTwoFAFormData, ForgotPasswordFormData, LoginFormData, ProfileUpdateDeleteFormData, ProfileUpdateNameFormData, ProfileUpdatePasswordFormData, RegisterFormData, ResetPasswordFormData, SettingsUpdateLangFormData, TwoFactorAuthFormData } from '../types/forms.type';
+import { EditAvatarFormData, EditDeleteUserFormData, EditNameFormData, EditRoleFormData, EditToggleTwoFAFormData, ForgotPasswordFormData, LoginFormData, ProfileUpdateAddFriendFormData, ProfileUpdateDeleteFormData, ProfileUpdateNameFormData, ProfileUpdatePasswordFormData, ProfileUpdateRemoveFriendFormData, RegisterFormData, ResetPasswordFormData, SettingsUpdateLangFormData, TwoFactorAuthFormData } from '../types/forms.type';
 import { checkboxValidator, emailValidator, passwordValidator, SettingLangValidator } from './validators';
 
 
@@ -315,7 +315,32 @@ export const profileUpdateNameconstraint: { [fieldName in keyof ProfileUpdateNam
 		messageConstraint: true,
 	}
 }
-
+export const profileUpdateAddFriendByNameconstraint: { [fieldName in keyof ProfileUpdateAddFriendFormData]: FieldValidation } = {
+	friendName: {
+		required: true,
+		type: 'text',
+		constraint: {
+		minLength: 2,
+		maxLength: 20,
+		allowedPattern: 'a-zA-Z0-9_@.-',
+		},
+		message: 'Please enter a valid name.',
+		messageConstraint: true,
+	}
+}
+export const profileUpdateRemoveFriendById: { [fieldName in keyof ProfileUpdateRemoveFriendFormData]: FieldValidation } = {
+	friendId: {
+		required: true,
+		type: 'text',
+		constraint: {
+		minLength: 1,
+		maxLength: 20,
+		allowedPattern: '0-9',
+		},
+		message: 'Please enter a valid id.',
+		messageConstraint: true,
+	},
+}
 export const profileUpdateAvatarconstraint: { [fieldName in keyof EditAvatarFormData]: FieldValidation } = {
 	avatar: {
 		required: true,

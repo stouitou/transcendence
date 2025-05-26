@@ -92,3 +92,17 @@ export const getLeaderboard = async (): Promise<LeaderBoardUser[] | void> => {
   const url = `/api/users/me/leaderboard`;
   return apiRequest<LeaderBoardUser[] | void>(url, 'GET');
 }
+
+
+/**
+ * Profile Users addfriendByUserName
+ */
+export const addfriendByUserName = async (friend:{friendName: string}): Promise<User | void> => {
+  const url = `/api/users/me/addFriendByUserName`;
+  return apiRequest<User | void>(url, 'PUT', friend);
+}
+export const removeFriendById = async (friend:{friendId: number}): Promise<User | void> => {
+  const url = `/api/users/me/removeFriendById`;
+  return apiRequest<User | void>(url, 'PUT', friend);
+}
+

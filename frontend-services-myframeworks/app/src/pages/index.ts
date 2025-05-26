@@ -1,7 +1,7 @@
 import { GameHistory } from "./gameHistory-component";
 import { GameSetting } from "./gamesetting-component";
 import { Login } from "./login-component";
-import { ProfilePage } from "./profile-component";
+import { ProfileGameHistory, ProfilePage, ProfileTournamentHistory } from "./profile-component";
 import { Register } from "./register";
 
 import { ChatComponent } from './chat-component';
@@ -46,6 +46,13 @@ if (!customElements.get('game-history-component')) {
 } */
 if (!customElements.get('profile-component')) {
 	customElements.define('profile-component', ProfilePage);
+}
+if (!customElements.get('profil-game-stats-component')) {
+	customElements.define('profil-game-stats-component', ProfileGameHistory);
+}
+
+if (!customElements.get('profil-tournament-stats-component')) {
+	customElements.define('profil-tournament-stats-component', ProfileTournamentHistory);
 }
 
 if (!customElements.get('login-component')) {

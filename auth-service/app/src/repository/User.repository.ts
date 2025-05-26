@@ -41,12 +41,31 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
   }
   //create
   create = async (user: Partial<User>): Promise<User> => {
-    const {/*  authProviders, */ id, ...userExtracted } = user;
+    const {/*  authProviders, */ id,name, ...userExtracted } = user;
+
+
+  //transforme le name en un uuid
+   // 1️⃣ Vérifier si le nom existe déjà
+   //- on prend le nom de l'utilisateur et on le transforme en un nom unique
+   // -- on commence par prendre la 1ere partie du nom : on decoupe au 1er espace
+
+
+
+  let baseName = name?.split(" ")[0];
+  let uniqueName = baseName;
+  let counter = 1;
+  while (await this.getOneByParams({ name: uniqueName })) {
+    // Ajoute un suffixe numérique jusqu'à trouver un nom libre
+    uniqueName = `${baseName}_${counter}`;
+    counter++;
+  }
+  
     const response = await fetch(this.URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
         ...userExtracted,
+        name: uniqueName, // Utilise le nom unique
       }),
     });
     const data = await response.json();

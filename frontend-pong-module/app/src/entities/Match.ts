@@ -30,9 +30,6 @@ export class	Match {
 		this.stop = this.stop.bind(this);
 		this.start = this.start.bind(this);
 		this.startLocal = this.startLocal.bind(this);
-		this.updateGameStateHandler = this.updateGameStateHandler.bind(this);
-		this.setGameManager = this.setGameManager.bind(this);
-		this.renderCountdownHandler = this.renderCountdownHandler.bind(this);
 		// Register to Web Socket events
 		this._webSocketManager.on("welcometogame", (data) => console.log(data));
 		this._webSocketManager.on("me", (data) => console.log(data));
@@ -73,6 +70,7 @@ export class	Match {
 
 	// Setup GameManager with received datas	@param dataMatch
 	setGameManager (datas: DataMatch) {//@TODO: a rename en DataMatch ou setGameManagerHandler???
+		this.stop()							// stop game if running
 		this._gameManager?.clearPlayers();					// clear players
 		this._gameManager?.setDataconfig(datas);			// set game with received datas
 		this._gameManager?.setupGame();						// setup game
@@ -136,19 +134,24 @@ export class	Match {
 	}
 
 	stop () {
+		if (this._rafId !== null) {
+            cancelAnimationFrame(this._rafId);
+            this._rafId = null;
+        }
 		this._isRunning = false;
+		 
 	}
 
 	start () {
 		if (!this._gameManager)	{ throw new Error('GameManager not initialized') ; }
-	
+		if (this._isRunning) { return; }	// already running
 		this._isRunning = true;
 		this.gameLoop();
 	}
 
 	startLocal () {
 		if (!this._gameManager)	{ throw new Error('GameManager not initialized') ; }
-
+		if (this._isRunning) { return; }	// already running
 		this._isRunning = true;
 		this.gameLoopLocal();
 	}
@@ -165,9 +168,10 @@ export class	Match {
 		this._renderer.draw(this._gameManager!.ball, this._gameManager!.players);
 	
 		// Appeler la prochaine frame
-		requestAnimationFrame(() => this.gameLoop());
+		 this._rafId = requestAnimationFrame(() => this.gameLoop());
 	}
 
+    private _rafId: number | null = null;
 	private gameLoopLocal () {
 		if (!this._isRunning) { return ; }
 
@@ -182,9 +186,10 @@ export class	Match {
 			this.stop();
 			//afficher l'historique du jeu en fin de partie
 			this._renderer.displayHistoriqueGame(this._statisticsManager, this._gameManager!.players);
+			return;
 		}	
 	
 		// call next frame
-		requestAnimationFrame(() => this.gameLoopLocal());
+		  this._rafId = requestAnimationFrame(() => this.gameLoopLocal());
 	}
 }

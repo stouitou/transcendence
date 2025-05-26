@@ -11,7 +11,7 @@ export class	Ball {
 	private				_velocity: Position;
 	private				_lastHit: Player | null = null;
 	private				_lastWallBounce: number | null = null;
-	private readonly	_maxBounceCountRound: number = 0;
+	private 			_maxBounceCountRound: number = 0;
 
 	constructor (position: Position, size: Size, velocity: Position, speed: number) {
 		this._position = position;

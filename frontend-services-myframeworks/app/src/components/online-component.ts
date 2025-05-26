@@ -51,10 +51,29 @@ export class OnlineComponent extends BaseComponent<{ ws: IWebSocketsService | nu
 					))}
 					</ul>
 				</div>
+        <div class="isFriendlOnline">
+          <ul class="flex flex-wrap">
+            ${this.isFriendlOnline(isOnline)}
+          </ul>
+				</div>
 			</div>
 		</div>
     `;
   // this.querySelector('#toggleBtn')!.addEventListener('click', this.toggleTheme.bind(this));
  // this.attachEvent(this, '#toggleBtn', 'click', this.toggleTheme.bind(this));
+  }
+
+  isFriendlOnline(isOnline: string[] | null): string {
+    const user = UserContext().user();
+    if (!user ) {
+      return '';
+    }
+    const div = document.createElement('ul');
+    user.friends?.forEach(friend => {
+        if (isOnline?.includes(`User-${String(friend.id).trim()}`)) {
+          div.innerHTML += `<li class="bg-yellow-800"> ${friend.name}</li>`;
+        }      
+      });
+    return div.innerHTML; 
   }
 }

@@ -82,6 +82,7 @@ export interface User {id: number;
 	level?: number;
 	tournaments?: Tournaments[];
 	games?: Game[];
+	friends?: User[];
    userStats?: UserStats;
 }
 

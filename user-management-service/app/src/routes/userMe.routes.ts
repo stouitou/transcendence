@@ -67,7 +67,8 @@ async function userMeRoutes(app: FastifyInstance) {
   app.get("/stats/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserStatsById); 
   /* metre a jour les amis de l'utilisateur connecté*/
   app.put("/addFriend",/*  {schema: UserSchema.updateUser}, */ userController.addFriend);
-  app.put("/removeFriend",/*  {schema: UserSchema.updateUser}, */ userController.removeFriend);
+  app.put<{ Body: { friendName: string; }; }>("/addFriendByUserName",{ preHandler: [verifyAuth] }, userController.addFriendByUserName);
+  app.put<{ Body: { friendId: string; }; }>("/removeFriendById",{ preHandler: [verifyAuth] }, userController.removeFriend);
   app.put("/updatePassword",{ preHandler: [verifyAuth] },/*  {schema: UserSchema.updateUser}, */ userController.updateMePassword);
 
   //app.get("/", {/* preHandler: [loggerMiddleware], *//* schema: UserSchema.getUsers */}, userController.getUsers);
@@ -83,7 +84,8 @@ async function userMeRoutes(app: FastifyInstance) {
    * gestion des games de l'utilisateur connecté
    */
   app.get("/games",{ preHandler: [verifyAuth] }, userController.getUserGames);
-  app.get("/games/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserGameById);
+  app.get<{ Params: { id: string; }; }>("/games/:id",{ preHandler: [verifyAuth] }, userController.getUserGamesByPlayerId);
+ // app.get("/games/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserGameById);
   //app.get("/games/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserGameStatsById);
   //app.put("/games/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.updateUserGameStatsById);
 
@@ -91,7 +93,8 @@ async function userMeRoutes(app: FastifyInstance) {
    * gestion des tournaments de l'utilisateur connecté
    */
   app.get("/tournaments",{ preHandler: [verifyAuth] },/*  {schema: UserSchema.getUserById} ,*/ userController.getUserTournaments);
-  app.get("/tournaments/id/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserTournamentById);
+  app.get<{ Params: { id: string; }; }>("/tournaments/:id",{ preHandler: [verifyAuth] },/*  {schema: UserSchema.getUserById} ,*/ userController.getUserTournamentsByUserId);
+//  app.get("/tournaments/id/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserTournamentById);
 //  app.get("/tournaments/id/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserTournamentStatsById);
 //  app.put("/tournaments/id/:id/stats",/*  {schema: UserSchema.getUserById} ,*/ userController.updateUserTournamentStatsById);
 //  app.get("/tournaments/id/:id/rounds",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserTournamentRoundsById);

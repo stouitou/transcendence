@@ -57,6 +57,12 @@ export type AdminUsersFormData = {
 export interface ProfileUpdateNameFormData  {
   name: string;
 };
+export interface ProfileUpdateAddFriendFormData  {
+  friendName: string;
+};
+export interface ProfileUpdateRemoveFriendFormData  {
+ friendId: number;
+};
 export interface ProfileUpdatePasswordFormData  {
   oldPassword: string;
   newPassword: string;
@@ -67,6 +73,8 @@ export interface ProfileUpdateDeleteFormData  {
   confirm: boolean;
 };
 export type ProfileUpdateFormData ={
+  formAddfriend: ProfileUpdateAddFriendFormData,
+  formRemoveFriend: ProfileUpdateRemoveFriendFormData,
   formUpdateName: ProfileUpdateNameFormData,
   formUpdateAvatar: EditAvatarFormData,
   formUpdatePassword: ProfileUpdatePasswordFormData,
