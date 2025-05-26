@@ -6,7 +6,7 @@ export class	ScoreManager {
 
 	private readonly	_players: Player[];
 	private readonly	_canvas = { width: CANVAS_WIDTH, height: CANVAS_HEIGHT };
-	private readonly	_maxScore = 10;
+	private readonly	_maxScore = 5;
 	private				_isFinished = false;
 
 	constructor (players: Player[]) {
