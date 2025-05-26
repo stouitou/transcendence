@@ -84,9 +84,18 @@ export const DESIGN = {
             inset           : "0",
             pointerEvents   : "none",
             zIndex          : "2",
-            backgroundImage:
+            //prevent Content-Security-Policy : ERROR
+            //use utf8 encoding instead of base64
+            //base64 encoding , XSS vulnerability; less compatible            
+            backgroundImage: `url("data:image/svg+xml;utf8,
+                <svg xmlns='http://www.w3.org/2000/svg' width='1' height='1'>
+                <g fill='#000000' fill-opacity='.04'>
+                    <rect width='1' height='1'/>
+                </g>
+                </svg>")`,
+           /*  backgroundImage:
                 "url(\"data:image/svg+xml;base64,"
-                + "PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxnIGZpbGw9JyMwMDAwMDAnIGZpbGwtb3BhY2l0eT0nLjA0Jz48cmVjdCB3aWR0aD0nMScgaGVpZ2h0PScxJy8+PC9nPjwvc3ZnPg==\")",
+                + "PHN2ZyB3aWR0aD0nMScgaGVpZ2h0PScxJyB4bWxucz0naHR0cDovL3d3dy53My5vcmcvMjAwMC9zdmcnPjxnIGZpbGw9JyMwMDAwMDAnIGZpbGwtb3BhY2l0eT0nLjA0Jz48cmVjdCB3aWR0aD0nMScgaGVpZ2h0PScxJy8+PC9nPjwvc3ZnPg==\")",*/
             backgroundSize  : "4px 4px",
             mixBlendMode    : "overlay",
             opacity         : ".4",
