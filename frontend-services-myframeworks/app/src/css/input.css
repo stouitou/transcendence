@@ -1,7 +1,5 @@
 @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');
 
-
-
 @tailwind base;
 @tailwind components;
 @tailwind utilities;
@@ -12,62 +10,111 @@
   body {
     @apply bg-white text-black dark:bg-transparent dark:text-white;
   }
+
   header {
     @apply bg-transparent bg-opacity-10 backdrop-blur-sm  text-black dark:bg-transparent dark:text-white ;
   }
+
   nav {
-    @apply  text-black bg-transparent dark:text-white;
+    @apply text-black bg-transparent dark:text-white;
   }
+
   .nav-link {
-    @apply  hover:font-bold transition relative;
+    @apply hover:font-bold transition relative;
   }
+
   .main-title {
-    @apply  text-4xl font-archivo bg-clip-text /* text-transparent bg-gradient-to-r from-blue-500 to-green-500 */;
+    @apply text-4xl font-archivo bg-clip-text /* text-transparent bg-gradient-to-r from-blue-500 to-green-500 */;
   }
+
   .form-container {/* max-w-sm mx-auto p-6 bg-gray-400 rounded-lg shadow-lg */
-    @apply  max-w-sm mx-auto bg-white  
+    @apply  max-w-sm mx-auto bg-white 
             bg-opacity-50 backdrop-blur-sm
              shadow-lg rounded-lg p-6
              border border-gray-300 dark:bg-transparent dark:border-gray-600;
   }
 
   .form-text-input {
-    @apply  bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-transparent dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mb-6;
+    @apply bg-transparent border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-transparent dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500 mb-6;
             
   }
   .btn {
-    @apply  w-full bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition dark:bg-gray-800 dark:hover:bg-gray-400 dark:text-white;
+    @apply w-full bg-blue-500 text-white font-semibold px-4 py-2 rounded-lg shadow-md hover:bg-blue-600 transition dark:bg-gray-800 dark:hover:bg-gray-400 dark:text-white;
   }
 
   /*chat module*/
-  
   .tabs {
     display: flex;
     flex-direction: row;
     margin-bottom: 10px;
     overflow-x: auto;
   }
+
   .select-form-message{
     @apply bg-gray-50 border border-gray-300 text-gray-900 text-sm rounded-lg focus:ring-blue-500 focus:border-blue-500 block w-full p-2.5 dark:bg-gray-700 dark:border-gray-600 dark:placeholder-gray-400 dark:text-white dark:focus:ring-blue-500 dark:focus:border-blue-500
   }
 
+  /* GAME */
+  .game-container {
+    @apply relative flex flex-col mx-auto mt-5;
+  }
 
   .game-card-container-background {/* max-w-sm mx-auto p-6 bg-gray-400 rounded-lg shadow-lg */
-    @apply  max-w-xl mx-auto bg-white  
+    @apply max-w-xl mx-auto bg-white 
             bg-opacity-50 backdrop-blur-sm
-             shadow-lg rounded-lg p-6
-             border border-gray-300 dark:bg-transparent dark:border-gray-600
-             flex flex-col;
+            shadow-lg rounded-lg p-6
+            border border-gray-300 dark:bg-transparent dark:border-gray-600
+            flex flex-col;
   }
+
   .game-card-container-row {
-    @apply  flex flex-row items-center justify-center;
+    @apply flex flex-row items-center justify-center;
   }
 
-  /* .btn-nav {
-    @apply 
-  } */
+  .ui {
+    @apply flex flex-1 justify-center items-center;
+  }
 
-   .input-success {
+  .canvas {
+    @apply w-full h-full;
+  }
+
+  .alert {
+    position:		    absolute;
+    top:			      50%;
+    left:			      50%;
+    transform:      translate(-50%, -50%);
+    min-width:      200px;
+    max-width:      300px;
+    padding:		    16px;
+    color:			    white;
+    font-size:      18px;
+    text-align:     center;
+    border-radius:  8px;
+    z-index:		    1000;
+    display:		    none;
+  }
+
+  .gameHero {
+    @apply absolute w-full h-full z-[1000];
+  }
+
+  .player-score {
+    @apply relative flex w-4/5 h-auto m-[5px] text-black whitespace-nowrap overflow-visible text-clip leading-[26px];
+  }
+
+  .score-cell {
+    @apply p-0 text-center text-black;
+  }
+  .score-cell.score-cell-points {
+    @apply py-0 px-5;
+  }
+
+  .alert.show {
+    @apply block;
+  }
+
+  .input-success {
     box-shadow: 0 0 5px rgba(0, 128, 0, 0.5);
   }
   .input-error {

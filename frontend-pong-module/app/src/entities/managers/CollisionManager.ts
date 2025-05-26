@@ -46,8 +46,9 @@ export class	CollisionManager {
 		players.forEach(player => {
 			const	paddle = player.paddle;
 			if (paddle && this.isCollidingWithPaddle(ball, paddle)) {
+				ball.maxBounceCountRound++;
 				//update statistics //@TODO d autre statistiques
-				player.historyPlayer.bounceCount++;
+				player.history.bounceCount++;
 				ball.lastHit = player;
 				this.bounceOffPaddle(ball, paddle);
 			}

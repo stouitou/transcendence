@@ -13,4 +13,15 @@ module.exports = {
     },
   },
   plugins: [],
+  safelist: [
+    'game-container',
+    'ui',
+    'canvas',
+    'alert',
+    'gameHero',
+    'player-score',
+    'score-cell',
+    'score-cell.score-cell-points',
+    'alert.show',
+  ],
 };

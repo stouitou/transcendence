@@ -11,14 +11,14 @@ export class	Ball {
 	private				_velocity: Position;
 	private				_lastHit: Player | null = null;
 	private				_lastWallBounce: number | null = null;
-	private 			_maxBounceCountRound: number = 0;
+	private				_maxBounceCountRound: number = 0;
 
-	constructor (position: Position, size: Size, velocity: Position, speed: number) {
+	constructor (position: Position, size: Size, velocity: Position) {
 		this._position = position;
 		this._size = size;
 		this._velocity = velocity;
 		this.normalize();
-		this._speed = speed;
+		this._speed = 4;
 	}
 
 	get position ()							{ return this._position ; }
@@ -33,6 +33,7 @@ export class	Ball {
 	set speed (speed: number)					{ this._speed = speed; }
 	set lastHit (player: Player)				{ this._lastHit = player; }
 	set lastWallBounce (wall: number | null)	{ this._lastWallBounce = wall; }
+	set maxBounceCountRound (count: number)		{ this._maxBounceCountRound = count; }
 
 	update () {
 		this._position.x += this._velocity.x * this._speed;
@@ -43,6 +44,7 @@ export class	Ball {
 		this.spawn();
 		this._lastHit = null;
 		this._lastWallBounce = null;
+		this._maxBounceCountRound = 0;
 	}
 
 	private spawn () {
