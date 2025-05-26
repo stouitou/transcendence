@@ -10,72 +10,16 @@ export let CANVAS_HEIGHT = 600;
 /* ────────────────────────────────────────── */
 @customElement('game-component')
 export class	classic extends LitElement {
+	createRenderRoot () {
+		// Désactive le shadow DOM, le rendu se fait dans le DOM ight
+		return this;
+	}
+
 // LitElement automatically create a shadow DOM
 	@property({ type: String }) gameContainerId: string = 'gameWrapper';
 	@property({ type: Object }) data: {id: string} | null = null;
 
 	private	_game!: Match;
-
-	static	styles = css `
-		.game-container {
-			position:		relative;
-			width:			${CANVAS_WIDTH}px;
-			height:			${CANVAS_HEIGHT}px;
-			margin:			0 auto;
-			margin-top:		20px;
-			display:		flex;
-			flex-direction:	column;
-		}
-		.game-ui {
-			flex:				1;
-			display:			flex;
-			justify-content:	center;
-			align-items:		center;
-		}
-		.game-canvas {
-			flex:				1;
-			display:			flex
-			justify-content:	center;
-			align-items:		center;
-		}
-		.canvas {
-			width:	100%;
-			height:	100%;
-		}
-		.alert {
-			position:		absolute;
-			top:			50%;
-			left:			50%;
-			transform:		translate(-50%, -50%);
-			min-width:		200px;
-			max-width:		300px;
-			padding:		16px;
-			color:			white;
-			font-size:		18px;
-			text-align:		center;
-			border-radius:	8px;
-			z-index:		1000;
-			display:		none;
-		}
-		.player-score {
-			position:		relative;
-			display:		flex;
-			justify-items:	space-between;
-			align-items:	space-between;
-			width:			80%;
-			height:			auto;
-			margin:			5px;
-		}
-		.score-cell {
-			padding:	0;
-		}
-		.score-cell.score-cell-points {
-			padding:	0 20px;
-		}
-		.alert.show {
-			display:	block;
-		}
-	`
 
 	constructor () {
 		super();
@@ -102,18 +46,20 @@ export class	classic extends LitElement {
 		this._game.webSocketManager.lobyId = this.data?.id;
 	}
 
-	firstUpdated() {
+	firstUpdated () {
 		console.log('firstUpdated: DOM is ready');
 
-		const gameCanvas = this.shadowRoot?.querySelector('#gameCanvas') as HTMLCanvasElement;
-		const gameDivUi = this.shadowRoot?.querySelector('#game-ui') as HTMLElement;
-		const gameDivAlert = this.shadowRoot?.querySelector('#alertBox') as HTMLElement;
-		const gameDivHero = this.shadowRoot?.querySelector('#gameHero') as HTMLElement;
-		const gameDivHeroTree = this.shadowRoot?.querySelector('#gameHeroTree') as HTMLElement;
+		const	gameCanvas = this.querySelector('#gameCanvas') as HTMLCanvasElement;
+		const	gameDivUi = this.querySelector('#game-ui') as HTMLElement;
+		const	gameDivAlert = this.querySelector('#alertBox') as HTMLElement;
+		const	gameDivHero = this.querySelector('#gameHero') as HTMLElement;
+		const	gameDivHeroTree = this.querySelector('#gameHeroTree') as HTMLElement;
 
 		if (!gameCanvas || !gameDivUi || !gameDivAlert || !gameDivHero || !gameDivHeroTree) {
-			throw new Error('One or more game DOM nodes not found');
+			throw new Error ('One or more game DOM nodes not found');
 		}
+
+		gameDivAlert.style.display = 'none';
 
 		/* Set the canvas and UI elements in the game instance */
 		this._game.setCanvas(gameCanvas);
@@ -131,16 +77,16 @@ export class	classic extends LitElement {
 		return html `
 			<div id="gameHero"></div>
 			<div id="gameHeroTree"></div>
-			<div class="game-container">
+			<div class="game-container" style="width: ${CANVAS_WIDTH}px; height: ${CANVAS_HEIGHT}px;">
 
 				<!-- Partie superieur : UI -->
-				<div class="game-ui" id="game-ui">
+				<div class="ui game-ui" id="game-ui">
 					<h1>Game UI</h1>
 				</div>
 				
 				<!-- Partie inferieure : canvas -->
-				<div class="game-canvas">
-					<canvas id="gameCanvas"></canvas>
+				<div class="ui game-canvas">
+					<canvas class="canvas" id="gameCanvas"></canvas>
 				</div>
 
 				<!-- Message d'alerte -->

@@ -103,7 +103,7 @@ export const DESIGN = {
 
 /* ---------- structure helpers ---------- */
 export function createAppendix(_: number): HTMLDivElement {
-    const bar = document.createElement("div");
+    const   bar = document.createElement("div");
 
     Object.assign(bar.style, {
         width               : `${CANVAS_WIDTH}px`,
@@ -121,7 +121,7 @@ export function createAppendix(_: number): HTMLDivElement {
         boxShadow           : "0 10px 32px rgba(0,0,0,.35)",
     } as Partial<CSSStyleDeclaration>);
 
-    return bar;
+    return bar ;
 }
 
 export function createGameCanvas(_: Player[]): HTMLCanvasElement {
@@ -265,18 +265,3 @@ export function drawBall(
     ctx.arc(x, y, r, 0, Math.PI * 2);
     ctx.fill();
 }
-
-/* ---------- scoreboard cell helper ---------- */
-const style = document.createElement("style");
-style.textContent = `
-  .score-cell{
-    margin:0;
-    color:${DESIGN.accentColor};
-    text-align:center;
-    white-space:nowrap;
-    overflow:visible;
-    text-overflow:clip;
-    width:100%;
-    line-height:26px;
-  }`;
-document.head.appendChild(style);

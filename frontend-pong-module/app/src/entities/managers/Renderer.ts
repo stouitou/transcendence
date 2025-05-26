@@ -30,36 +30,34 @@ export class Renderer {
 	private displayScore (Players: Player[] = []) {
 		this._score.innerHTML = '';
 		Players.forEach((player, index) => {
-			const divPlayerScore = this.createDivDisplayScore(player.name, player.score, index);
+			const	divPlayerScore = this.createDivDisplayScore(player.name, player.score, index);
 			this._score.appendChild(divPlayerScore);
 		});
 	}
 
 	createDivDisplayScore (playerName: string, playerScore: number, indexLocation: number) {
-		const setGrid = [
+		const	setGrid = [
 			{ gridCol: "3", gridRow: "2" }, { gridCol: "1", gridRow: "2" },
 			{ gridCol: "2", gridRow: "3" }, { gridCol: "2", gridRow: "1" },
 		]
-		const divPlayerScore = document.createElement('div');
+		const	divPlayerScore = document.createElement('div');
 
 		divPlayerScore.classList.add('player-score');
 		divPlayerScore.innerHTML = `
 			<p class="score-cell">${playerName}</p>
 			<p class="score-cell score-cell-points">${playerScore}</p>`;
-		const { gridCol, gridRow } = setGrid[indexLocation];
+		const	{ gridCol, gridRow } = setGrid[indexLocation];
 		divPlayerScore.style.gridColumn = gridCol;
 		divPlayerScore.style.gridRow = gridRow;
-		return divPlayerScore;
+		return divPlayerScore ;
 	}
 
 	/* setup inital Display */
 	setupDisplay () {
-		if (!this._canvas) { throw new Error('Game canvas not found'); }
+		if (!this._canvas)	{ throw new Error('Game canvas not found') ; }
 
 		this._canvas.style.verticalAlign = 'top';
 		this._canvas.height = CANVAS_HEIGHT;
-		// if (this._players.length > 2)
-		// 	CANVAS_WIDTH = 500;
 		this._canvas.width = CANVAS_WIDTH;
 
 		this._score = Design.createAppendix(/* this._players.length */4 - 1);
@@ -237,64 +235,48 @@ type PREPARE_MATCHES_STARTED_ROUND_GAME = {
 const displayPrepareMatchesStartedRoundGame = (div: HTMLDivElement, data: PREPARE_MATCHES_STARTED_ROUND_GAME) => {
 	const { players, winner } = data;
 	div.innerHTML = `
-	<div class="mx-auto text-center">
-			<div class="game-card-container-background">
+		<div class="game-card-container-background mx-auto text-center">
 	
 			<div class="game-card-container-row">
-			 <p class="text-3xl font-bold text-center mb-6">Game ID: #${data.id}</p>
+				<p class="text-3xl font-bold text-center mb-6">Game ID: #${data.id}</p>
 			</div>
 
-			<div class="game-card-container-row">
-				<div class="flex flex-col items-center justify-center min-w-[220px]">
-				${players.map((player, i) =>
-		i % 2 === 0 ? `
-				<div class="flex flex-col items-center justify-center min-w-[220px] py-4">
-					<img referrerPolicy="no-referrer"
-							src=${player.avatar}
+			<div class="game-card-container-row" style="display: flex; flex-direction: row;">
+				<div class="flex flex-col items-center justify-center" style="width: 200px;">
+				${players.map((player, i) => i % 2 === 1 ? `
+					<div class="flex flex-col items-center justify-center py-4">
+						<img
+							referrerPolicy="no-referrer"
+							src=${player.avatar.replace(/=s\d+-c$/, '')}
 							alt="User Avatar"
-							class="w-24 h-24 mx-auto rounded-full border-4 border-gray-300 mb-4"
+							class="mx-auto object-cover rounded-full border-4 border-gray-300 mb-4"
+							style="width: 160px; height: 160px; clip-path: circle();"
 						/>
-							<h2 class="text-2xl font-semibold">${player.name}</h2>
-	
-							<br>
-							<h3 class="text-lg font-semibold">Games Score</h3>
-							<p class="text-green-600 text-9xl">${player.score}</p>
-	
-				</div>`: ``
-	).join('')}
-	
+						<h2 class="text-2xl font-semibold">${player.name}</h2>
+					</div>` : ``
+				).join('')}
 				</div>
-				<div class="flex flex-col items-center justify-center">
-				<p class="text-blue-600 text-8xl px-3">VS</p>
+
+				<div class="flex flex-col items-center justify-center" style="width: 200px;">
+					<p class="text-blue-600 text-8xl px-3">VS</p>
 				</div>
 	
-	
-				<div class="flex flex-col items-center justify-center min-w-[220px]">
-					${players.map((player, i) =>
-		i % 2 === 1 ? `
-					<div class="flex flex-col items-center justify-center min-w-[220px] py-4">
+				<div class="flex flex-col items-center justify-center" style="width: 200px;">
+				${players.map((player, i) => i % 2 === 0 ? `
+					<div class="flex flex-col items-center justify-center py-4">
 						<img referrerPolicy="no-referrer"
-								src=${player.avatar}
-								alt="User Avatar"
-								class="w-24 h-24 mx-auto rounded-full border-4 border-gray-300 mb-4"
-							/>
-								<h2 class="text-2xl font-semibold">${player.name}</h2>
-	
-								<br>
-								<h3 class="text-lg font-semibold">Games Score</h3>
-								<p class="text-green-600 text-9xl">${player.score}</p>
-	
-					</div>`: ``
-	).join('')}
-	
+							src=${player.avatar.replace(/=s\d+-c$/, '')}
+							alt="User Avatar"
+							class="w-40 h-40 mx-auto object-cover rounded-full border-4 border-gray-300 mb-4"
+							style="width: 160px; height: 160px; clip-path: circle();"
+						/>
+						<h2 class="text-2xl font-semibold">${player.name}</h2>
+					</div>` : ``
+				).join('')}
 				</div>
 			</div>
-				<p>Winner: </p>
-				<p class="text-3xl font-bold text-center mb-6 text-green-600">${winner ? winner.name : ''}</p>
-			</div>
-			 
-		 </div>
-	 `;
+		</div>
+	`;
 }
 
 type PREPARE_MATCHES_STARTED_ROUND = {
