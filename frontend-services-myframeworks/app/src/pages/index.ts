@@ -22,6 +22,7 @@ import { Settings } from "./settings-component";
 import { SettingsLanguage } from "./settingsLanguage";
 import { PopupCookies } from "./popup-cookies";
 import { Support } from "./support";
+import { Leaderboard } from "./leaderboard";
 
 
   
@@ -116,4 +117,8 @@ if (!customElements.get('support-component')) {
 
 if (!customElements.get('popup-cookies')) {
 	customElements.define('popup-cookies', PopupCookies);
+}
+
+if (!customElements.get('leaderbord-component')) {
+	customElements.define('leaderboard-component', Leaderboard);
 }

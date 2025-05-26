@@ -81,3 +81,14 @@ export const getProfileById = async (id:string): Promise<User | void> => {
   const url = `/api/users/me/users/${id}`;
   return apiRequest<User | void>(url);
 }
+
+interface LeaderBoardUser {
+  id: number;
+  name: string;
+  level: number;
+  avatar: string;
+}
+export const getLeaderboard = async (): Promise<LeaderBoardUser[] | void> => {
+  const url = `/api/users/me/leaderboard`;
+  return apiRequest<LeaderBoardUser[] | void>(url, 'GET');
+}

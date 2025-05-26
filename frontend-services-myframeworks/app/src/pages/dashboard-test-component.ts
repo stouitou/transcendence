@@ -64,7 +64,7 @@ export class Dashboard extends BaseComponent<{ user: User | null,tournamentsData
 	  
 			  <!-- History + Dashboard -->
 			  <game-history-component></game-history-component>
-			  <dashboard-tournois></dashboard-tournois>
+			  <dashboard-tournois></dashboard-tournois> 
 			</div>
 		  </div>
 		`;

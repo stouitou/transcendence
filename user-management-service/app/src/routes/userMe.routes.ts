@@ -62,6 +62,8 @@ async function userMeRoutes(app: FastifyInstance) {
 /* 
    recuperer les stats de l'utilisateur connecté
   */
+
+  app.get("/leaderboard",/*  {schema: UserSchema.getUserById} ,*/ userController.getUsersLeaderboard); 
   app.get("/stats/:id",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserStatsById); 
   /* metre a jour les amis de l'utilisateur connecté*/
   app.put("/addFriend",/*  {schema: UserSchema.updateUser}, */ userController.addFriend);

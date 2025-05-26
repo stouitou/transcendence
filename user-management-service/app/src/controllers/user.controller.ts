@@ -92,6 +92,7 @@ export class UserController {
     this.updateUserAvatarById = this.updateUserAvatarById.bind(this);
     this.addFriend = this.addFriend.bind(this);
     this.removeFriend = this.removeFriend.bind(this);
+    this.getUsersLeaderboard = this.getUsersLeaderboard.bind(this);
 
     this.getUserGames = this.getUserGames.bind(this);
   }
@@ -176,7 +177,13 @@ export class UserController {
     }
     return reply.send(user.userStats);
   }
-
+  async getUsersLeaderboard(request:  FastifyRequest, reply: FastifyReply) {
+    const leaderboard = await this.userRepository.getUsersLeaderboard();
+        if (!leaderboard) {
+      return reply.status(404).send({ error: 'leaderboard not found' });
+    }
+    return reply.send(leaderboard);
+  }
   //@TODO updateStatsById est ce que c'est utile de le conserver ?
   async updateStatsById(request:  FastifyRequest<{ Params: { id: string },Body:Partial<UserStats> }>, reply: FastifyReply) {
     const userId = Number(request.params.id);

@@ -45,7 +45,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
       }),
     });
     const data = await response.json();
-    console.log("🔐User.repository.ts UserRepository.create()  --data--",data)
+    console.log("🔐User.repository.ts UserRepository.create()  --data--"/* ,data */)
     const userCreated = data.data;
     console.log("🔐User.repository.ts UserRepository.create()  --userCreated--",userCreated)
    // const userCreated = User.fromJSON(data.data);
@@ -67,9 +67,6 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
   //read
     getAllbyQuery = async (query:IParams): Promise<User[]> =>{
   const queryPagination = this.buildQueryString(query);
-    //return data.map(User.fromJSON);
-   // const url = `${this.URL}?${queryPagination}`;
-  //  const url = `${this.URL}?${queryPagination}`;
     const url = `${this.URL}?${queryPagination}`;
     //const url = `${this.URL}${this.getRelations()}&${queryPagination}`;
     console.log("🔐 UserRepository.getAllbyQuery()  --start-- fetch from: ", this.URL)
@@ -87,7 +84,6 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
     const data = await response.json();
     console.log("🔐 UserRepository.getAll()  --data--",data)
     const results = data.data
-    console.log("🔐 UserRepository.getAll()  --results--",results)
     return {...results};
   }
 
@@ -102,15 +98,17 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
     return data?? null;
   }
 
-/*   getByParams = async(params: IParams) : Promise<User[] | null> => {
-
-    const queryString = Helpers.buildQueryString(params);
-    const url = `${this.URL}?${queryString}`;
+ getUsersLeaderboard= async (): Promise<User[] | null> => {      
+    const url = `${this.URL}?limit=5&order=DESC&orderBy=level`;//{this.getRelations()}
+    console.log("🔐 UserRepository.getUsersLeaderboard()  --url--",url)
     const response = await fetch(url);
-    const data = await response.json();
-   // return data.map(User.fromJSON);
-    return data.data;
-  } */
+    const  data  = await response.json();
+    console.log("🔐User.repository.ts UserRepository.getUsersLeaderboard()  --data--"/* ,result */)
+   const results = data.data
+    return {...results};
+  }
+  
+
   getByParams = async(params: IParams) : Promise<User[] | null> => {
   
     //  const queryString = Helpers.buildQueryString(params);
@@ -120,7 +118,6 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
       const response = await fetch(url);
       console.log("🔐 UserRepository.getByParams()  --response--",response)
       const data = await response.json();
-      console.log("🔐 UserRepository.getByParams()  --data--",data)
      // return data.map(User.fromJSON);
       return data.data?data.data[0]?data.data:null:null;
     }
@@ -132,7 +129,6 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
         const response = await fetch(url);
         console.log("🔐 UserRepository.getByParams()  --response--",response)
         const data = await response.json();
-        console.log("🔐 UserRepository.getByParams()  --data--",data)
        // return data.map(User.fromJSON);
         return data.data?data.data[0]?data.data[0]:null:null;
       }
@@ -152,7 +148,6 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
       }),
     });
     const data = await response.json();
-    console.log("🔐 UserRepository.update()  --data--",data)
     //const userUpdated = User.fromJSON(data.data);
     const userUpdated =data.data;
     if (!userUpdated) {

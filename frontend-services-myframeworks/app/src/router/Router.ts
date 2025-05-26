@@ -140,6 +140,7 @@ routerConfig.addRoute('/settings', () => document.createElement('settings-compon
 routerConfig.addRoute('/support', () => document.createElement('support-component'));
 //routerConfig.addRoute('/mentions-legales', () => document.createElement('mentions-legales-component'));
 routerConfig.addRoute('/game-loby', () => document.createElement('game-loby-component'));
+routerConfig.addRoute('/leaderboard', () => document.createElement('leaderboard-component'));
 
 routerConfig.addRoute('/404', () => document.createElement('error-404-component'));
 routerConfig.addRoute('/401', () => document.createElement('error-401-component'));
