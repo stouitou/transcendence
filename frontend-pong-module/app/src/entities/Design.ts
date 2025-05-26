@@ -296,23 +296,19 @@ export function drawPaddle(
 
     ctx.restore();
 }
-// <<<<<<< HEAD
-// =======
-
-
 
 // /* ---------- scoreboard cell helper ---------- */
-// const style = document.createElement("style");
-// style.textContent = `
-//   .score-cell{
-//     margin: 56px;
-//     color:${DESIGN.accentColor};
-//     text-align:center;
-//     white-space:nowrap;
-//     overflow:visible;
-//     text-overflow:clip;
-//     width:100%;
-//     line-height: 34px;
-//   }`;
-// document.head.appendChild(style);
+const style = document.createElement("style");
+style.textContent = `
+  .score-cell{
+    margin: 56px;
+    color:${DESIGN.accentColor};
+    text-align:center;
+    white-space:nowrap;
+    overflow:visible;
+    text-overflow:clip;
+    width:100%;
+    line-height: 34px;
+  }`;
+document.head.appendChild(style);
 // >>>>>>> origin
