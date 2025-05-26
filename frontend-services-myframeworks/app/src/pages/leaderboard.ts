@@ -62,7 +62,7 @@ const {leaderboard} = this.state ;
             <tbody>
               ${leaderboard.map(
           (player,index) => `
-                <tr class="border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
+                <tr data-id="${player.id}" class="leaderboardRow border-b border-gray-200 dark:border-gray-600 hover:bg-gray-50 dark:hover:bg-gray-700 transition">
                   <td class="px-6 py-4 font-semibold">${index + 1}</td>
                   <td class="px-6 py-4 flex items-center gap-3">
                     <img src="${player.avatar}" alt="${player.name}" class="w-8 h-8 rounded-full object-cover" />
@@ -78,5 +78,15 @@ const {leaderboard} = this.state ;
         </div>
       </section>
     `;
+
+  this.querySelectorAll('.leaderboardRow').forEach(row => {
+      row.addEventListener('click', (e: Event) => {
+        const target = e.currentTarget as HTMLElement;
+        const id = target.getAttribute('data-id');
+        if (!id) return;
+        this.router.navigate(`/profile?id=${id}`);
+      });
+    })
+    
   }
 }
