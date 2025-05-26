@@ -108,7 +108,7 @@ export class PongComponent extends HTMLElement {
                     width: 40px;
                     height: 40px;
                     position: absolute;
-                    background-color: #004052;
+                    background-color: #ff0063;
                     border-radius: 100%;
                     opacity: .8;
                 }
