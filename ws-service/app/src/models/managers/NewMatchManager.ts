@@ -129,6 +129,7 @@ export class TournamentManager {
 				const matchConfig: WebSocketGameConfig = {
 					type: game.type,
 					format: game.format,
+					difficulty: config.difficulty,
 					tournamentId: tournament.id,
 					maxPlayers: game.max_players,
 					isallowedRegistration: true,
@@ -174,6 +175,7 @@ export class TournamentManager {
 			const matchConfig: WebSocketGameConfig = {
 			  type: game.type,
 			  format: game.format,
+			  difficulty: 1, // game.difficulty,
 			  tournamentId: tournament.id,
 			  maxPlayers: game.max_players,
 			  isallowedRegistration: false,
@@ -257,6 +259,7 @@ export class MatchManager {
 		const config:WebSocketGameConfig = {
 			type: lobyConfig.type,
 			format: lobyConfig.format,
+			difficulty: lobyConfig.difficulty,
 			//mode: this.config._mode,
 			tournamentId: null,
 			maxPlayers: lobyConfig.maxPlayers,

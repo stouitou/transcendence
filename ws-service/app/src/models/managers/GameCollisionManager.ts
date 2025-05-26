@@ -54,28 +54,6 @@ export class GameCollisionManager {
   
 	private checkWallCollisions(): number {
 		return this.ballManager.handleBallBounceWall();
-	  // Collision avec les murs
-	/* 		//mur left 
-			if (this.ball.position.x <= 0) {
-				this.ball.velocity.x *= -1; // Inverser la direction horizontale
-				return 0; // 
-			  }
-			//mur right
-			if (this.ball.position.x + this.ball.size.width >= this.canvas.width) {
-				this.ball.velocity.x *= -1; // Inverser la direction horizontale
-				return 1; //
-			}
-			//mur top
-			if (this.ball.position.y <= 0) {
-				this.ball.velocity.y *= -1; // Inverser la direction verticale
-				return 2; //
-			  }
-			//mur botom
-			if (this.ball.position.y + this.ball.size.height >= this.canvas.height) {
-				this.ball.velocity.y *= -1; // Inverser la direction verticale
-				return 3; //
-			  }
-			return -1; // Aucune collision */
 	}
   
 	/* getBall(): Ball {
@@ -92,7 +70,7 @@ export class GameCollisionManager {
 	
 		// Parcourir les joueurs pour mettre à jour le score
 		let score = 0;
-		for (const [index, player] of players.entries()) {
+		for (const [index, player] of players.entries()) { 
 			if (index !== wallIndex) {
 				if (player.score === undefined) {
 					player.score = 0; // Initialiser le score à 0 si non défini

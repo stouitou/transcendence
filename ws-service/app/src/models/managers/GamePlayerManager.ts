@@ -1,13 +1,14 @@
 import { Player } from "../../models/gameClass/Player";
 import { WaitingPlayers } from "../../services/ws.service";
 import { playerAction } from "../../types/gameUtils.type";
+import { Ball } from "../gameClass/Ball";
 
 export class GamePlayerManager {
 	private _players: Player[] = [];
 	private playerActions: playerAction[] = [];
   
-	constructor(initialPlayers: WaitingPlayers[]) {
-	  this._players = initialPlayers.map((playerData, index) => new Player(playerData, index));
+	constructor(initialPlayers: WaitingPlayers[], difficulty:number ) {
+	  this._players = initialPlayers.map((playerData, index) => new Player(playerData, index, difficulty));
 	  this.playerActions = initialPlayers.map(() => null);
 	}
 	isPlayer(playerId: number): boolean {
@@ -60,8 +61,19 @@ export class GamePlayerManager {
 	getPlayers(): Player[] {
 	  return this._players;
 	}
+
+	updatePlayerBotMovement(ball:Ball): void {
+	  this._players.forEach((player,index) => {
+		if (player.isIA) {
+		  player.bot?.move(ball);		 
+		  // Update player action based on bot movement
+		  this.playerActions[index] = player.directionReceived || null;
+		}
+	  });
+	}
   
-	getPlayerActions(): playerAction[] {
+	getPlayerActions(ball:Ball): playerAction[] {
+		this.updatePlayerBotMovement(ball);
 	  return this.playerActions;
 	}
   

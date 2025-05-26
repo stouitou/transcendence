@@ -15,26 +15,27 @@ export class GameBallManager {
 		this.ball = new Ball(
 			{ x: canvas.width / 2, y: canvas.height / 2 },
 			size,
-			initialVelocity
+			initialVelocity,
+			canvas
 		);
 	}
 
 	createBall(position: Position): Ball {
-		const newBall = new Ball(position, this.ballSize, this.ballVelocity);
+		const newBall = new Ball(position, this.ballSize, this.ballVelocity, this._canvas);
 		return newBall;
 	}
 	updateBall(ball: Ball): void {
 		ball.update();
 	}
 	resetBall(ball: Ball, position: Position, velocity: Position): void {
-		ball.reset(position, velocity);
+		ball.reset(/* position, velocity */);
 	}
 	getBall(): Ball {
 		return this.ball;
 	}
 	resetBallPosition(): void {
-		this.ball.reset({ x: this._canvas.width / 2, y: this._canvas.height / 2 },
-			{ x: -this.ball.velocity.x, y: -this.ball.velocity.y });
+		this.ball.reset(/* { x: this._canvas.width / 2, y: this._canvas.height / 2 },
+			{ x: -this.ball.velocity.x, y: -this.ball.velocity.y } */);
 	}
 
 	hasCollision(paddle: Paddle): boolean {
@@ -60,12 +61,12 @@ export class GameBallManager {
 			//mur left 
 			if (this.ball.position.x <= 0) {
 				this.ball.velocity.x *= -1; // Inverser la direction horizontale
-				return 0; // 
+				return 1; // 
 			  }
 			//mur right
 			if (this.ball.position.x + this.ball.size.width >= this._canvas.width) {
 				this.ball.velocity.x *= -1; // Inverser la direction horizontale
-				return 1; //
+				return 0; //
 			}
 			//mur top
 			if (this.ball.position.y <= 0) {

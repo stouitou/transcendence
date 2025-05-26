@@ -31,7 +31,7 @@ export class Match extends EventEmitter {
 	constructor(
 	  private lobyId: string,
 	  private _id: string,
-	  private _config: WebSocketGameConfig
+	  private _config: WebSocketGameConfig,
 
 	) {
 		super();
@@ -39,7 +39,7 @@ export class Match extends EventEmitter {
 		  width: 800,
 		  height: 600,
 		};
-	  this._playerManager = new GamePlayerManager(_config.players);
+	  this._playerManager = new GamePlayerManager(_config.players,_config.difficulty = 1);
 	  this._socketManager = new GameSocketManager();
 	  this.ballManager = new GameBallManager(canvas,{width:10,height:10},{x:1,y:1});
 	  this.collisionManager = new GameCollisionManager(canvas,this.ballManager);
@@ -114,7 +114,7 @@ export class Match extends EventEmitter {
 	  if (this.playerManager.areAllPlayersInGame()) {
 		this.movementManager.updatePlayerMovements( // @TODO passer le player manager au mouvement manager?
 		  this.playerManager.getPlayers(),
-		  this.playerManager.getPlayerActions()
+		  this.playerManager.getPlayerActions(this.ballManager.getBall())
 		);
 	//	this.collisionManager.getBall().update();
 		this.ballManager.getBall().update();

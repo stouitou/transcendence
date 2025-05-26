@@ -92,7 +92,7 @@ export class PopupCookies extends BaseComponent<{}> {
           <h3 class="text-sm font-semibold mb-2">${this.t("COOKIE.SETTINGS_TITLE")}</h3>
           <label class="flex items-center justify-between text-sm mb-1">
             <span>${this.t("COOKIE.FUNCTIONAL")}</span>
-            <input type="checkbox" checked disabled class="accent-green-600 cursor-not-allowed" />
+            <input id="functionalToggle" type="checkbox" checked disabled class="accent-green-600 cursor-not-allowed" />
           </label>
           <label class="flex items-center justify-between text-sm mb-1">
             <span>${this.t("COOKIE.ANALYTICS")}</span>

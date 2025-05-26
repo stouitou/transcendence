@@ -2,6 +2,7 @@ import { BaseComponent } from "../frameworks/base-component";
 import { UserContext } from "../globalstate/GlobalState";
 import {User, Game, Players } from "../types/types";
 import { IWebSocketsService } from "../globalstate/WebSocketService";
+
 class PlayerConfig {
   id?: number | null;
   name: string | null;
@@ -92,6 +93,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
       // mode: this.state.mode,
       max_players: this.state.max_players,
       isallowedRegistration: true,
+      difficulty: this.state.difficulty,
     }
     try {
       const response = await fetch(`/api/auth/ws-csrf`)
@@ -281,7 +283,10 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
                     </span>
                   </td>
                   <td class="avatar-cell">
-                    <img src="${
+                    <img
+                        referrerpolicy="no-referrer"
+                        alt="Avatar de ${p.display_name}"
+                     src="${
                 p.avatar?.startsWith('http')
                     ? p.avatar
                     : (p.avatar ? 'https://localhost:4433/' + p.avatar : '')
@@ -322,7 +327,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
           <input id="playerName" name="playerName" required class="input w-full">
         </div>
         <div>
-          <label class="label">Avatar :</label>
+          <label class="label" for="playerAvatar">Avatar :</label>
           <div class="flex items-center gap-4">
             <div id="avatarPreviewSelected">
               <img src="https://localhost:4433/uploads/1-avatartest.jpg" class="avatar-cell-img">

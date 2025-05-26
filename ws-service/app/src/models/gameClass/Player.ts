@@ -1,6 +1,7 @@
 import { Direction } from "../../types/gameUtils.type";
 import { Paddle } from "./Paddle";
 import { WaitingPlayers } from "../../services/ws.service";
+import { Bot } from "./Bot";
 
 const directions:Direction[] = ['left', 'right', 'top', 'bottom'];
 export class Player {
@@ -21,7 +22,10 @@ export class Player {
 	size:{ width: number, height: number }
 	index: number = 0;
 
-	constructor(jsonData: WaitingPlayers, index: number = 0) {
+	bot:Bot|null = null; // Bot instance if the player is a bot
+	directionReceived: 'up'|'down'|'left'|'right'|null = null;
+
+	constructor(jsonData: WaitingPlayers, index: number = 0,difficulty: number = 1) {
 		/**
 		 * 
 				userId: 'User-3',
@@ -38,7 +42,7 @@ export class Player {
 		this.index = index;
 		this.size =this.sizes[index]
 		this.position = this.initialPosition[index];//@TODO doublon
-		this.paddle = new Paddle(this.initialPosition[index], this.size);
+		this.paddle = new Paddle(this.position, this.size);
 		this.direction = directions[index];
 			this.id = jsonData.id??-1;
 			this.userId = jsonData.userId?? -1;
@@ -48,6 +52,10 @@ export class Player {
 			this.isIA = jsonData.isIA;
 			this.isInGame = this.isIA?true:jsonData.isInGame;
 			this.score = jsonData.score?? 0;
+		//add bot if isIA
+		if (this.isIA) {
+			this.bot = new Bot(difficulty, this);
+		}
 			
 	}
 	toJSON(): any { //@BUG 

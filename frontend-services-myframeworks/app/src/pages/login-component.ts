@@ -70,6 +70,7 @@ export class Login extends BaseComponent<{}, { formLogin: LoginFormData }> {
                 name="email"
                 class="form-text-input"
                 placeholder="name@student.42.fr"
+                autocomplete="email"
                 required
             />
             <label for="password" class="block  mb-2">Password:</label>
@@ -80,6 +81,7 @@ export class Login extends BaseComponent<{}, { formLogin: LoginFormData }> {
                 name="password"
                 class="form-text-input"
                 placeholder="********"
+                autocomplete="current-password"
                 required
             />
             <button

@@ -86,6 +86,7 @@ export class WsController {
           loby.config/* .setMode(message.config.mode) */
           .setFormat(message.config.format)
           .setType(message.config.type)
+          .setDifficulty(message.config.difficulty)
           .setIsAllowedRegistration(message.config.isallowedRegistration)
           .setMaxPlayers(message.config.max_players);
           loby.playerManager.setPlayers(setPlayers)
