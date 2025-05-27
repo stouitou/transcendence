@@ -110,19 +110,19 @@ export class GameLobyComponent extends BaseComponent<{
 
                 return /*html*/ `
           <tr>
-            <td><span class="chip">${index + 1}</span></td>
-            <td><span class="chip truncate">${game.lobyId}</span></td>
-            <td><span class="chip">${game.config.state}</span></td>
-            <td><span class="chip">${game.config.type}</span></td>
-            <td><span class="chip">${game.config.format}</span></td>
-            <td><span class="chip">${game.config.players.length}/${game.config.maxPlayers}</span></td>
+            <td><span class="idx-chip">${index + 1}</span></td>
+            <td><span class="content-chip">${game.lobyId}</span></td>
+            <td><span class="content-chip">${game.config.state}</span></td>
+            <td><span class="content-chip">${game.config.type}</span></td>
+            <td><span class="content-chip">${game.config.format}</span></td>
+            <td><span class="content-chip">${game.config.players.length}/${game.config.maxPlayers}</span></td>
             <td>
               ${
                     game.config.state === "open"
                         ? `<button id="join-game-${game.lobyId}"
                              data-loby-id="${game.lobyId}"
                              data-id="${game.config.gameId}"
-                             class="chip !bg-blue-500 !text-white capitalize">
+                             class="btn">
                        ${btnLabel}
                      </button>`
                         : ""
@@ -173,21 +173,15 @@ export class GameLobyComponent extends BaseComponent<{
       ${!isCreateGame ? `
       <!-- join-game list wrapper (only this gets hidden) -->
       <div id="joinListCard">
-        <div
-          class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md rounded-3xl
-                 shadow-xl ring-1 ring-black/5 overflow-hidden">
+        <div>
 
           <h2 class="text-4xl font-semibold px-10 pt-10 pb-8">Join a game</h2>
 
           <div class="overflow-x-auto">
             <table
-              class="lobby-table table-auto w-full text-lg text-left
-                     divide-y divide-zinc-200 dark:divide-zinc-800">
+              class="player-table w-full">
 
-              <thead
-                class="bg-zinc-100/70 dark:bg-zinc-800/70 backdrop-blur
-                       text-sm tracking-[0.04em] uppercase select-none
-                       text-zinc-600 shadow-sm">
+              <thead>
                 <tr>
                   <th class="w-12">#</th>
                   <th class="w-[18rem] truncate">Id</th>
@@ -207,58 +201,7 @@ export class GameLobyComponent extends BaseComponent<{
       <game-setting-component></game-setting-component>`}
     </div>
   </section>
-
-
-  <!-- fonts & helper styles -->
-  <style>
-    @import url('https://fonts.googleapis.com/css2?family=Archivo+Black&display=swap');
-    .font-display { font-family: 'Archivo Black', ui-sans-serif, system-ui, sans-serif; }
-
-    /* zebra striping */
-    .lobby-table tbody tr:nth-child(odd) { background:rgba(0,0,0,0.025); }
-    .lobby-table tbody tr:hover         { background:rgba(139,92,246,0.08); }
-
-    /* roomy but fits viewport */
-    .lobby-table {
-      table-layout: fixed;
-      border-collapse: separate;
-      border-spacing: 0 0.8rem;
-    }
-    .lobby-table th,
-    .lobby-table td {
-      padding: 0.75rem 1.75rem;
-      vertical-align: middle;
-      text-align: left;
-    }
-    .lobby-table :is(th,td):nth-child(1),
-    .lobby-table :is(th,td):nth-child(6),
-    .lobby-table :is(th,td):nth-child(7) { text-align:center; }
-
-    /* truncate long IDs */
-    .lobby-table td:nth-child(2) { white-space:nowrap; overflow:hidden; text-overflow:ellipsis; }
-
-    /* pastel circular chip */
-    .chip{
-      display:inline-flex; align-items:center; justify-content:center;
-      padding:.4rem 1.1rem; font-size:.95rem; font-weight:600;
-      border-radius:9999px;
-      background:rgba(87,104,172,.25);
-      color:#0059bf;
-      border:1px solid rgba(87,104,172,.35);
-      backdrop-filter:blur(6px);
-      box-shadow:0 2px 6px rgba(0,0,0,.06);
-      cursor:pointer; transition:transform .15s ease, box-shadow .15s ease;
-    }
-    .chip:hover{ transform:translateY(-2px) scale(1.05); box-shadow:0 8px 20px rgba(0,0,0,.12); }
-
-    @media(prefers-color-scheme:dark){
-      .chip{
-        background:rgba(255,255,255,.35);
-        border-color:rgba(255,255,255,.5);
-        color:#000;
-      }
-    }
-  </style>
+ 
 `;
 
 
@@ -287,9 +230,9 @@ export class GameLobyComponent extends BaseComponent<{
             lobbyView.appendChild(lobbyComponent);
 
             /* hide the big “Join a game” list */
-            const listCard = this.querySelector('#joinListCard') as HTMLElement;
+           /*  const listCard = this.querySelector('#joinListCard') as HTMLElement;
             if (listCard) listCard.style.display = 'none';
-
+ */
             /* send WS join if the user isn’t already in that lobby */
             const alreadyInLobby = this.state.ws?.isUserInLobybyId(
                 lobyID,

@@ -21,10 +21,10 @@ export class Home extends BaseComponent<{user: User | null}> {
     const { user } = this.state;
     const disable = user === null || user === undefined;
     this.innerHTML = `
-      <section class=" px-4 py-8">
-        <div class="max-w-7xl mx-auto">
-          <h1 class="text-4xl font-bold mb-8 text-center">Bienvenue sur GameCentral</h1>
-          <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+      <section class="section-container">
+        <div class="section-content">
+          <h1 class="section-title">Bienvenue sur GameCentral</h1>
+          <div class="dashboard-grid">
             ${this.card("Dashboard", "Accédez à votre tableau de bord", "/dashboard", "📊", disable)}
             ${this.card("Jouer", "Lancez une nouvelle partie", "/game", "🎮", disable)}
             ${this.card("Profil", "Gérez vos informations personnelles", "/profile", "👤", disable)}
@@ -36,17 +36,6 @@ export class Home extends BaseComponent<{user: User | null}> {
         </div>
       </section>
     `;
-
-/*     // Attach event to cards (simulate navigation or hook with your router)
-    const cards = this.querySelectorAll('[data-link]');
-    cards.forEach(card => {
-      card.addEventListener('click', (e) => {
-        const target = (e.currentTarget as HTMLElement).dataset.link;
-        if (target) {
-          window.location.href = target; // ou utiliser ton router interne (Le router gere deja les liens via le <a href=...>)
-        }
-      });
-    }); */
   }
 
   card (title: string, subtitle: string, link: string, emoji: string, disabled: boolean = false) : string {
@@ -54,14 +43,14 @@ export class Home extends BaseComponent<{user: User | null}> {
     const isDisabled = disabled;
     const linkAttribute = isDisabled ? '' : `href="${link}"`;
     const cardClasses = isDisabled
-      ? 'cursor-not-allowed opacity-50 bg-gray-200 dark:bg-gray-700'
-      : 'cursor-pointer bg-white dark:bg-gray-800 hover:shadow-lg transition-all hover:scale-[1.02] hover:bg-gray-50 dark:hover:bg-gray-700';
+      ? 'dashboard-card-disabled'
+      : 'dashboard-card-hover';
   
     return `
-      <a ${linkAttribute} data-link="${link}" class="p-6 rounded-2xl shadow ${cardClasses}">
-        <div class="text-4xl mb-3">${emoji}</div>
-        <h2 class="text-xl font-semibold mb-1">${title}</h2>
-        <p class="text-sm text-gray-600 dark:text-gray-300">${subtitle}</p>
+      <a ${linkAttribute} data-link="${link}" class="dashboard-card ${cardClasses}">
+        <div class="dashboard-card-icon">${emoji}</div>
+        <h2 class="dashboard-card-title">${title}</h2>
+        <p class="dashboard-card-text-muted">${subtitle}</p>
       </a>
     `;
   }

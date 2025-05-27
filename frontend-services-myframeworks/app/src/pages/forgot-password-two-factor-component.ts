@@ -101,53 +101,11 @@ export class ForgotPasswordTwoFactor extends BaseComponent<{}, { form2FA: TwoFac
 
   render() {
     this.innerHTML = `
-          <style>
-  .qr-code-container {
-    text-align: center;
-    margin-top: 20px;
-  }
-  .qr-code-image {
-    max-width: 200px;
-    margin: 0 auto;
-    display: block;
-  }
-    .code-input-container {
-  display: flex;
-  justify-content: center;
-  gap: 10px;
-  margin-top: 20px;
-}
-
-.code-input {
-  width: 40px;
-  height: 40px;
-  text-align: center;
-  font-size: 18px;
-  border: 2px solid green;
-  border-radius: 5px;
-  outline: none;
-  transition: border-color 0.3s ease;
-}
-
-.code-input:focus {
-  border-color: darkgreen;
-  box-shadow: 0 0 5px rgba(0, 128, 0, 0.5);
-}
-
-
-</style>
       <form id="form2FA" class="form-container">
-        <h2 class="text-2xl font-bold text-center mb-4">Enter the 2FA Code</h2>
-         <div id="message-box" class="font-bold text-center mb-4">ici</div>
+        <h2 class="form-title">Enter the 2FA Code</h2>
+         <div id="message-box" class="form-error">ici</div>
         <p class="text-center mb-4">Please enter the 2FA code sent to your email or App</p>
-        <div id="code-error" class="font-bold text-center mb-4"></div>
-    <!--     <div id="code_1-error" class="font-bold text-center mb-4"></div>
-         <div id="code_2-error" class="font-bold text-center mb-4"></div>
-         <div id="code_3-error" class="font-bold text-center mb-4"></div>
-         <div id="code_4-error" class="font-bold text-center mb-4"></div>
-         <div id="code_5-error" class="font-bold text-center mb-4"></div>
-         <div id="code_6-error" class="font-bold text-center mb-4"></div>-->
-        <input type="hidden" name="code" id="hiddenCode" />
+        <div id="code-error" class="form-error"></div>
         <div id="2faCodeContainer" class="code-input-container">
           <input name="code_1" type="text" maxlength="1" class="form-text-input code-input" />
           <input name="code_2" type="text" maxlength="1" class="form-text-input code-input" />
@@ -156,7 +114,7 @@ export class ForgotPasswordTwoFactor extends BaseComponent<{}, { form2FA: TwoFac
           <input name="code_5" type="text" maxlength="1" class="form-text-input code-input" />
           <input name="code_6" type="text" maxlength="1" class="form-text-input code-input" />
         </div>
-        <button id="verify2faBtn" type="submit" class="btn mt-4">Verify 2FA Code</button>
+        <button id="verify2faBtn" type="submit" class="btn">Verify 2FA Code</button>
       </form>
     `;
   }

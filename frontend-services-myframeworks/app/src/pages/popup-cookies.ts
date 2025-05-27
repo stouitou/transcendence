@@ -31,7 +31,7 @@ export class PopupCookies extends BaseComponent<{}> {
   handleCustomizeCookies(event: Event) {
     event.preventDefault();
      const settingsPanel = this.querySelector('#cookieSettings') as HTMLElement;
-     settingsPanel.classList.remove('hidden');
+     settingsPanel.classList.toggle('hidden');
   }
 
   handleSaveCookies(event: Event) {
@@ -70,40 +70,40 @@ export class PopupCookies extends BaseComponent<{}> {
 
   renderCookiePopup() {
     return `
-      <div id="cookiePopup" class="fixed bottom-20 right-4 max-w-sm bg-white dark:bg-gray-800 text-gray-900 dark:text-white p-4 rounded-2xl shadow-xl z-50 transition-opacity duration-300">
-        <h2 class="text-lg font-semibold mb-2">${this.t("COOKIE.TITLE")}</h2>
-        <p class="text-sm text-gray-600 dark:text-gray-300 mb-4">
+      <div id="cookiePopup" class="cookie-container">
+        <h2 class="cookie-title">${this.t("COOKIE.TITLE")}</h2>
+        <p class="cookie-header-text">
           ${this.t("COOKIE.TEXT")} 
-          <a href="/support" class="text-blue-500 hover:underline">${this.t("COOKIE.LINK")}</a>.
+          <a href="/support" class="cookie-header-text-link">${this.t("COOKIE.LINK")}</a>.
         </p>
-        <div class="flex flex-col space-y-2 sm:flex-row sm:space-y-0 sm:space-x-2 justify-end">
-          <button id="customCookies" class="bg-gray-200 dark:bg-gray-700 text-gray-900 dark:text-white px-4 py-2 rounded-lg text-sm hover:bg-gray-300 dark:hover:bg-gray-600 transition">
+        <div class="cookie-buttons-container">
+          <button id="customCookies" class="cookie-btn-settings">
             ${this.t("COOKIE.CUSTOMIZE")}
           </button>
-          <button id="refuseCookies" class="bg-gray-300 dark:bg-gray-700 hover:bg-gray-400 dark:hover:bg-gray-600 text-gray-800 dark:text-white px-4 py-2 rounded-lg text-sm transition">
+          <button id="refuseCookies" class="cookie-btn-refuse">
             ${this.t("COOKIE.REFUSE")}
           </button>
-          <button id="acceptCookies" class="bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white px-4 py-2 rounded-lg text-sm transition">
+          <button id="acceptCookies" class="cookie-btn-accept">
             ${this.t("COOKIE.ACCEPT")}
           </button>
         </div>
 
-        <div id="cookieSettings" class="mt-4 hidden border-t pt-4 dark:border-gray-600">
-          <h3 class="text-sm font-semibold mb-2">${this.t("COOKIE.SETTINGS_TITLE")}</h3>
-          <label class="flex items-center justify-between text-sm mb-1">
+        <div id="cookieSettings" class="cookie-form-container hidden">
+          <h3 class="cookie-form-title">${this.t("COOKIE.SETTINGS_TITLE")}</h3>
+          <label class="cookie-form-label">
             <span>${this.t("COOKIE.FUNCTIONAL")}</span>
-            <input id="functionalToggle" type="checkbox" checked disabled class="accent-green-600 cursor-not-allowed" />
+            <input id="functionalToggle" type="checkbox" checked disabled class="cookie-form-input-disabled" />
           </label>
-          <label class="flex items-center justify-between text-sm mb-1">
+          <label class="cookie-form-label">
             <span>${this.t("COOKIE.ANALYTICS")}</span>
             <input id="analyticsToggle" type="checkbox" class="accent-blue-500" />
           </label>
-          <label class="flex items-center justify-between text-sm mb-3">
+          <label class="cookie-form-label">
             <span>${this.t("COOKIE.MARKETING")}</span>
             <input id="marketingToggle" type="checkbox" class="accent-pink-500" />
           </label>
-          <div class="flex justify-end">
-            <button id="savePreferences" class="bg-gradient-to-br from-indigo-500 via-violet-500 to-fuchsia-500 text-white px-4 py-2 rounded-lg text-sm">
+          <div class="flex justify-end mt-4">
+            <button id="savePreferences" class="cookie-btn-accept">
               ${this.t("COOKIE.SAVE")}
             </button>
           </div>
