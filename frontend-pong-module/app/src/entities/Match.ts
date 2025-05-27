@@ -38,8 +38,8 @@ export class	Match {
 	setGameHero (div: HTMLElement)			{ this._renderer.gameHero = div; }
 	setGameHeroTree (div: HTMLElement)		{ this._renderer.gameHeroTree = div; }
 
-	renderGameHeroDiv(data:any)		{ this._renderer.renderGameHeroDiv(data); }
-	renderGameHeroTreeDiv(data:any)	{ this._renderer.renderGameHeroTreeDiv(data); }
+	renderGameHeroDiv (data: any)		{ this._renderer.renderGameHeroDiv(data); }
+	renderGameHeroTreeDiv (data: any)	{ this._renderer.renderGameHeroTreeDiv(data); }
 
 	// Handler used by the Web Socket for initial countdown	@param data
 	renderCountdownHandler (data: { matchId: string, value: number }) {
@@ -162,6 +162,8 @@ export class	Match {
 		// check score
 		if (this._gameManager!.checkMaxScore(this._webSocketManager.sendMessage.bind(this._webSocketManager))) {
 			this.stop();
+			console.log('datas in the websocket manager:', this._webSocketManager.dataConfig);
+				console.log('blablabla');
 			//afficher l'historique du jeu en fin de partie
 			this._renderer.displayHistoriqueGame(this._gameManager!.statisticsManager, this._gameManager!.players);
 		}	

@@ -14,7 +14,7 @@ export class Renderer {
 	private _score!: HTMLDivElement;
 	private _gameAlert: HTMLElement | null = null;
 
-	constructor () { }
+	constructor() { }
 
 	/* ---------- getters / setters UI ---------- */
 	get gameCanvas(): HTMLCanvasElement | null { return this._canvas; }
@@ -28,35 +28,35 @@ export class Renderer {
 	set gameHeroTree(div: HTMLElement) { this._gameHeroTree = div; }
 
 
-	private displayScore (Players: Player[] = []) {
+	private displayScore(Players: Player[] = []) {
 		this._score.innerHTML = '';
 		Players.forEach((player, index) => {
-			const	divPlayerScore = this.createDivDisplayScore(player.name, player.score, index);
+			const divPlayerScore = this.createDivDisplayScore(player.name, player.score, index);
 			this._score.appendChild(divPlayerScore);
 		});
 	}
 
 
-	createDivDisplayScore (playerName: string, playerScore: number, indexLocation: number) {
-		const	setGrid = [
+	createDivDisplayScore(playerName: string, playerScore: number, indexLocation: number) {
+		const setGrid = [
 			{ gridCol: "3", gridRow: "2" }, { gridCol: "1", gridRow: "2" },
 			{ gridCol: "2", gridRow: "3" }, { gridCol: "2", gridRow: "1" },
 		]
-		const	divPlayerScore = document.createElement('div');
+		const divPlayerScore = document.createElement('div');
 
 		divPlayerScore.classList.add('player-score');
 		divPlayerScore.innerHTML = `
 			<p class="score-cell">${playerName}</p>
 			<p class="score-cell score-cell-points">${playerScore}</p>`;
-		const	{ gridCol, gridRow } = setGrid[indexLocation];
+		const { gridCol, gridRow } = setGrid[indexLocation];
 		divPlayerScore.style.gridColumn = gridCol;
 		divPlayerScore.style.gridRow = gridRow;
-		return divPlayerScore ;
+		return divPlayerScore;
 	}
 
 	/* setup inital Display */
-	setupDisplay () {
-		if (!this._canvas)	{ throw new Error('Game canvas not found') ; }
+	setupDisplay() {
+		if (!this._canvas) { throw new Error('Game canvas not found'); }
 
 		this._canvas.style.verticalAlign = 'top';
 		this._canvas.height = CANVAS_HEIGHT;
@@ -73,7 +73,7 @@ export class Renderer {
 	}
 
 	// affiche un nombre sous forme de countdown	@param countdown	@returns
-	renderCountdown (countdown: number) {
+	renderCountdown(countdown: number) {
 		if (!this._ctx || !this._canvas) { console.error('Game context is not set.'); return; }
 
 		this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
@@ -81,12 +81,12 @@ export class Renderer {
 		Design.drawCountdownFrame(this._ctx, countdown.toString());
 	}
 
-	render (players: Player[]) {	//@TODO a renommer
+	render(players: Player[]) {	//@TODO a renommer
 		this.setupDisplay();
 		this.displayScore(players);
 	}
 
-	draw (ball: Ball, players: Player[]) {
+	draw(ball: Ball, players: Player[]) {
 		this.clear();
 
 		Design.drawBackground(this._ctx);
@@ -118,31 +118,31 @@ export class Renderer {
 		g.addColorStop(0.55, Design.DESIGN.accentColor);
 		g.addColorStop(1, "#4c000d");
 		ctx.fillStyle = g;
-// =======
+		// =======
 
-// 	private drawBall(ball: Ball) {
-// 		if (!this._ctx) return;
-// 		const ctx = this._ctx;
+		// 	private drawBall(ball: Ball) {
+		// 		if (!this._ctx) return;
+		// 		const ctx = this._ctx;
 
-// 		const r = ball.size.width;   // radius
-// 		const x = ball.position.x;   // center X
-// 		const y = ball.position.y;   // center Y
+		// 		const r = ball.size.width;   // radius
+		// 		const x = ball.position.x;   // center X
+		// 		const y = ball.position.y;   // center Y
 
-// 		// 1) build fancy radial gradient
-// 		const g = ctx.createRadialGradient(
-// 			x - r * 0.4, y - r * 0.4, r * 0.1,
-// 			x,            y,            r
-// 		);
-// 		g.addColorStop(0,   "#ffffff");                // bright core
-// 		g.addColorStop(0.25, Design.DESIGN.accentColor); // your accent
-// 		g.addColorStop(1,   "rgba(228,0,27,0.35)");                // deep edge
-// >>>>>>> origin
+		// 		// 1) build fancy radial gradient
+		// 		const g = ctx.createRadialGradient(
+		// 			x - r * 0.4, y - r * 0.4, r * 0.1,
+		// 			x,            y,            r
+		// 		);
+		// 		g.addColorStop(0,   "#ffffff");                // bright core
+		// 		g.addColorStop(0.25, Design.DESIGN.accentColor); // your accent
+		// 		g.addColorStop(1,   "rgba(228,0,27,0.35)");                // deep edge
+		// >>>>>>> origin
 
 
 		// 2) shadow/glow behind the ball
 		ctx.save();
 		ctx.shadowColor = Design.DESIGN.accentColor;
-		ctx.shadowBlur  = 12;
+		ctx.shadowBlur = 12;
 		ctx.shadowOffsetX = 0;
 		ctx.shadowOffsetY = 0;
 
@@ -169,15 +169,15 @@ export class Renderer {
 		ctx.beginPath();
 		ctx.ellipse(
 			x - r * 0.35, y - r * 0.35,
-			r * 0.2,      r * 0.12,
-			0,           0,           Math.PI * 2
+			r * 0.2, r * 0.12,
+			0, 0, Math.PI * 2
 		);
 		ctx.fill();
 		ctx.restore();
 
 		// 6) edge stroke for definition
 		ctx.save();
-		ctx.lineWidth   = 2;
+		ctx.lineWidth = 2;
 		ctx.strokeStyle = "rgba(255,255,255,0.2)";
 		ctx.beginPath();
 		ctx.arc(x, y, r - 1, 0, Math.PI * 2);
@@ -198,21 +198,21 @@ export class Renderer {
 		);
 	}
 
-// <<<<<<< HEAD
-// 	renderGameHeroDiv(data: PREPARE_MATCHES_STARTED_ROUND_GAME) {
-// 		console.log('Renderer: renderGameHeroDiv data:', data);
-// 		const	div = this._gameHero as HTMLDivElement;
-// 		if (div) {
-// 			div.innerHTML = '';
-// 			displayPrepareMatchesStartedRoundGame(div, data);
-// 		}
-// 		// Remove the div after 5 seconds
-// 		setTimeout(() => {
-// 			if (div) {
-// 				div.innerHTML = '';
-// 			}
-// 		}, 5000);
-// =======
+	// <<<<<<< HEAD
+	// 	renderGameHeroDiv(data: PREPARE_MATCHES_STARTED_ROUND_GAME) {
+	// 		console.log('Renderer: renderGameHeroDiv data:', data);
+	// 		const	div = this._gameHero as HTMLDivElement;
+	// 		if (div) {
+	// 			div.innerHTML = '';
+	// 			displayPrepareMatchesStartedRoundGame(div, data);
+	// 		}
+	// 		// Remove the div after 5 seconds
+	// 		setTimeout(() => {
+	// 			if (div) {
+	// 				div.innerHTML = '';
+	// 			}
+	// 		}, 5000);
+	// =======
 
 	renderGameHeroDiv(data: PREPARE_MATCHES_STARTED_ROUND_GAME) {
 		const div = this._gameHero as HTMLDivElement;
@@ -238,103 +238,97 @@ export class Renderer {
 		setTimeout(() => div.remove(), 5000);
 	}
 
-// <<<<<<< HEAD
-// 	displayHistoriqueGame(statisticsManager: StatisticsManager, players: Player[]) {
-// 		const menuHistoriqueGame = document.createElement('div');
-// 		menuHistoriqueGame.style.position = 'absolute';
-// 		menuHistoriqueGame.style.top = '50%';
-// 		menuHistoriqueGame.style.left = '50%';
-// 		menuHistoriqueGame.style.transform = 'translate(-50%, -50%)';
-// 		menuHistoriqueGame.style.margin = '0';
-// 		menuHistoriqueGame.style.padding = '0';
-// 		menuHistoriqueGame.style.width = '250px';
-// 		menuHistoriqueGame.style.height = '250px';
-// 		menuHistoriqueGame.style.backgroundColor = 'blue';
-// 		menuHistoriqueGame.style.display = 'flex';
-// 		menuHistoriqueGame.style.justifyContent = 'center';
-// 		menuHistoriqueGame.style.alignItems = 'center';
-// 		menuHistoriqueGame.style.color = 'white';
-// 		menuHistoriqueGame.style.fontSize = '15px';
-// 		menuHistoriqueGame.style.fontFamily = 'Arial';
-// 		menuHistoriqueGame.style.borderRadius = '8px';
-// 		menuHistoriqueGame.style.border = '5px solid rgb(255, 0, 0)';
-// 		menuHistoriqueGame.style.background = 'rgb(0, 0, 0)';
-// 		menuHistoriqueGame.style.color = 'rgb(255, 0, 0)';
-// 		menuHistoriqueGame.style.whiteSpace = 'pre-line';
-// 		let	text = `Plus grand nombre d'échanges: ${statisticsManager._gameHistory.maxBounceCount}\n\n`;
-// 		players.forEach(player => {
-// 			text += `${player.name}:\nNombre de rebonds: ${player.history.bounceCount}\nDistance parcourue: ${player.history.distance}\n\n`;
-// 		});
-// 		menuHistoriqueGame.textContent = text;
-// 		this._gameAlert?.appendChild(menuHistoriqueGame);
-// =======
+	// <<<<<<< HEAD
+	// 	displayHistoriqueGame(statisticsManager: StatisticsManager, players: Player[]) {
+	// 		const menuHistoriqueGame = document.createElement('div');
+	// 		menuHistoriqueGame.style.position = 'absolute';
+	// 		menuHistoriqueGame.style.top = '50%';
+	// 		menuHistoriqueGame.style.left = '50%';
+	// 		menuHistoriqueGame.style.transform = 'translate(-50%, -50%)';
+	// 		menuHistoriqueGame.style.margin = '0';
+	// 		menuHistoriqueGame.style.padding = '0';
+	// 		menuHistoriqueGame.style.width = '250px';
+	// 		menuHistoriqueGame.style.height = '250px';
+	// 		menuHistoriqueGame.style.backgroundColor = 'blue';
+	// 		menuHistoriqueGame.style.display = 'flex';
+	// 		menuHistoriqueGame.style.justifyContent = 'center';
+	// 		menuHistoriqueGame.style.alignItems = 'center';
+	// 		menuHistoriqueGame.style.color = 'white';
+	// 		menuHistoriqueGame.style.fontSize = '15px';
+	// 		menuHistoriqueGame.style.fontFamily = 'Arial';
+	// 		menuHistoriqueGame.style.borderRadius = '8px';
+	// 		menuHistoriqueGame.style.border = '5px solid rgb(255, 0, 0)';
+	// 		menuHistoriqueGame.style.background = 'rgb(0, 0, 0)';
+	// 		menuHistoriqueGame.style.color = 'rgb(255, 0, 0)';
+	// 		menuHistoriqueGame.style.whiteSpace = 'pre-line';
+	// 		let	text = `Plus grand nombre d'échanges: ${statisticsManager._gameHistory.maxBounceCount}\n\n`;
+	// 		players.forEach(player => {
+	// 			text += `${player.name}:\nNombre de rebonds: ${player.history.bounceCount}\nDistance parcourue: ${player.history.distance}\n\n`;
+	// 		});
+	// 		menuHistoriqueGame.textContent = text;
+	// 		this._gameAlert?.appendChild(menuHistoriqueGame);
+	// =======
 
 	displayHistoriqueGame(statisticsManager: StatisticsManager, players: Player[]) {
 		const menu = document.createElement('div');
 
 		// ─── PANEL LAYOUT ────────────────────────────────────────────
 		Object.assign(menu.style, {
-			position:       'absolute',
-			top:            '50%',
-			left:           '50%',
-			transform:      'translate(-50%, -50%)',
-			width:          '320px',            // wider to fit all text
-			padding:        '16px 24px',
-			background:     'rgba(255,255,255,0.6)',
+			position: 'absolute',
+			top: '50%',
+			left: '50%',
+			transform: 'translate(-50%, -50%)',
+			width: '320px',            // wider to fit all text
+			padding: '16px 24px',
+			background: 'rgba(255,255,255,0.6)',
 			backdropFilter: 'blur(4px)',
-			border:         '1px solid rgba(0,0,0,0.05)',
-			borderRadius:   '12px',
-			boxShadow:      '0 4px 12px rgba(0,0,0,0.06)',
-			fontFamily:     'Inter, Arial, sans-serif',
-			fontSize:       '14px',
-			lineHeight:     '1.5',
-			color:          '#333',
-			textAlign:      'left',
-			overflow:       'visible',         // show all at once
-			zIndex:         '1000',
+			border: '1px solid rgba(0,0,0,0.05)',
+			borderRadius: '12px',
+			boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
+			fontFamily: 'Inter, Arial, sans-serif',
+			fontSize: '14px',
+			lineHeight: '1.5',
+			color: '#333',
+			textAlign: 'left',
+			overflow: 'visible',         // show all at once
+			zIndex: '1000',
 		} as Partial<CSSStyleDeclaration>);
 
 		// ─── LOBBY BUTTON (top) ─────────────────────────────────────
 		menu.innerHTML = `
-    <div style="text-align:right; margin-bottom:12px;">
-      <a
-        href="https://localhost:4433/game-loby"
-        style="
-          display:inline-block;
-          padding:6px 12px;
-          background:rgba(200,230,255,0.7);
-          color:#333;
-          text-decoration:none;
-          border-radius:6px;
-          font-weight:600;
-          box-shadow:0 2px 8px rgba(0,0,0,0.08);
-        "
-      >
-        ◀ Retour au Lobby
-      </a>
-    </div>
-    <ul style="list-style:none; padding:0; margin:0;">
-      <li><strong>Rebonds max :</strong> ${statisticsManager._gameHistory.maxBounceCount}</li>
-      <li>
-        <strong>Plus de buts encaissés :</strong>
-        ${statisticsManager._gameHistory.mostGoalsConcededPlayer.name}
-        (${statisticsManager._gameHistory.mostGoalsConcededPlayer.goalsConceded})
-      </li>
-      ${players.map(p =>
-			`<li><strong>${p.name} rebonds :</strong> ${p.history.bounceCount}</li>`
+			<div style="text-align:right; margin-bottom:12px;">
+				<a
+					href="https://localhost:4433/game-loby"
+					style="
+					display:inline-block;
+					padding:6px 12px;
+					background:rgba(200,230,255,0.7);
+					color:#333;
+					text-decoration:none;
+					border-radius:6px;
+					font-weight:600;
+					box-shadow:0 2px 8px rgba(0,0,0,0.08);
+					"
+				>
+					◀ Retour au Lobby
+				</a>
+			</div>
+			<ul style="list-style:none; padding:0; margin:0;">
+			<li><strong>Longest rally:</strong> ${statisticsManager._gameHistory.maxBounceCount}</li>
+			<li>
+				<strong>Most goals conceded:</strong>
+				${statisticsManager._gameHistory.mostGoalsConcededPlayer.name}
+				(${statisticsManager._gameHistory.mostGoalsConcededPlayer.goalsConceded})
+			</li>
+			${players.map(p =>
+			`<li><strong>${p.name}: rebounds:</strong> ${p.history.bounceCount}, <strong>distance:</strong> ${p.history.distance}</li>`
 		).join("")}
-    </ul>
-  `;
+			</ul>
+		`;
 
 		this._gameAlert?.appendChild(menu);
-// >>>>>>> origin
 		this._gameAlert?.classList.add('show');
 	}
-
-
-
-
-
 }
 
 // type PREPARE_MATCHES_STARTED_ROUND_GAME = {
@@ -369,7 +363,7 @@ export class Renderer {
 // 	const { players, winner } = data;
 // 	div.innerHTML = `
 // 		<div class="game-card-container-background mx-auto text-center">
-	
+
 // 			<div class="game-card-container-row">
 // 				<p class="text-3xl font-bold text-center mb-6">Game ID: #${data.id}</p>
 // 			</div>
@@ -393,7 +387,7 @@ export class Renderer {
 // 				<div class="flex flex-col items-center justify-center" style="width: 200px;">
 // 					<p class="text-blue-600 text-8xl px-3">VS</p>
 // 				</div>
-	
+
 // 				<div class="flex flex-col items-center justify-center" style="width: 200px;">
 // 				${players.map((player, i) => i % 2 === 0 ? `
 // 					<div class="flex flex-col items-center justify-center py-4">
@@ -527,26 +521,26 @@ export function displayPrepareMatchesStartedTournament(
 	div.innerHTML = `
     <div class="space-y-4">
       ${data
-		.map(
-			(round, idx) => `
+			.map(
+				(round, idx) => `
             <details${idx === 0 ? " open" : ""} class="rounded-xl overflow-hidden ring-1 ring-gray-200 dark:ring-zinc-700 shadow-sm">
               <summary class="cursor-pointer select-none px-4 py-2 bg-gray-50 dark:bg-zinc-800 font-medium">
                 Round ${idx + 1}
               </summary>
               <div class="px-4 py-4 space-y-6 bg-white dark:bg-zinc-900">
                 ${round.matches
-				.map(
-					(match) => `
+						.map(
+							(match) => `
                       <div class="flex flex-wrap justify-center items-center gap-3">
                         ${match.players.map(miniChip).join("")}
                       </div>`
-				)
-				.join("")}
+						)
+						.join("")}
               </div>
             </details>`
-		)
-		.join("")}
+			)
+			.join("")}
     </div>`;
-// >>>>>>> origin
+	// >>>>>>> origin
 }
 
