@@ -26,7 +26,7 @@ export class Home extends BaseComponent<{user: User | null}> {
           <h1 class="text-4xl font-bold mb-8 text-center">Bienvenue sur GameCentral</h1>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             ${this.card("Dashboard", "Accédez à votre tableau de bord", "/dashboard", "📊",disable)}
-            ${this.card("Jouer", "Lancez une nouvelle partie", "/game", "🎮",disable)}
+            ${this.card("Jouer", "Lancez une nouvelle partie", "/game-loby", "🎮",disable)}
             ${this.card("Profil", "Gérez vos informations personnelles", "/profile", "👤",disable)}
             ${this.card("Classement", "Consultez le classement général", "/leaderboard", "🏆",disable)}
             ${this.card("Paramètres", "Réglez vos préférences", "/settings", "⚙️")}
