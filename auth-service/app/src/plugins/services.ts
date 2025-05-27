@@ -1,7 +1,7 @@
 import fp from 'fastify-plugin';
 import { AuthService } from "../services/auth.service";
 import { FastifyPluginAsync, FastifyInstance, FastifyPluginOptions } from 'fastify'
-import { TwoFactorAuthService } from '@src/services/TwoFactorAuthServices';
+import { TwoFactorAuthService } from '../services/TwoFactorAuthServices';
 
 
 const UserServicePlugin: FastifyPluginAsync = async (fastify: FastifyInstance, options: FastifyPluginOptions): Promise<void> => { 

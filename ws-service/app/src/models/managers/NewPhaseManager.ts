@@ -11,6 +11,7 @@ export class LobbyEndPhase implements LobbyPhaseStep {
 	constructor(private lobyConfig:LobyConfig,private context:PhaseContext, private socketManager: SocketManager) {}
   
 	async execute(): Promise<LobbyPhaseTransition> {
+		this.lobyConfig.config._state = "finished";
 		this.socketManager.broadcastMessage({ type: "LOBBYENDPHASE", data: this.context.tournamentWinner });
 	  return { next: "done" };
 	}
@@ -50,6 +51,11 @@ export class LobbyEndPhase implements LobbyPhaseStep {
 		const round = this.matchManager.roundManager.currentRound;
 
 		this.socketManager.broadcastMessage({ type: "PREPARE_MATCHES_STARTED_ROUND",data:this.matchManager.getAllMatchesinAllRound() });
+		// Vérifier si le state du loby est "finished"
+		if (this.matchManager.lobyConfig.config._state === "finished") {
+		  console.log(`[MatchPhase] Lobby is finished, skipping match phase.`);
+		  return { next: "skip" }; // Passer à la phase suivante
+		}
 	
 		if (this.matchManager.lobyConfig.config._type === "local") {
 		  console.log(`[MatchPhase] Processing local matches with countdown`);
@@ -63,7 +69,10 @@ export class LobbyEndPhase implements LobbyPhaseStep {
 		  );
 		} else {
 		  console.log(`[MatchPhase] Starting remote matches`);
-		  await this.matchManager.startAllMatchesRemote(round);
+		  await this.matchManager.startAllMatchesRemote(round,
+			async (match: Match) => {
+			  await this.countdownBeforeMatch(match);
+			});
 		}
 	
 		console.log(`[MatchPhase] Matches completed for phase: ${this.name}`);
@@ -74,6 +83,7 @@ export class LobbyEndPhase implements LobbyPhaseStep {
 
 	  private async countdownBeforeMatch(match: Match): Promise<void> {
 		this.socketManager.broadcastMessage({ type: "PREPARE_MATCHES_STARTED_ROUND_GAME", data: match.viewDetails() });
+//		if (match.config.state === "remote") {
 
 		const countdownDuration = 10; // Durée du compte à rebours en secondes
 		for (let i = countdownDuration; i > 0; i--) {

@@ -1,3 +1,6 @@
+import  languageContext from "../globalstate/LanguageContext";
+import { Language } from "./i18n/types";
+import { t, TranslationKey } from './i18n/index';
 import { RouterConfig } from "../router/Router";
 import { ApiError } from "./base-error";
 import { FormHandler } from "./base-form";
@@ -59,7 +62,12 @@ export abstract class BaseComponentShadowRoot<TState = {}> extends HTMLElement {
 }
 
 export abstract class BaseComponent<TState = {}, TForms extends Record<string, any> = {}> extends HTMLElement {
-  
+  protected currentLang: Language = languageContext.getLang();
+  protected setLang = (lang: Language) => languageContext.setLang(lang);
+  private _unsubscribeLang?: () => void;
+  protected t(key: TranslationKey): string {
+    return t(key, this.currentLang);
+  }
   protected router = RouterConfig.getInstance(); 
   protected state: TState;
   private _attachedEvents: { event: string; handler: EventListener }[] = [];
@@ -69,6 +77,11 @@ export abstract class BaseComponent<TState = {}, TForms extends Record<string, a
   constructor(initialState: TState) {
     super();
     this.state = initialState;
+    //set le contexte de langue
+   this._unsubscribeLang =  languageContext.onChange((lang) => {
+      this.currentLang = lang;
+      this.render();
+    });
     //set apiErrorHandler
     this.setApiErrorHandler(400, {
       message: 'Validation error. Please check your input.',
@@ -115,7 +128,7 @@ export abstract class BaseComponent<TState = {}, TForms extends Record<string, a
     if (!formElement) {
       throw new Error(`Form with id "${String(divId)}" not found.`);
     }
-    const formHandler = new FormHandler<TForms[K]>(formElement);
+    const formHandler = new FormHandler<TForms[K]>(formElement,this.t.bind(this));
     this._formHandlers.set(divId, formHandler);
     return formHandler;
   }
@@ -196,6 +209,11 @@ export abstract class BaseComponent<TState = {}, TForms extends Record<string, a
       handler.cleanEventListeners();
     });
     this._formHandlers = []; */
+    // Nettoyer les écouteurs d'événements Lang
+    if (this._unsubscribeLang) {
+      this._unsubscribeLang();
+      this._unsubscribeLang = undefined;
+    }
   
   }
 

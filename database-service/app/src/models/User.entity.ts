@@ -13,7 +13,7 @@ export class User {
   /* @Column({ type: "text", unique: true })
   email: string; */
 
-  @Column({ type: "text", nullable: true })
+  @Column({ type: "text", unique: true })
   name: string;
 
   @Column({ type: "text", default: "user" })

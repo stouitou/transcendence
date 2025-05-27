@@ -2,12 +2,12 @@ import { FastifyInstance } from "fastify";
 import FastifyPassport from "@fastify/passport";
 import { AuthController } from "../controllers/auth.controller";
 import { AuthSchema } from "../schemas/auth.schema";
-import { sendMail } from "@src/services/mail.service";
-import { TwoFactorController } from "@src/controllers/twoFactor.controller";
-import { CrsfController } from "@src/controllers/crsf.controller";
-import { isGuest } from "@src/middleware/isGuest.middleware";
-import { verifyCSRFToken } from "@src/middleware/verifyCRSFToken.middleware";
-import { AuthHandlerCallback } from "@src/handlers/callback.handler";
+import { sendMail } from "../services/mail.service";
+import { TwoFactorController } from "../controllers/twoFactor.controller";
+import { CrsfController } from "../controllers/crsf.controller";
+import { isGuest } from "../middleware/isGuest.middleware";
+import { verifyCSRFToken } from "../middleware/verifyCRSFToken.middleware";
+import { AuthHandlerCallback } from "../handlers/callback.handler";
 
 async function authRoutes(app: FastifyInstance) {
 

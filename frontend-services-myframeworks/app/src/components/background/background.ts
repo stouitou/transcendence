@@ -29,6 +29,7 @@ export class BackgroundCanvas extends BaseComponent {
   }
 
   render() {
+    this.cleanup();
     this.innerHTML = `         
       <div id="canvasContainer" class="fixed top-0 left-0 w-full h-full z-0">
           <canvas id="canvasContent" class="absolute top-0 left-0 w-full h-full"></canvas>
@@ -68,7 +69,7 @@ export class BackgroundCanvas extends BaseComponent {
 
     // Transparent clear so background shows through
     const lightClear = new Color4(1, 1, 1, 0);
-    const darkClear  = new Color4(0.2, 0.2, 0.2, 0);
+    const darkClear  = new Color4(0.2, 0.2, 0.2, 1);
     this.scene.clearColor = getThemeColor() === 'light' ? lightClear : darkClear;
 
     // Ensure the <canvas> itself is transparent in CSS

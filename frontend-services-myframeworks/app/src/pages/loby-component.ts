@@ -96,12 +96,28 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
         console.log('game is set lobyID', lobyID);
         this.lobyID = lobyID;
       }
+
+    joinGameBtn(game:Match) {
+      const minTournamentPlayers = 3;
+      const minClassicPlayers = 2;
+      const minPlayers = game.config.format === 'tournament' ? minTournamentPlayers : minClassicPlayers;
+
+      if (/* game.config.type === 'local'  && */ game.config.players.length >= minPlayers) {
+        return `<a class="chip !px-8 !py-3 inline-block mt-4"
+           href="/game?id=${game?.lobyId}">Join game</a>`;
+      }
+      return `<div class="chip !px-8 !py-3 inline-block mt-4"> waiting for players</div>`;
+    }
       
 
     render() {
       const game = this.state.game;
       const players = this.state.game?.config.players;
       const waitingPlayers = this.state.game?.config.waitingList;
+      if (!game) {
+        this.innerHTML = ''
+        return;
+      }
 
         this.innerHTML = /*html*/`
     <div class="form-container max-w-5xl mx-auto px-4 space-y-8">
@@ -122,8 +138,9 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
       </div>
         
       <div class="text-center">
-        <a class="chip !px-8 !py-3 inline-block mt-4"
-           href="/game?id=${game?.lobyId}">Join game</a>
+      ${this.joinGameBtn(game)}
+     <!--   <a class="chip !px-8 !py-3 inline-block mt-4"
+           href="/game?id=${game?.lobyId}">Join game</a>-->
       </div>
 
       <!-- PLAYERS ------------------------------------------------------------ -->
@@ -147,7 +164,7 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
                          src="${p.avatar?.startsWith('http')
                 ? p.avatar
                 : p.avatar
-                    ? `https://localhost:4433/${p.avatar}`
+                    ? `${p.avatar}`
                     : ''}"
                          alt="avatar">
                   </td>
@@ -178,7 +195,7 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
                                src="${p.avatar?.startsWith('http')
                     ? p.avatar
                     : p.avatar
-                        ? `https://localhost:4433/${p.avatar}`
+                        ? `${p.avatar}`
                         : ''}"
                                alt="avatar"></td>
                       <td><span class="chip">${p.state??'joined'}</span></td>

@@ -209,7 +209,7 @@ class TournamentsRepository extends BaseRepository<Tournaments,TournamentsCreate
     return data.data;
   }
 
-  addRound = async (tournamentsId: number, RoundId: number,currentRound:number): Promise<Tournaments | null> => {
+/*   addRound = async (tournamentsId: number, RoundId: number,currentRound:number): Promise<Tournaments | null> => {
     //1- recuperer le tournoi
     const tournament = await this.getById(tournamentsId);
     if (!tournament) {
@@ -241,7 +241,7 @@ class TournamentsRepository extends BaseRepository<Tournaments,TournamentsCreate
     const data = await response.json();
     console.log("🔐create TournamentsRepository.addRound()  --data--",data)
     return data.data;
-  }
+  } */
 
   newfilters = (params: IParams) => {
     let queryString = "?";

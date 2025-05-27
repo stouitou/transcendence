@@ -9,7 +9,7 @@ import { DataMatch } from '../../Interfaces/DataMatch.interface';
 export class	GameManager {
 
 	private				_players: Player[] = [];
-	private readonly	_ball: Ball;
+	private 	readonly _ball: Ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 });
 	
 	private				_dataConfig: DataMatch | null = null;
 	private readonly	_collisionManager: CollisionManager = new CollisionManager();
@@ -18,7 +18,7 @@ export class	GameManager {
 	private readonly	_inputManagers: Map< string, InputManager > = new Map(); // par joueur id
 
 	constructor () {
-		this._ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 });
+		//this._ball = new Ball({ x: 350, y: 250 }, { width: 16, height: 16 }, { x: 1, y: 1 }, 4);
 	}
 
 	get players ()							{ return this._players ; }

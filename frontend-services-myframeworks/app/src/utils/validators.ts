@@ -20,6 +20,16 @@ export const emailValidator = (value: string): string[] => {
 
 export const checkboxValidator = (value: string): string[] => {
   const errors: string[] = [];
-  if (!value) errors.push("Le champ est requis.");
+  if (!value) errors.push("FORM.GENERIC.REQUIRED");
   return errors;
 }
+
+export const SettingLangValidator = (value: string): string[] => {
+  const errors: string[] = [];
+  if (!value) errors.push("FORM.SETTINGS.LANG.REQUIRED");
+  const allowedLangs = ['fr', 'en'];
+  // if (!allowedLangs.includes(value)) errors.push("La langue sélectionnée n'est pas valide.");
+   if (!allowedLangs.includes(value)) errors.push("FORM.SETTINGS.LANG.INVALID");
+  
+  return errors;
+};

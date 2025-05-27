@@ -6,15 +6,10 @@ export let CANVAS_WIDTH = 800;
 export let CANVAS_HEIGHT = 600;
 
 /* ────────────────────────────────────────── */
-/*				<game-component>	 		  */
+/* <game-component>                           */
 /* ────────────────────────────────────────── */
 @customElement('game-component')
-export class	classic extends LitElement {
-	createRenderRoot () {
-		// Désactive le shadow DOM, le rendu se fait dans le DOM ight
-		return this;
-	}
-
+export class  classic extends LitElement {
 // LitElement automatically create a shadow DOM
 	@property({ type: String }) gameContainerId: string = 'gameWrapper';
 	@property({ type: Object }) data: {id: string} | null = null;
@@ -249,10 +244,9 @@ export class	classic extends LitElement {
         }
     `
 
-	constructor () {
-		super();
-		console.log('game component constructor')
-	}
+
+
+	constructor ()	{ super(); console.log('game component constructor') }
 
 	set params (params: { id: string })	{ this.data = params; }
 
@@ -274,17 +268,16 @@ export class	classic extends LitElement {
 		this._game.webSocketManager.lobyId = this.data?.id;
 	}
 
-	firstUpdated () {
+	firstUpdated() {
 		console.log('firstUpdated: DOM is ready');
 
-		const	gameCanvas = this.querySelector('#gameCanvas') as HTMLCanvasElement;
-		const	gameDivUi = this.querySelector('#game-ui') as HTMLElement;
-		const	gameDivAlert = this.querySelector('#alertBox') as HTMLElement;
-		const	gameDivHero = this.querySelector('#gameHero') as HTMLElement;
-		const	gameDivHeroTree = this.querySelector('#gameHeroTree') as HTMLElement;
+		const gameCanvas   = this.shadowRoot?.querySelector('#gameCanvas')  as HTMLCanvasElement;
+		const gameDivUi    = this.shadowRoot?.querySelector('#game-ui')     as HTMLElement;
+		const gameDivAlert = this.shadowRoot?.querySelector('#alertBox')    as HTMLElement;
+		const gameDivHero  = this.shadowRoot?.querySelector('#gameHero')    as HTMLElement;
 
-		if (!gameCanvas || !gameDivUi || !gameDivAlert || !gameDivHero || !gameDivHeroTree) {
-			throw new Error ('One or more game DOM nodes not found');
+		if (!gameCanvas || !gameDivUi || !gameDivAlert || !gameDivHero) {
+			throw new Error('One or more game DOM nodes not found');
 		}
 
 		/* Set the canvas and UI elements in the game instance */
@@ -301,18 +294,16 @@ export class	classic extends LitElement {
 
 		return html `
 			<div id="gameHero"></div>
-			<div id="gameHeroTree"></div>
-			<div class="game-container" style="width: ${CANVAS_WIDTH}px; height: ${CANVAS_HEIGHT}px;">
 			<div class="game-container">
 
 				<!-- Partie superieur : UI -->
-				<div class="ui game-ui" id="game-ui">
+				<div class="game-ui" id="game-ui">
 					<h1>Game UI</h1>
 				</div>
 				
 				<!-- Partie inferieure : canvas -->
-				<div class="ui game-canvas">
-					<canvas class="canvas" id="gameCanvas"></canvas>
+				<div class="game-canvas">
+					<canvas id="gameCanvas"></canvas>
 				</div>
 
 				<!-- Message d'alerte -->
@@ -332,47 +323,48 @@ export class	classic extends LitElement {
 		super.disconnectedCallback();
 	}
 
-    private hideBackground () : void {
-        const	bg = document.querySelector('background-canvas-component');
-        if (bg)	{ (bg as HTMLElement).style.display = 'none'; }
+	private hideBackground(): void {
+		const bg = document.querySelector('background-canvas-component');
+		if (bg) (bg as HTMLElement).style.display = 'none';
 
-        // force black at the very root, *and* show your JPG
-        document.documentElement.style.backgroundColor = 'black';
-        document.documentElement.style.backgroundImage = 'url("/uploads/bg3.png")';
-        document.documentElement.style.backgroundRepeat = 'no-repeat';
-        document.documentElement.style.backgroundSize = 'cover';
-        document.documentElement.style.backgroundPosition = 'center';
+		// force black at the very root, *and* show your JPG
+		document.documentElement.style.backgroundColor = 'black';
+		document.documentElement.style.backgroundImage = 'url("/uploads/bg3.png")';
+		document.documentElement.style.backgroundRepeat = 'no-repeat';
+		document.documentElement.style.backgroundSize = 'cover';
+		document.documentElement.style.backgroundPosition = 'center';
 
-        // if body covers the html, give it the same
-        document.body.style.backgroundColor   = "";  // clear your white fallback
-        document.body.style.backgroundImage   =
-            `linear-gradient(
-				rgba(255,255,255,0.8),    /* 50% white fade */
-				rgba(255,255,255,0.8)
-			), 
-			url("/uploads/bg10.png")`;
-        document.body.style.backgroundRepeat  = "no-repeat";
-        document.body.style.backgroundSize    = "cover";
-        document.body.style.backgroundPosition= "center";
-    }
+		// if body covers the html, give it the same
+		document.body.style.backgroundColor   = "";  // clear your white fallback
+		document.body.style.backgroundImage   =
+			`linear-gradient(
+     rgba(255,255,255,0.8),    /* 50% white fade */
+     rgba(255,255,255,0.8)
+   ), 
+   url("/uploads/bg10.png")`;
+		document.body.style.backgroundRepeat  = "no-repeat";
+		document.body.style.backgroundSize    = "cover";
+		document.body.style.backgroundPosition= "center";
+	}
 
-    private showBackground () : void {
-        const	bg = document.querySelector('background-canvas-component');
-        if (bg)	{ (bg as HTMLElement).style.display = ''; }
+	private showBackground(): void {
+		const bg = document.querySelector('background-canvas-component');
+		if (bg) (bg as HTMLElement).style.display = '';
 
-        // restore original page styles
-        document.documentElement.style.backgroundColor = '';
-        document.documentElement.style.backgroundImage = '';
-        document.documentElement.style.backgroundRepeat = '';
-        document.documentElement.style.backgroundSize = '';
-        document.documentElement.style.backgroundPosition = '';
+		// restore original page styles
+		document.documentElement.style.backgroundColor = '';
+		document.documentElement.style.backgroundImage = '';
+		document.documentElement.style.backgroundRepeat = '';
+		document.documentElement.style.backgroundSize = '';
+		document.documentElement.style.backgroundPosition = '';
 
-        document.body.style.backgroundColor = '';
-        document.body.style.backgroundImage = '';
-        document.body.style.backgroundRepeat = '';
-        document.body.style.backgroundSize = '';
-        document.body.style.backgroundPosition = '';
-    }
+		document.body.style.backgroundColor = '';
+		document.body.style.backgroundImage = '';
+		document.body.style.backgroundRepeat = '';
+		document.body.style.backgroundSize = '';
+		document.body.style.backgroundPosition = '';
+	}
+
 }
 
 // Save the component with a customize tagname
@@ -383,6 +375,6 @@ declare global {
 }
 
 export function setCanvasSize (width: number, height: number) {
-	CANVAS_WIDTH = width;
-	CANVAS_HEIGHT = height;
+	CANVAS_WIDTH = 1200;
+	CANVAS_HEIGHT = 1000;
 }

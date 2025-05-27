@@ -100,7 +100,7 @@ export class Renderer {
 	}
 
 	private clear() {
-		if (!this._ctx || !this._canvas) { console.error('Game context is not set.'); return; }	// if context is undefined, impossible to clear canvas 
+		if (!this._ctx || !this._canvas) { console.error('Game context is not set.'); return; }	// if context is undefined, impossible to clear canvas
 		this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
 	}
 
@@ -272,8 +272,9 @@ export class Renderer {
 	displayHistoriqueGame(statisticsManager: StatisticsManager, players: Player[]) {
 		const menu = document.createElement('div');
 
-		// ─── PANEL LAYOUT ────────────────────────────────────────────
+		/* ─── PANEL LAYOUT ─────────────────────────────────────────── */
 		Object.assign(menu.style, {
+<<<<<<< HEAD
 			position: 'absolute',
 			top: '50%',
 			left: '50%',
@@ -292,10 +293,31 @@ export class Renderer {
 			textAlign: 'left',
 			overflow: 'visible',         // show all at once
 			zIndex: '1000',
+=======
+			position:       'absolute',
+			top:            '50%',
+			left:           '50%',
+			transform:      'translate(-50%, -50%)',
+			width:          '320px',
+			padding:        '16px 24px',
+			background:     'rgba(255,255,255,0.6)',
+			backdropFilter: 'blur(4px)',
+			border:         '1px solid rgba(0,0,0,0.05)',
+			borderRadius:   '12px',
+			boxShadow:      '0 4px 12px rgba(0,0,0,0.06)',
+			fontFamily:     'Inter, Arial, sans-serif',
+			fontSize:       '14px',
+			lineHeight:     '1.5',
+			color:          '#333',
+			textAlign:      'left',
+			overflow:       'visible',
+			zIndex:         '1000',
+>>>>>>> origin
 		} as Partial<CSSStyleDeclaration>);
 
-		// ─── LOBBY BUTTON (top) ─────────────────────────────────────
+		/* ─── CONTENT ──────────────────────────────────────────────── */
 		menu.innerHTML = `
+<<<<<<< HEAD
 			<div style="text-align:right; margin-bottom:12px;">
 				<a
 					href="https://localhost:4433/game-loby"
@@ -325,9 +347,50 @@ export class Renderer {
 		).join("")}
 			</ul>
 		`;
+=======
+    <div style="text-align:right; margin-bottom:12px;">
+      <a
+        href="/game"
+        style="
+          display:inline-block;
+          padding:6px 12px;
+          background:rgba(200,230,255,0.7);
+          color:#333;
+          text-decoration:none;
+          border-radius:6px;
+          font-weight:600;
+          box-shadow:0 2px 8px rgba(0,0,0,0.08);
+        "
+      >
+        ◀ Retour au Lobby
+      </a>
+    </div>
+    <ul style="list-style:none; padding:0; margin:0;">
+      <li><strong>Rebonds max&nbsp;:</strong> ${statisticsManager._gameHistory.maxBounceCount}</li>
+      <li>
+        <strong>Plus de buts encaissés&nbsp;:</strong>
+        ${statisticsManager._gameHistory.mostGoalsConcededPlayer.name}
+        (${statisticsManager._gameHistory.mostGoalsConcededPlayer.goalsConceded})
+      </li>
+      ${players
+			.map(
+				p =>
+					`<li><strong>${p.name} rebonds&nbsp;:</strong> ${p.history.bounceCount}</li>`
+			)
+			.join('')}
+    </ul>
+  `;
+>>>>>>> origin
 
+		/* ─── SHOW & AUTO-HIDE ─────────────────────────────────────── */
 		this._gameAlert?.appendChild(menu);
 		this._gameAlert?.classList.add('show');
+
+		// hide banner after 5 s
+		setTimeout(() => {
+			menu.remove();
+			this._gameAlert?.classList.remove('show');
+		}, 5000);
 	}
 }
 
@@ -419,9 +482,9 @@ type PREPARE_MATCHES_STARTED_ROUND = {
 // 		<div class="flex flex-col">
 // 				<p>Round ${index + 1}</p>
 // 				${round.matches.map((match) => `
-// 				<div class="flex flex-row">					 
+// 				<div class="flex flex-row">
 // 					${match.players.map((player) => `
-// 						<div class="flex flex-col">								
+// 						<div class="flex flex-col">
 // 							<div class="w-20">
 // 							<img referrerPolicy="no-referrer"
 // 									src=${player.avatar}
@@ -499,7 +562,7 @@ export function displayPrepareMatchesStartedRoundGame(
       <div class="rounded-2xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md shadow-lg ring-1 ring-black/5 p-8 text-center space-y-10">
         <div class="flex flex-wrap justify-center items-center gap-6">
           ${players.filter((_, i) => i % 2 === 0).map(heroChip).join("")}
-          <span class="text-3xl font-extrabold text-blue-600 select-none">VS</span>
+          <span class="text-3xl font-extrabold text-blue-600 select-none">VS </span>
           ${players.filter((_, i) => i % 2 === 1).map(heroChip).join("")}
         </div>
 
@@ -541,6 +604,10 @@ export function displayPrepareMatchesStartedTournament(
 			)
 			.join("")}
     </div>`;
+<<<<<<< HEAD
 	// >>>>>>> origin
+=======
+
+>>>>>>> origin
 }
 

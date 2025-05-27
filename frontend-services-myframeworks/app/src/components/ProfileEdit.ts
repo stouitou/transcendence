@@ -3,9 +3,9 @@ import { BaseComponent } from "../frameworks/base-component";
 import {  UserContext } from '../globalstate/GlobalState';
 import { User } from '../types/types';
 import { disable2FA, enable2FA, get2FADetail, TwoFA } from "../services/api.2fa";
-import { updatePassword , updateProfileDeleteMe, updateProfileName, uploadProfileAvatar } from "../services/api.profile";
+import { addfriendByUserName, removeFriendById, updatePassword , updateProfileDeleteMe, updateProfileName, uploadProfileAvatar } from "../services/api.profile";
 import { ProfileUpdateFormData } from "../types/forms.type";
-import { profileUpdateAvatarconstraint, profileUpdateDeleteconstraint, profileUpdateNameconstraint, profileUpdatePasswordconstraint } from "../utils/constraints";
+import { profileUpdateAddFriendByNameconstraint, profileUpdateAvatarconstraint, profileUpdateDeleteconstraint, profileUpdateNameconstraint, profileUpdatePasswordconstraint, profileUpdateRemoveFriendById } from "../utils/constraints";
 
 export class ProfileEdit extends BaseComponent<{user: User | null},ProfileUpdateFormData> {
   constructor() {
@@ -76,10 +76,36 @@ export class ProfileEdit extends BaseComponent<{user: User | null},ProfileUpdate
         <div id="message-box" class="font-bold text-center mb-4"></div>
         <p class="text-gray-500 dark:text-gray-400">Edit your profile information below.</p>
         <p class="text-gray-500 dark:text-gray-400">You can update your name, avatar, and password.</p>
-        <img referrerPolicy="no-referrer" src=${avatar?.startsWith('http')?avatar:avatar?`https://localhost:4433/${avatar}`:undefined} alt="avatar" width="100" height="100"/>
+        <img referrerPolicy="no-referrer" src=${avatar?.startsWith('http')?avatar:avatar?`${avatar}`:undefined} alt="avatar" width="100" height="100"/>
         <p class="text-gray-500 dark:text-gray-400">Name: ${user.name}</p>
         <p class="text-gray-500 dark:text-gray-400">Role: ${user.role}</p>            
       </div>
+      	<form id="formAddfriend">
+        <label for="friendName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Add friend:</label>
+        <input 
+          id="friendName"
+          type="text"
+          name="friendName" 
+          class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+          required
+        />
+        <div id="friendName-error" class="font-bold text-center mb-4"></div>
+        <button type="submit" class="btn">ADD Friend</button>
+			</form>
+
+      <form id="formRemoveFriend">
+        <label for="friendId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Remove Friend by ID:</label>
+         <select friendId="inputSelectRmfriend" name='friendId'  class="select-form-message">
+                        <option value="">Select a user</option>
+                        ${user.friends?.map((friend) => (
+                            `<option value='${friend.id}'>
+                                ${friend.name} (${friend.id})
+                            </option>`
+                        ))}
+                    </select>
+        <div id="id-error" class="font-bold text-center mb-4"></div>
+        <button type="submit" class="btn">Remove Friend</button>
+      </form>
 			<form id="formUpdateName">
         <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Name:</label>
         <input 
@@ -235,6 +261,43 @@ export class ProfileEdit extends BaseComponent<{user: User | null},ProfileUpdate
       this.apiErrorHandler(error);
     }
   }
+    handleSubmitAddfriendByUserName = async(e: Event)=> {
+    e.preventDefault()
+    const formHandler = this.getFormHandler('formAddfriend');
+    if (!formHandler?.validateForm()) {
+      this.showMessage('Please fix the errors in the form.', 'error');
+      return;
+    }
+    try {
+      const formData = formHandler.getFormData();
+      const response = await addfriendByUserName({friendName:formData.friendName});
+      if (response) {
+        this.showMessage(`Name updated! ${formData.friendName}`, 'success');
+      }
+    } catch (error) {
+        //console.error('register failed:', error);
+      this.apiErrorHandler(error);
+    }
+  }
+  handleSubmitRemoveFriend = async(e: Event)=> {
+    e.preventDefault()
+    const formHandler = this.getFormHandler('formRemoveFriend');
+    if (!formHandler?.validateForm()) {
+      this.showMessage('Please fix the errors in the form.', 'error');
+      return;
+    }
+    try {
+      const formData = formHandler.getFormData();
+      console.log("formData",formData);
+      const response = await removeFriendById({friendId:formData.friendId});
+      if (response) {
+        this.showMessage(`friend removed! ${formData.friendId}`, 'success');
+      }
+    } catch (error) {
+        //console.error('register failed:', error);
+      this.apiErrorHandler(error);
+    }
+  }
 
   handleSubmitUpdateAvatar = async(e: Event)=> {
     e.preventDefault()
@@ -277,18 +340,24 @@ export class ProfileEdit extends BaseComponent<{user: User | null},ProfileUpdate
 
   attachAllForm() {
     // attach the form handler to the form
+    const formHandlerAddFriendByName = this.addForm('formAddfriend');
+    const formHandlerRemoveFriend = this.addForm('formRemoveFriend');
     const formHandlerEditName = this.addForm('formUpdateName');
     const formHandlerEditAvatar = this.addForm('formUpdateAvatar');
     const formHandlerEditPassword = this.addForm('formUpdatePassword');
     const formHandlerDeleteUser = this.addForm('formDeleteUser');
     
     // add the validation constraints to the form handler
+    formHandlerAddFriendByName?.addValidation(profileUpdateAddFriendByNameconstraint);
+    formHandlerRemoveFriend?.addValidation(profileUpdateRemoveFriendById);
     formHandlerEditName?.addValidation(profileUpdateNameconstraint);
     formHandlerEditAvatar?.addValidation(profileUpdateAvatarconstraint);
     formHandlerEditPassword?.addValidation(profileUpdatePasswordconstraint);
     formHandlerDeleteUser?.addValidation(profileUpdateDeleteconstraint);
 
     // attach the event handler to the form
+    this.attachEvent(this, '#formAddfriend', 'submit', this.handleSubmitAddfriendByUserName.bind(this));
+    this.attachEvent(this, '#formRemoveFriend', 'submit', this.handleSubmitRemoveFriend.bind(this));
     this.attachEvent(this, '#formUpdateName', 'submit', this.handleSubmitUpdateName.bind(this));
     this.attachEvent(this, '#formUpdateAvatar', 'submit', this.handleSubmitUpdateAvatar.bind(this));
     this.attachEvent(this, '#formUpdatePassword', 'submit', this.handleSubmitUpdatePassword.bind(this));

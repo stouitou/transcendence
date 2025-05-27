@@ -30,11 +30,12 @@ export class EntityRepository<T extends ObjectLiteral> {
     } as FindManyOptions<T>);
   }
    // 📌 🔍 Trouver tous les éléments avec relations optionnelles
-   async findAllAndCount(options?: { limit?: number; offset?: number; order?: "ASC" | "DESC"; relations?: string[] }): Promise<[T[],number]> {
-    const { limit, offset, order, relations = [] } = options || {};
+   async findAllAndCount(options?: { limit?: number; offset?: number; order?: "ASC" | "DESC";orderBy?: keyof T; relations?: string[] }): Promise<[T[],number]> {
+    const { limit, offset, order, orderBy = "id", relations = [] } = options || {};
+   
     return this.repo.findAndCount({
       where: {} as any,
-      order: order ? { id: order } as any : undefined,
+      order: order ? { [orderBy]: order } as any : undefined,
       take: limit,
       skip: offset,
       relations,
@@ -48,11 +49,12 @@ export class EntityRepository<T extends ObjectLiteral> {
   }
 
   // 📌 🔍 Trouver un élément avec des filtres avancés
-  async findByParams(params: Partial<T>, options?: { limit?: number; offset?: number; order?: "ASC" | "DESC"; relations?: string[] }): Promise<T[]> {
-    const { limit, offset, order, relations = [] } = options || {};
+  async findByParams(params: Partial<T>, options?: { limit?: number; offset?: number; order?: "ASC" | "DESC"; relations?: string[];orderBy?: keyof T }): Promise<T[]> {
+    const { limit, offset, order, orderBy = "id", relations = [] } = options || {};
     return this.repo.find({
       where: params as any,
-      order: order ? { id: order } as any : undefined,
+    //  order: order ? { id: order } as any : undefined,
+      order: order ?{ [orderBy]: order } as any : undefined,
       take: limit,
       skip: offset,
       relations,
@@ -60,11 +62,12 @@ export class EntityRepository<T extends ObjectLiteral> {
   }
 
   // 📌 🔍 Trouver un élément avec des filtres avancés
-  async findByParamsAndCount(params: Partial<T>, options?: { limit?: number; offset?: number; order?: "ASC" | "DESC"; relations?: string[] })/* : Promise<[T[], number]> */ {
-    const { limit, offset, order, relations = [] } = options || {};
+  async findByParamsAndCount(params: Partial<T>, options?: { limit?: number; offset?: number; order?: "ASC" | "DESC";orderBy?: keyof T ; relations?: string[] })/* : Promise<[T[], number]> */ {
+    const { limit, offset, order, orderBy = "id", relations = [] } = options || {};
+    
     return await  this.repo.findAndCount({
       where: params as any,
-      order: order ? { id: order } as any : undefined,
+      order: order ? { [orderBy]: order } as any : undefined,
       take: limit,
       skip: offset,
       relations,

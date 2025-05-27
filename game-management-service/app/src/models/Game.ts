@@ -50,7 +50,7 @@ export type GameCreate = {
   currentRound?: number;
   tournament?: number;
   type: "local" | "remote";
-  format: "classic" | "tournament" /* | "normal" */;
+  format: 'classic' | 'tournament' /* | "normal" */;
 }
 // 📌 Définition des modèles avec contraintes
 export type GameBody = {

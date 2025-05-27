@@ -1,8 +1,8 @@
 import { FastifyInstance } from "fastify";
 import { AuthController } from "../controllers/auth.controller";
-import { CrsfController } from "@src/controllers/crsf.controller";
-import { internal } from "@src/middleware/internal";
-import { TwoFactorController } from "@src/controllers/twoFactor.controller";
+import { CrsfController } from "../controllers/crsf.controller";
+import { internal } from "../middleware/internal";
+import { TwoFactorController } from "../controllers/twoFactor.controller";
 
 async function internalRoutes(app: FastifyInstance) {
 

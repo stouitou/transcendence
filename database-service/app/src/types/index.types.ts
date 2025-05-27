@@ -3,6 +3,7 @@ export interface UrlSearchParams {
 	limit: string;
 	offset: string;
 	order: string;
+	orderBy?: string;
 	relations: string[];
   }
   

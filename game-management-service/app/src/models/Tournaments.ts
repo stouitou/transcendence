@@ -1,5 +1,5 @@
 import { Game } from "./Game";
-import { Round } from "./Round";
+import { Players } from "./Players";
 import { User } from "./User";
 
 
@@ -7,16 +7,13 @@ export class Tournaments{
   id: number;
   games?: Game[];
   state?: string;
-  players?: User[]/*  | number[] */;
+  players?: User[];
   created_at: Date;
   updated_at: Date;
-  rounds?: Round[]; //@TODO en faire un DTO
   currentRound?: number;
-  winner?: User | number | string;
-  //mode de la partie : local ou remote
-  type: string;
-  //si local, les players sont un tableau de displaynames
-  local_players: string[];
+  winner?: /* User */Players | number | string;//Players //ok
+  type: 'local' | 'remote'
+  max_players: number;
 
  
 	constructor(data: Partial<Tournaments>) {
@@ -25,7 +22,7 @@ export class Tournaments{
     this.state = "en attente";
     this.players = [];
     this.type = "local";
-    this.local_players = [];
+    this.max_players = 16;
     Object.assign(this, data);
     this.created_at = new Date(data?.created_at?data.created_at:new Date());
 	  this.updated_at = new Date(data?.updated_at?data.updated_at:new Date());
@@ -38,20 +35,17 @@ export type TournamentsCreate = {
   id?: number;
   players: number[];
   currentRound?: number;
- // difficulty: number;
   state: string; // en attente, en cours, terminee
   type: "local"| "remote"
   max_players?: number;
- // mode: string;
-/*   created_at: Date;
-  updated_at: Date; */
 }
+
 // 📌 Définition des modèles avec contraintes
 export type TournamentsBody = {
   id: number;
   games: Game[];
   state: string;
-  players: User[]/*  | number[] */;
+  players: User[];
   created_at: Date;
   updated_at: Date;
 }
@@ -87,11 +81,8 @@ export const TournamentsSafe: TournamentsModel<TournamentsSafe> = {
 
 export const TournamentsCreate: TournamentsModel<TournamentsCreate> = {
   players: [],
-  //difficulty: 0,
   state: "en attente",
   type: "local",
   max_players: 20,
   currentRound: 0,
-  //created_at: new Date(),
-  //updated_at: new Date()
 };

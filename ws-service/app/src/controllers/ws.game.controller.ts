@@ -24,11 +24,9 @@ export class WsGameController {
       socket.send(JSON.stringify({ type:"welcometogame", userId:`${id}`, name:`${name}`, message: "Welcome to the game" }));
       socket.send(JSON.stringify({ type:"me", userId:`${id}`, name:`${name}` }));
 
-
       /**
        * ACTIONS
        */
-      //4- handle message
       //4- handle message
       socket.on("message", (data:any) => {
         console.log("WebSocket game - message:", data.toString());
@@ -57,13 +55,11 @@ export class WsGameController {
                 return;
               }
               loby.socketManager.updateSocket(id,socket);
-              loby.playerManager.setPlayerIsInGame(id,true);//@TODO doublon?
+              loby.playerManager.setPlayerIsInGame(id,true);//doublon?
               loby.start(id);
               break;
               //case "move": seulement pour le mode REMOTE
               case "move":
-                console.log(`id :${id} move`,message);
-                //@TODO a definir le roundNumber
                 const gameMove =  LobyFactory.getLobyById(message.lobyId)?.matchManager.getCurrentMatch(message.pongId)//getMatch(message.pongId,0)
                 if (!gameMove) {
                   console.error("[move] Loby not found");

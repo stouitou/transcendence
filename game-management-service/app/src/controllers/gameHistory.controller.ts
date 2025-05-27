@@ -1,6 +1,9 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import  GameHistoryRepository  from '../repository/GameHistory.repository';
 import { GameHistoryBody } from '../models/GameHistory';
+import {  Players } from '../models/Players';
+import UserRepository from '../repository/User.repository';
+import { User, UserStats } from '../models/User';
 
 export class GameHistoryController {
   private gameHistoryRepository = new GameHistoryRepository();
@@ -51,11 +54,30 @@ export class GameHistoryController {
     const { id, ...data } = requestBody;
   
     const gameHistory = await this.gameHistoryRepository.update({id:gameHistoryId,...data});
-    console.log("GameHistoryController updateGameHistory ",gameHistory);
+    console.log("[GameHistoryController] updateGameHistory ",gameHistory);
 
     if (!gameHistory) {
       return reply.status(404).send({ error: 'gameHistory not found' });
     }
+   
+      const {type,format,players} = gameHistory as {format:"classic"|"tournament",type:'local'|'remote',players:Players[]};
+       const games = await Promise.all(players.map(async (player: Players) => {
+        console.log(" GameRepository.updateGameHistory()  --STATS-- user--",player);
+        const { user } = player;
+        if (!user || user === null || typeof user === 'undefined' || typeof user === 'number') {
+          console.warn(" GameRepository.updateGameHistory()  --STATS-- player is null or undefined",player);
+          return null; // Skip if user is not defined
+        }
+        console.log(" GameRepository.updateGameHistory()  --STATS-- user--",user);
+        const fieldName = gameHistory.winner? user.name == gameHistory.winner? `won`: `lost` : `draw`;
+
+        const userStatsData = buildUserStatsResult(user, format, type, fieldName);
+
+        const userUpdated = await (new UserRepository()).update(userStatsData);
+        return userUpdated;
+       }));
+       console.log(" GameRepository.create()  --gameCreated-STATS- UPDATED--",games)
+    
     return reply.send(gameHistory);
   }
   
@@ -66,4 +88,31 @@ export class GameHistoryController {
   }
 }
 
+export const buildUserStatsResult = (user: User, format:"classic"|"tournament",type:'local'|'remote', fieldName: `won`| `lost` | `draw`) => {
+  const userStats:UserStats = { 
+    ...user.userStats,
+    [`${format}_${type}_game_${fieldName}`]: user.userStats[`${format}_${type}_game_${fieldName}`] + 1,
+    // [`<classic|tournament>_<local|remote>_game_<won|lost|draw>`]: user.userStats[`<classic|tournament>_<local|remote>_game_<won|lost|draw>`] + 1,
 
+  };
+  //si le format est "classic" , on incrémente le total_game_<won|lost|draw>
+  if (format === "classic") {
+    userStats[`${format}_total_game_${fieldName}`] = user.userStats[`${format}_total_game_${fieldName}`] + 1;
+  }
+  //update level for user local
+  if (fieldName === "won") {
+    if (type==='local' && format === "classic") {
+      user.level = user.level?user.level + 1:1; //increment level for classic local won
+    }
+    if (type==='remote' && format === "classic") {
+      user.level = user.level?user.level + 2:2; //increment level for classic remote won
+    }
+    if (type==='local' && format === "tournament") {
+      user.level = user.level?user.level + 1:1; //increment level for tournament local won
+    }
+    if (type==='remote' && format === "tournament") {
+      user.level = user.level?user.level + 2:2; //increment level for tournament remote won
+    }
+  }
+  return {id:user.id,userStats,level:user.level};
+}

@@ -22,6 +22,7 @@ export class LobyConfig {
 		_isallowedRegistration:boolean,
 		_gameId:number, //@TODO a redefinir
 		_state:string,
+		_difficulty:number, // [1..5]
 	//	_players:WaitingPlayers[],
 	//	_waitingList:WaitingPlayers[]
 		} = {
@@ -34,6 +35,7 @@ export class LobyConfig {
 				_isallowedRegistration: true,
 				_gameId: -1,
 				_state: "open",
+				_difficulty: 1, // Default difficulty level
 				//_players: [],
 				//_waitingList: [],
 			};
@@ -59,6 +61,14 @@ export class LobyConfig {
 	}
 	get format() {
 	return this.config._format;
+	}
+	setDifficulty(difficulty: string) {
+	this.config._difficulty = Number(difficulty) || 1; // Default to 0 if not a number
+	return this;
+	}
+
+	get difficulty() {
+	return this.config._difficulty || 1; // Default to 1 if not set
 	}
 	setType(type: string) {
 	this.config._type = type == "local" ? "local" : "remote";
@@ -261,6 +271,7 @@ export class Loby {
 		  config: {
 			type: this.config.type,
 			format: this.config.format,
+			difficulty: this.config.difficulty,
 		//	mode: this.config.mode,
 			tournamentId: this.config.tournamentId,
 			maxPlayers: this.config.maxPlayers,

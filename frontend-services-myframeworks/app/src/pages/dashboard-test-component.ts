@@ -3,6 +3,7 @@ import { UserContext } from "../globalstate/GlobalState";
 import { User, Tournaments } from "../types/types";
 import { DonutsChart } from "./charts-donuts-componenet";
 import { GameCardTest } from "./game-card-component";
+import { ProfilStatsComponent } from "./profil-stats-component";
 import { DashboardTournois, GameCard,  TournoiDetail } from "./tournament-test-composant";
 
 customElements.define('dashboard-tournois', DashboardTournois);
@@ -11,33 +12,38 @@ customElements.define('tournoi-detail', TournoiDetail);
 customElements.define('game-card-component', GameCardTest);
 customElements.define('game-card', GameCard);
 customElements.define('donuts-chart',DonutsChart);
+
+
+  if (!customElements.get('profil-stats-component')) {
+	customElements.define('profil-stats-component', ProfilStatsComponent);
+  }
 export class Dashboard extends BaseComponent<{ user: User | null,tournamentsData: Tournaments[]}> {
 	constructor() {
 		super({ user: null, tournamentsData: [] });
 	  }
 
   
-  connectedCallback() {
-	//super.connectedCallback();
-	this.state.user = UserContext().user();
-	if (this.state.user) {
-		this.state.tournamentsData = this.state.user.tournaments || [];
-	} else {
-	  console.log('No user connected');
+	connectedCallback() {
+		//super.connectedCallback();
+		this.state.user = UserContext().user();
+		if (this.state.user) {
+			this.state.tournamentsData = this.state.user.tournaments || [];
+		} else {
+		console.log('No user connected');
+		}
+		this.render();
+		document.addEventListener('profile-data-updated', (e: Event) => {
+		const customEvent = e as CustomEvent;
+		console.log('profile-data-updated event received');
+		this.state.user = customEvent.detail.profileData;
+		/*  if (this.state.user) {
+			this.state.tournamentsData = this.state.user.tournaments || [];
+		} else {
+		console.log('No user connected');
+		} */
+		this.render();
+		});
 	}
-	this.render();
-	document.addEventListener('profile-data-updated', (e: Event) => {
-	  const customEvent = e as CustomEvent;
-	  console.log('profile-data-updated event received');
-	  this.state.user = customEvent.detail.profileData;
-	  if (this.state.user) {
-		this.state.tournamentsData = this.state.user.tournaments || [];
-	} else {
-	  console.log('No user connected');
-	}
-	  this.render();
-	});
-  }
   
 	render() {
 	  this.renderDashboard();
@@ -53,193 +59,14 @@ export class Dashboard extends BaseComponent<{ user: User | null,tournamentsData
 				<profile-component class="flex-1"></profile-component>
 				<chat-component class="flex-1"></chat-component>
 			  </div>
-	  
-			  <!-- Game Stats Section -->
-			  <section>
-				<h2 class="text-2xl font-bold mb-4 text-center">Game Stats</h2>
-				<div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md">
-				  <donuts-chart id="gameChart"></donuts-chart>
-				  <donuts-chart id="gameChartLocal"></donuts-chart>
-				  <donuts-chart id="gameChartRemote"></donuts-chart>
-				</div>
-			  </section>
-	  
-			  <!-- Tournament Stats Section -->
-			  <section>
-				<h2 class="text-2xl font-bold mb-4 text-center">Tournament Stats</h2>
-				<div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md">
-				  <donuts-chart id="tournamentChart"></donuts-chart>
-				  <donuts-chart id="tournamentChartLocal"></donuts-chart>
-				  <donuts-chart id="tournamentChartRemote"></donuts-chart>
-				</div>
-			  </section>
+
+			  <profil-stats-component id=${this.state.user?.id}></profil-stats-component>
 	  
 			  <!-- History + Dashboard -->
 			  <game-history-component></game-history-component>
-			  <dashboard-tournois></dashboard-tournois>
+			  <dashboard-tournois></dashboard-tournois> 
 			</div>
 		  </div>
 		`;
-	  
-		const userStats = this.createDataSet();
-	  
-		const dashboard = this.querySelector('dashboard-tournois') as any;
-		dashboard.data = this.state.tournamentsData;
-	  
-		const gameChart = this.querySelector('#gameChart') as any;
-		gameChart.data = userStats.gamePlayedTotalData;
-	  
-		const gameChartLocal = this.querySelector('#gameChartLocal') as any;
-		gameChartLocal.data = userStats.gamePlayedLocalData;
-	  
-		const gameChartRemote = this.querySelector('#gameChartRemote') as any;
-		gameChartRemote.data = userStats.gamePlayedRemoteData;
-	  
-		const tournamentChart = this.querySelector('#tournamentChart') as any;
-		tournamentChart.data = userStats.gamePlayedTournamentData;
-	  
-		const gameChartTournamentLocal = this.querySelector('#tournamentChartLocal') as any;
-		gameChartTournamentLocal.data = userStats.gamePlayedTournamentLocalData;
-	  
-		const gameChartTournamentRemote = this.querySelector('#tournamentChartRemote') as any;
-		gameChartTournamentRemote.data = userStats.gamePlayedTournamentRemoteData;
-	  }
-	  
-	
-
-	createDataSet() {
-		// Données reelles
-		//game_played
-		//recuperer les stats de l'utilisateur
-		const userStats = this.state.user?.userStats;
-		//cree un objet manipulable pour chaque type de jeu
-		const gamePlayedTotal = {
-			total: userStats?.total_game_played || 0,
-			win: userStats?.total_game_won || 0,
-			lose: userStats?.total_game_lost || 0,
-			draw: userStats?.total_game_draw || 0,
-		}
-		const gamePlayedLocal = {
-			total: userStats?.local_game_played || 0,
-			win: userStats?.local_game_won || 0,
-			lose: userStats?.local_game_lost || 0,
-			draw: userStats?.local_game_draw || 0,
-		}
-		const gamePlayedRemote = {
-			total: userStats?.remote_game_played || 0,
-			win: userStats?.remote_game_won || 0,
-			lose: userStats?.remote_game_lost || 0,
-			draw: userStats?.remote_game_draw || 0,
-		}
-		const gamePlayedTournament = {
-			total: userStats?.tournament_game_played || 0,
-			win: userStats?.tournament_game_won || 0,
-			lose: userStats?.tournament_game_lost || 0,
-			draw: userStats?.tournament_game_draw || 0,
-		}
-		const gamePlayedTournamentLocal = {
-			total: userStats?.tournament_local_game_played || 0,
-			win: userStats?.tournament_local_game_won || 0,
-			lose: userStats?.tournament_local_game_lost || 0,
-			draw: userStats?.tournament_local_game_draw || 0,
-		}
-		const gamePlayedTournamentRemote = {
-			total: userStats?.tournament_remote_game_played || 0,
-			win: userStats?.tournament_remote_game_won || 0,
-			lose: userStats?.tournament_remote_game_lost || 0,
-			draw: userStats?.tournament_remote_game_draw || 0,
-		}
-
-		// creation des objet Data pour les charts
-		const gamePlayedTotalData = {
-			title: "Game Played Total",
-			dataset:[
-				{ label: "lose", value: gamePlayedTotal.lose, color: "#f87171" }, // Rouge
-				{ label: "win", value: gamePlayedTotal.win, color: "#60a5fa" },
-				{ label: "draw", value: gamePlayedTotal.draw, color: "#fbbf24" }
-			],
-			legende: [
-				{label: "lose", color: "bg-red-500" },
-				{label: "win", color: "bg-blue-500" },
-				{label: "draw", color: "bg-yellow-500" }
-			]			
-		}
-		const gamePlayedLocalData = {
-			title: "Game Played Local",
-			dataset:[
-				{ label: "lose", value: gamePlayedLocal.lose, color: "#f87171" }, // Rouge
-				{ label: "win", value: gamePlayedLocal.win, color: "#60a5fa" },
-				{ label: "draw", value: gamePlayedLocal.draw, color: "#fbbf24" }
-			],
-			legende: [
-				{label: "lose", color: "bg-red-500" },
-				{label: "win", color: "bg-blue-500" },
-				{label: "draw", color: "bg-yellow-500" }
-			]			
-		}
-		const gamePlayedRemoteData = {
-			title: "Game Played Remote",
-			dataset:[
-				{ label: "lose", value: gamePlayedRemote.lose, color: "#f87171" }, // Rouge
-				{ label: "win", value: gamePlayedRemote.win, color: "#60a5fa" },
-				{ label: "draw", value: gamePlayedRemote.draw, color: "#fbbf24" }
-			],
-			legende: [
-				{label: "lose", color: "bg-red-500" },
-				{label: "win", color: "bg-blue-500" },
-				{label: "draw", color: "bg-yellow-500" }
-			]
-		}
-		const gamePlayedTournamentData = {
-			title: "Game Played Tournament",
-			dataset:[
-				{ label: "lose", value: gamePlayedTournament.lose, color: "#f87171" }, // Rouge
-				{ label: "win", value: gamePlayedTournament.win, color: "#60a5fa" },
-				{ label: "draw", value: gamePlayedTournament.draw, color: "#fbbf24" }
-			],
-			legende: [
-				{label: "lose", color: "bg-red-500" },
-				{label: "win", color: "bg-blue-500" },
-				{label: "draw", color: "bg-yellow-500" }
-			]
-		}
-		const gamePlayedTournamentLocalData = {
-			title: "Game Played Tournament Local",
-			dataset:[
-				{ label: "lose", value: gamePlayedTournamentLocal.lose, color: "#f87171" }, // Rouge
-				{ label: "win", value: gamePlayedTournamentLocal.win, color: "#60a5fa" },
-				{ label: "draw", value: gamePlayedTournamentLocal.draw, color: "#fbbf24" }
-			],
-			legende: [
-				{label: "lose", color: "bg-red-500" },
-				{label: "win", color: "bg-blue-500" },
-				{label: "draw", color: "bg-yellow-500" }
-			]
-		}
-		const gamePlayedTournamentRemoteData = {
-			title: "Game Played Tournament Remote",
-			dataset:[
-				{ label: "lose", value: gamePlayedTournamentRemote.lose, color: "#f87171" }, // Rouge
-				{ label: "win", value: gamePlayedTournamentRemote.win, color: "#60a5fa" },
-				{ label: "draw", value: gamePlayedTournamentRemote.draw, color: "#fbbf24" }
-			],
-			legende: [
-				{label: "lose", color: "bg-red-500" },
-				{label: "win", color: "bg-blue-500" },
-				{label: "draw", color: "bg-yellow-500" }
-			]
-		}
-
-		return {
-			gamePlayedTotalData,
-			gamePlayedLocalData,
-			gamePlayedRemoteData,
-			gamePlayedTournamentData,
-			gamePlayedTournamentLocalData,
-			gamePlayedTournamentRemoteData
-		}
 	}
-  
-  }
-  
-  
+}

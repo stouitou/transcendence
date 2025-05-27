@@ -51,9 +51,7 @@ export class Register extends BaseComponent<{},{formRegister:RegisterFormData}> 
 
   render() {
     this.innerHTML = `
-      <div class="min-h-screen flex items-center justify-center bg-gray-100 dark:bg-gray-900 px-4">
-        <div class="w-full max-w-md bg-white dark:bg-gray-800 p-8 rounded-2xl shadow-md">
-          <form id="formRegister" class="space-y-5">
+          <form id="formRegister" class="form-container">
             <h2 class="text-3xl font-extrabold text-center text-gray-900 dark:text-white mb-6">Register</h2>
              <div id="message-box" class="font-bold text-center mb-4"></div>
             <div>
@@ -65,6 +63,7 @@ export class Register extends BaseComponent<{},{formRegister:RegisterFormData}> 
                 name="name"
                 class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="SuP€rK@RoT"
+                autocomplete="name"
                 required
               />
             </div>
@@ -78,6 +77,7 @@ export class Register extends BaseComponent<{},{formRegister:RegisterFormData}> 
                 name="email"
                 class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="name@student.42.fr"
+                autocomplete="email"
                 required
               />
             </div>
@@ -91,6 +91,7 @@ export class Register extends BaseComponent<{},{formRegister:RegisterFormData}> 
                 name="password"
                 class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="********"
+                autocomplete="off"
                 required
               />
             </div>
@@ -104,6 +105,7 @@ export class Register extends BaseComponent<{},{formRegister:RegisterFormData}> 
                 name="confirmPassword"
                 class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
                 placeholder="********"
+                autocomplete="off"
                 required
               />
             </div>
@@ -120,8 +122,6 @@ export class Register extends BaseComponent<{},{formRegister:RegisterFormData}> 
               Already have an account? <a href="/login" class="text-blue-500 hover:underline">Login</a>
             </p>
           </form>
-        </div>
-      </div>
     `;
   
   }

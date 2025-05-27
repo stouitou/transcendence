@@ -17,6 +17,7 @@ class buildOptions {
   private limits: number | undefined;
   private offsets: number | undefined;
   private orders: "ASC" | "DESC" | undefined;
+  private orderBy: string = "id"; // Default order by id
   private relations: string[] | undefined;
   private total: number | undefined
   constructor(private options: UrlSearchParams) {
@@ -24,6 +25,7 @@ class buildOptions {
     this.limits = undefined;
     this.offsets = undefined;
     this.orders = undefined;
+    this.orderBy =options.orderBy || "id"; // Default order by id
     this.relations = undefined;
     this.total = undefined;
     this.setLimits(options.limit);
@@ -50,8 +52,8 @@ class buildOptions {
     }    
     this.relations = relations;
   }
-  getOptions() : {limit?: number; offset?: number; order?: "ASC" | "DESC"; relations?: string[], total?: number} {
-    return {limit: this.limits, offset: this.offsets, order: this.orders, relations: this.relations};
+  getOptions() : {limit?: number; offset?: number; order?: "ASC" | "DESC",orderBy:string; relations?: string[], total?: number} {
+    return {limit: this.limits, offset: this.offsets, order: this.orders,orderBy:this.orderBy, relations: this.relations};
   }
 }
 
