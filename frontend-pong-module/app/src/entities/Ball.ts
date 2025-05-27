@@ -18,7 +18,7 @@ export class	Ball {
 		this._size = size;
 		this._velocity = velocity;
 		this.normalize();
-		this._speed = 4;
+		this._speed = 8;
 	}
 
 	get position ()							{ return this._position ; }

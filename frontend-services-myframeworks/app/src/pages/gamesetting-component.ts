@@ -10,7 +10,8 @@ class PlayerConfig {
   state: string | null;
   isInGame: boolean;
   isIA: boolean;
-  constructor(id: number | null, name: string | null, avatar: string | null, state: string | null, isInGame: boolean, isIA: boolean) {
+
+  constructor (id: number | null, name: string | null, avatar: string | null, state: string | null, isInGame: boolean, isIA: boolean) {
     this.id = id;
     this.name = name;
     this.avatar = avatar;
@@ -73,6 +74,8 @@ class ConfigGame {
 
 export class GameSetting extends BaseComponent<{ user: User | null; difficulty: number,type:string,format:string,/* mode:string, */
   max_players: number, players?: Players[] ,ws?: IWebSocketsService | null}> {
+  iaIndex: number = 0;
+
   constructor() {
     super({ user: null, difficulty: 1,type:'local',format:'classic',/* mode:'normal', */ players:[{
     type: 'local',
@@ -84,6 +87,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     }],
     max_players: 4,ws:null });
   }
+
   handlePost = async (e: Event) => {
     e.preventDefault();
     const config = {
@@ -234,7 +238,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     <div class="block flex flex-col items-center gap-4">
 
       <div id="setType" class="toggle-row">
-        <button class="btn toggle-btn ${type==='local' ? 'on':'off'}"   data-type="local">Local</button>
+        <button class="btn toggle-btn ${type==='local' ? 'on':'off'}"  data-type="local">Local</button>
         <button class="btn toggle-btn ${type!=='local'? 'on':'off'}"    data-type="remote">Remote</button>
       </div>
 
@@ -244,7 +248,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
       </div>
 
      <!-- <div id="setMode" class="toggle-row">
-        <button class="btn toggle-btn {mode==='normal' ? 'on':'off'}"   data-type="normal">Normal</button>
+        <button class="btn toggle-btn {mode==='normal' ? 'on':'off'}"  data-type="normal">Normal</button>
         <button class="btn toggle-btn {mode==='advanced' ? 'on':'off'}" data-type="advanced">Advanced</button>
       </div> -->
     </div>
@@ -263,7 +267,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
         <tbody>
           ${
         players
-            ? players.map((p,i)=>`
+            ? players.map((p,i)=> `
                 <tr>
                   <td><span class="idx-chip">${i+1}</span></td>
                   <td><span class="name-cell">${p.display_name ?? '-'}</span></td>
@@ -282,6 +286,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
                     : (p.avatar ? p.avatar : '')
             }">
                   </td>
+                  <td>${i !== 0 ? `<span class="action-btn rem-chip" data-name="${p.display_name}">X</span>` : ``}</td>
                 </tr>`).join('')
             : ''
     }
@@ -324,7 +329,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
             </div>
             <select id="playerAvatar" name="playerAvatar" class="input flex-1">
               <option data-image="/uploads/1-avatartest.jpg" value="/uploads/1-avatartest.jpg">Avatar 1</option>
-              <option data-image="/uploads/avatar2.jpg"      value="/uploads/avatar2.jpg">Avatar 2</option>
+              <option data-image="/uploads/avatar2.jpg"   value="/uploads/avatar2.jpg">Avatar 2</option>
         <!--      <option value="3">Avatar 3</option>
               <option value="4">Avatar 4</option> -->
             </select>
@@ -337,7 +342,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
 
     <!-- ── 7. start button ─────────────────────────────────────────────── -->
     <div class="block flex justify-center">
-      <button id="start-game" class="action-btn w-56">Start Game</button>
+      <button id="start-game" class="action-btn w-56">Create Game</button>
     </div>
   </div>
 
@@ -352,7 +357,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
       border-radius:1.75rem;
       padding:2.5rem 2.25rem;
     }
-    .glass-card.wider{max-width:32rem;}   /* ≈520 px */
+    .glass-card.wider{max-width:32rem;}  /* ≈520 px */
     .card-blob{
       position:absolute; inset:-40px -50px; z-index:-1;
       filter:blur(28px) opacity(.45);
@@ -388,6 +393,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     .player-table tbody tr:hover{background:rgba(145,133,255,.08)}
 
     .idx-chip{display:inline-flex;width:2.25rem;height:2.25rem;align-items:center;justify-content:center;border-radius:9999px;background:#fff;box-shadow:inset 0 0 0 2px rgba(145,133,255,.25);font-weight:600}
+    .rem-chip{display:inline-flex;width:2.25rem;height:2.25rem;align-items:center;justify-content:center;border-radius:9999px;background:#ddd;box-shadow:inset 0 0 0 2px rgba(145,133,255,.25);font-weight:600}
     .name-cell{display:inline-block;max-width:11rem;white-space:nowrap;overflow:hidden;text-overflow:ellipsis;font-weight:600;color:#111827}
     .ia-pill{display:inline-flex;padding:.15rem .6rem;border-radius:9999px;font-size:.75rem;font-weight:600;background:rgba(145,133,255,.15);color:#4338ca}
     .ia-pill.on{background:linear-gradient(135deg,#c7d2fe,#e9d5ff)}
@@ -411,7 +417,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
 
 
 
-    this.attachEvent(this, '#playerAvatar', 'change',  () => {
+    this.attachEvent(this, '#playerAvatar', 'change', () => {
     console.log('changed');
     const select = this.querySelector('#playerAvatar') as HTMLSelectElement;
     const backgroundImage = select.options[select.selectedIndex].getAttribute('data-image');
@@ -459,12 +465,13 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     }
     const newPlayer: Players = {
       type: 'local',
-      display_name: `IA-${this.state.players?.length?this.state.players.length + 1: 1}`,
+      display_name: `IA-${this.iaIndex}`,
       avatar: '/uploads/1-avatartest.jpg',
       score: 0,
       is_IA:true,
       user: null,
     };
+    this.iaIndex++;
     this.setState({ players: [...this.state.players!, newPlayer] });
     this.render(); // Re-render the component to show the updated player list
     
@@ -490,6 +497,22 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
   });
 
   this.attachEvent(this, '#start-game', 'click', this.handlePost.bind(this));
+    
+  this.attachEvent(this, 'tbody', 'click', (event: Event) => {
+    const target = event.target as HTMLElement;
+    if (!target.classList.contains('rem-chip'))  { return ; }
 
+    const playerName = target.dataset.name;
+    console.log('You clicked on', playerName);
+    const players = [...(this.state.players ?? [])];
+    const indexToRemove = players.findIndex(p => p.display_name === playerName);
+
+    if (indexToRemove !== -1) {
+      players.splice(indexToRemove, 1);
+      this.setState({ players });
+      this.render();
+    }
+  })
   }
+
 }

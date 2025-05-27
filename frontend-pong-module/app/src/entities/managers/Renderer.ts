@@ -14,21 +14,20 @@ export class Renderer {
 	private _score!: HTMLDivElement;
 	private _gameAlert: HTMLElement | null = null;
 
-	constructor() { }
+	constructor () { }
 
 	/* ---------- getters / setters UI ---------- */
-	get gameCanvas(): HTMLCanvasElement | null { return this._canvas; }
-	get gameDivUi(): HTMLElement | null { return this._gameUi; }
-	get gameDivAlert(): HTMLElement | null { return this._gameAlert; }
+	get gameCanvas(): HTMLCanvasElement | null	{ return this._canvas; }
+	get gameDivUi(): HTMLElement | null			{ return this._gameUi; }
+	get gameDivAlert(): HTMLElement | null		{ return this._gameAlert; }
 
-	set canvas(canvas: HTMLCanvasElement) { this._canvas = canvas; this._ctx = canvas?.getContext('2d')!; }
-	set gameUi(div: HTMLElement) { this._gameUi = div; }
-	set gameAlert(div: HTMLElement) { this._gameAlert = div; }
-	set gameHero(div: HTMLElement) { this._gameHero = div; }
-	set gameHeroTree(div: HTMLElement) { this._gameHeroTree = div; }
+	set canvas(canvas: HTMLCanvasElement)	{ this._canvas = canvas; this._ctx = canvas?.getContext('2d')!; }
+	set gameUi(div: HTMLElement)			{ this._gameUi = div; }
+	set gameAlert(div: HTMLElement)			{ this._gameAlert = div; }
+	set gameHero(div: HTMLElement)			{ this._gameHero = div; }
+	set gameHeroTree(div: HTMLElement)		{ this._gameHeroTree = div; }
 
-
-	private displayScore(Players: Player[] = []) {
+	private displayScore (Players: Player[] = []) {
 		this._score.innerHTML = '';
 		Players.forEach((player, index) => {
 			const divPlayerScore = this.createDivDisplayScore(player.name, player.score, index);
@@ -36,33 +35,32 @@ export class Renderer {
 		});
 	}
 
-
-	createDivDisplayScore(playerName: string, playerScore: number, indexLocation: number) {
-		const setGrid = [
+	createDivDisplayScore (playerName: string, playerScore: number, indexLocation: number) {
+		const	setGrid = [
 			{ gridCol: "3", gridRow: "2" }, { gridCol: "1", gridRow: "2" },
 			{ gridCol: "2", gridRow: "3" }, { gridCol: "2", gridRow: "1" },
 		]
-		const divPlayerScore = document.createElement('div');
 
+		const	divPlayerScore = document.createElement('div');
 		divPlayerScore.classList.add('player-score');
 		divPlayerScore.innerHTML = `
 			<p class="score-cell">${playerName}</p>
 			<p class="score-cell score-cell-points">${playerScore}</p>`;
-		const { gridCol, gridRow } = setGrid[indexLocation];
+		const	{ gridCol, gridRow } = setGrid[indexLocation];
 		divPlayerScore.style.gridColumn = gridCol;
 		divPlayerScore.style.gridRow = gridRow;
-		return divPlayerScore;
+		return divPlayerScore ;
 	}
 
 	/* setup inital Display */
-	setupDisplay() {
-		if (!this._canvas) { throw new Error('Game canvas not found'); }
+	setupDisplay () {
+		if (!this._canvas)	{ throw new Error('Game canvas not found'); }
 
 		this._canvas.style.verticalAlign = 'top';
 		this._canvas.height = CANVAS_HEIGHT;
 		this._canvas.width = CANVAS_WIDTH;
 
-		this._score = Design.createAppendix(/* this._players.length */4 - 1);
+		this._score = Design.createAppendix();
 
 		this._score.style.width = '100%';
 		this._score.style.height = '100%';
@@ -73,20 +71,15 @@ export class Renderer {
 	}
 
 	// affiche un nombre sous forme de countdown	@param countdown	@returns
-	renderCountdown(countdown: number) {
-		if (!this._ctx || !this._canvas) { console.error('Game context is not set.'); return; }
+	renderCountdown (countdown: number) {
+		if (!this._ctx || !this._canvas) { console.error('Game context is not set.'); return ; }
 
 		this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
 		Design.drawBackground(this._ctx);
 		Design.drawCountdownFrame(this._ctx, countdown.toString());
 	}
 
-	render(players: Player[]) {	//@TODO a renommer
-		this.setupDisplay();
-		this.displayScore(players);
-	}
-
-	draw(ball: Ball, players: Player[]) {
+	draw (ball: Ball, players: Player[]) {
 		this.clear();
 
 		Design.drawBackground(this._ctx);
@@ -99,13 +92,13 @@ export class Renderer {
 		this.displayScore(players);
 	}
 
-	private clear() {
-		if (!this._ctx || !this._canvas) { console.error('Game context is not set.'); return; }	// if context is undefined, impossible to clear canvas
+	private clear () {
+		if (!this._ctx || !this._canvas)	{ console.error('Game context is not set.'); return ; }	// if context is undefined, impossible to clear canvas
 		this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
 	}
 
-	private drawBall(ball: Ball) {
-		if (!this._ctx) { return; }
+	private drawBall (ball: Ball) {
+		if (!this._ctx)	{ return ; }
 
 		const ctx = this._ctx;
 		const r = ball.size.width;	// Radius
@@ -118,26 +111,6 @@ export class Renderer {
 		g.addColorStop(0.55, Design.DESIGN.accentColor);
 		g.addColorStop(1, "#4c000d");
 		ctx.fillStyle = g;
-		// =======
-
-		// 	private drawBall(ball: Ball) {
-		// 		if (!this._ctx) return;
-		// 		const ctx = this._ctx;
-
-		// 		const r = ball.size.width;   // radius
-		// 		const x = ball.position.x;   // center X
-		// 		const y = ball.position.y;   // center Y
-
-		// 		// 1) build fancy radial gradient
-		// 		const g = ctx.createRadialGradient(
-		// 			x - r * 0.4, y - r * 0.4, r * 0.1,
-		// 			x,            y,            r
-		// 		);
-		// 		g.addColorStop(0,   "#ffffff");                // bright core
-		// 		g.addColorStop(0.25, Design.DESIGN.accentColor); // your accent
-		// 		g.addColorStop(1,   "rgba(228,0,27,0.35)");                // deep edge
-		// >>>>>>> origin
-
 
 		// 2) shadow/glow behind the ball
 		ctx.save();
@@ -185,10 +158,7 @@ export class Renderer {
 		ctx.restore();
 	}
 
-
-
-
-	private drawPaddle(position: { x: number; y: number }, size: { width: number; height: number }) {
+	private drawPaddle (position: { x: number; y: number }, size: { width: number; height: number }) {
 		Design.drawPaddle(
 			this._ctx!,
 			position.x,
@@ -198,35 +168,19 @@ export class Renderer {
 		);
 	}
 
-	// <<<<<<< HEAD
-	// 	renderGameHeroDiv(data: PREPARE_MATCHES_STARTED_ROUND_GAME) {
-	// 		console.log('Renderer: renderGameHeroDiv data:', data);
-	// 		const	div = this._gameHero as HTMLDivElement;
-	// 		if (div) {
-	// 			div.innerHTML = '';
-	// 			displayPrepareMatchesStartedRoundGame(div, data);
-	// 		}
-	// 		// Remove the div after 5 seconds
-	// 		setTimeout(() => {
-	// 			if (div) {
-	// 				div.innerHTML = '';
-	// 			}
-	// 		}, 5000);
-	// =======
-
-	renderGameHeroDiv(data: PREPARE_MATCHES_STARTED_ROUND_GAME) {
-		const div = this._gameHero as HTMLDivElement;
-		if (!div) return;
+	renderGameHeroDiv (data: PREPARE_MATCHES_STARTED_ROUND_GAME) {
+		const	div = this._gameHero as HTMLDivElement;
+		if (!div)	{ return ; }
 
 		// wipe & re-render
 		div.innerHTML = '';
 		displayPrepareMatchesStartedRoundGame(div, data);
 
 		// completely remove the container after 5s (no empty frame)
-		setTimeout(() => div.remove(), 5000);
+		setTimeout(() => div.remove(), 10000);
 	}
 
-	renderGameHeroTreeDiv(data: PREPARE_MATCHES_STARTED_ROUND[]) {
+	renderGameHeroTreeDiv (data: PREPARE_MATCHES_STARTED_ROUND[]) {
 		const div = this._gameHeroTree as HTMLDivElement;
 		if (!div) return;
 
@@ -237,37 +191,6 @@ export class Renderer {
 		// completely remove the container after 5s
 		setTimeout(() => div.remove(), 5000);
 	}
-
-	// <<<<<<< HEAD
-	// 	displayHistoriqueGame(statisticsManager: StatisticsManager, players: Player[]) {
-	// 		const menuHistoriqueGame = document.createElement('div');
-	// 		menuHistoriqueGame.style.position = 'absolute';
-	// 		menuHistoriqueGame.style.top = '50%';
-	// 		menuHistoriqueGame.style.left = '50%';
-	// 		menuHistoriqueGame.style.transform = 'translate(-50%, -50%)';
-	// 		menuHistoriqueGame.style.margin = '0';
-	// 		menuHistoriqueGame.style.padding = '0';
-	// 		menuHistoriqueGame.style.width = '250px';
-	// 		menuHistoriqueGame.style.height = '250px';
-	// 		menuHistoriqueGame.style.backgroundColor = 'blue';
-	// 		menuHistoriqueGame.style.display = 'flex';
-	// 		menuHistoriqueGame.style.justifyContent = 'center';
-	// 		menuHistoriqueGame.style.alignItems = 'center';
-	// 		menuHistoriqueGame.style.color = 'white';
-	// 		menuHistoriqueGame.style.fontSize = '15px';
-	// 		menuHistoriqueGame.style.fontFamily = 'Arial';
-	// 		menuHistoriqueGame.style.borderRadius = '8px';
-	// 		menuHistoriqueGame.style.border = '5px solid rgb(255, 0, 0)';
-	// 		menuHistoriqueGame.style.background = 'rgb(0, 0, 0)';
-	// 		menuHistoriqueGame.style.color = 'rgb(255, 0, 0)';
-	// 		menuHistoriqueGame.style.whiteSpace = 'pre-line';
-	// 		let	text = `Plus grand nombre d'échanges: ${statisticsManager._gameHistory.maxBounceCount}\n\n`;
-	// 		players.forEach(player => {
-	// 			text += `${player.name}:\nNombre de rebonds: ${player.history.bounceCount}\nDistance parcourue: ${player.history.distance}\n\n`;
-	// 		});
-	// 		menuHistoriqueGame.textContent = text;
-	// 		this._gameAlert?.appendChild(menuHistoriqueGame);
-	// =======
 
 	displayHistoriqueGame(statisticsManager: StatisticsManager, players: Player[]) {
 		const menu = document.createElement('div');
@@ -296,38 +219,35 @@ export class Renderer {
 
 		/* ─── CONTENT ──────────────────────────────────────────────── */
 		menu.innerHTML = `
-    <div style="text-align:right; margin-bottom:12px;">
-      <a
-        href="/game"
-        style="
-          display:inline-block;
-          padding:6px 12px;
-          background:rgba(200,230,255,0.7);
-          color:#333;
-          text-decoration:none;
-          border-radius:6px;
-          font-weight:600;
-          box-shadow:0 2px 8px rgba(0,0,0,0.08);
-        "
-      >
-        ◀ Retour au Lobby
-      </a>
-    </div>
-    <ul style="list-style:none; padding:0; margin:0;">
-      <li><strong>Rebonds max&nbsp;:</strong> ${statisticsManager._gameHistory.maxBounceCount}</li>
-      <li>
-        <strong>Plus de buts encaissés&nbsp;:</strong>
-        ${statisticsManager._gameHistory.mostGoalsConcededPlayer.name}
-        (${statisticsManager._gameHistory.mostGoalsConcededPlayer.goalsConceded})
-      </li>
-      ${players
-			.map(
-				p =>
+			<div style="text-align:right; margin-bottom:12px;">
+				<a
+					href="/game"
+					style="
+					display:inline-block;
+					padding:6px 12px;
+					background:rgba(200,230,255,0.7);
+					color:#333;
+					text-decoration:none;
+					border-radius:6px;
+					font-weight:600;
+					box-shadow:0 2px 8px rgba(0,0,0,0.08);
+					"
+				>
+					◀ Retour au Lobby
+				</a>
+			</div>
+			<ul style="list-style:none; padding:0; margin:0;">
+				<li><strong>Rebonds max&nbsp;:</strong> ${statisticsManager._gameHistory.maxBounceCount}</li>
+				<li>
+					<strong>Plus de buts encaissés&nbsp;:</strong>
+					${statisticsManager._gameHistory.mostGoalsConcededPlayer.name}
+					(${statisticsManager._gameHistory.mostGoalsConcededPlayer.goalsConceded})
+				</li>
+				${players.map(p =>
 					`<li><strong>${p.name} rebonds&nbsp;:</strong> ${p.history.bounceCount}</li>`
-			)
-			.join('')}
-    </ul>
-  `;
+				).join('')}
+			</ul>
+		`;
 
 		/* ─── SHOW & AUTO-HIDE ─────────────────────────────────────── */
 		this._gameAlert?.appendChild(menu);
@@ -479,13 +399,12 @@ export type PREPARE_MATCHES_STARTED_ROUND_GAME = PrepareMatchGame;
 /* -------------------------------------------------------------------------- */
 
 // Large pill for hero card
-// Large pill for hero card
-const heroChip = (p: Player) => `
+const	heroChip = (p: Player) => `
   <div class="chip hero-chip">
     <span class="name">${p.name}</span>
   </div>`;
 
-const miniChip = (p: Player) => `
+const	miniChip = (p: Player) => `
   <div class="chip mini-chip">
     <span class="name">${p.name}</span>
   </div>`;
@@ -495,27 +414,24 @@ const miniChip = (p: Player) => `
 /*  Single‑game hero card                                                      */
 /* -------------------------------------------------------------------------- */
 
-export function displayPrepareMatchesStartedRoundGame(
+export function	displayPrepareMatchesStartedRoundGame(
 	div: HTMLDivElement,
 	data: PrepareMatchGame,
-): void {
+) : void {
 	// debug banner so you *see* the right bundle
 	console.log("💎 Chips UI active – hero card", data.id);
 
-	const { players, winner } = data;
+	const	{ players } = data;
 
 	div.innerHTML = `
-    <section class="mx-auto max-w-screen-md px-4 sm:px-6 lg:px-8">
-      <div class="rounded-2xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md shadow-lg ring-1 ring-black/5 p-8 text-center space-y-10">
-        <div class="flex flex-wrap justify-center items-center gap-6">
-          ${players.filter((_, i) => i % 2 === 0).map(heroChip).join("")}
-          <span class="text-3xl font-extrabold text-blue-600 select-none">VS </span>
-          ${players.filter((_, i) => i % 2 === 1).map(heroChip).join("")}
-        </div>
-
-        ${winner ? `<p class="text-base font-medium text-emerald-600">Winner: <span class="font-semibold">${winner.name}</span></p>` : ""}
-      </div>
-    </section>`;
+		<section class="mx-auto max-w-screen-md px-4 sm:px-6 lg:px-8">
+		<div class="rounded-2xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md shadow-lg ring-1 ring-black/5 p-8 text-center space-y-10">
+			<div class="flex flex-wrap justify-center items-center gap-6">
+			${players.filter((_, i) => i % 2 === 0).map(heroChip).join("")}
+			${players.filter((_, i) => i % 2 === 1).map(heroChip).join("")}
+			</div>
+		</div>
+		</section>`;
 }
 
 /* -------------------------------------------------------------------------- */
