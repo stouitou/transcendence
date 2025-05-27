@@ -184,6 +184,5 @@ export const translations = {
   },
 };
 
-// Utilitaire
 export const t = (key: string, lang: string): string =>
   translations[lang as keyof typeof translations]?.[key] || key;
