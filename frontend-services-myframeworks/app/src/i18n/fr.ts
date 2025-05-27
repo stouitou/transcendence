@@ -81,7 +81,8 @@
 	TITLE: "Langue",
 	CHOOSE: "Choisissez votre langue",
 	EN: "Anglais",
-	FR: "Français"
+	FR: "Français",
+	ES: "Espagnol",
   },
   FORM: {
 	GENERIC: {

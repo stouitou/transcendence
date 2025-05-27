@@ -1,12 +1,10 @@
-// src/i18n/translations.ts
-export const languages = ['fr', 'en'/* , 'es' */] as const;
+export const languages = ['fr', 'en', 'es'] as const;
 export type Language = typeof languages[number];
 
-// Utilise la langue de référence pour générer les clés
 const en = {
     profile: "My Profile",
-    settings: "Settings", //
-    settings_phrase: "Setup language and colors", //
+    settings: "Settings", 
+    settings_phrase: "Setup language and colors", 
     name: "Name",
     register: "Register",
     messages: "Messages",

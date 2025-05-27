@@ -114,6 +114,7 @@ export const en = {
 	CHOOSE: "Choose your language",
 	FR: "French",
 	EN: "English",
+	ES: "Spanish",
   },
   FORM: {
 	GENERIC: {

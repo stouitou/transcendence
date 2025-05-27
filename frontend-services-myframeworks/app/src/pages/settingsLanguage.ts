@@ -34,6 +34,7 @@ export class SettingsLanguage extends BaseComponent<{},SettingsFormData> {
         <select id="lang" name='lang' class="rounded px-3 py-2 border dark:bg-gray-800 dark:text-white">
           <option value="fr" ${this.currentLang === 'fr' ? 'selected' : ''}>${this.t("LANGUAGE.FR")}</option>
           <option value="en" ${this.currentLang  === 'en' ? 'selected' : ''}>${this.t("LANGUAGE.EN")}</option>
+          <option value="es" ${this.currentLang  === 'es' ? 'selected' : ''}>${this.t("LANGUAGE.ES")}</option>
           <option value="de" >de</option>
         </select>
         <div id="message-box" class="font-bold text-center mb-4"></div>
