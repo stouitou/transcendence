@@ -76,7 +76,7 @@ export class ProfileEdit extends BaseComponent<{user: User | null},ProfileUpdate
         <div id="message-box" class="font-bold text-center mb-4"></div>
         <p class="text-gray-500 dark:text-gray-400">Edit your profile information below.</p>
         <p class="text-gray-500 dark:text-gray-400">You can update your name, avatar, and password.</p>
-        <img referrerPolicy="no-referrer" src=${avatar?.startsWith('http')?avatar:avatar?`https://localhost:4433/${avatar}`:undefined} alt="avatar" width="100" height="100"/>
+        <img referrerPolicy="no-referrer" src=${avatar?.startsWith('http')?avatar:avatar?`${avatar}`:undefined} alt="avatar" width="100" height="100"/>
         <p class="text-gray-500 dark:text-gray-400">Name: ${user.name}</p>
         <p class="text-gray-500 dark:text-gray-400">Role: ${user.role}</p>            
       </div>

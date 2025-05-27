@@ -164,7 +164,7 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
                          src="${p.avatar?.startsWith('http')
                 ? p.avatar
                 : p.avatar
-                    ? `https://localhost:4433/${p.avatar}`
+                    ? `${p.avatar}`
                     : ''}"
                          alt="avatar">
                   </td>
@@ -195,7 +195,7 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
                                src="${p.avatar?.startsWith('http')
                     ? p.avatar
                     : p.avatar
-                        ? `https://localhost:4433/${p.avatar}`
+                        ? `${p.avatar}`
                         : ''}"
                                alt="avatar"></td>
                       <td><span class="chip">${p.state??'joined'}</span></td>

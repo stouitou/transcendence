@@ -117,9 +117,9 @@ export class RouterConfig {
 const routerConfig = RouterConfig.getInstance();
 routerConfig.addRoute('/', () => document.createElement('home-component'));
 routerConfig.addRoute('/about', () => document.createElement('about-component'));
-//routerConfig.addRoute('/game', () => document.createElement('pong-game'));
-routerConfig.addRoute('/game', () => document.createElement('game-component'));//@TODO a rename
-//routerConfig.addRoute('/game', () => document.createElement('game-component-classic'));//@TODO a rename
+//routerConfig.addRoute('/game', () => document.createElement('game-component'));
+//routerConfig.addRoute('/game-loby', () => document.createElement('game-loby-component'));
+routerConfig.addRoute('/game', () => document.createElement('game-wrapper-component'));//wrapper pour game-loby-component|game-component : /game || /game?id=xxxxx
 routerConfig.addRoute('/login', () => document.createElement('login-component'));
 routerConfig.addRoute('/login-2fa', () => document.createElement('login-two-factor-component'));
 //routerConfig.addRoute('/forgot-password', () => document.createElement('forgot-password-component'));
@@ -139,7 +139,6 @@ routerConfig.addRoute('/dashboard', () => document.createElement('dashboard-comp
 routerConfig.addRoute('/settings', () => document.createElement('settings-component'));
 routerConfig.addRoute('/support', () => document.createElement('support-component'));
 //routerConfig.addRoute('/mentions-legales', () => document.createElement('mentions-legales-component'));
-routerConfig.addRoute('/game-loby', () => document.createElement('game-loby-component'));
 routerConfig.addRoute('/leaderboard', () => document.createElement('leaderboard-component'));
 
 routerConfig.addRoute('/404', () => document.createElement('error-404-component'));

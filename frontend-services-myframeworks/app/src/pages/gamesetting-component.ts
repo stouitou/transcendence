@@ -77,7 +77,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     super({ user: null, difficulty: 1,type:'local',format:'classic',/* mode:'normal', */ players:[{
     type: 'local',
     is_IA:false,
-    avatar: "https://localhost:4433/uploads/1-avatartest.jpg",
+    avatar: "/uploads/1-avatartest.jpg",
     display_name: 'Player 1',
     score: 0,
     user: null
@@ -157,7 +157,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
       setplayer.user = this.state.user!.id;
       this.setState({ ...this.state, players: [setplayer] });
     }
-    if (type === 'local') {
+    if (type === 'local') { 
       setplayer.type = 'local';
       setplayer.is_IA = false;
       setplayer.user = null;
@@ -279,7 +279,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
                      src="${
                 p.avatar?.startsWith('http')
                     ? p.avatar
-                    : (p.avatar ? 'https://localhost:4433/' + p.avatar : '')
+                    : (p.avatar ? p.avatar : '')
             }">
                   </td>
                 </tr>`).join('')
@@ -320,13 +320,13 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
           <label class="label" for="playerAvatar">Avatar :</label>
           <div class="flex items-center gap-4">
             <div id="avatarPreviewSelected">
-              <img src="https://localhost:4433/uploads/1-avatartest.jpg" class="avatar-cell-img">
+              <img src="/uploads/1-avatartest.jpg" class="avatar-cell-img">
             </div>
             <select id="playerAvatar" name="playerAvatar" class="input flex-1">
-              <option value="https://localhost:4433/uploads/1-avatartest.jpg">Avatar 1</option>
-              <option value="https://localhost:4433/uploads/avatar2.jpg">Avatar 2</option>
-              <option value="3">Avatar 3</option>
-              <option value="4">Avatar 4</option>
+              <option data-image="/uploads/1-avatartest.jpg" value="/uploads/1-avatartest.jpg">Avatar 1</option>
+              <option data-image="/uploads/avatar2.jpg"      value="/uploads/avatar2.jpg">Avatar 2</option>
+        <!--      <option value="3">Avatar 3</option>
+              <option value="4">Avatar 4</option> -->
             </select>
           </div>
         </div>
@@ -418,7 +418,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     const avatarPreview = this.querySelector('#avatarPreviewSelected') as HTMLElement;
     if (avatarPreview) {
       avatarPreview.innerHTML = `
-        <img src="${backgroundImage?.startsWith('http') ? backgroundImage : backgroundImage ? `https://localhost:4433/${backgroundImage}` : undefined}" alt="avatar" width="50" height="50"/>
+        <img src="${backgroundImage?.startsWith('http') ? backgroundImage : backgroundImage ? `${backgroundImage}` : undefined}" alt="avatar" width="50" height="50"/>
       `;
     }
   });
@@ -460,7 +460,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     const newPlayer: Players = {
       type: 'local',
       display_name: `IA-${this.state.players?.length?this.state.players.length + 1: 1}`,
-      avatar: 'https://localhost:4433/uploads/1-avatartest.jpg',
+      avatar: '/uploads/1-avatartest.jpg',
       score: 0,
       is_IA:true,
       user: null,

@@ -74,9 +74,9 @@ export class NavBarComponent extends BaseComponent<{ theme: string,user: User | 
                       Game	
                     </a>
 
-                    <a href="/game-loby" class="nav-link">
+               <!--     <a href="/game-loby" class="nav-link">
                     game-loby	test
-                    </a>
+                    </a> -->
 
                      ${!user ?`
                     <a href="/login" class="nav-link">

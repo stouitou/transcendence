@@ -7,7 +7,7 @@ import AuthProviderRepository from "../repository/AuthProvider.repository";
 
 import { generateTOTPSecret, verifyTOTP } from "../utils/totp";
 import { AuthProvider } from "../models/AuthProvider.models";
-const defaultAvatar = "https://localhost:4433/uploads/defaultAvatar.jpg"; //@TODO : a changer
+const defaultAvatar = "/uploads/defaultAvatar.jpg"; //@TODO : a changer
 /**
  * Service d'authentification
  * rappel: un service est une classe qui contient des méthodes qui effectuent des opérations spécifiques

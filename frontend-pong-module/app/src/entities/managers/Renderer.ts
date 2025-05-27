@@ -298,7 +298,7 @@ export class Renderer {
 		menu.innerHTML = `
     <div style="text-align:right; margin-bottom:12px;">
       <a
-        href="https://localhost:4433/game-loby"
+        href="/game"
         style="
           display:inline-block;
           padding:6px 12px;

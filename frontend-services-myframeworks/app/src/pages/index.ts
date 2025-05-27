@@ -23,6 +23,7 @@ import { SettingsLanguage } from "./settingsLanguage";
 import { PopupCookies } from "./popup-cookies";
 import { Support } from "./support";
 import { Leaderboard } from "./leaderboard";
+import { GameWrapper } from "./game-wrapper-component";
 
 
   
@@ -81,6 +82,10 @@ if (!customElements.get('reset-password-component')) {
 
 if (!customElements.get('game-setting-component')) {
 	customElements.define('game-setting-component', GameSetting);
+}
+
+if (!customElements.get('game-wrapper-component')) {
+	customElements.define('game-wrapper-component', GameWrapper);
 }
 
 if (!customElements.get('chat-component')) {

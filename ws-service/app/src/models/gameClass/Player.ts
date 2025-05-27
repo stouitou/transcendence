@@ -9,7 +9,7 @@ export class Player {
 	userId: number = -1;
 	name: string = 'host';
 	isRemote: boolean = false;
-	avatar: string = 'https://localhost:4433/uploads/1-avatartest.jpg';
+	avatar: string = '/uploads/1-avatartest.jpg';
 	state: string = 'waiting'; // "waiting" | "playing" | "finished" | "joined" | "left" | "cancelled"
 	isIA: boolean = false;
 	isInGame: boolean = false;
@@ -48,7 +48,7 @@ export class Player {
 			this.userId = jsonData.userId?? -1;
 			this.name = jsonData.name?? 'guest';//@TODO
 			//this.isRemote = jsonData.isRemote;
-			this.avatar = jsonData.avatar?? 'https://localhost:4433/uploads/1-avatartest.jpg';
+			this.avatar = jsonData.avatar?? '/uploads/1-avatartest.jpg';
 			this.isIA = jsonData.isIA;
 			this.isInGame = this.isIA?true:jsonData.isInGame;
 			this.score = jsonData.score?? 0;
