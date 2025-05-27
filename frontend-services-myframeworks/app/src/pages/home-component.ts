@@ -23,14 +23,14 @@ export class Home extends BaseComponent<{user: User | null}> {
     this.innerHTML = `
       <section class=" px-4 py-8">
         <div class="max-w-7xl mx-auto">
-          <h1 class="text-4xl font-bold mb-8 text-center">Bienvenue sur GameCentral</h1>
+          <h1 class="text-4xl font-bold mb-8 text-center">${this.t("MENU.TITLE")}</h1>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            ${this.card("Dashboard", "Accédez à votre tableau de bord", "/dashboard", "📊", disable)}
-            ${this.card("Jouer", "Lancez une nouvelle partie", "/game", "🎮", disable)}
-            ${this.card("Profil", "Gérez vos informations personnelles", "/profile", "👤", disable)}
-            ${this.card("Classement", "Consultez le classement général", "/leaderboard", "🏆", disable)}
-            ${this.card("Paramètres", "Réglez vos préférences", "/settings", "⚙️")}
-            ${this.card("Support", "Besoin d’aide ?", "/support", "❓")}
+            ${this.card(`${this.t("DASHBOARD.TITLE")}`, `${this.t("DASHBOARD.ACCESS")}`, "/dashboard", "📊", disable)}
+            ${this.card(`${this.t("GAME.TITLE")}`, `${this.t("GAME.PHRASE")}`, "/game", "🎮", disable)}
+            ${this.card(`${this.t("PROFILE.TITLE")}`, `${this.t("PROFILE.PHRASE")}`, "/profile", "👤", disable)}
+            ${this.card(`${this.t("RANKING.TITLE")}`, `${this.t("RANKING.PHRASE")}`, "/leaderboard", "🏆", disable)}
+            ${this.card(`${this.t("SETTINGS.TITLE")}`, `${this.t("SETTINGS.PHRASE")}`, "/settings", "⚙️")}
+            ${this.card(`${this.t("SUPPORT.TITLE")}`, `${this.t("SUPPORT.LEGAL_TITLE")}`, "/support", "❓")}
             ${user?.role === 'admin' ? this.card("Admin", "Gérez les utilisateurs et le contenu", "/admin", "👨‍💼") : ''}
           </div>
         </div>

@@ -3,8 +3,8 @@ import { fr } from '../../i18n/fr';
 import { es } from '../../i18n/es';
 import { Language } from "./types";
 
-export const languages = ['en', 'fr', 'es'] as const;
-export type Language = typeof languages[number];
+// export const languages = ['en', 'fr', 'es'] as const;
+// export type Language = typeof languages[number];
 
 export const translations = { en, fr, es };
 

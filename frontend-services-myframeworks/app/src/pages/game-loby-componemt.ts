@@ -150,7 +150,7 @@ export class GameLobyComponent extends BaseComponent<{
       <!-- header -->
       <header class="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-8">
         <h1 class="text-6xl font-display tracking-wide text-center sm:text-left select-none">
-          🎮 Game Lobby
+          🎮 ${this.t("GAME.LOBBY")}
         </h1>
 
         <button id="createGame"
@@ -163,7 +163,7 @@ export class GameLobyComponent extends BaseComponent<{
                viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
             <path stroke-linecap="round" stroke-linejoin="round" d="M12 4v16m8-8H4" />
           </svg>
-          <span>${isCreateGame ? 'View list' : 'Create new game'}</span>
+          <span>${isCreateGame ? `${this.t("GAME.LIST_VIEW")}` : `${this.t("GAME.CREATE")}`}</span>
         </button>
       </header>
 
@@ -177,7 +177,7 @@ export class GameLobyComponent extends BaseComponent<{
           class="bg-white/80 dark:bg-zinc-900/60 backdrop-blur-md rounded-3xl
                  shadow-xl ring-1 ring-black/5 overflow-hidden">
 
-          <h2 class="text-4xl font-semibold px-10 pt-10 pb-8">Join a game</h2>
+          <h2 class="text-4xl font-semibold px-10 pt-10 pb-8">${this.t("GAME.JOIN")}</h2>
 
           <div class="overflow-x-auto">
             <table
@@ -191,11 +191,11 @@ export class GameLobyComponent extends BaseComponent<{
                 <tr>
                   <th class="w-12">#</th>
                   <th class="w-[18rem] truncate">Id</th>
-                  <th class="w-28">State</th>
-                  <th class="w-24">Type</th>
-                  <th class="w-28">Format</th>
-                  <th class="w-24">Players</th>
-                  <th class="w-32">Action</th>
+                  <th class="w-28">${this.t("TOURNAMENT.STATE")}</th>
+                  <th class="w-24">${this.t("GAME.TYPE")}</th>
+                  <th class="w-28">${this.t("TOURNAMENT.FORMAT")}</th>
+                  <th class="w-24">${this.t("GENERIC.PLAYERS")}</th>
+                  <th class="w-32">${this.t("GAME.ACTION")}</th>
                 </tr>
               </thead>
 
