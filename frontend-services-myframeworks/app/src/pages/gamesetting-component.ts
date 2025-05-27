@@ -89,6 +89,10 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
   }
 
   handlePost = async (e: Event) => {
+    if (!this.state.players || this.state.players.length < 2) {
+      console.log('Please add player before create game');
+      return ;
+    }
     e.preventDefault();
     const config = {
       players: this.state.players,
