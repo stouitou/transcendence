@@ -296,6 +296,23 @@ export class Renderer {
 
 		/* ─── CONTENT ──────────────────────────────────────────────── */
 		menu.innerHTML = `
+    <div style="text-align:right; margin-bottom:12px;">
+      <a
+        href="/game"
+        style="
+          display:inline-block;
+          padding:6px 12px;
+          background:rgba(200,230,255,0.7);
+          color:#333;
+          text-decoration:none;
+          border-radius:6px;
+          font-weight:600;
+          box-shadow:0 2px 8px rgba(0,0,0,0.08);
+        "
+      >
+        ◀ Retour au Lobby
+      </a>
+    </div>
     <ul style="list-style:none; padding:0; margin:0;">
       <li><strong>Rebonds max&nbsp;:</strong> ${statisticsManager._gameHistory.maxBounceCount}</li>
       <li>

@@ -40,6 +40,17 @@ export const getGames = async (pagination:Pagination,filter:Filter): Promise<Api
 	return	apiRequest<Promise<ApiRedirectResponse<Game> | void>>(url,'GET');
 }
 
+export const getGamesByUserId = async (id:number,pagination:Pagination,filter:Filter): Promise<ApiRedirectResponse<Game>|void> => {
+  const { limit = 10, offset = 0, order = 'ASC' } = pagination;
+  const { type = "remote" } = filter;
+
+  const url = `/api/users/me/games/${id}?limit=${limit}
+				&offset=${offset}
+				&order=${order}
+				&filters={"type":"${type}","format":"classic"}&relations=players`
+
+	return	apiRequest<Promise<ApiRedirectResponse<Game> | void>>(url,'GET');
+}
 /* export interface Round {
 	id: number;
 	games: Game[];
@@ -59,6 +70,16 @@ export const getTournaments = async (pagination:Pagination,filter:Filter): Promi
 	const { type = "remote" } = filter;
 
 	const url = `/api/users/me/tournaments?limit=${limit}&offset=${offset}&order=${order}&filters={"type":"${type}"}`
+
+	return	apiRequest<Promise<ApiRedirectResponse<Tournaments> | void>>(url,'GET');
+}
+
+
+export const getTournamentsByUserId = async (id:number,pagination:Pagination,filter:Filter): Promise<ApiRedirectResponse<Tournaments>|void> => {
+	const { limit = 10, offset = 0, order = 'ASC' } = pagination;
+	const { type = "remote" } = filter;
+
+	const url = `/api/users/me/tournaments/${id}?limit=${limit}&offset=${offset}&order=${order}&filters={"type":"${type}"}`
 
 	return	apiRequest<Promise<ApiRedirectResponse<Tournaments> | void>>(url,'GET');
 }

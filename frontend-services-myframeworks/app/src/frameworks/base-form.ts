@@ -1,3 +1,4 @@
+import { TranslationKey } from "./i18n/index";
 
 export interface FieldConstraint {
   minLength?: number;
@@ -32,7 +33,7 @@ export class FormHandler<TFormData extends Record<string,any>> {
   private errorMessages: { [fieldName in keyof TFormData]?: string } = {};
   private attachedEvents: { field: HTMLInputElement; event: string; handler: EventListener }[] = [];
 
-  constructor(formElement: HTMLFormElement) {
+  constructor(formElement: HTMLFormElement,private t:(key: TranslationKey)=> string) {
     this.formElement = formElement;
   }
 
@@ -204,17 +205,19 @@ export class FormHandler<TFormData extends Record<string,any>> {
 }
 
   // Afficher un message d'erreur pour un champ
-  private setError(fieldName:  keyof TFormData, message: string) {
+  //private setError(fieldName:  keyof TFormData, message: string) {
+  private setError(fieldName: keyof TFormData, messageKey: string, params?: Record<string, string | number>) {
     const field = this.formElement.querySelector<HTMLInputElement>(`[name="${String(fieldName)}"]`);
     const errorDiv = this.formElement.querySelector(`#${String(fieldName)}-error`);
     if (field) {
       field.classList.add('input-error');
     }
+    const translated = this.t(messageKey as TranslationKey/* , params */)
     if (errorDiv) {
-      errorDiv.textContent = message;
+      errorDiv.textContent = translated;
       errorDiv.classList.add('error-visible');
     }
-    this.errorMessages[fieldName] = message;
+    this.errorMessages[fieldName] = translated;
   }
 
   // Effacer le message d'erreur pour un champ

@@ -1,7 +1,7 @@
 import { GameHistory } from "./gameHistory-component";
 import { GameSetting } from "./gamesetting-component";
 import { Login } from "./login-component";
-import { ProfilePage } from "./profile-component";
+import { ProfileGameHistory, ProfilePage, ProfileTournamentHistory } from "./profile-component";
 import { Register } from "./register";
 
 import { ChatComponent } from './chat-component';
@@ -18,6 +18,12 @@ import { AdminUsers } from "./admin/users";
 
 import { Error401 } from "./error-pages/error-401-component";
 import { Error404 } from "./error-pages/error-404-component";
+import { Settings } from "./settings-component";
+import { SettingsLanguage } from "./settingsLanguage";
+import { PopupCookies } from "./popup-cookies";
+import { Support } from "./support";
+import { Leaderboard } from "./leaderboard";
+import { GameWrapper } from "./game-wrapper-component";
 
 
   
@@ -41,6 +47,13 @@ if (!customElements.get('game-history-component')) {
 } */
 if (!customElements.get('profile-component')) {
 	customElements.define('profile-component', ProfilePage);
+}
+if (!customElements.get('profil-game-stats-component')) {
+	customElements.define('profil-game-stats-component', ProfileGameHistory);
+}
+
+if (!customElements.get('profil-tournament-stats-component')) {
+	customElements.define('profil-tournament-stats-component', ProfileTournamentHistory);
 }
 
 if (!customElements.get('login-component')) {
@@ -71,6 +84,10 @@ if (!customElements.get('game-setting-component')) {
 	customElements.define('game-setting-component', GameSetting);
 }
 
+if (!customElements.get('game-wrapper-component')) {
+	customElements.define('game-wrapper-component', GameWrapper);
+}
+
 if (!customElements.get('chat-component')) {
   customElements.define('chat-component', ChatComponent);
 }
@@ -79,7 +96,13 @@ if (!customElements.get('dashboard-component')) {
 	customElements.define('dashboard-component', Dashboard);
 }
 
+if (!customElements.get('settings-component')) {
+	customElements.define('settings-component', Settings);
+}
 
+if (!customElements.get('language-component')) {
+	customElements.define('language-component', SettingsLanguage);
+}
 if (!customElements.get('game-loby-component')) {
 	customElements.define('game-loby-component', GameLobyComponent);
 }
@@ -97,4 +120,17 @@ if (!customElements.get('admin-pannel')) {
 }
 if (!customElements.get('admin-users')) {
 	customElements.define('admin-users', AdminUsers);
+}
+
+
+if (!customElements.get('support-component')) {
+	customElements.define('support-component', Support);
+}
+
+if (!customElements.get('popup-cookies')) {
+	customElements.define('popup-cookies', PopupCookies);
+}
+
+if (!customElements.get('leaderbord-component')) {
+	customElements.define('leaderboard-component', Leaderboard);
 }

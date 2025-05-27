@@ -11,32 +11,22 @@ export class Settings extends BaseComponent<{}> {
 
   render() {
     this.innerHTML = `
-      <section class="min-h-screen px-4 py-8 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
+     <section class=" px-4 py-8">
         <div class="max-w-4xl mx-auto">
-          <h1 class="text-3xl font-bold mb-6 text-center">Paramètres</h1>
-
+          <h1 class="text-3xl font-bold mb-6 text-center">${this.t("SETTINGS.TITLE")}</h1>
           <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-6">
             <div>
-              <label class="block text-sm font-medium mb-1" for="theme">Thème</label>
+              <label class="block text-sm font-medium mb-1" for="theme">${this.t("THEME.TITLE")}</label>
               <select id="theme" class="w-full rounded-lg px-3 py-2 border dark:border-gray-700 dark:bg-gray-900">
-                <option value="light">Clair</option>
-                <option value="dark">Sombre</option>
-                <option value="system">Système</option>
+                <option value="light">${this.t("THEME.LIGHT")}</option>
+                <option value="dark">${this.t("THEME.DARK")}</option>
+                <option value="system">${this.t("THEME.SYSTEM")}</option>
               </select>
             </div>
 
             <div>
-              <label class="block text-sm font-medium mb-1" for="language">Langue</label>
-              <select id="language" class="w-full rounded-lg px-3 py-2 border dark:border-gray-700 dark:bg-gray-900">
-                <option value="fr">Français</option>
-                <option value="en">English</option>
-              </select>
+              <language-component></language-component>
             </div>
-
-            <div class="flex justify-end">
-              <button class="bg-blue-600 hover:bg-blue-700 text-white px-4 py-2 rounded-lg transition">Enregistrer</button>
-            </div>
-          </div>
         </div>
       </section>
     `;

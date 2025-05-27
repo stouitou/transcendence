@@ -83,7 +83,7 @@ export class DatabaseManager {
 			tournament: tournamentId,
 			};
 		try {
-			const response = await fetch(`http://game-management-service:3000/docker/games/${match.config.type}/${match.config.format}`, {
+			const response = await fetch(`http://game-management-service:3000/internal/games/${match.config.type}/${match.config.format}`, {
 
 			method: 'POST',
 			headers: {
@@ -136,8 +136,7 @@ export class DatabaseManager {
 		console.log("[Match]processDataBaseSaveMatchResult data ",data);
 		
 		try {
-		//const result = await fetch(`https://localhost:4433/api/game-management-service/gameHistory/${this.gameHistoryId}`, {
-		const result = await fetch(`http://game-management-service:3000/docker/gameHistory/${match.gameHistoryId}`, {
+		const result = await fetch(`http://game-management-service:3000/internal/gameHistory/${match.gameHistoryId}`, {
 
 			method: 'PUT',
 				headers: {
@@ -187,22 +186,19 @@ export class DatabaseManager {
 			type:config.type,
 			format:config.format,
 			max_players:config.maxPlayers,
-			players: playersId?? [],
+			players: playersId?? [], 
 			configPlayers: {
 				players: databasePlayers,
 				},
 			/* currentRound,
 			tournament: tournamentId, */
 			};
-			//const result = await fetch(`http://game-management-service:3000/docker/games/${match.config.type}/${match.config.format}/normal`, {
-				//
-
-				console.log("processDataBaseCreateTournament dataDB ",`http://game-management-service:3000/docker/tournaments/${config.type}/${config.format}`);
+			console.log("processDataBaseCreateTournament dataDB ",`http://game-management-service:3000/internal/tournaments/${config.type}/${config.format}`);
 			
 
    		 try {
-			//	const response = await fetch(`http://game-management-service:3000/api/game-management-service/docker/tournaments/${config.type}/${config.format}/normal`, {
-				const response = await fetch(`http://game-management-service:3000/api/game-management-service/docker/tournaments/${config.type}/${config.format}`, {
+			//	const response = await fetch(`http://game-management-service:3000/internal/tournaments/${config.type}/${config.format}/normal`, {
+				const response = await fetch(`http://game-management-service:3000/internal/tournaments/${config.type}/${config.format}`, {
 					method: 'POST',
 					headers: {
 						'Content-Type': 'application/json',
@@ -246,7 +242,7 @@ export class DatabaseManager {
 
 	processDataBaseGenerateNextRoundTournament = async() => {
 		const tournamentID = this.tournamentId;
-		return fetch(`http://game-management-service:3000/api/game-management-service/docker/tournaments/${tournamentID}/generateNextRound`, {
+		return fetch(`http://game-management-service:3000/internal/tournaments/${tournamentID}/generateNextRound`, {
 
 			method: 'PUT',
 			headers: {

@@ -5,7 +5,7 @@ import { pipeline } from 'node:stream';
 import { promisify } from 'util';
 import { createWriteStream } from 'node:fs';
 import { UserStats } from '../models/User';
-import Helpers, { IParams } from '@src/repository/helpers';
+import Helpers, { IParams } from '../repository/helpers';
 import { AuthServiceController } from './authService.controller';
 import { chmod } from 'node:fs/promises';
 const pump = promisify(pipeline);
@@ -33,7 +33,7 @@ export type AutProvider = {
   user: User;
 }
 
-const helpersUpdateStats=( userStats: UserStats, addValue : Partial<UserStats>) => {
+/* const helpersUpdateStats=( userStats: UserStats, addValue : Partial<UserStats>) => {
   return {
       id: userStats.id,
       total_game_played: addValue.total_game_played? addValue.total_game_played + userStats.total_game_played: userStats.total_game_played,
@@ -61,7 +61,7 @@ const helpersUpdateStats=( userStats: UserStats, addValue : Partial<UserStats>) 
       tournament_remote_game_lost : addValue.tournament_remote_game_lost? addValue.tournament_remote_game_lost + userStats.tournament_remote_game_lost: userStats.tournament_remote_game_lost,
       tournament_remote_game_draw : addValue.tournament_remote_game_draw? addValue.tournament_remote_game_draw + userStats.tournament_remote_game_draw: userStats.tournament_remote_game_draw
   };
-}
+} */
 
 //@TODO importer le bon type de GAME
 interface Game {
@@ -82,6 +82,7 @@ export class UserController {
     this.getUserMe = this.getUserMe.bind(this);
     this.getUsers = this.getUsers.bind(this);
     this.getUserById = this.getUserById.bind(this);
+    this.getUserMeById = this.getUserMeById.bind(this);
     this.getUserStatsById = this.getUserStatsById.bind(this);
     this.updateStatsById = this.updateStatsById.bind(this);
     this.updateUser = this.updateUser.bind(this);
@@ -90,9 +91,14 @@ export class UserController {
     this.updateUserAvatar = this.updateUserAvatar.bind(this);
     this.updateUserAvatarById = this.updateUserAvatarById.bind(this);
     this.addFriend = this.addFriend.bind(this);
+    this.addFriendByUserName = this.addFriendByUserName.bind(this);
     this.removeFriend = this.removeFriend.bind(this);
+    this.getUsersLeaderboard = this.getUsersLeaderboard.bind(this);
 
     this.getUserGames = this.getUserGames.bind(this);
+    this.getUserGameById = this.getUserGameById.bind(this);
+
+    this.getUserTournamentsByUserId = this.getUserTournamentsByUserId.bind(this);
   }
   //constructor(private userService: UserService) {}
 
@@ -157,6 +163,15 @@ export class UserController {
     }
     return reply.send(user);
   }
+    async getUserMeById(request:  FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+    const userId = Number(request.params.id);
+    const user = await this.userRepository.getById(userId);
+        if (!user) {
+      return reply.status(404).send({ error: 'User not found' });
+    }
+    const {id,avatar,name,role,created_at} = user;
+    return reply.send({id,avatar,name,role,created_at});
+  }
 
   async getUserStatsById(request:  FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     const userId = Number(request.params.id);
@@ -166,7 +181,14 @@ export class UserController {
     }
     return reply.send(user.userStats);
   }
-
+  async getUsersLeaderboard(request:  FastifyRequest, reply: FastifyReply) {
+    const leaderboard = await this.userRepository.getUsersLeaderboard();
+        if (!leaderboard) {
+      return reply.status(404).send({ error: 'leaderboard not found' });
+    }
+    return reply.send(leaderboard);
+  }
+  //@TODO updateStatsById est ce que c'est utile de le conserver ?
   async updateStatsById(request:  FastifyRequest<{ Params: { id: string },Body:Partial<UserStats> }>, reply: FastifyReply) {
     const userId = Number(request.params.id);
     if (!userId) {
@@ -193,7 +215,7 @@ export class UserController {
       // Mettre à jour les statistiques de l'utilisateur
     const userUpdated = await this.userRepository.update({
       id: userId,
-      userStats: helpersUpdateStats(userStats, requestBody),
+      //userStats: helpersUpdateStats(userStats, requestBody),
     });
   
     if (!userUpdated) {
@@ -355,6 +377,29 @@ await chmod(uploadPath, 0o644);
       return reply.send(user);
     }
     //add Friend
+    async addFriendByUserName(request: FastifyRequest<{/*  Params: { id: string}, */Body:{ friendName:string} }>, reply: FastifyReply) {
+     // const userId = parseInt(request.params.id);
+     try {
+        const userId = Number(request.authenticatedUser?.id);
+        if (!userId) {
+          return reply.status(400).send({ error: 'Invalid user id' });
+        }
+          const friendName = request.body.friendName;
+
+          const friend = await this.userRepository.getOneByParams({ name: friendName })
+          if (!friend) {
+            return reply.status(404).send({ error: 'Friend not found' });
+          }
+          //const user = await this.userService.deleteUser(userId);
+        // const user = await UserRepository.delete(userId);
+          const user = await this.userRepository.addFriend(userId,friend.id);
+          return reply.send(user);
+      } catch (error) {
+          console.error('Error adding friend by username:', error);
+          return reply.status(500).send({ error: 'Failed to add friend' });
+      }
+    }
+
     async addFriend(request: FastifyRequest<{/*  Params: { id: string}, */Body:{ friendId:string} }>, reply: FastifyReply) {
      // const userId = parseInt(request.params.id);
      const userId = Number(request.authenticatedUser?.id);
@@ -368,18 +413,25 @@ await chmod(uploadPath, 0o644);
       return reply.send(user);
     }
     //remove Friend
-    async removeFriend(request: FastifyRequest<{/*  Params: { id: string }, */Body:{ friendId:string}  }>, reply: FastifyReply) {
-     // const userId = parseInt(request.params.id);
+    async removeFriend(request: FastifyRequest<{Body:{ friendId:string}  }>, reply: FastifyReply) {
+     try {
      const userId = Number(request.authenticatedUser?.id);
      if (!userId) {
-       return reply.status(400).send({ error: 'Invalid user id' });
+       return reply.status(400).send({ error: 'Invalid user id user not authenticated' });
      }
       const friendId = parseInt(request.body.friendId);
+      console.log("UserController removeFriend ",userId,friendId);
+      console.log("UserController removeFriend request.body",userId,request.body);
       //const user = await this.userService.deleteUser(userId);
      // const user = await UserRepository.delete(userId);
       const user = await this.userRepository.removeFriend(userId,friendId);
       return reply.send(user);
     }
+    catch (error) {
+      console.error('Error removing friend:', error);
+      return reply.status(500).send({ error: 'Failed to remove friend' });
+    }
+  }
 
 
   async deleteUser(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
@@ -428,7 +480,47 @@ await chmod(uploadPath, 0o644);
 
    try {
     const authHeader = request.headers.authorization;
-    const response = await fetch(`http://game-management-service:3000/api/game-management-service/games?${builQuery}`, {
+    const response = await fetch(`http://game-management-service:3000/internal/games?${builQuery}`, {
+      method: 'GET',
+      headers: {
+        'Authorization': authHeader?? '',
+      },
+    });
+
+    if (!response.ok) {
+      console.error("Error fetching games:", response);
+      throw new Error(`[getUserGames] Failed to fetch games: ${response.statusText}`);
+    }
+
+    const games = await response.json();
+    return reply.code(200).send(games);
+  } catch (error) {
+    console.error("Error fetching games:", error);
+    return reply.code(500).send({ error: "Failed to fetch games" });
+  }
+}
+  async getUserGamesByPlayerId(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+    const authenticatedUser = request.authenticatedUser;
+    if (!authenticatedUser) {
+      return reply.status(401).send({ error: 'User not authenticated' });
+    }
+    const userId = authenticatedUser.id;
+    if (!userId) {
+      return reply.status(400).send({ error: 'Invalid user id' });
+    }
+    const playerId = parseInt(request.params.id);
+    if (!playerId) {
+      return reply.status(400).send({ error: 'Invalid player id' });
+    }
+    //add userId to query filters {"id":userId}
+        console.log("[UserController] getUserGames request.query ",request.query);
+        const query = request.query as IParams;
+        const builQuery = Helpers.buildQueryString<Game>(query,{players:{id:playerId}});
+       
+
+   try {
+    const authHeader = request.headers.authorization;
+    const response = await fetch(`http://game-management-service:3000/internal/games?${builQuery}`, {
       method: 'GET',
       headers: {
         'Authorization': authHeader?? '',
@@ -507,7 +599,44 @@ async getUserFriends(request: FastifyRequest, reply: FastifyReply) {
         const builQuery = Helpers.buildQueryString/* <Game> */(query,{players:{id:userId}});//@TODO Type Tournaments
     try {
       const authHeader = request.headers.authorization;
-      const response = await fetch(`http://game-management-service:3000/api/game-management-service/tournaments?${builQuery}`, {
+      const response = await fetch(`http://game-management-service:3000/internal/tournaments?${builQuery}`, {
+        method: 'GET',
+        headers: {
+          'Authorization': authHeader?? '',
+        },
+      });
+  
+      if (!response.ok) {
+        throw new Error(`Failed to fetch tournament: ${response.statusText}`);
+      }
+  
+      const tournament = await response.json();
+      return reply.code(200).send(tournament);
+    } catch (error) {
+      console.error("Error fetching tournament:", error);
+      return reply.code(500).send({ error: "Failed to fetch tournament" });
+    }
+  }
+    async getUserTournamentsByUserId(request: FastifyRequest<{Params:{id:string}}>, reply: FastifyReply) {
+    const authenticatedUser = request.authenticatedUser;
+    if (!authenticatedUser) {
+      return reply.status(401).send({ error: 'User not authenticated' });
+    }
+    const userId = authenticatedUser.id;
+    if (!userId) {
+      return reply.status(400).send({ error: 'Invalid user id' });
+    }
+     const playerId = parseInt(request.params.id);
+    if (!playerId) {
+      return reply.status(400).send({ error: 'Invalid player id' });
+    }
+    //add userId to query filters {"id":userId}
+        console.log("[UserController] getUserTournaments request.query ",request.query);
+        const query = request.query as IParams;
+        const builQuery = Helpers.buildQueryString/* <Game> */(query,{players:{id:playerId}});//@TODO Type Tournaments
+    try {
+      const authHeader = request.headers.authorization;
+      const response = await fetch(`http://game-management-service:3000/internal/tournaments?${builQuery}`, {
         method: 'GET',
         headers: {
           'Authorization': authHeader?? '',

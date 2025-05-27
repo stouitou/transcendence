@@ -57,39 +57,7 @@ import { RoundAccordion } from "./round-Accordion-composant";
   
 	return paginationHTML;
   }
-/* export interface Tournaments {
-	id: number;
-	games?: Game[];
-	state?: string;
-	players?: User[];
-	created_at: Date;
-	updated_at: Date;
-	rounds?: Round[];
-	currentRound?: number;
-	winner: User | number | null;
-  } */
-  
- /*  export interface Round {
-	id: number;
-	games: Game[];
-	state: string;
-	players?: User[] | number[];
-	created_at: Date;
-	updated_at: Date;
-	tournaments?: Partial<Tournaments>[];
-	current: number;
-  } */
-  
-/*   export interface User {
-	id: number;
-	name: string;
-	avatar: string;
-	role: string;
-	games: Game[] | null;
-	tournaments: Tournaments[] | null;
-	created_at: string;
-	updated_at: string;
-  } */
+
   
   export interface GameHistory {
 	id: number;
@@ -136,7 +104,6 @@ export class DashboardTournois extends BaseComponent<{ user: User | null,
 		getTournaments({limit:10},{type:"remote"}).then((result) => {
 			if (!result || !result.success) return;
 			const {data:tournaments,meta} = result;
-			console.log('getTournaments(remote).then((result) tournaments', tournaments);
 			if (tournaments) {
 			
 			//this.state.games = {...this.state.games,...games};
@@ -150,8 +117,6 @@ export class DashboardTournois extends BaseComponent<{ user: User | null,
 		getTournaments({limit:10},{type:"local"}).then((result) => {
 			if (!result || !result.success) return;
 			const {data:tournaments,meta} = result;
-			console.log('getTournaments(local).then((result) tournaments', tournaments);
-			console.log('getTournaments(local).then((result) meta', meta);
 			if (tournaments) {
 			
 			//this.state.games = {...this.state.games,...games};
@@ -356,7 +321,35 @@ export class DashboardTournois extends BaseComponent<{ user: User | null,
 		 }	 
 		}});
 	  });
-	}
+
+
+		this.querySelectorAll('.paginator').forEach((button) => {
+			button.addEventListener('click', (e: Event) => {
+			  e.preventDefault();
+			  const target = e.currentTarget as HTMLElement;
+			  const page = Number(target.getAttribute('data-page'));
+			  const type = target.getAttribute('data-type');
+			  if (!page || page < 1) return;
+			  if (!type) return;		  
+			  // Charger les données pour la page sélectionnée
+				getTournaments({limit:10, offset: (page - 1) * 10 },{type:type}).then((result) => {
+					if (!result || !result.success) return;
+					const {data:tournaments,meta} = result;
+					if (tournaments) {
+					if (type === 'remote') {
+						this.state.metaPagination.remoteGame = meta;
+						this.state.remoteTournaments = tournaments;
+						}
+						if (type === 'local') {
+						this.state.metaPagination.localGame = meta;
+						this.state.localTournaments = tournaments;
+						}
+					this.render();
+					}
+				});
+			});
+		  });
+		}
 	}
 	private showTournamentDetail(tournoi: Tournaments) {
 		const newRowDetail = document.createElement('tournoi-detail') as any;

@@ -67,7 +67,8 @@ export class LobyFactory {
 				const age = currentTime - loby.createDate;
 				const shouldDelete =
 					(loby.getCurrentPhase() === "LOBBYENDPHASE" && age > 5 * 60 * 1000) ||
-					(loby.getCurrentPhase() === "NotStarted" && age > 5 * 60 * 1000);
+					(loby.getCurrentPhase() === "NotStarted" && age > 5 * 60 * 1000) ||
+					(loby.config.state === "finished");
 
 				if (shouldDelete) {
 					lobys.delete(lobyId);

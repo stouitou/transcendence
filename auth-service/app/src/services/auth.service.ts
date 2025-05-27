@@ -3,11 +3,11 @@ import { OauthProviderResponse } from "../types/provider.types";
 import { User } from "../models/User.models";
 import UserRepository from "../repository/User.repository";
 import bcrypt from "bcryptjs"
-import AuthProviderRepository from "@src/repository/AuthProvider.repository";
+import AuthProviderRepository from "../repository/AuthProvider.repository";
 
-import { generateTOTPSecret, verifyTOTP } from "@src/utils/totp";
-import { AuthProvider } from "@src/models/AuthProvider.models";
-const defaultAvatar = "https://localhost:4433/uploads/defaultAvatar.jpg"; //@TODO : a changer
+import { generateTOTPSecret, verifyTOTP } from "../utils/totp";
+import { AuthProvider } from "../models/AuthProvider.models";
+const defaultAvatar = "/uploads/defaultAvatar.jpg"; //@TODO : a changer
 /**
  * Service d'authentification
  * rappel: un service est une classe qui contient des méthodes qui effectuent des opérations spécifiques

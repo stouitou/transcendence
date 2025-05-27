@@ -8,9 +8,9 @@ import  { IParams } from "../repository/helpers";
 import { Game, GameCreate } from "../models/Game";
 import { IRepository } from "./Base/IRepository";
 import { BaseRepository } from "./Base/BaseRepository";
-import { User } from "../models/User";
-import { Players } from "../models/GameHistory";
-import { UrlSearchParams } from "@src/utils/BuildOptions";
+import { User, UserStats } from "../models/User";
+import { Players } from "../models/Players";
+import UserRepository from "./User.repository";
 
 /**
  * GameRepository - Gestion des appels HTTP à la DB
@@ -39,6 +39,8 @@ class GameRepository extends BaseRepository<Game,GameCreate> implements IReposit
   //create
   create = async (game: Partial<GameCreate>): Promise<Game> => { 
     const {/*  authProviders, */ id, ...gameExtracted } = game;
+
+    console.log("GameRepository create()  --gameExtracted--",gameExtracted);//gameExtracted.tournament: null
     const response = await fetch(this.URL+this.getRelations(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -54,7 +56,27 @@ class GameRepository extends BaseRepository<Game,GameCreate> implements IReposit
     if (!gameCreated) {
       throw new Error("User creation failed");
     }
+    //updtate the usersStats
     console.log(" GameRepository.create()  --gameCreated-- OK")
+    console.log(" GameRepository.create()  --gameCreated-- gameCreated.players--",gameCreated.players)
+    const {type,format,players} = gameCreated as {format:"classic"|"tournament",type:'local'|'remote',players:User[]};
+       const games = await Promise.all(players.map(async (user: User) => {
+
+        console.log(" GameRepository.create()  --STATS-- user--",user)
+        const userStatsCreate = buildUserStatsCreate(user, format, type, game.tournament?true:false);
+        const userUpdated = await (new UserRepository()).update(userStatsCreate/* {
+          id: user.id,
+          userStats: {
+            ...user.userStats,
+            [`${format}_total_game_played`]: user.userStats[`${format}_total_game_played`] + 1,
+            [`${format}_${type}_game_played`]: user.userStats[`${format}_${type}_game_played`] + 1,
+         // [`<classic|tournament>_<local|remote>_game_played`]: user.userStats[`<classic|tournament>_<local|remote>_game_played`] + 1,
+          
+          },
+        } */);
+        return userUpdated;
+       }));
+       console.log(" GameRepository.create()  --gameCreated-STATS- UPDATED--",games)
     return gameCreated;
   };
 
@@ -234,3 +256,21 @@ class GameRepository extends BaseRepository<Game,GameCreate> implements IReposit
   
 }
 export default GameRepository;
+
+export const buildUserStatsCreate = (user: User, format:"classic"|"tournament",type:'local'|'remote', iscreateTournament:boolean=false) => {
+  const userStats:UserStats = { 
+    ...user.userStats,
+ //  [`${format}_total_game_played`]: user.userStats[`${format}_total_game_played`] + 1,
+   [`${format}_${type}_game_played`]: user.userStats[`${format}_${type}_game_played`] + 1,
+         // [`<classic|tournament>_<local|remote>_game_played`]: user.userStats[`<classic|tournament>_<local|remote>_game_played`] + 1,
+
+  };
+  //si le format est "classic" , on incrémente le total_game_played
+  if (format === "classic") {
+    userStats [`${format}_total_game_played`] = user.userStats[`${format}_total_game_played`] + 1;
+  }
+  if (format === "tournament" && iscreateTournament) {
+    userStats [`${format}_total_game_played`] = user.userStats[`${format}_total_game_played`] + 1;
+  }
+  return {id:user.id,userStats};
+}

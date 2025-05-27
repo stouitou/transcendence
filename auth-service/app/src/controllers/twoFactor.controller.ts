@@ -1,7 +1,7 @@
 import  UserRepository  from "../repository/User.repository";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { BaseController } from "./BaseController";
-import { generateCSRFToken } from "@src/utils/crypto";
+import { generateCSRFToken } from "../utils/crypto";
 
 
 /**

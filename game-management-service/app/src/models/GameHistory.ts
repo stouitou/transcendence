@@ -1,29 +1,15 @@
 
 import { Game } from "./Game";
-import { User } from "./User";
-export interface Players {
-  id?: number;
-  is_IA: boolean;
-  gameHistory?: GameHistory;
-  type: string;
-  avatar?: string;
-  display_name?: string;
-  score: number;
-  user?: User | null | number;
-}
+import { Players } from "./Players";
+
 export class GameHistory{
   id: number;
-/*   score1: number;
-  score2: number;
-  player1: number;
-  player2: number; */
   game?: Game;
   created_at: Date;
   updated_at: Date;
   //mode de la partie : local ou remote
-  type: string;
-  //si local, les players sont un tableau de displaynames
- // local_players: string[];
+  type: 'local'|'remote'/* string */;
+  format:"classic"|"tournament"; //classic, tournament
   players?: Players[];
   winner: string|null = null;
 
@@ -35,7 +21,7 @@ export class GameHistory{
     this.player1 = 0;
     this.player2 = 0; */
     this.type = "local";
-   // this.local_players = [];
+    this.format = "classic"; //default format
     this.players = data?.players ? data.players : [];
     //this.game = new Game({});
     Object.assign(this, data);
@@ -53,6 +39,8 @@ export type GameHistoryCreate = {
   player2: number; */
   game?: Game;
   players?: Players[];
+  type: "local" | "remote";
+  format: "classic" | "tournament"; //classic, tournament
 /*   created_at: Date;
   updated_at: Date; */
 }
@@ -110,6 +98,8 @@ export const GameHistoryCreate: GameHistoryModel<GameHistoryCreate> = {
   player2: 0, */
   game: undefined,
   players: [],
+  type: "local",
+  format: "classic", //default format
 /*   created_at: new Date(),
   updated_at: new Date() */
 };

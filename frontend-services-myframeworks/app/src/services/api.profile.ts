@@ -1,5 +1,5 @@
 import { apiRequest } from "../frameworks/apiRequest";
-import { User } from "../types/types";
+import { User, UserStats } from "../types/types";
 
 /**
  * Profile Users Update Name
@@ -64,3 +64,45 @@ export const updatePassword = async (data: Partial<UpdatePassword>): Promise<{me
 		throw new Error('[updateProfile] Error to update profile');
   }
 }
+
+
+/**
+ * Profile Users Update Name
+ */
+export const getProfileStat = async (id:number): Promise<UserStats | void> => {
+  const url = `/api/users/me/stats/${id}`;
+  return apiRequest<UserStats | void>(url, 'GET');
+}
+
+/**
+ * Profile Users Update Name
+ */
+export const getProfileById = async (id:string): Promise<User | void> => {
+  const url = `/api/users/me/users/${id}`;
+  return apiRequest<User | void>(url);
+}
+
+interface LeaderBoardUser {
+  id: number;
+  name: string;
+  level: number;
+  avatar: string;
+}
+export const getLeaderboard = async (): Promise<LeaderBoardUser[] | void> => {
+  const url = `/api/users/me/leaderboard`;
+  return apiRequest<LeaderBoardUser[] | void>(url, 'GET');
+}
+
+
+/**
+ * Profile Users addfriendByUserName
+ */
+export const addfriendByUserName = async (friend:{friendName: string}): Promise<User | void> => {
+  const url = `/api/users/me/addFriendByUserName`;
+  return apiRequest<User | void>(url, 'PUT', friend);
+}
+export const removeFriendById = async (friend:{friendId: number}): Promise<User | void> => {
+  const url = `/api/users/me/removeFriendById`;
+  return apiRequest<User | void>(url, 'PUT', friend);
+}
+

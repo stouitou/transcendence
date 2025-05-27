@@ -27,7 +27,7 @@ export class Tournaments {
   state: string;
 
   //max_players de la partie
-  @Column({ type: "int", default: 4 })
+  @Column({ type: "int", default: 16 })
   max_players: number;
 
   //chaque Tournoi a plusieurs joueurs
