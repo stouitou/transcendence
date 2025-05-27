@@ -1,6 +1,6 @@
-import { Players } from "@src/models/Players";
-import { User, UserStats } from "@src/models/User";
-import UserRepository from "@src/repository/User.repository";
+import { Players } from "../models/Players";
+import { User, UserStats } from "../models/User";
+import UserRepository from "../repository/User.repository";
 
 export class StatsService {
   private userRepo = new UserRepository();

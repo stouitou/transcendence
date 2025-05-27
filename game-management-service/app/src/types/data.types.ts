@@ -1,4 +1,4 @@
-import { DTOPlayer } from "@src/DTO/DTOPlayer";
+import { DTOPlayer } from "../DTO/DTOPlayer";
 
 export type ReceivedData = {
     state:string,

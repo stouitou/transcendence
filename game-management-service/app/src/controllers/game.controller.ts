@@ -1,9 +1,7 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import  GameRepository  from '../repository/Game.repository';
-import { GameBody, GameCreate } from '../models/Game';
-import { UserStats } from '../models/User';
-import { BuildOptions, UrlSearchParams } from '@src/utils/BuildOptions';
-import { IParams } from '@src/repository/helpers';
+import { GameCreate } from '../models/Game';
+import { IParams } from '../repository/helpers';
 
 /* const handlefetchStats = async (authorization:string|undefined,cookie : string|undefined,userId:number, dataStats:Partial<UserStats>) => {
   try {

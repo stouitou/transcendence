@@ -1,8 +1,8 @@
 import { FastifyRequest, FastifyReply } from 'fastify';
 import  TournamentsRepository  from '../repository/Tournament.repository';
-import { IParams } from '@src/repository/helpers';
-import { TournamentService } from '@src/services/tournament.service';
-import { ReceivedData } from '@src/types/data.types';
+import { IParams } from '../repository/helpers';
+import { TournamentService } from '../services/tournament.service';
+import { ReceivedData } from '../types/data.types';
 
 export class TournamentsController {
   private tournamentsRepository = new TournamentsRepository();

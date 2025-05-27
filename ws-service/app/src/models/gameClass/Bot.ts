@@ -1,6 +1,6 @@
 import { Ball } from './Ball';
 import { Player } from "./Player";
-import { Position } from '@src/types/gameUtils.type';
+import { Position } from '../../types/gameUtils.type';
 
 export class	Bot {
 

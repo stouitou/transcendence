@@ -10,7 +10,6 @@ import { IRepository } from "./Base/IRepository";
 import { BaseRepository } from "./Base/BaseRepository";
 import { User, UserStats } from "../models/User";
 import { Players } from "../models/Players";
-import { UrlSearchParams } from "@src/utils/BuildOptions";
 import UserRepository from "./User.repository";
 
 /**

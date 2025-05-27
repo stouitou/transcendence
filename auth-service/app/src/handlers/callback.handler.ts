@@ -1,7 +1,7 @@
 import { FastifyRequest, FastifyReply, FastifyInstance } from 'fastify';
-import { generateCSRFToken } from '@src/utils/crypto';
+import { generateCSRFToken } from "../utils/crypto";
 import { User } from "../models/User.models";
-import { AuthController } from '@src/controllers/auth.controller';
+import { AuthController } from '../controllers/auth.controller';
 
 const BACKEND_SERVER_URL = process.env.BACKEND_SERVER_URL || "https://localhost:4433";
 const redirectUrlAfterLoginSuccess = `${BACKEND_SERVER_URL}/profile`;

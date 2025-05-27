@@ -2,8 +2,8 @@ import { FastifyRequest, FastifyReply } from 'fastify';
 import  GameHistoryRepository  from '../repository/GameHistory.repository';
 import { GameHistoryBody } from '../models/GameHistory';
 import {  Players } from '../models/Players';
-import UserRepository from '@src/repository/User.repository';
-import { User, UserStats } from '@src/models/User';
+import UserRepository from '../repository/User.repository';
+import { User, UserStats } from '../models/User';
 
 export class GameHistoryController {
   private gameHistoryRepository = new GameHistoryRepository();

@@ -1,9 +1,9 @@
-import { AuthProvider } from "@src/models/AuthProvider.models";
-import { User } from "@src/models/User.models";
-import AuthProviderRepository from "@src/repository/AuthProvider.repository";
-import UserRepository from "@src/repository/User.repository";
-import { decrypt } from "@src/utils/crypto";
-import { generateTOTPSecret, verifyTOTP } from "@src/utils/totp";
+import { AuthProvider } from "../models/AuthProvider.models";
+import { User } from "../models/User.models";
+import AuthProviderRepository from "../repository/AuthProvider.repository";
+import UserRepository from "../repository/User.repository";
+import { decrypt } from "../utils/crypto";
+import { generateTOTPSecret, verifyTOTP } from "../utils/totp";
 import { FastifyInstance } from "fastify";
 
 import qrcode from "qrcode";

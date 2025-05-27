@@ -2,8 +2,8 @@ import AuthProviderRepository from "../repository/AuthProvider.repository";
 import  UserRepository  from "../repository/User.repository";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { BaseController } from "./BaseController";
-import { send2FAEmail } from "@src/services/mail.service";
-import { generateCSRFToken } from "@src/utils/crypto";
+import { send2FAEmail } from "../services/mail.service";
+import { generateCSRFToken } from "../utils/crypto";
 
 
 /**

@@ -1,12 +1,8 @@
-import { FastifyInstance, FastifyRequest } from "fastify";
-import {UpdateUserBody, UserController} from "../controllers/user.controller";
-import { UserSchema } from '../schemas/user.schema';
-
-import  { AuthMiddleware } from "../middlewares/auth.middleware";
-import { reconstructAuthHeader } from "@src/middlewares/reconstructAuthHeader";
-import { verifyAuth } from "@src/middlewares/verifyAuth";
-import { verifyCSRF } from "@src/middlewares/verifyCSRF";
-//import { AuthServiceController } from "@src/controllers/authService.controller";
+import { FastifyInstance } from "fastify";
+import { UpdateUserBody, UserController } from "../controllers/user.controller";
+import { reconstructAuthHeader } from "../middlewares/reconstructAuthHeader";
+import { verifyAuth } from "../middlewares/verifyAuth";
+import { verifyCSRF } from "../middlewares/verifyCSRF";
 
 import {
   get2FAStatus,

@@ -1,4 +1,4 @@
-import { DTOPlayer } from "@src/DTO/DTOPlayer";
+import { DTOPlayer } from "../DTO/DTOPlayer";
 
 export function splitIntoPairs(players: DTOPlayer[]): DTOPlayer[][] {
   const pairs: DTOPlayer[][] = [];

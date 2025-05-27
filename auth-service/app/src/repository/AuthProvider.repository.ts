@@ -9,7 +9,7 @@ import Helpers, { IParams } from "../repository/helpers";
 import { AuthProvider } from "../models/AuthProvider.models";
 import { IRepository } from "./Base/IRepository";
 import { BaseRepository } from "./Base/BaseRepository";
-import { encrypt } from "@src/utils/crypto";
+import { encrypt } from "../utils/crypto";
 
 /**
  * AuthProviderRepository - Gestion des appels HTTP à la DB

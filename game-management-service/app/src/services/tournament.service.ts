@@ -1,9 +1,9 @@
-import { Game } from "@src/models/Game";
-import { Players } from "@src/models/Players";
-import TournamentsRepository from "@src/repository/Tournament.repository";
+import { Game } from "../models/Game";
+import { Players } from "../models/Players";
+import TournamentsRepository from "../repository/Tournament.repository";
 import { GameService } from "./game.service";
 import { StatsService } from "./stats.service";
-import { DTOPlayer } from "@src/DTO/DTOPlayer";
+import { DTOPlayer } from "../DTO/DTOPlayer";
 type ReceivedData = {
     state: string;
     type: "remote" | "local";

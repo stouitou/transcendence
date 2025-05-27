@@ -4,8 +4,8 @@ import { User, UserStats } from '../models/User';
 import { Game } from '../models/Game';
 import {  Players } from '../models/Players';
 import GameRepository from '../repository/Game.repository';
-import { IParams } from '@src/repository/helpers';
-import UserRepository from '@src/repository/User.repository';
+import { IParams } from '../repository/helpers';
+import UserRepository from '../repository/User.repository';
 
 export class TournamentsController {
   private tournamentsRepository = new TournamentsRepository();

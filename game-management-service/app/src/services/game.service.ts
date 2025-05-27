@@ -1,9 +1,9 @@
-import { DTOPlayer } from "@src/DTO/DTOPlayer";
-import { Game } from "@src/models/Game";
-import { Players } from "@src/models/Players";
-import { Tournaments } from "@src/models/Tournaments";
-import GameRepository from "@src/repository/Game.repository";
-import { mergePlayersWithIA, splitIntoPairs } from "@src/utils/tournament.utils";
+import { DTOPlayer } from "../DTO/DTOPlayer";
+import { Game } from "../models/Game";
+import { Players } from "../models/Players";
+import { Tournaments } from "../models/Tournaments";
+import GameRepository from "../repository/Game.repository";
+import { mergePlayersWithIA, splitIntoPairs } from "../utils/tournament.utils";
 
 export class GameService {
 	private gameRepo = new GameRepository();

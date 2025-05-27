@@ -5,7 +5,7 @@ import { pipeline } from 'node:stream';
 import { promisify } from 'util';
 import { createWriteStream } from 'node:fs';
 import { UserStats } from '../models/User';
-import Helpers, { IParams } from '@src/repository/helpers';
+import Helpers, { IParams } from '../repository/helpers';
 import { AuthServiceController } from './authService.controller';
 import { chmod } from 'node:fs/promises';
 const pump = promisify(pipeline);
