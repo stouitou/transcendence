@@ -25,10 +25,10 @@ export class Home extends BaseComponent<{user: User | null}> {
         <div class="max-w-7xl mx-auto">
           <h1 class="text-4xl font-bold mb-8 text-center">Bienvenue sur GameCentral</h1>
           <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
-            ${this.card("Dashboard", "Accédez à votre tableau de bord", "/dashboard", "📊",disable)}
-            ${this.card("Jouer", "Lancez une nouvelle partie", "/game-loby", "🎮",disable)}
-            ${this.card("Profil", "Gérez vos informations personnelles", "/profile", "👤",disable)}
-            ${this.card("Classement", "Consultez le classement général", "/leaderboard", "🏆",disable)}
+            ${this.card("Dashboard", "Accédez à votre tableau de bord", "/dashboard", "📊", disable)}
+            ${this.card("Jouer", "Lancez une nouvelle partie", "/game", "🎮", disable)}
+            ${this.card("Profil", "Gérez vos informations personnelles", "/profile", "👤", disable)}
+            ${this.card("Classement", "Consultez le classement général", "/leaderboard", "🏆", disable)}
             ${this.card("Paramètres", "Réglez vos préférences", "/settings", "⚙️")}
             ${this.card("Support", "Besoin d’aide ?", "/support", "❓")}
             ${user?.role === 'admin' ? this.card("Admin", "Gérez les utilisateurs et le contenu", "/admin", "👨‍💼") : ''}
@@ -49,7 +49,7 @@ export class Home extends BaseComponent<{user: User | null}> {
     }); */
   }
 
-  card(title: string, subtitle: string, link: string, emoji: string,disabled:boolean = false): string {
+  card (title: string, subtitle: string, link: string, emoji: string, disabled: boolean = false) : string {
     // Si l'utilisateur n'est pas connecté, désactiver le lien et ajouter une classe CSS
     const isDisabled = disabled;
     const linkAttribute = isDisabled ? '' : `href="${link}"`;

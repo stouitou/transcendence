@@ -92,31 +92,16 @@ export class NavBarComponent extends BaseComponent<{ theme: string,user: User | 
           </div>
           <!-- End Theme Toggle -->
 
-                    <a href="/"  class=" nav-link">
-                      Home	
-                    </a>
-                    <a href="/game" class="nav-link">
-                      Game	
-                    </a>
+          ${!user ? `
+          <a href="/login" class="nav-link">Log-In</a>
+          <a href="/register" class="nav-link">Register</a>
+          ` : ``}
 
-                    <a href="/game-loby" class="nav-link">
-                    game-loby	test
-                    </a>
-
-                     ${!user ?`
-                    <a href="/login" class="nav-link">
-                      Log-In	
-                    </a>
-                    <a href="/register" class="nav-link">
-                      Register	
-                    </a>`:``}                   
- <dropdown-porfile-component></dropdown-porfile-component>
-
-                </nav>
-                
-            </div>
-          </header>
-    `;
+          <dropdown-porfile-component></dropdown-porfile-component>
+        </nav>
+      </div>
+    </header>
+  `;
 
  this.attachEvent(this, '#theme-toggle', 'click', this.themeToggleFn.bind(this));
  
