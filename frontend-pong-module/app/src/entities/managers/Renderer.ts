@@ -274,26 +274,6 @@ export class Renderer {
 
 		/* ─── PANEL LAYOUT ─────────────────────────────────────────── */
 		Object.assign(menu.style, {
-<<<<<<< HEAD
-			position: 'absolute',
-			top: '50%',
-			left: '50%',
-			transform: 'translate(-50%, -50%)',
-			width: '320px',            // wider to fit all text
-			padding: '16px 24px',
-			background: 'rgba(255,255,255,0.6)',
-			backdropFilter: 'blur(4px)',
-			border: '1px solid rgba(0,0,0,0.05)',
-			borderRadius: '12px',
-			boxShadow: '0 4px 12px rgba(0,0,0,0.06)',
-			fontFamily: 'Inter, Arial, sans-serif',
-			fontSize: '14px',
-			lineHeight: '1.5',
-			color: '#333',
-			textAlign: 'left',
-			overflow: 'visible',         // show all at once
-			zIndex: '1000',
-=======
 			position:       'absolute',
 			top:            '50%',
 			left:           '50%',
@@ -312,42 +292,10 @@ export class Renderer {
 			textAlign:      'left',
 			overflow:       'visible',
 			zIndex:         '1000',
->>>>>>> origin
 		} as Partial<CSSStyleDeclaration>);
 
 		/* ─── CONTENT ──────────────────────────────────────────────── */
 		menu.innerHTML = `
-<<<<<<< HEAD
-			<div style="text-align:right; margin-bottom:12px;">
-				<a
-					href="https://localhost:4433/game-loby"
-					style="
-					display:inline-block;
-					padding:6px 12px;
-					background:rgba(200,230,255,0.7);
-					color:#333;
-					text-decoration:none;
-					border-radius:6px;
-					font-weight:600;
-					box-shadow:0 2px 8px rgba(0,0,0,0.08);
-					"
-				>
-					◀ Retour au Lobby
-				</a>
-			</div>
-			<ul style="list-style:none; padding:0; margin:0;">
-			<li><strong>Longest rally:</strong> ${statisticsManager._gameHistory.maxBounceCount}</li>
-			<li>
-				<strong>Most goals conceded:</strong>
-				${statisticsManager._gameHistory.mostGoalsConcededPlayer.name}
-				(${statisticsManager._gameHistory.mostGoalsConcededPlayer.goalsConceded})
-			</li>
-			${players.map(p =>
-			`<li><strong>${p.name}: rebounds:</strong> ${p.history.bounceCount}, <strong>distance:</strong> ${p.history.distance}</li>`
-		).join("")}
-			</ul>
-		`;
-=======
     <div style="text-align:right; margin-bottom:12px;">
       <a
         href="/game"
@@ -380,7 +328,6 @@ export class Renderer {
 			.join('')}
     </ul>
   `;
->>>>>>> origin
 
 		/* ─── SHOW & AUTO-HIDE ─────────────────────────────────────── */
 		this._gameAlert?.appendChild(menu);
@@ -604,10 +551,5 @@ export function displayPrepareMatchesStartedTournament(
 			)
 			.join("")}
     </div>`;
-<<<<<<< HEAD
-	// >>>>>>> origin
-=======
-
->>>>>>> origin
 }
 
