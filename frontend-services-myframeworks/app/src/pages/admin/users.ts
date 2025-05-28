@@ -312,159 +312,115 @@ export class AdminUsersComponent extends BaseComponent <{two_factor_auth:boolean
     }
 	const { two_factor_auth } = this.state;
     this.innerHTML = `
+    <div class="admin-user-details flex flex-row gap-4 justify-center items-center">
+      <div class="admin-user-details-info">
+        <div id="message-box" class="font-bold text-center mb-4"></div>
+        <h2>User: ${this.user.name}</h2>
+        <img src="${this.user.avatar || '/default-avatar.png'}" alt="avatar" width="80" height="80" />
+        <div>ID: ${this.user.id}</div>
+        <div>Role: ${this.user.role}</div>
+        <div>2FA: ${two_factor_auth ? 'Enabled' : 'Disabled'}</div>
+        <div>Created At: ${new Date(this.user.created_at).toLocaleDateString()}</div>
+        <div>Updated At: ${new Date(this.user.updated_at).toLocaleDateString()}</div>
+      </div>
+      <div class="admin-user-actions">
 
-<style>
-.switch {
-  position: relative;
-  display: inline-block;
-  width: 60px;
-  height: 34px;
-}
+        <form id="formEditName">
+          <input type="hidden" name="id" value="${this.user.id}" />
+          <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Name:</label>
+          <input 
+            id="name"
+            type="text"
+            name="name" value="${this.user.name}" 
+            class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            required
+          />
+          <div id="name-error" class="font-bold text-center mb-4"></div>
+          <button type="submit" class="btn">Update Name</button>
+        </form>
+        <br><hr><br>
 
-.switch input { 
-  opacity: 0;
-  width: 0;
-  height: 0;
-}
+        <form id="formEditAvatar">
+          <img id="avatar-preview"
+            src=''
+            alt="Avatar Preview, select a file to see the preview"
+            class="max-w-[120px]"
+            referrerPolicy="no-referrer"
+          />
+          <input type="hidden" name="id" value="${this.user.id}" />
+          <label for="avatar" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New avatar:</label>
+          <input					
+            id="avatar"
+            name="avatar"
+            type="file"
+            accept="image/png, image/jpeg"
+            class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
+            value="${this.user.avatar || ''}"
+           />
+          <div id="avatar-error" class="font-bold text-center mb-4"></div>
+          <button type="submit" class="btn">Update Avatar</button>
+        </form>
+        <br><hr><br>
 
-.slider {
-  position: absolute;
-  cursor: pointer;
-  top: 0;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  background-color: #ccc;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+        <form id="formEditRole">
+          <input type="hidden" name="id" value="${this.user.id}" />
+          <label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New role:</label>
+          <select name="role" class="select-form-message">
+            <option value="user" ${this.user.role === 'user' ? 'selected' : ''}>User</option>
+            <option value="admin" ${this.user.role === 'admin' ? 'selected' : ''}>Admin</option>
+          </select>
+          <div id="role-error" class="font-bold text-center mb-4"></div>
+          <button type="submit" class="btn">Update Role</button>
+        </form>
+        <br><hr><br>
 
-.slider:before {
-  position: absolute;
-  content: "";
-  height: 26px;
-  width: 26px;
-  left: 4px;
-  bottom: 4px;
-  background-color: white;
-  -webkit-transition: .4s;
-  transition: .4s;
-}
+        <form id="formToggle2FA">
+          <input type="hidden" name="id" value="${this.user.id}" />
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Are you sure you want to ${two_factor_auth ? 'disable' : 'enable'} 2FA for this user?
+          </label>
 
-input:checked + .slider {
-  background-color: #2196F3;
-}
+          <!-- switch -->
+          <label class="relative inline-block w-[60px] h-[34px]">
+            <input type="checkbox" name="confirm" required
+              class="opacity-0 w-0 h-0 peer" />
+            <span
+              class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300
+                transition-colors duration-400 peer-checked:bg-[#2196F3] rounded-full"></span>
+            <span
+              class="absolute left-[4px] bottom-[4px] w-[26px] h-[26px] bg-white
+                transition-transform duration-400 peer-checked:translate-x-[26px] rounded-full"></span>
+          </label>
 
-input:focus + .slider {
-  box-shadow: 0 0 1px #2196F3;
-}
+          <button type="submit" class="btn">Update 2FA</button>
+        </form>
+        <br><hr><br>
 
-input:checked + .slider:before {
-  -webkit-transform: translateX(26px);
-  -ms-transform: translateX(26px);
-  transform: translateX(26px);
-}
+        <form id="formDeleteUser">
+          <label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
+            Are you sure you want to delete this user?
+          </label>
+          <input type="hidden" name="id" value="${this.user.id}" />
 
-/* Rounded sliders */
-.slider.round {
-  border-radius: 34px;
-}
+          <!-- switch -->
+          <label class="relative inline-block w-[60px] h-[34px]">
+            <input type="checkbox" name="confirm" required
+              class="opacity-0 w-0 h-0 peer" />
+            <span
+              class="absolute cursor-pointer top-0 left-0 right-0 bottom-0 bg-gray-300
+                transition-colors duration-400 peer-checked:bg-[#2196F3] rounded-full"></span>
+            <span
+              class="absolute left-[4px] bottom-[4px] w-[26px] h-[26px] bg-white
+                transition-transform duration-400 peer-checked:translate-x-[26px] rounded-full"></span>
+          </label>
 
-.slider.round:before {
-  border-radius: 50%;
-}
-</style>
-	<div class="admin-user-details flex flex-row gap-4 justify-center items-center">
-		<div class="admin-user-details-info">
-			<div id="message-box" class="font-bold text-center mb-4"></div>
-			<h2>User: ${this.user.name}</h2>
-			<img src="${this.user.avatar || '/default-avatar.png'}" alt="avatar" width="80" height="80" />
-			<div>ID: ${this.user.id}</div>
-			<div>Role: ${this.user.role}</div>
-			<div>2FA: ${two_factor_auth ? 'Enabled' : 'Disabled'}</div>
-			<div>Created At: ${new Date(this.user.created_at).toLocaleDateString()}</div>
-			<div>Updated At: ${new Date(this.user.updated_at).toLocaleDateString()}</div>
-		</div>
-		<div class="admin-user-actions">
-			<form id="formEditName">
-			<input type="hidden" name="id" value="${this.user.id}" />
-			<label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Name:</label>
-			<input 
-				id="name"
-				type="text"
-				name="name" value="${this.user.name}" 
-				class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-				required
-			/>
-			<div id="name-error" class="font-bold text-center mb-4"></div>
-			<button type="submit" class="btn">Update Name</button>
-			</form>
-			<br><hr><br>
+          <button type="submit" class="btn">Delete User</button>
+        </form>
+        <br><hr><br>
 
-			<form id="formEditAvatar">
-				<img id="avatar-preview"
-					src=''
-					alt="Avatar Preview, select a file to see the preview"
-					style="max-width: 120px;"
-					referrerPolicy="no-referrer"
-				/>
-				<input type="hidden" name="id" value="${this.user.id}" />
-				<label for="avatar" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New avatar:</label>
-				<input					
-					id="avatar"
-					name="avatar"
-					type="file"
-					accept="image/png, image/jpeg"
-					class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-					value="${this.user.avatar || ''}"
-				 />
-				<div id="avatar-error" class="font-bold text-center mb-4"></div>
-				<button type="submit" class="btn">Update Avatar</button>
-			</form>
-			<br><hr><br>
-			<form id="formEditRole">
-				<input type="hidden" name="id" value="${this.user.id}" />
-				<label for="role" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New role:</label>
-					<select name="role" class="select-form-message">
-						<option value="user" ${this.user.role === 'user' ? 'selected' : ''}>User</option>
-						<option value="admin" ${this.user.role === 'admin' ? 'selected' : ''}>Admin</option>
-					</select>
-				<div id="role-error" class="font-bold text-center mb-4"></div>
-				<button type="submit" class="btn">Update Role</button>
-			</form>
-			<br><hr><br>
-
-			
-			<form id="formToggle2FA">
-
-				<input type="hidden" name="id" value="${this.user.id}" />
-				<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-					Are you sure you want to ${two_factor_auth ? 'disable' : 'enable'} 2FA for this user?
-				</label>
-				<label class="switch"> 
-					<input type="checkbox"  name="confirm" required/>
-					<span class="slider round"></span>
-				</label>
-				<button type="submit" class="btn">Update 2FA</button>
-			</form>
-			<br><hr><br>
-
-						
-			<form id="formDeleteUser">
-				<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-					Are you sure you want to delete this user?
-				</label>
-				<input type="hidden" name="id" value="${this.user.id}" />
-				<label class="switch"> 
-					<input type="checkbox"  name="confirm" required/>
-					<span class="slider round"></span>
-				</label>
-				<button type="submit" class="btn">Delete User</button>
-			</form>
-			<br><hr><br>
-		</div>
-	</div>
-	`;
+      </div>
+    </div>
+  `;
 	this.attachAllForm();
     this.previewImage();
   }

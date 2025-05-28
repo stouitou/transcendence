@@ -401,15 +401,10 @@ export  class TournoiDetail extends HTMLElement {
     <round-accordion data='${JSON.stringify(roundGames)}' round='${index}'></round-accordion>
   `).join('');
 	  this.innerHTML = `
-		<style>
-		  .rounds-container {
-			margin-top: 1rem;
-		  }
-		</style>
 		<div class="mx-auto p-6 text-center w-full">
 		  <h2>Détails du Tournoi #${this.tournoi.id}</h2>
 		  <p>État: ${this.tournoi.state || 'Inconnu'}</p>
-      <div class="rounds-container">
+      <div class="mt-4">
         ${accordionContent || '<p>Aucun round disponible.</p>'}
       </div>
 		</div>
@@ -460,15 +455,7 @@ export  class TournoiDetail extends HTMLElement {
 
   
 	  this.innerHTML = `
-		<style>
-		  .game-card {
-			border: 1px solid #aaa;
-			padding: 0.5rem;
-			margin-bottom: 0.5rem;
-			border-radius: 4px;
-		  }
-		</style>
-		<div class="game-card">
+		<div class="border border-gray-400 p-2 mb-2 rounded">
 		  <h4>Jeu #${this.game.id} - Difficulté : ${this.game.difficulty}</h4>
 		  <p>État: ${this.game.state}</p>
 		  <p>Date de création: ${new Date(this.game.created_at).toLocaleDateString()}</p>
