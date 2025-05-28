@@ -372,6 +372,9 @@
   input[type=range]::-moz-range-thumb {
     @apply w-3.5 h-3.5 rounded-full bg-indigo-500 border-none;
   }
+  .rem-chip{
+    @apply inline-flex w-10 h-10 items-center justify-center rounded-full bg-gray-300 shadow-inner font-semibold border-2 border-indigo-200/25 cursor-pointer;
+  }
 
   /* GAMELOBY */
   /* Font display */
