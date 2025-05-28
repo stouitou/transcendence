@@ -7,7 +7,7 @@
     "outDir": "./dist",
     "rootDir": "./src"
   },
-  "include": ["src", "vite-env.d.ts"],
+  "include": ["src", "vite-env.d.ts", "src/components/game.ts"],
   "types": [
     "babylonjs",
     "node",

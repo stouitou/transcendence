@@ -45,40 +45,23 @@ import { Game } from '../types/types';
 			}
 		}
 			
-	  if (!this.shadowRoot) return;
-	  if (!this.round) {
-		this.shadowRoot.innerHTML = '<p>Aucun round disponible.</p>';
-		console.log('data', this.getAttribute('data'));
-		return;
-	  }
-	  this.shadowRoot.innerHTML = `
-		<style>
-		  .accordion {
-			border: 1px solid #ccc;
-			margin-bottom: 0.5rem;
-			border-radius: 4px;
-			overflow: hidden;
-		  }
-		  .accordion-header {
-			
-			padding: 0.5rem;
-			cursor: pointer;
-		  }
-		  .accordion-content {
-			padding: 0.5rem;
-			display: none;
-		  }
-		  .accordion-content.active {
-			display: block;
-		  }
-		</style>
-		<div class="accordion">
-		  <div class="accordion-header">Round #${this.index} - État : {this.round.state}</div>
-		  <div class="accordion-content">
-			${this.round.map(game => `<game-card data='${JSON.stringify(game)}'></game-card>`).join('')}
-		  </div>
+		if (!this.shadowRoot) return;
+		if (!this.round) {
+			this.shadowRoot.innerHTML = '<p>Aucun round disponible.</p>';
+			console.log('data', this.getAttribute('data'));
+			return;
+		}
+
+		this.shadowRoot.innerHTML = `
+		<div class="border border-gray-300 mb-2 rounded overflow-hidden">
+			<div class="p-2 cursor-pointer">
+				Round #${this.index} - État : {this.round.state}
+			</div>
+			<div class="p-2 hidden">
+				${this.round.map(game => `<game-card data='${JSON.stringify(game)}'></game-card>`).join('')}
+			</div>
 		</div>
-	  `;
+		`;
   
 	  // Gestion du clic pour l'expandion/collapse
 	  // de l'élément d'accordéon

@@ -9,21 +9,19 @@ export class GameMenu extends HTMLElement {
         const sh = this.attachShadow({ mode: 'open' });
 
         sh.innerHTML = /*html*/`
-      <style>
-        :host   { display:flex; flex-direction:column; gap:1.4rem;
-+           align-items:center; margin-top:6rem;
-+           position:relative; z-index:20; }   /* ← NEW */
-        button  { padding:1rem 2.4rem; font-size:1.05rem;
-                  border:none; border-radius:.55rem;
-                  background:#4f46e5; color:#fff; cursor:pointer;
-                  transition:transform .15s ease; }
-        button:hover { transform:translateY(-2px); }
-      </style>
-
-      <button id="local">Start local game</button>
-      <button id="multi">Start multiplayer</button>
-      <button id="tourn">Start tournament</button>
-    `;
+        <link href="https://cdn.jsdelivr.net/npm/tailwindcss@3.4.1/dist/tailwind.min.css" rel="stylesheet">
+        <div class="flex flex-col gap-6 items-center mt-24 relative z-20">
+            <button class="px-10 py-4 text-[1.05rem] border-none rounded-lg bg-indigo-600 text-white cursor-pointer transition-transform duration-150 ease-in hover:-translate-y-0.5">
+            Start local game
+            </button>
+            <button class="px-10 py-4 text-[1.05rem] border-none rounded-lg bg-indigo-600 text-white cursor-pointer transition-transform duration-150 ease-in hover:-translate-y-0.5">
+            Start multiplayer
+            </button>
+            <button class="px-10 py-4 text-[1.05rem] border-none rounded-lg bg-indigo-600 text-white cursor-pointer transition-transform duration-150 ease-in hover:-translate-y-0.5">
+            Start tournament
+            </button>
+        </div>
+        `;
     }
 
     connectedCallback() {
