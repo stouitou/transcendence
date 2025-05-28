@@ -114,7 +114,7 @@ export const DESIGN = {
 })();
 
 /* ---------- structure helpers ---------- */
-export function createAppendix(_: number): HTMLDivElement {
+export function createAppendix(): HTMLDivElement {
     const   bar = document.createElement("div");
 
     Object.assign(bar.style, {

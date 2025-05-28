@@ -28,7 +28,7 @@ export class Home extends BaseComponent<{user: User | null}> {
             ${this.card("Dashboard", "Accédez à votre tableau de bord", "/dashboard", "📊", disable)}
             ${this.card("Jouer", "Lancez une nouvelle partie", "/game", "🎮", disable)}
             ${this.card("Profil", "Gérez vos informations personnelles", "/profile", "👤", disable)}
-            ${this.card("Classement", "Consultez le classement général", "/leaderboard", "🏆", disable)}
+            ${this.card("Classement", "Consultez le classement général", "/leaderboard", "🏆")}
             ${this.card("Paramètres", "Réglez vos préférences", "/settings", "⚙️")}
             ${this.card("Support", "Besoin d’aide ?", "/support", "❓")}
             ${user?.role === 'admin' ? this.card("Admin", "Gérez les utilisateurs et le contenu", "/admin", "👨‍💼") : ''}

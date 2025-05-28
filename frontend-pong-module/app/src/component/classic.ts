@@ -268,7 +268,7 @@ export class  classic extends LitElement {
 		this._game.webSocketManager.lobyId = this.data?.id;
 	}
 
-	firstUpdated() {
+	firstUpdated () {
 		console.log('firstUpdated: DOM is ready');
 
 		const gameCanvas   = this.shadowRoot?.querySelector('#gameCanvas')  as HTMLCanvasElement;
@@ -323,9 +323,9 @@ export class  classic extends LitElement {
 		super.disconnectedCallback();
 	}
 
-	private hideBackground(): void {
+	private hideBackground (): void {
 		const bg = document.querySelector('background-canvas-component');
-		if (bg) (bg as HTMLElement).style.display = 'none';
+		if (bg) { (bg as HTMLElement).style.display = 'none'; }
 
 		// force black at the very root, *and* show your JPG
 		document.documentElement.style.backgroundColor = 'black';
@@ -338,18 +338,18 @@ export class  classic extends LitElement {
 		document.body.style.backgroundColor   = "";  // clear your white fallback
 		document.body.style.backgroundImage   =
 			`linear-gradient(
-     rgba(255,255,255,0.8),    /* 50% white fade */
-     rgba(255,255,255,0.8)
-   ), 
-   url("/uploads/bg10.png")`;
+            rgba(255,255,255,0.8),    /* 50% white fade */
+            rgba(255,255,255,0.8)
+            ), 
+            url("/uploads/bg10.png")`;
 		document.body.style.backgroundRepeat  = "no-repeat";
 		document.body.style.backgroundSize    = "cover";
 		document.body.style.backgroundPosition= "center";
 	}
 
-	private showBackground(): void {
-		const bg = document.querySelector('background-canvas-component');
-		if (bg) (bg as HTMLElement).style.display = '';
+	private showBackground (): void {
+		const   bg = document.querySelector('background-canvas-component');
+		if (bg) { (bg as HTMLElement).style.display = ''; }
 
 		// restore original page styles
 		document.documentElement.style.backgroundColor = '';
@@ -364,7 +364,6 @@ export class  classic extends LitElement {
 		document.body.style.backgroundSize = '';
 		document.body.style.backgroundPosition = '';
 	}
-
 }
 
 // Save the component with a customize tagname
