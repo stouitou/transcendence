@@ -1,96 +1,77 @@
 import { BaseComponent } from "../frameworks/base-component";
 import { UserContext } from "../globalstate/GlobalState";
-import {User, Game, Players } from "../types/types";
+import {User, Players } from "../types/types";
 import { IWebSocketsService } from "../globalstate/WebSocketService";
+import { SettingsGameFormData } from "../types/forms.type";
+import { settingsGamePlayerconstraint } from "../utils/constraints";
 
-class PlayerConfig {
-  id?: number | null;
-  name: string | null;
-  avatar: string | null;
-  state: string | null;
-  isInGame: boolean;
-  isIA: boolean;
-
-  constructor (id: number | null, name: string | null, avatar: string | null, state: string | null, isInGame: boolean, isIA: boolean) {
-    this.id = id;
-    this.name = name;
-    this.avatar = avatar;
-    this.state = state;
-    this.isInGame = isInGame;
-    this.isIA = isIA;
-  }
-  toJSON() {
-    return {
-      id: this.id,
-      name: this.name,
-      avatar: this.avatar,
-      state: this.state,
-      isInGame: this.isInGame,
-      isIA: this.isIA
-    };
-  }
-}
-class ConfigGame {
+interface IGameSettingState {
+  user: User | null;
+  difficulty: number;
   type: string;
   format: string;
-  tournamentId: number | null;
-  maxPlayers: number;
-  isallowedRegistration: boolean;
-  gameId: number;
-  state: string;
-  players?: PlayerConfig[];
-  constructor(config:{type: string, format: string, tournamentId: number | null, maxPlayers: number, isallowedRegistration: boolean, gameId: number, state: string, players?: PlayerConfig[]}) {
-    this.type = config.type;
-    this.format = config.format;
-    this.tournamentId = config.tournamentId;
-    this.maxPlayers = config.maxPlayers;
-    this.isallowedRegistration = config.isallowedRegistration;
-    this.gameId = config.gameId;
-    this.state = config.state;
-    this.players = config.players;
-  }
-  toJSON() {
-    return {
-      type: this.type,
-      format: this.format,
-      tournamentId: this.tournamentId,
-      maxPlayers: this.maxPlayers,
-      isallowedRegistration: this.isallowedRegistration,
-      gameId: this.gameId,
-      state: this.state,
-      players: this.players
-    };
-  }
-  sendMessage(socket: IWebSocketsService | null | undefined) {
-    if (!socket) {
-      console.error("WebSocket is not initialized");
-      return;
-    }
-    const message = JSON.stringify({ type: "gameCreate", gameId: this.gameId, config: this });
-    console.log("sendMessage bu ConfigGame", message);
-    socket.sendMessage(message);
-  }
+  max_players: number;
+  players?: Players[];
+  ws?: IWebSocketsService | null;
 }
 
-export class GameSetting extends BaseComponent<{ user: User | null; difficulty: number,type:string,format:string,/* mode:string, */
-  max_players: number, players?: Players[] ,ws?: IWebSocketsService | null}> {
+export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFormData> {
   iaIndex: number = 0;
 
   constructor() {
-    super({ user: null, difficulty: 1,type:'local',format:'classic',/* mode:'normal', */ players:[{
-    type: 'local',
-    is_IA:false,
-    avatar: "/uploads/1-avatartest.jpg",
-    display_name: 'Player 1',
-    score: 0,
-    user: null
-    }],
+    super({ user: null, difficulty: 1,type:'local',format:'classic',
+      players:[{
+        type: 'local',
+        is_IA:false,
+        avatar: "/uploads/1-avatartest.jpg",
+        display_name: 'Player 1',
+        score: 0,
+        user: null
+      }],
     max_players: 4,ws:null });
   }
 
+  attachAllForm() {
+    try {
+      // attach the form handler to the form
+      const formHandlerAddPlayer = this.addForm('addPlayerForm');      
+      // add the validation constraints to the form handler
+      formHandlerAddPlayer?.addValidation(settingsGamePlayerconstraint);  
+      // attach the event handler to the form
+      this.attachEvent(this, '#addPlayerForm', 'submit', this.handleSubmitAddPlayerForm.bind(this));
+    } catch (error) {
+        console.log('Error attaching form handler:', error);
+    }
+
+    this.attachEvent(this, '#addIA', 'click', (e: Event) => {
+      e.preventDefault();
+      const form = this.querySelector('#addPlayerForm') as HTMLFormElement;
+      if (form) {
+        form.querySelector('input[name="display_name"]')?.setAttribute('value', `IA-${this.iaIndex}`);
+        form.querySelector('input[name="avatar"]')?.setAttribute('value', '/uploads/1-avatartest.jpg');
+        form.querySelector('input[name="is_IA"]')?.setAttribute('value', 'true');
+        form.querySelector('input[name="user"]')?.setAttribute('value', '');
+        // les ia ne sont autorisé que pour des parties classic et local
+        form.querySelector('input[name="is_format"]')?.setAttribute('value', 
+          (this.state.type === 'local' && this.state.format === 'classic')?'true': 'false');
+        //submit the form to add the player
+        form.requestSubmit();
+        this.iaIndex++;
+      }
+    });
+  }
+
   handlePost = async (e: Event) => {
-    if (!this.state.players || this.state.players.length < 2) {
-      console.log('Please add player before create game');
+    if (!this.state.players) {
+       this.showMessage('Please add player before create game', 'error');
+      return ;
+    }
+    if (this.state.players.length < 3 && this.state.type === 'local' && this.state.format === 'tournament') {
+      this.showMessage('Please add at least 3 players before creating a local game.', 'error');
+      return ;
+    }
+    if (this.state.players.length < 2 && this.state.type === 'local') {
+      this.showMessage('Please add at least 2 players before creating a local game.', 'error');
       return ;
     }
     e.preventDefault();
@@ -98,7 +79,6 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
       players: this.state.players,
       type: this.state.type,
       format: this.state.format,
-      // mode: this.state.mode,
       max_players: this.state.max_players,
       isallowedRegistration: true,
       difficulty: this.state.difficulty,
@@ -155,32 +135,37 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     this.setState({ ...this.state, user });
   }
 
-  setType(type: string) {
-    this.setState({ ...this.state, type });
-    //if type remote remove all players
-      const setplayer = this.state.players![0];
+  resetplayers() {
+    const type = this.state.type;
+    const setplayer = this.state.players![0];
     if (type === 'remote') {
       setplayer.type = 'remote';
       setplayer.is_IA = false;
       setplayer.user = this.state.user!.id;
-      this.setState({ ...this.state, players: [setplayer] });
     }
     if (type === 'local') { 
       setplayer.type = 'local';
       setplayer.is_IA = false;
       setplayer.user = null;
-      this.setState({ ...this.state, players: [setplayer] });
     }
+
+    if (this.state.format === 'tournament') {
+      this.state.max_players = 16;
+    }else {
+      this.state.max_players = 4;
+    }
+    this.setState({ ...this.state, players: [setplayer] });
+  }
+  setType(type: string) {
+    this.setState({ ...this.state, type });
+    this.resetplayers();
     this.render();
   }
   setFormat(format: string) {
     this.setState({ ...this.state, format });
+    this.resetplayers();
     this.render();
   }
-/*   setMode(mode: string) {
-    this.setState({ ...this.state, mode });
-    this.render();
-  } */
 
   handleDifficultyChange(event: Event) {
     event.preventDefault();
@@ -317,24 +302,45 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     <!-- ── 6. local-only IA button and add-player form ─────────────────── -->
     ${ type==='local' ? `
     <div class="block">
-      <button id="addIA" class="action-btn w-full mb-6">Ajouter une IA</button>
+      ${format != 'tournament'? `
+        <button id="addIA" class="action-btn w-full mb-6">Ajouter une IA</button>
+      ` : ''}
 
       <form id="addPlayerForm" class="space-y-6">
+			<div id="message-box" class="font-bold text-center mb-4"></div>
+
+      <!-- hidden field -->
+      <div id="is_format-error" class="error-message "></div>
+      <input type="hidden" name="is_format" value="true">
+
+      <div id="type-error" class="error-message "></div>
+      <input type="hidden" name="type" value="${this.state.type}">
+
+      <div id="is_max_players-error" class="error-message "></div>
+      <input type="hidden" name="is_max_players" value="${(this.state.players?.length?? 0) >= this.state.max_players? 'true' : 'false'}">
+      
+      <div id="is_IA-error" class="error-message "></div>
+      <input type="hidden" name="is_IA" value="false">
+
+      <div id="user-error" class="error-message "></div>
+      <input type="hidden" name="user" value="">
+
+      <div id="avatar-error" class="error-message "></div>
+      <div id="display_name-error" class="error-message "></div>
+
         <div>
-          <label class="label" for="playerName">Nom du joueur :</label>
-          <input id="playerName" name="playerName" required class="input w-full">
+          <label class="label" for="display_name">Nom du joueur :</label>
+          <input id="display_name" name="display_name" required class="input w-full">
         </div>
         <div>
-          <label class="label" for="playerAvatar">Avatar :</label>
+          <label class="label" for="avatar">Avatar :</label>
           <div class="flex items-center gap-4">
             <div id="avatarPreviewSelected">
               <img src="/uploads/1-avatartest.jpg" class="avatar-cell-img">
             </div>
-            <select id="playerAvatar" name="playerAvatar" class="input flex-1">
+            <select id="playerAvatar" name="avatar" class="input flex-1">
               <option data-image="/uploads/1-avatartest.jpg" value="/uploads/1-avatartest.jpg">Avatar 1</option>
               <option data-image="/uploads/avatar2.jpg"   value="/uploads/avatar2.jpg">Avatar 2</option>
-        <!--      <option value="3">Avatar 3</option>
-              <option value="4">Avatar 4</option> -->
             </select>
           </div>
         </div>
@@ -383,53 +389,7 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     }
   });
 
-/*   this.attachEvent(this, '#setMode', 'click', (event: Event) => {
-    const target = event.target as HTMLElement;
-    if (!target.matches('button')) return; // le clic provient d'un bouton
-    const type = target.getAttribute('data-type');
-    if (type) {
-      this.setMode(type);
-    }
-  }); */
-  this.attachEvent(this, '#addIA', 'click', (event: Event) => {
-    const target = event.target as HTMLElement;
-    if (!target.matches('button')) return; // le clic provient d'un bouton
-    if (this.state.players?.length === 4) {
-      alert('Vous ne pouvez pas ajouter plus de 4 joueurs.');
-      return;
-    }
-    const newPlayer: Players = {
-      type: 'local',
-      display_name: `IA-${this.iaIndex}`,
-      avatar: '/uploads/1-avatartest.jpg',
-      score: 0,
-      is_IA:true,
-      user: null,
-    };
-    this.iaIndex++;
-    this.setState({ players: [...this.state.players!, newPlayer] });
-    this.render(); // Re-render the component to show the updated player list
-    
-  });
-
-  this.attachEvent(this, '#addPlayerForm', 'submit', (event: Event) => {
-    event.preventDefault();
-    const form = event.target as HTMLFormElement;
-    const formData = new FormData(form);
-    const playerName = formData.get('playerName') as string;
-    const playerAvatar = formData.get('playerAvatar') as string;
-    const newPlayer: Players = {
-      type: "local",
-      display_name: playerName,
-      avatar: playerAvatar,
-      score: 0,
-      is_IA:false,
-      user: null,
-    };
-    this.setState({ players: [...this.state.players!, newPlayer] });
-    form.reset(); // Réinitialiser le formulaire après l'ajout du joueur
-    this.render(); // Re-render the component to show the updated player list
-  });
+  this.attachAllForm();
 
   this.attachEvent(this, '#start-game', 'click', this.handlePost.bind(this));
     
@@ -449,5 +409,41 @@ export class GameSetting extends BaseComponent<{ user: User | null; difficulty: 
     }
   })
   }
+
+  handleSubmitAddPlayerForm(e: Event) {
+      e.preventDefault()
+      const formHandler = this.getFormHandler('addPlayerForm');
+      if (!formHandler?.validateForm()) {
+        this.showMessage('Please fix the errors in the form.', 'error');
+        return;
+      }
+      try {
+        const formData = formHandler.getFormData();
+        //check player unique name
+        const playerName = formData.display_name;
+        const existingPlayer = this.state.players?.find(p => p.display_name === playerName);
+        console.log('existingPlayer', existingPlayer);
+        if (existingPlayer) {
+          this.showMessage(`Player with name ${playerName} already exists.`, 'error');
+          return;
+        }
+        const newPlayer: Players = {
+          type: "local",
+          display_name: playerName,
+          avatar: formData.avatar,
+          score: 0,
+          is_IA:formData.is_IA === 'true',
+          user: null,
+        };
+        this.setState({ players: [...this.state.players!, newPlayer] });
+        const form = this.querySelector('#addPlayerForm') as HTMLFormElement;
+        if (form) {
+          form.reset(); // Réinitialiser le formulaire après l'ajout du joueur
+          this.render(); // Re-render the component to show the updated player list
+        }
+      } catch (error) {
+        this.apiErrorHandler(error);
+      }
+    }
 
 }

@@ -1,6 +1,6 @@
 import { FieldValidation } from '../frameworks/base-form';
-import { EditAvatarFormData, EditDeleteUserFormData, EditNameFormData, EditRoleFormData, EditToggleTwoFAFormData, ForgotPasswordFormData, LoginFormData, ProfileUpdateAddFriendFormData, ProfileUpdateDeleteFormData, ProfileUpdateNameFormData, ProfileUpdatePasswordFormData, ProfileUpdateRemoveFriendFormData, RegisterFormData, ResetPasswordFormData, SettingsUpdateLangFormData, TwoFactorAuthFormData } from '../types/forms.type';
-import { checkboxValidator, emailValidator, passwordValidator, SettingLangValidator } from './validators';
+import { EditAvatarFormData, EditDeleteUserFormData, EditNameFormData, EditRoleFormData, EditToggleTwoFAFormData, ForgotPasswordFormData, LoginFormData, ProfileUpdateAddFriendFormData, ProfileUpdateDeleteFormData, ProfileUpdateNameFormData, ProfileUpdatePasswordFormData, ProfileUpdateRemoveFriendFormData, RegisterFormData, ResetPasswordFormData, SettingsGamePlayerFormData, SettingsUpdateLangFormData, TwoFactorAuthFormData } from '../types/forms.type';
+import { checkboxValidator, emailValidator, hiddenCheckboxValidator, hiddenisformatValidator, passwordValidator, SettingLangValidator } from './validators';
 
 
 /*
@@ -374,4 +374,64 @@ export const settingsditLangconstraint: { [fieldName in keyof SettingsUpdateLang
 		message: 'Please enter a valid role.',
 		messageConstraint: true,
 	}
+}
+
+export const settingsGamePlayerconstraint: { [fieldName in keyof SettingsGamePlayerFormData]: FieldValidation } = {
+	is_max_players: {
+		required: true,
+		type: 'text',
+		customValidator: hiddenCheckboxValidator,
+		message: 'Please confirm if the game is for max players.',
+		messageConstraint: true,
+	},
+	is_format: {
+		required: true,
+		type: 'text',
+		customValidator: hiddenisformatValidator,
+		message: 'Please confirm if the game format.',
+		messageConstraint: true,
+	},
+	type: {
+		required: true,
+		type: 'text',
+		constraint: {
+			minLength: 5,
+			maxLength: 5,
+			allowedPattern: 'a-zA-Z',
+		},
+		message: 'Please enter a valid type.',
+		messageConstraint: true,
+	},
+	avatar: {
+		required: true,
+		type: 'text',
+		//customValidator: SettingLangValidator,
+		message: 'Please enter a valid avatar.',
+		messageConstraint: true,
+	},
+	display_name: {
+		required: true,
+		type: 'text',
+		constraint: {
+			minLength: 2,
+			maxLength: 20,
+			allowedPattern: 'a-zA-Z0-9_@.-',
+		},
+		message: 'Please enter a valid display name.',
+		messageConstraint: true,
+	},
+	is_IA: {
+		type: 'checkbox',
+		customValidator: checkboxValidator,
+		message: 'Please confirm if the player is an IA.',
+		messageConstraint: true,
+	},
+	user: {
+		type: 'number',
+		constraint: {
+			min: 1,
+		},
+		message: 'Please enter a valid user ID.',
+		messageConstraint: true,
+	},
 }
