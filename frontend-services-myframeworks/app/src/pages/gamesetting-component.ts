@@ -208,7 +208,7 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
 
     <!-- ── 1. difficulty slider ───────────────────────────────────────── -->
     <div class="block text-center">
-      <h3 class="text-lg font-semibold">Difficulté du jeu</h3>
+      <h3 class="text-lg font-semibold">${this.t("GAME.GAME_DIFF")}</h3>
 
       <div class="relative w-full h-3 mt-4 rounded-full bg-white/40 overflow-hidden">
         <div id="progress"
@@ -219,25 +219,25 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
                class="slider-thumb w-full h-full opacity-0 cursor-pointer">
       </div>
 
-      <p class="mt-2 text-sm">Difficulté actuelle: <b>${difficulty}</b></p>
+      <p class="mt-2 text-sm">${this.t("GAME.ACT_DIFF")}: <b>${difficulty}</b></p>
     </div>
 
     <!-- ── 2. toggles (IDs unchanged so old listeners keep working) ────── -->
     <div class="block flex flex-col items-center gap-4">
 
       <div id="setType" class="toggle-row">
-        <button class="btn toggle-btn ${type==='local' ? 'on':'off'}"  data-type="local">Local</button>
-        <button class="btn toggle-btn ${type!=='local'? 'on':'off'}"    data-type="remote">Remote</button>
+        <button class="btn toggle-btn ${type==='local' ? 'on':'off'}"  data-type="local">${this.t("GAME.LOCAL")}</button>
+        <button class="btn toggle-btn ${type!=='local'? 'on':'off'}"    data-type="remote">${this.t("GAME.REMOTE")}</button>
       </div>
 
       <div id="setFormat" class="toggle-row">
-        <button class="btn toggle-btn ${format==='classic' ? 'on':'off'}" data-type="classic">Classic</button>
-        <button class="btn toggle-btn ${format!=='classic'? 'on':'off'}"  data-type="tournament">Tournament</button>
+        <button class="btn toggle-btn ${format==='classic' ? 'on':'off'}" data-type="classic">${this.t("GAME.CLASSIC")}</button>
+        <button class="btn toggle-btn ${format!=='classic'? 'on':'off'}"  data-type="tournament">${this.t("TOURNAMENT.TITLE")}</button>
       </div>
 
      <!-- <div id="setMode" class="toggle-row">
-        <button class="btn toggle-btn {mode==='normal' ? 'on':'off'}"  data-type="normal">Normal</button>
-        <button class="btn toggle-btn {mode==='advanced' ? 'on':'off'}" data-type="advanced">Advanced</button>
+        <button class="btn toggle-btn {mode==='normal' ? 'on':'off'}"  data-type="normal">${this.t("GAME.NORMAL")}</button>
+        <button class="btn toggle-btn {mode==='advanced' ? 'on':'off'}" data-type="advanced">${this.t("GAME.ADVANCED")}</button>
       </div> -->
     </div>
 
@@ -303,7 +303,7 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
     ${ type==='local' ? `
     <div class="block">
       ${format != 'tournament'? `
-        <button id="addIA" class="action-btn w-full mb-6">Ajouter une IA</button>
+        <button id="addIA" class="action-btn w-full mb-6">${this.t("GAME.AI")}</button>
       ` : ''}
 
       <form id="addPlayerForm" class="space-y-6">
@@ -329,7 +329,7 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
       <div id="display_name-error" class="error-message "></div>
 
         <div>
-          <label class="label" for="display_name">Nom du joueur :</label>
+          <label class="label" for="display_name">${this.t("GAME.PLAYER_NAME")} :</label>
           <input id="display_name" name="display_name" required class="input w-full">
         </div>
         <div>
@@ -345,13 +345,13 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
           </div>
         </div>
 
-        <button id="addPlayer" class="action-btn w-full">Ajouter Joueur</button>
+        <button id="addPlayer" class="action-btn w-full">${this.t("GAME.PLAYER_ADD")}</button>
       </form>
     </div>` : '' }
 
     <!-- ── 7. start button ─────────────────────────────────────────────── -->
     <div class="block flex justify-center">
-      <button id="start-game" class="action-btn w-56">Create Game</button>
+      <button id="start-game" class="action-btn w-56">${this.t("GAME.PHRASE")}</button>
     </div>
   </div>
 `;
