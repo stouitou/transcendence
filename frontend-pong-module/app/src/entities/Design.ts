@@ -115,7 +115,7 @@ export const DESIGN = {
 
 /* ---------- structure helpers ---------- */
 export function createAppendix(): HTMLDivElement {
-    const   bar = document.createElement("div");
+    const bar = document.createElement("div");
 
     Object.assign(bar.style, {
         width               : `${CANVAS_WIDTH}px`,
@@ -307,17 +307,17 @@ export function drawPaddle(
 }
 
 // /* ---------- scoreboard cell helper ---------- */
-const style = document.createElement("style");
-style.textContent = `
-  .score-cell{
-    margin: 56px;
-    color:${DESIGN.accentColor};
-    text-align:center;
-    white-space:nowrap;
-    overflow:visible;
-    text-overflow:clip;
-    width:100%;
-    line-height: 34px;
-  }`;
-document.head.appendChild(style);
-// >>>>>>> origin
+// const style = document.createElement("style");
+// style.textContent = `
+//   .score-cell{
+//     margin: 56px;
+//     color:${DESIGN.accentColor};
+//     text-align:center;
+//     white-space:nowrap;
+//     overflow:visible;
+//     text-overflow:clip;
+//     width:100%;
+//     line-height: 34px;
+//   }`;
+// document.head.appendChild(style);
+// // >>>>>>> origin

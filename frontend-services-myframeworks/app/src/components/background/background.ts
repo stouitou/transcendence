@@ -31,11 +31,11 @@ export class BackgroundCanvas extends BaseComponent {
   render() {
     this.cleanup();
     this.innerHTML = `         
-      <div id="canvasContainer" class="fixed top-0 left-0 w-full h-full z-0">
-          <canvas id="canvasContent" class="absolute top-0 left-0 w-full h-full"></canvas>
-      </div>
-    `;
-
+    <div id="canvasContainer" class="fixed top-0 left-0 w-full h-full z-0"
+         style="background-image: url('/uploads/bg10.png'); background-size: cover; background-position: center;">
+        <canvas id="canvasContent" class="absolute top-0 left-0 w-full h-full"></canvas>
+    </div>
+  `;
     const container = this.querySelector('#canvasContainer')! as HTMLDivElement;
     const canvas = this.querySelector('#canvasContent')! as HTMLCanvasElement;
     this.canvas = canvas;
@@ -44,19 +44,6 @@ export class BackgroundCanvas extends BaseComponent {
 
   initBackground(container: HTMLElement, canvas: HTMLCanvasElement) {
     if (!container || !canvas) return;
-
-    // Put your PNG behind the transparent canvas
-    Object.assign(container.style, {
-      backgroundImage:    `linear-gradient(
-     rgba(255,255,255,0.8),    /* 50% white fade */
-     rgba(255,255,255,0.8)
-   ), 
-   url("/uploads/bg10.png")`,
-      backgroundSize:    'cover',
-      backgroundPosition:'center',
-      backgroundRepeat:  'no-repeat',
-
-    } as Partial<CSSStyleDeclaration>);
 
     // Babylon engine & scene (with alpha framebuffer)
     this.engine = new Engine(canvas, true, {
@@ -69,7 +56,7 @@ export class BackgroundCanvas extends BaseComponent {
 
     // Transparent clear so background shows through
     const lightClear = new Color4(1, 1, 1, 0);
-    const darkClear  = new Color4(0.2, 0.2, 0.2, 1);
+    const darkClear  = new Color4(0.1, 0.1, 0.1, 1);
     this.scene.clearColor = getThemeColor() === 'light' ? lightClear : darkClear;
 
     // Ensure the <canvas> itself is transparent in CSS
@@ -169,7 +156,7 @@ export class BackgroundCanvas extends BaseComponent {
   createDefaultMaterials(scene: Scene): StandardMaterial[] {
     const colors = getThemeColor() === 'light'
         ? ["#ff0063", "#ff0000", "#00ffa1", "#0032ff", "#d7b5ff", "#FFD1BA"]
-        : ["#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff", "#ffffff"];
+        : ["#ff0063", "#ff0000", "#00ffa1", "#0032ff", "#d7b5ff", "#FFD1BA"];
     return colors.map((color, index) => {
       const mat = new StandardMaterial(`mat${index}`, scene);
       mat.diffuseColor  = Color3.FromHexString(color);

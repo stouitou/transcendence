@@ -8,7 +8,14 @@
 /* Optional: Custom styles using Tailwind’s @apply */
 @layer base {
   body {
-    @apply bg-white text-black dark:bg-transparent dark:text-white;
+    @apply text-black dark:bg-transparent dark:text-white;
+  }
+
+  #canvasContainer {
+    background-image: url('/uploads/bg10.png');
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
   }
 
   header {
@@ -135,16 +142,6 @@
     @apply absolute w-full h-full z-[1000];
   }
 
-  .player-score {
-    @apply relative flex w-4/5 h-auto m-[5px] text-black whitespace-nowrap overflow-visible text-clip leading-[26px];
-  }
-
-  .score-cell {
-    @apply p-0 text-center text-black;
-  }
-  .score-cell.score-cell-points {
-    @apply py-0 px-5;
-  }
 
   .alert.show {
     @apply block;
