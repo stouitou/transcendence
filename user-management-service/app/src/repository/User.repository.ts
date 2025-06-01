@@ -9,6 +9,7 @@ import Helpers, { IParams } from "../repository/helpers";
 import { User } from "../models/User";
 import { IRepository } from "./Base/IRepository";
 import { BaseRepository } from "./Base/BaseRepository";
+import { errorDebugLog } from "@src/middlewares/logger.middleware";
 
 /**
  * UserRepository - Gestion des appels HTTP à la DB
@@ -57,7 +58,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
   };
 
   private getRelations = (): string => {
-    console.log("🔐 UserRepository.getRelations()  --this.RELATIONS--",this.RELATIONS)
+   // console.log("🔐 UserRepository.getRelations()  --this.RELATIONS--",this.RELATIONS)
     if (this.RELATIONS.length === 0) {
       return "";
     }
@@ -90,10 +91,11 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
  getById= async (id: number): Promise<User | null> => {
       
     const url = `${this.URL}/id/${id}${this.getRelations()}`;//{this.getRelations()}
-    console.log("🔐 UserRepository.getById()  --url--",url)
+  //  console.log("🔐 UserRepository.getById()  --url--",url)
+   errorDebugLog("UserRepository", "getById", `🔐 UserRepository.getById()  url:`,url);
     const response = await fetch(url);
     const  result  = await response.json();
-    console.log("🔐User.repository.ts UserRepository.getById()  --data--"/* ,result */)
+   // console.log("🔐User.repository.ts UserRepository.getById()  --data--"/* ,result */)
    const { data } = result
     return data?? null;
   }
@@ -105,7 +107,8 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
     const  data  = await response.json();
     console.log("🔐User.repository.ts UserRepository.getUsersLeaderboard()  --data--"/* ,result */)
    const results = data.data
-    return {...results};
+   return results?results:[]; //return empty array if no data
+  //  return {...results};
   }
   
 
@@ -180,7 +183,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
     //2- ajouter le new id de l'ami
     friendsIds.push(friendId);
     //3- update
-    const response = await fetch(`${this.URL}/id/${userId}`, {
+    const response = await fetch(`${this.URL}/id/${userId}?relations=friends`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -188,7 +191,15 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
       }),
     });
     const data = await response.json();
-    return data;
+    if (!data) {
+      throw new Error("Failed to add friend");
+    }
+    const userUpdated =data.data;
+    if (!userUpdated) {
+      throw new Error("User update failed");
+    }
+    return userUpdated;
+   // return data;
   }
 
   removeFriend = async (userId: number, friendId: number): Promise<boolean> => {
@@ -207,7 +218,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
     //2- supprimer le new id de l'ami
     const newFriendsIds = friendsIds.filter((id: number) => id !== friendId);
     //3- update
-    const response = await fetch(`${this.URL}/id/${userId}`, {
+    const response = await fetch(`${this.URL}/id/${userId}?relations=friends`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify({
@@ -215,7 +226,15 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
       }),
     });
     const data = await response.json();
-    return data;
+    if (!data) {
+      throw new Error("Failed to remove friend");
+    }
+    const userUpdated =data.data;
+    if (!userUpdated) {
+      throw new Error("User update failed");
+    }
+    return userUpdated;
+   // return data;
   }
 }
 export default UserRepository;

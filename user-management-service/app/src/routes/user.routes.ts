@@ -4,7 +4,7 @@ import { UserSchema } from '../schemas/user.schema';
 
 import  { AuthMiddleware } from "../middlewares/auth.middleware";
 
-//@TODO pour tester les hooks
+//@TODO supprimer ce fichier et utiliser userMe.routes.ts et userAdmin.routes.ts
 
 
 async function userRoutes(app: FastifyInstance) {

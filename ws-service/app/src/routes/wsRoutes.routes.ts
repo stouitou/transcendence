@@ -32,8 +32,8 @@ async function wsRoutes(app: FastifyInstance) {
       }
 
       //3- Appel du service d'authentification pour vérifier le token
-   //   const res = await fetch('http://auth_services:3000/internal/auth/me', {
-      const res = await fetch('http://user-management-service:3000/api/users/me', {
+      const res = await fetch('http://auth_services:3000/internal/auth/me', {
+   //   const res = await fetch('http://user-management-service:3000/api/users/me', {
         method: 'GET',
         headers: {
           'Authorization': authHeader,
@@ -42,6 +42,7 @@ async function wsRoutes(app: FastifyInstance) {
       });
       //4- Vérification de la réponse
       const data = await res.json();
+      console.log("🔗 userRoutes onRequest data : ",data)
       //4-1 Si la réponse n'est pas ok, utilisateur non authentifié
       if (!res.ok) {
         console.error("not ok")

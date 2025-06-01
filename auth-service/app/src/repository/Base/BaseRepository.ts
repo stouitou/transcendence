@@ -28,7 +28,7 @@ export abstract class BaseRepository<T> {
   abstract create(entity: Partial<T>): Promise<T>;
   abstract getAll(): Promise<T[]>;
   abstract getById(id: number): Promise<T | null>;
-  abstract getByParams(params: any): Promise<T[] | null>;//@TODO any or Partial<T>
+  abstract getByParams(params: any): Promise<T[] | null>;// any or Partial<T>
   abstract getOneByParams (params: any) : Promise<T | null>;
   abstract update(entity: Partial<T>): Promise<T | null>;
   abstract delete(id: number): Promise<boolean>;

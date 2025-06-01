@@ -36,8 +36,15 @@ export class TournamentService {
 			console.error('Players is required');
 		throw { status: 400, message: 'body.players is required' };
 		}
-		
-		const tournament = await this.tournamentRepo.create({players:players, state:"created",max_players, type, currentRound:0});
+    let currentMaxPlayers = max_players || 16; // Default to 4 if not specified
+    //adpater le max_players au nombre de players
+    if (players.length <= 4 ) currentMaxPlayers = 4;
+    else if (players.length <= 8) currentMaxPlayers = 8;
+    else if (players.length <= 16) currentMaxPlayers = 16;
+    else throw { status: 400, message: 'Too many players for a tournament' }; // Limit to powers of two
+    // 4, 8, 16
+
+		const tournament = await this.tournamentRepo.create({players:players, state:"created",max_players:currentMaxPlayers, type, currentRound:0});
 		if (!tournament) throw { status: 400, message: 'Tournament creation failed' };
 
 		const games = await this.gameService.createFirstRoundGames(tournament, configPlayers.players, 0);

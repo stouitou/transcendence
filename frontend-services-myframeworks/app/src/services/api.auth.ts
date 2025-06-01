@@ -17,7 +17,7 @@ export const registerUser = async (data: RegisterData): Promise<void> => {
 export const loginUser = async (data: LoginData): Promise<{ twoFactorRequired: boolean|null, tempToken:any|null,token:any|null}> => {
     return apiRequest('/api/auth/login', 'POST', data);
 };
-
+ 
 export const forgotPassword = async (email: string): Promise<{ twoFactorRequired: boolean|null, tempToken:any|null,token:any|null}> => {
     return apiRequest('/api/auth/login/forget-password', 'POST', { email });
 };
@@ -26,6 +26,7 @@ export const resetPassword = async (password: string): Promise<{ twoFactorRequir
     return apiRequest('/api/auth/login/reset-password', 'POST', { password });
 };
 export const fetchProfileData = async (): Promise<any |void> => {
+  //  alert('fetchProfileData');
     return apiRequest('/api/users/me', 'GET');
 };
 export const logoutUser = async (): Promise<void> => {

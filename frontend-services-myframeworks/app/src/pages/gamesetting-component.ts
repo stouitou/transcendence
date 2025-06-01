@@ -89,7 +89,7 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
         console.error('Failed to fetch CSRF token for WebSocket');
         return;
       }
-      const wsCSRFToken = await response.json();
+      const wsCSRFToken = await response.json();//@TODO gameId: 1 pourquoi??
       this.state.ws?.sendMessage(JSON.stringify({ type: "gameCreate", gameId: 1, config: config ,wsCSRFToken:wsCSRFToken.token}));
       return;
     } catch (error) {
@@ -146,7 +146,7 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
     if (type === 'local') { 
       setplayer.type = 'local';
       setplayer.is_IA = false;
-      setplayer.user = null;
+      setplayer.user = this.state.user!.id;
     }
 
     if (this.state.format === 'tournament') {

@@ -1,6 +1,6 @@
 import crypto from "crypto";
 
-const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "def_32_byte_key_1234567890123456"; // 32 bytes//@TODO remove this key
+const ENCRYPTION_KEY = process.env.ENCRYPTION_KEY || "def_32_byte_key_1234567890123456";
 //const ENCRYPTION_KEY = crypto.randomBytes(32).toString("hex"); // 32 bytes
 const IV_LENGTH = 12; // Longueur du vecteur d'initialisation (IV)
 

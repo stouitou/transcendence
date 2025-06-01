@@ -9,6 +9,23 @@ const app = server();
 async function start() {
   //1- Enregistrement des plugins
   await registerPlugins(app);
+
+
+  app.addHook('onRequest', async (request, reply) => {
+    console.log(`[${new Date().toLocaleString()}] ${request.method} ${request.url}`);
+  });
+
+  app.addHook('onResponse', async (request, reply) => {
+    // Log uniquement les succès (statut 2xx)
+    if (reply.statusCode >= 200 && reply.statusCode < 300) {
+      console.log(`[SUCCESS] ${request.method} ${request.url} - ${reply.statusCode}`);
+      // le body si besoin :
+      // console.log('Response payload:', reply.payload);
+    }else if (reply.statusCode >= 400) {
+      console.error(`[ERROR] ${request.method} ${request.url} - ${reply.statusCode}`);
+      // console.error('Response payload:', reply.payload);
+    }
+  });
   //2- Enregistrer les routes
 	await app.register(gameHistoryRoutes, { prefix: "/internal/gameHistory" });
 	await app.register(gameRoutes, { prefix: "/internal/games" });

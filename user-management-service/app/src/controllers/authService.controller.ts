@@ -1,4 +1,6 @@
 
+import { ErrorFactory } from '@src/Errors/ErrorFactory';
+import { ValidationError } from '@src/Errors/errors';
 import { FastifyRequest } from 'fastify';
 
 export class AuthServiceController {
@@ -41,14 +43,13 @@ export class AuthServiceController {
   // Vérifier le statut 2FA
   async status2FA(req: FastifyRequest): Promise<any> {
   const response = await fetch(`${this.authServiceUrl}/2fa/status/me`, {
-    //  const response = await fetch(`http://auth_services:3000/api/auth/2fa/status`, {
       method: 'GET',
       headers: this.getHeaders(req),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(`Failed to fetch 2FA status: ${error.message}`);
+      throw ErrorFactory.fromRemoteError(error);
     }
 
     return await response.json();
@@ -60,14 +61,13 @@ export class AuthServiceController {
       throw new Error('User ID is required');
     }
   const response = await fetch(`${this.authServiceUrl}/2fa/status/${id}`, {
-    //  const response = await fetch(`http://auth_services:3000/api/auth/2fa/status`, {
       method: 'GET',
       headers: this.getHeaders(req),
     });
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(`Failed to fetch 2FA status: ${error.message}`);
+      throw ErrorFactory.fromRemoteError(error);
     }
 
     return await response.json();
@@ -84,7 +84,7 @@ export class AuthServiceController {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(`Failed to enable 2FA: ${error.message}`);
+      throw ErrorFactory.fromRemoteError(error);
     }
 
     return await response.json();
@@ -100,7 +100,7 @@ export class AuthServiceController {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(`Failed to disable 2FA: ${error.message}`);
+      throw ErrorFactory.fromRemoteError(error);
     }
 
     return await response.json();
@@ -110,12 +110,12 @@ export class AuthServiceController {
     const { id } = req.params as { id: number };
     if (!id) {
       console.error('[disable2FAById] User ID is required');
-      throw new Error('User ID is required');
+      throw new ValidationError('User ID is required', 'id');
     }
     const response = await fetch(`${this.authServiceUrl}/2fa/disable/${id}`, {
       method: 'PUT',
       headers: this.getHeaders(req),
-      body: JSON.stringify({ /* userId: req.authenticatedUser?.id */ }),
+      body: JSON.stringify({ }),
     });
 
     if (!response.ok) {
@@ -123,37 +123,30 @@ export class AuthServiceController {
       console.error('[disable2FAById] Failed to disable 2FA');
       console.error('[disable2FAById] Response:', response);
       const error = await response.json();
-      console.error('[disable2FAById] Error:', error);
-      throw new Error(`Failed to disable 2FA: ${error.message || error.error || 'unknown error'}`);
+      console.error('[disable2FAById] Error details:', error);
+      throw ErrorFactory.fromRemoteError(error);
     }
 
     return await response.json();
   }
   // Générer un QR code pour le 2FA
   async generate2FAQrCode(req: FastifyRequest): Promise<any> {
-    try {
-      const response = await fetch(`${this.authServiceUrl}/2fa/qrcode`, {
+      const response = await fetch(`${this.authServiceUrl}/2fa/qrcode`, { 
         method: 'GET',
         headers: this.getHeaders(req),
-      //  body: JSON.stringify({ userId: req.authenticatedUser?.id }),
       });
 
       if (!response.ok) {
         const error = await response.json();
-        throw new Error(`Failed to generate 2FA QR code: ${error.message}`);
+        throw ErrorFactory.fromRemoteError(error);
       }
       // Vérifier si le type de contenu est image/png
       const contentType = response.headers.get('Content-Type');
       if (contentType !== 'image/png') {
-        throw new Error(`Unexpected content type: ${contentType}`);
-      }else {
-        console.log('QR code generated successfully');
+        throw new ValidationError('Invalid content type for QR code', 'contentType');
       }
 
       return response;
-    } catch (error) {
-      throw new Error(`ERROR [generate2FAQrCode] Failed to generate 2FA QR code: ${error.message}`);
-    }
   }
 
     async verify2FA(req: FastifyRequest): Promise<any> {
@@ -166,7 +159,7 @@ export class AuthServiceController {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(`Failed to verify 2FA: ${error.message}`);
+      throw ErrorFactory.fromRemoteError(error);
     }
 
     return await response.json();
@@ -176,8 +169,6 @@ export class AuthServiceController {
   async updateMePassword(req: FastifyRequest): Promise<any> {
 
     const { oldPassword,newPassword } = req.body as { oldPassword: string;	newPassword: string; };
-    console.log("🔐 AuthServiceController.updateMePassword()  --oldPassword",oldPassword)
-    console.log("🔐 AuthServiceController.updateMePassword()  --newPassword",newPassword)
     const response = await fetch(`${this.authServiceUrl}/updatePassword/me`, {
       method: 'PUT',
       headers: this.getHeaders(req),
@@ -186,7 +177,7 @@ export class AuthServiceController {
 
     if (!response.ok) {
       const error = await response.json();
-      throw new Error(`Failed to update password : ${error.message}`);
+      throw ErrorFactory.fromRemoteError(error);
     }
     //204 no content
     if (response.status === 204) {

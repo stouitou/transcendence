@@ -44,7 +44,7 @@ export class EntityRepository<T extends ObjectLiteral> {
 
   // 📌 🔍 Trouver un élément par ID avec relations optionnelles
   async findById(id: number, relations: string[] = []): Promise<T | null> {
-    console.log("🚀 ~ file: Entity.repository.ts ~ line 77 ~ EntityRepository ~ findById ~ id", id)
+  //  console.log("🚀 ~ file: Entity.repository.ts ~ line 77 ~ EntityRepository ~ findById ~ id", id)
     return this.repo.findOne({ where: { id } as any, relations } as FindOneOptions<T>);
   }
 
@@ -106,14 +106,14 @@ export class EntityRepository<T extends ObjectLiteral> {
     }  */
 
 
-    console.log("🚀 update ~ data", data)
+  //  console.log("🚀 update ~ data", data)
     //1️⃣ Filtrer les propriétés valides
     const cleanData = filterValidProperties(this.repo,data);
-    console.log("🚀 cleandata", cleanData)
+  //  console.log("🚀 cleandata", cleanData)
     //2️⃣ mettre a jour les relation si il y en a
    
     if (Object.keys(cleanData).length === 0) {
-      console.warn("⚠️ Aucune donnée valide à mettre à jour.");
+    //  console.warn("⚠️ Aucune donnée valide à mettre à jour.");
       return entity;
     }
 
