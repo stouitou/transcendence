@@ -30,12 +30,19 @@ export class BackgroundCanvas extends BaseComponent {
 
   render() {
     this.cleanup();
-    this.innerHTML = `         
-    <div id="canvasContainer" class="fixed top-0 left-0 w-full h-full z-0"
-         style="background-image: url('/uploads/bg10.png'); background-size: cover; background-position: center;">
-        <canvas id="canvasContent" class="absolute top-0 left-0 w-full h-full"></canvas>
-    </div>
-  `;
+    this.innerHTML = `
+  <div id="canvasContainer" class="fixed top-0 left-0 w-full h-full z-0"
+       style="
+         background-image:
+           linear-gradient(rgba(255,255,255,0.8), rgba(255,255,255,0.8)),
+           url('/uploads/bg10.png');
+         background-size: cover;
+         background-position: center;
+       ">
+      <canvas id="canvasContent" class="absolute top-0 left-0 w-full h-full"></canvas>
+  </div>
+`;
+
     const container = this.querySelector('#canvasContainer')! as HTMLDivElement;
     const canvas = this.querySelector('#canvasContent')! as HTMLCanvasElement;
     this.canvas = canvas;

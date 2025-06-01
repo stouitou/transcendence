@@ -18,36 +18,15 @@ export class Renderer {
 	constructor() {}
 
 	/* ---------- getters / setters UI ---------- */
-	get gameCanvas(): HTMLCanvasElement | null {
-		return this._canvas;
-	}
-	get gameDivUi(): HTMLElement | null {
-		return this._gameUi;
-	}
-	get gameDivAlert(): HTMLElement | null {
-		return this._gameAlert;
-	}
+	get gameCanvas(): HTMLCanvasElement | null { return this._canvas; }
+	get gameDivUi(): HTMLElement | null       { return this._gameUi; }
+	get gameDivAlert(): HTMLElement | null    { return this._gameAlert; }
 
-	set canvas(canvas: HTMLCanvasElement) {
-		this._canvas = canvas;
-		this._ctx = canvas.getContext('2d')!;
-	}
-
-	set gameUi(div: HTMLElement) {
-		this._gameUi = div;
-	}
-
-	set gameAlert(div: HTMLElement) {
-		this._gameAlert = div;
-	}
-
-	set gameHero(div: HTMLElement) {
-		this._gameHero = div;
-	}
-
-	set gameHeroTree(div: HTMLElement) {
-		this._gameHeroTree = div;
-	}
+	set canvas(canvas: HTMLCanvasElement)   { this._canvas = canvas; this._ctx = canvas.getContext('2d')!; }
+	set gameUi(div: HTMLElement)            { this._gameUi = div; }
+	set gameAlert(div: HTMLElement)         { this._gameAlert = div; }
+	set gameHero(div: HTMLElement)          { this._gameHero = div; }
+	set gameHeroTree(div: HTMLElement)      { this._gameHeroTree = div; }
 
 	/**
 	 * Called once when the game starts (or when you want to show the scoreboard).
@@ -58,36 +37,33 @@ export class Renderer {
 	 *   4) Draws the static background under the canvas.
 	 */
 	setupDisplay() {
-		if (!this._canvas) {
-			throw new Error('Game canvas not found');
-		}
+		if (!this._canvas) { throw new Error('Game canvas not found'); }
 
-		// 1) Size the <canvas>
+		// Size the <canvas> element
 		this._canvas.style.verticalAlign = 'top';
 		this._canvas.height = CANVAS_HEIGHT;
 		this._canvas.width  = CANVAS_WIDTH;
 
-		// 2) Create one <div class="score-grid">
+		// Create one <div class="score-grid"> container
 		this._score = Design.createAppendix();
 		this._score.classList.add('score-grid');
 
 		// ── STRIP OUT ANY INLINE STYLES THAT createAppendix() ADDED ──
 		this._score.removeAttribute('style');
 
-		// 3) Now let our CSS take over width/height:
-		//    (the CSS will set .score-grid { width: 100%; ... })
-		//    If you want, you can explicitly set them here as well:
+		// Let CSS in the Lit component handle width/height/padding
+		// (the CSS sets .score-grid { width:100%; … })
+		// Optionally set them here anyway:
 		// this._score.style.width  = '100%';
 		// this._score.style.height = 'auto';
 
-		// 4) Clear out #game-ui (which is currently empty) and append our single grid
+		// Clear out anything in #game-ui, then append our single .score-grid
 		this._gameUi!.innerHTML = '';
 		this._gameUi?.appendChild(this._score);
 
-		// 5) Draw the background beneath the canvas
+		// Draw static background (beneath canvas)
 		Design.drawBackground(this._ctx);
 	}
-
 
 	/**
 	 * Populates the single .score-grid with four <div class="player-score …"> bubbles.
@@ -132,10 +108,7 @@ export class Renderer {
 	 * Renders a countdown frame (e.g. "3", "2", "1") in the very center of the canvas.
 	 */
 	renderCountdown(countdown: number) {
-		if (!this._ctx || !this._canvas) {
-			console.error('Game context is not set.');
-			return;
-		}
+		if (!this._ctx || !this._canvas) { console.error('Game context is not set.'); return; }
 
 		// Clear entire canvas and redraw background
 		this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
@@ -153,7 +126,6 @@ export class Renderer {
 	 */
 	draw(ball: Ball, players: Player[]) {
 		this.clear();
-
 		Design.drawBackground(this._ctx);
 
 		// Draw the ball
@@ -174,10 +146,7 @@ export class Renderer {
 	 * Clears the entire HTML canvas area.
 	 */
 	private clear() {
-		if (!this._ctx || !this._canvas) {
-			console.error('Game context is not set.');
-			return;
-		}
+		if (!this._ctx || !this._canvas) { console.error('Game context is not set.'); return; }
 		this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
 	}
 
@@ -263,24 +232,37 @@ export class Renderer {
 		const div = this._gameHero as HTMLDivElement;
 		if (!div) return;
 
-		// 1) Show the hero container
+		// If there are no players, hide immediately
+		if (!data.players || data.players.length === 0) {
+			div.innerHTML = '';
+			div.style.display = 'none';
+			return;
+		}
+
+		// Build a <div class="hero-chip"> for each player,
+		// and insert <span class="vs-text">VS</span> between them:
+		const heroHtml = data.players
+			.map((p) => `<div class="hero-chip">${p.name}</div>`)
+			.join(`<span class="vs-text">VS</span>`);
+
 		div.innerHTML = `
     <div class="hero-row">
-      <div class="hero-chip">${data.players[0].name}</div>
-      <span class="vs-text">VS</span>
-      <div class="hero-chip">${data.players[1].name}</div>
+      ${heroHtml}
     </div>
   `;
-		div.style.display = 'flex';  // un‐hide it
+		div.style.display = 'flex';
 
-		// Remove after 10s if desired:
+		// Remove after 10s (optional)
 		setTimeout(() => {
 			div.innerHTML = '';
 			div.style.display = 'none';
 		}, 10000);
 	}
 
-	/** When a tournament (multiple rounds) is prepared: */
+
+	/**
+	 * Renders the tournament tree view when a multi‐round tournament is prepared.
+	 */
 	renderGameHeroTreeDiv(data: PREPARE_MATCHES_STARTED_ROUND[]) {
 		const div = this._gameHeroTree as HTMLDivElement;
 		if (!div) return;
@@ -288,37 +270,43 @@ export class Renderer {
 		// Build out a <details> for each round
 		const roundsHtml = data
 			.map((round, idx) => {
+				// For each match in this round, render: [Chip A] VS [Chip B]
+				const matchesHtml = round.matches
+					.map((match) => {
+						// If match.players has exactly two entries:
+						const [pA, pB] = match.players;
+
+						return `
+              <div class="mini-chip-row">
+                <div class="mini-chip">${pA.name}</div>
+                <span class="vs-text">VS</span>
+                <div class="mini-chip">${pB.name}</div>
+              </div>
+            `;
+					})
+					.join('');
+
 				return `
-        <details ${idx === 0 ? 'open' : ''}>
-          <summary>Round ${idx + 1}</summary>
-          <div>
-            ${round.matches
-					.map(
-						(match) => `
-                  <div class="mini-chip-row">
-                    ${match.players
-							.map(
-								(p) => `<div class="mini-chip">${p.name}</div>`
-							)
-							.join('')}
-                  </div>`
-					)
-					.join('')}
-          </div>
-        </details>
-      `;
+          <details ${idx === 0 ? 'open' : ''}>
+            <summary>Round ${idx + 1}</summary>
+            <div>
+              ${matchesHtml}
+            </div>
+          </details>
+        `;
 			})
 			.join('');
 
 		div.innerHTML = roundsHtml;
 		div.style.display = 'block';  // un‐hide it
 
-		// Auto‐collapse after 5s if you like:
+		// Auto‐hide after 5s (optional)
 		setTimeout(() => {
 			div.innerHTML = '';
 			div.style.display = 'none';
 		}, 5000);
 	}
+
 
 	/**
 	 * Displays a historical statistics panel (max rebounds, most goals conceded, etc.).
@@ -390,7 +378,7 @@ export class Renderer {
 }
 
 /* ------------------------------------------------------------ */
-/*  Data Transfer Objects (DTOs) for match/round payloads       */
+/*  Public DTOs – identical to back-end payloads                */
 /* ------------------------------------------------------------ */
 export interface PrepareMatchGame {
 	id: string;
@@ -407,73 +395,4 @@ export interface PrepareMatchRound {
 }
 
 export type PREPARE_MATCHES_STARTED_ROUND_GAME = PrepareMatchGame;
-export type PREPARE_MATCHES_STARTED_ROUND      = PrepareMatchRound;
-
-/* ------------------------------------------------------------ */
-/*  Chip factories for hero/tournament UI                       */
-/* ------------------------------------------------------------ */
-const heroChip = (p: Player) => `
-  <div class="chip hero-chip">
-    <span class="name">${p.name}</span>
-  </div>`;
-
-const miniChip = (p: Player) => `
-  <div class="chip mini-chip">
-    <span class="name">${p.name}</span>
-  </div>`;
-
-/* ------------------------------------------------------------ */
-/*  Renders a single‐match “hero card”                           */
-/* ------------------------------------------------------------ */
-export function displayPrepareMatchesStartedRoundGame(
-	div: HTMLDivElement,
-	data: PrepareMatchGame
-): void {
-	console.log("💎 Chips UI active – hero card", data.id);
-
-	const { players } = data;
-
-	div.innerHTML = `
-    <section class="mx-auto max-w-screen-md px-4 sm:px-6 lg:px-8">
-      <div class="rounded-2xl bg-white/60 dark:bg-zinc-900/60 backdrop-blur-md shadow-lg ring-1 ring-black/5 p-8 text-center space-y-10">
-        <div class="flex flex-wrap justify-center items-center gap-6">
-          ${players.filter((_, i) => i % 2 === 0).map(heroChip).join('')}
-          ${players.filter((_, i) => i % 2 === 1).map(heroChip).join('')}
-        </div>
-      </div>
-    </section>`;
-}
-
-/* ------------------------------------------------------------ */
-/*  Renders a multi‐round tournament tree view                   */
-/* ------------------------------------------------------------ */
-export function displayPrepareMatchesStartedTournament(
-	div: HTMLDivElement,
-	data: PrepareMatchRound[]
-): void {
-	console.log("🌳 Chips UI active – tournament tree (rounds)");
-
-	div.innerHTML = `
-    <div class="space-y-4">
-      ${data
-		.map(
-			(round, idx) => `
-            <details${idx === 0 ? ' open' : ''} class="rounded-xl overflow-hidden ring-1 ring-gray-200 dark:ring-zinc-700 shadow-sm">
-              <summary class="cursor-pointer select-none px-4 py-2 bg-gray-50 dark:bg-zinc-800 font-medium">
-                Round ${idx + 1}
-              </summary>
-              <div class="px-4 py-4 space-y-6 bg-white dark:bg-zinc-900">
-                ${round.matches
-				.map(
-					(match) => `
-                      <div class="flex flex-wrap justify-center items-center gap-3">
-                        ${match.players.map(miniChip).join('')}
-                      </div>`
-				)
-				.join('')}
-              </div>
-            </details>`
-		)
-		.join('')}
-    </div>`;
-}
+export type PREPARE_MATCHES_STARTED_ROUND = PrepareMatchRound;

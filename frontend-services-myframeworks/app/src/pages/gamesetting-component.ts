@@ -243,9 +243,9 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
 
     <!-- ── 3. summary chips ───────────────────────────────────────────── -->
     <div class="block flex flex-wrap gap-3 justify-center">
-      <span class="summary-chip">Type&nbsp;: <b>${type}</b></span>
-      <span class="summary-chip">Format&nbsp;: <b>${format}</b></span>
-     <!-- <span class="summary-chip">Mode&nbsp;: <b>{mode}</b></span> -->
+      <span class="summary-chip">Type: <b>${type}</b></span>
+      <span class="summary-chip">Format : <b>${format}</b></span>
+     <!-- <span class="summary-chip">Mode : <b>{mode}</b></span> -->
     </div>
 
     <!-- ── 4. players table ───────────────────────────────────────────── -->
@@ -296,7 +296,7 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
                value="${this.state.max_players}"
                class="slider-thumb w-full h-full opacity-0 cursor-pointer">
       </div>
-      <span class="text-sm">Max actuel&nbsp;: <b>${this.state.max_players}</b></span>
+      <span class="text-sm">Max actuel : <b>${this.state.max_players}</b></span>
     </div>` : '' }
 
     <!-- ── 6. local-only IA button and add-player form ─────────────────── -->

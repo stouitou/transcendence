@@ -5,6 +5,9 @@ import { Match } from '../entities/Match';
 export let CANVAS_WIDTH = 800;
 export let CANVAS_HEIGHT = 600;
 
+/* ────────────────────────────────────────── */
+/* <game-component>                           */
+/* ────────────────────────────────────────── */
 @customElement('game-component')
 export class classic extends LitElement {
 	@property({ type: String }) gameContainerId: string = 'gameWrapper';
@@ -12,7 +15,10 @@ export class classic extends LitElement {
 
 	private _game!: Match;
 
+	// ─── Arrow‐key handler reference ─────────────────────────────────────
+	// We store the bound function reference so we can remove it in disconnectedCallback().
 	private _onKeyDown = (e: KeyboardEvent) => {
+		// Only intercept the four arrow keys:
 		if (
 			e.key === 'ArrowLeft' ||
 			e.key === 'ArrowRight' ||
@@ -20,7 +26,8 @@ export class classic extends LitElement {
 			e.key === 'ArrowDown'
 		) {
 			e.preventDefault();
-			// …forward to your game logic if needed…
+			// Forward to your game logic here, if desired. For example:
+			// this._game.handleArrowKey(e.key);
 		}
 	};
 
@@ -28,6 +35,7 @@ export class classic extends LitElement {
 		/* ────────────────────────────────────────────────────────────────────────── */
 		/* 1) GAME CONTAINER & CANVAS                                                    */
 		/* ────────────────────────────────────────────────────────────────────────── */
+
 		.game-container {
 			position: relative;
 			width: 1200px;
@@ -53,6 +61,7 @@ export class classic extends LitElement {
 		/* ────────────────────────────────────────────────────────────────────────── */
 		/* 2) ALERT POPUP                                                             */
 		/* ────────────────────────────────────────────────────────────────────────── */
+
 		.alert {
 			position: absolute;
 			top: 50%;
@@ -69,6 +78,7 @@ export class classic extends LitElement {
 			z-index: 1000;
 			display: none;
 		}
+
 		.alert.show {
 			display: block;
 		}
@@ -76,6 +86,7 @@ export class classic extends LitElement {
 		/* ────────────────────────────────────────────────────────────────────────── */
 		/* 3) HERO CARD (SINGLE‐MATCH)                                                  */
 		/* ────────────────────────────────────────────────────────────────────────── */
+
 		#gameHero {
 			width: 100%;
 			max-width: 720px;
@@ -94,10 +105,13 @@ export class classic extends LitElement {
 			0 12px 24px rgba(0, 0, 0, 0.08);
 			backdrop-filter: blur(4px);
 		}
+
 		#gameHero:empty {
 			display: none;
 		}
+
 		/* The row that holds two hero‐chips and a VS */
+
 		.hero-row {
 			display: flex;
 			align-items: center;
@@ -105,6 +119,7 @@ export class classic extends LitElement {
 			gap: 32px;
 			width: 100%;
 		}
+
 		.hero-chip {
 			background: rgba(255, 255, 255, 0.9);
 			padding: 12px 24px;
@@ -114,15 +129,17 @@ export class classic extends LitElement {
 			color: #333;
 			box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
 		}
+
 		.vs-text {
 			font-size: 1.5rem;
 			font-weight: 800;
-			color: #0077cc;
+			color: rgba(128, 34, 34, 0.63);
 		}
 
 		/* ────────────────────────────────────────────────────────────────────────── */
 		/* 4) TOURNAMENT TREE (MULTI‐ROUND)                                             */
 		/* ────────────────────────────────────────────────────────────────────────── */
+
 		#gameHeroTree {
 			width: 100%;
 			max-width: 720px;
@@ -131,9 +148,11 @@ export class classic extends LitElement {
 			display: none; /* hidden when empty */
 			gap: 12px;
 		}
+
 		#gameHeroTree:empty {
 			display: none;
 		}
+
 		#gameHeroTree details {
 			background: rgba(255, 255, 255, 0.6);
 			border: 1px solid rgba(0, 0, 0, 0.08);
@@ -142,6 +161,7 @@ export class classic extends LitElement {
 			margin-bottom: 8px;
 			backdrop-filter: blur(4px);
 		}
+
 		#gameHeroTree summary {
 			cursor: pointer;
 			padding: 12px 16px;
@@ -150,18 +170,23 @@ export class classic extends LitElement {
 			border-bottom: 1px solid rgba(0, 0, 0, 0.05);
 			outline: none;
 		}
+
 		/* When expanded, the content area */
+
 		#gameHeroTree summary + div {
 			padding: 12px 16px;
 			background: rgba(255, 255, 255, 0.8);
 		}
+
 		/* Each match’s mini‐chips row */
+
 		.mini-chip-row {
 			display: flex;
 			flex-wrap: wrap;
 			justify-content: center;
 			gap: 12px;
 		}
+
 		.mini-chip {
 			background: rgba(255, 255, 255, 0.7);
 			padding: 8px 16px;
@@ -176,17 +201,18 @@ export class classic extends LitElement {
 		/* ────────────────────────────────────────────────────────────────────────── */
 		/* 5) SCOREBOARD (UPPER UI) & PLAYER CHIPS                                    */
 		/* ────────────────────────────────────────────────────────────────────────── */
+
 		.game-ui {
 			display: flex;
 			justify-content: center;
 			align-items: center;
 			margin: 0 auto 24px;
 			width: 500px;
-			background: rgba(255, 255, 255, 0.25);
+			background: transparent;
 			border-radius: 16px;
 			padding: 20px 0;
-			box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 		}
+
 		.game-ui > .score-grid {
 			display: grid !important;
 			grid-template-areas:
@@ -204,6 +230,7 @@ export class classic extends LitElement {
 			box-shadow: none !important;
 			padding: 0 !important;
 		}
+
 		.game-ui > div:not(.score-grid) {
 			background: transparent !important;
 			border: none !important;
@@ -217,6 +244,7 @@ export class classic extends LitElement {
 			align-items: center;
 			gap: 24px;
 		}
+
 		.player-score {
 			display: inline-flex;
 			align-items: center;
@@ -229,10 +257,23 @@ export class classic extends LitElement {
 			font-size: 0.95rem;
 			max-width: 200px;
 		}
-		.player-score.top    { grid-area: top; }
-		.player-score.left   { grid-area: left; }
-		.player-score.right  { grid-area: right; }
-		.player-score.bottom { grid-area: bottom; }
+
+		.player-score.top {
+			grid-area: top;
+		}
+
+		.player-score.left {
+			grid-area: left;
+		}
+
+		.player-score.right {
+			grid-area: right;
+		}
+
+		.player-score.bottom {
+			grid-area: bottom;
+		}
+
 		.score-cell {
 			margin: 0;
 			font-weight: 600;
@@ -240,6 +281,7 @@ export class classic extends LitElement {
 			padding: 0;
 			white-space: nowrap;
 		}
+
 		.score-cell.score-cell-points {
 			font-weight: 700;
 			color: #3a1212;
@@ -252,9 +294,11 @@ export class classic extends LitElement {
 		/* ────────────────────────────────────────────────────────────────────────── */
 		/* 6) UTILITY CLASSES                                                         */
 		/* ────────────────────────────────────────────────────────────────────────── */
+
 		.text-center {
 			text-align: center;
 		}
+
 		.flex-center {
 			display: flex;
 			align-items: center;
@@ -274,7 +318,10 @@ export class classic extends LitElement {
 	connectedCallback(): void {
 		super.connectedCallback();
 		console.log('ConnectedCallback: Component added to the DOM');
+
+		// ─── Attach the arrow‐key listener here ─────────────────────────────────
 		window.addEventListener('keydown', this._onKeyDown);
+
 		this.hideBackground();
 		this._game = new Match();
 		this._game.webSocketManager.lobyId = this.data?.id;
@@ -283,19 +330,11 @@ export class classic extends LitElement {
 	firstUpdated() {
 		console.log('firstUpdated: DOM is ready');
 
-		const gameCanvas = this.shadowRoot?.querySelector(
-			'#gameCanvas'
-		) as HTMLCanvasElement;
-		const gameDivUi = this.shadowRoot?.querySelector('#game-ui') as HTMLElement;
-		const gameDivAlert = this.shadowRoot?.querySelector(
-			'#alertBox'
-		) as HTMLElement;
-		const gameDivHero = this.shadowRoot?.querySelector(
-			'#gameHero'
-		) as HTMLElement;
-		const gameDivHeroTree = this.shadowRoot?.querySelector(
-			'#gameHeroTree'
-		) as HTMLElement;
+		const gameCanvas      = this.shadowRoot?.querySelector('#gameCanvas')  as HTMLCanvasElement;
+		const gameDivUi       = this.shadowRoot?.querySelector('#game-ui')     as HTMLElement;
+		const gameDivAlert    = this.shadowRoot?.querySelector('#alertBox')    as HTMLElement;
+		const gameDivHero     = this.shadowRoot?.querySelector('#gameHero')    as HTMLElement;
+		const gameDivHeroTree = this.shadowRoot?.querySelector('#gameHeroTree') as HTMLElement;
 
 		if (!gameCanvas || !gameDivUi || !gameDivAlert || !gameDivHero || !gameDivHeroTree) {
 			throw new Error('One or more game DOM nodes not found');
@@ -305,7 +344,7 @@ export class classic extends LitElement {
 		this._game.setGameUI(gameDivUi);
 		this._game.setGameAlert(gameDivAlert);
 		this._game.setGameHero(gameDivHero);
-		this._game.setGameHeroTree(gameDivHeroTree); // Make sure your Match or Renderer knows about this too
+		this._game.setGameHeroTree(gameDivHeroTree);   // ★ hook up tournament tree
 
 		this._game.webSocketManager.connect();
 	}
