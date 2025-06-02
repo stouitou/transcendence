@@ -39,10 +39,10 @@ export class Login extends BaseComponent<{}, { formLogin: LoginFormData }> {
       const formData = formHandler.getFormData();
 			const loginToken = await  loginUser(formData);
       const { twoFactorRequired} = loginToken;
-      console.log('Login 2FA token:', loginToken);
+      // console.log('Login 2FA token:', loginToken);
       // Check if two-factor authentication is required
       if (twoFactorRequired) {
-        console.log('Two-factor authentication required');
+        // console.log('Two-factor authentication required');
         this.router.navigate('/login-2fa');
         return;
       }
@@ -53,7 +53,12 @@ export class Login extends BaseComponent<{}, { formLogin: LoginFormData }> {
       this.router.navigate('/');
 		} catch (error) {
 			console.error('Login failed:', error);
-			alert('Login failed. Please try again.');
+			//alert('Login failed. Please try again.');
+      if (error instanceof Error) {
+        this.showMessage(error.message, 'error');
+      } else {
+        this.showMessage('An unexpected error occurred. Please try again.', 'error');
+      }
 		}
   }
 

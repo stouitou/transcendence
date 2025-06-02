@@ -86,7 +86,7 @@ class GlobalState {
     /* SETTERS */
     public setuser(user: any) {
       this._user = user;
-      console.log('user', user);
+    //  console.log('user', user);
     }
   
     public setLoginSuccess() {

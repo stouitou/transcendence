@@ -12,7 +12,7 @@ export class ProfilePage extends BaseComponent<{ user: User | null, userProfile:
     super({ user: null, userProfile: null, twoFa: null });
   }
   set params(params: { id: string }) {
-    console.error("params", params);
+   // console.error("params", params);
     this.data = params;
   }
   handleListenerProfileUpdate = (e: Event) => {
