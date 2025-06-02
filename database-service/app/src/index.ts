@@ -9,7 +9,7 @@ import { managerRoutes } from "./routes/manager.routes";
 
 const start = async () => {
   try {
-    const app = Fastify({ logger: true, ignoreTrailingSlash: true });   // ✅ On crée une instance de Fastify
+    const app = Fastify({ /* logger: true, */ ignoreTrailingSlash: true });   // ✅ On crée une instance de Fastify
     await app.register(dotenvPlugin);        // ✅ On charge le plugin Dotenv
     await app.register(databases);           // ✅ On charge le plugin Databases
     await registerSwagger(app);              // ✅ Ensuite, on charge le plugin Swagger
@@ -20,6 +20,21 @@ const start = async () => {
       this.log.error(error)
       reply.status(409).send({ setErrorHandler: error }) // 409 Conflict @TODO: create errorhandling()
     })
+    // ✅ Gestion des routes
+    app.addHook('onRequest', async (request, reply) => {
+      console.log(`[${new Date().toLocaleString()}] ${request.method} ${request.url}`);
+    });
+    app.addHook('onResponse', async (request, reply) => {
+      // Log uniquement les succès (statut 2xx)
+      if (reply.statusCode >= 200 && reply.statusCode < 300) {
+        console.log(`[SUCCESS] ${request.method} ${request.url} - ${reply.statusCode}`);
+        // le body si besoin :
+        // console.log('Response payload:', reply.payload);
+      }else if (reply.statusCode >= 400) {
+        console.error(`[ERROR] ${request.method} ${request.url} - ${reply.statusCode}`);
+        // console.error('Response payload:', reply.payload);
+      }
+    });
 
 
     app.register(entityRoutes ,{prefix:"/api/v2/database"});

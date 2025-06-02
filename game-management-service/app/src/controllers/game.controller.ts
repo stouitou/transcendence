@@ -3,101 +3,6 @@ import  GameRepository  from '../repository/Game.repository';
 import { GameCreate } from '../models/Game';
 import { IParams } from '../repository/helpers';
 
-/* const handlefetchStats = async (authorization:string|undefined,cookie : string|undefined,userId:number, dataStats:Partial<UserStats>) => {
-  try {
-      const response = await fetch(`http://user-management-service:3000/api/users/${userId}/stats`, {
-    method: 'PUT',
-    headers: {
-      "authorization":authorization??'',
-      'cookie': cookie??'',
-      'content-type': 'application/json',
-    },
-    body: JSON.stringify({...dataStats}),
-  })
-      if (!response.ok) {
-          throw new Error('Failed to fetch user data stats');
-      }
-      const data = await response.json();
-      console.log("GameController handlefetch data stats ",data);
-      return data;
-  }
-  catch (error) {
-      console.error('Error fetching user data stats:', error,userId);
-      throw error;
-  }
-}
-
-const handleSetStats = async (type:string,format:string,request:FastifyRequest<{ Body?: GameCreate }>,reply:FastifyReply) => {
-
- // const { ...requestBody } = request.body;
-  const {authorization,cookie} = request.headers;
-  const playerId = request.authenticatedUser?.id;
-  if (!playerId) {
-    return reply.status(401).send({ error: 'Unauthorized' });
-  }
-  //  - update user state
-      if (type === "local" && format === "classic") {
-        //   requestBody.players.length
-     //   const playerId = requestBody.players.at(0) as number;
-           const updatedStats = await handlefetchStats(authorization,cookie,playerId,{
-             total_game_played: 1,
-             local_game_played: 1,
-             remote_game_played: 0,
-           });
-             console.log("GameController createGame updatedStats ");
-             const user =  updatedStats;
-             if (!user) {
-               return reply.status(404).send({ error: 'User not found' });
-             }
-     
-         }
-         if (type === "remote" && format === "classic") {
-           // mettre à jour les stats des l'utilisateurs requestBody.players[]
-        //   for (const playerId of requestBody.players as number[]) {
-             const updatedStats = await handlefetchStats(authorization,cookie,playerId,{
-               total_game_played: 1,
-               local_game_played: 0,
-               remote_game_played: 1,
-             });
-             console.log("GameController createGame updatedStats ");
-             const user =  updatedStats;
-             if (!user) {
-               return reply.status(404).send({ error: 'User not found' });
-             }
-          // }
-     
-         }
-     
-         if (type === "local" && format === "tournament") {//@BUG a revoir!!!
-          // const playerId = requestBody.players.at(0) as number;
-           const updatedStats = await handlefetchStats(authorization,cookie,playerId,{
-             tournament_game_played: 1,
-             tournament_local_game_played: 1,
-             tournament_remote_game_played: 0,
-           });
-             console.log("GameController createGame updatedStats ");
-             const user =  updatedStats;
-             if (!user) {
-               return reply.status(404).send({ error: 'User not found' });
-             }
-     
-         }
-         if (type === "remote" && format === "tournament") {
-                 // mettre à jour les stats des l'utilisateurs requestBody.players[]
-            // for (const playerId of requestBody.players as number[]) {
-               const updatedStats = await handlefetchStats(authorization,cookie,playerId,{
-                 tournament_game_played: 1,
-                 tournament_local_game_played: 0,
-                 tournament_remote_game_played: 1,
-               });
-               console.log("GameController createGame updatedStats ");
-               const user =  updatedStats;
-               if (!user) {
-                 return reply.status(404).send({ error: 'User not found' });
-               }
-            // }
-         }
-        } */
 
 export class GameController {
   private gameRepository = new GameRepository();
@@ -132,7 +37,7 @@ export class GameController {
     } */
 
     const games = await this.gameRepository.create({...requestBody,type,format/* ,mode */});
-    console.log("GameController createGame ",games?'ok':'ko');
+  //  console.log("GameController createGame ",games?'ok':'ko');
     if (!games) {
       return reply.status(404).send({ error: 'Game creation failed' });
     }
@@ -166,14 +71,14 @@ export class GameController {
 
   async getGames(request: FastifyRequest, reply: FastifyReply) { 
     try {
-    console.log("--GameController getGames ");
+  //  console.log("--GameController getGames ");
     /* const games = await  this.gameRepository.getAll();
         console.log("GameController getGames ",games);
     return reply.send(games); */
      const query = request.query as IParams;
        // const options = new BuildOptions(query).getOptions();
         const games = await  this.gameRepository.getAllbyQuery(query);
-        console.log("gamesController getgames ",games);
+  //      console.log("gamesController getgames ",games);
           return reply.send(games);
     } catch (error) {
       console.error("GameController getGames error ",error);
@@ -182,7 +87,7 @@ export class GameController {
   }
 
   async getGamesByQuery(request: FastifyRequest, reply: FastifyReply) {  
-    console.log("--GameController getGamesByQuery ");
+   // console.log("--GameController getGamesByQuery ");
     const query = request.query as IParams;
    // const options = new BuildOptions(query).getOptions();
     const games = await  this.gameRepository.getAllbyQuery(query);
@@ -211,7 +116,7 @@ export class GameController {
     const { state/* ,local_players */ } = requestBody; //@TODO : à revoir
 
     const game = await this.gameRepository.update({id:gameId,state/* ,local_players */});
-    console.log("GameController updateGame ",game);
+  //  console.log("GameController updateGame ",game);
 
     if (!game) {
       return reply.status(404).send({ error: 'Game not found' });

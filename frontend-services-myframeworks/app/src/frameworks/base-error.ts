@@ -19,14 +19,49 @@ export class BaseError extends Error {
  * It is used to categorize API errors based on their HTTP status codes.
  */
 export class ApiError extends BaseError {
-  public status: number;
+  public statusCode: number;
 
-  constructor(status: number, message: string) {
+  constructor(statusCode: number, message: string) {
     super('apiError', message);
-    this.status = status;
+    this.statusCode = statusCode;
   }
 }
 
+export class ApiErrorBase extends BaseError {
+  public statusCode: number;
+  public error:string = "ApiErrorBase";
+  public message:string = "Invalid message";
+  public success:boolean = false;
+  public name:string = "APPError";
+  public code:string = "ERROR_APP";
+  field?:string;
+  details?:any;
+  public timestamp?:string;
+
+  constructor( errorData?: {name:string, statusCode: number, message: string, error?: string, code?: string ,timestamp?: string, success?: boolean, field?: string, details?: any}) {
+    super(errorData?.name || 'apiError', errorData?.message || 'Unknown error');
+    this.statusCode = errorData?.statusCode || 500;
+    this.error = errorData?.error || "AuthError";
+    this.message = errorData?.message || "Invalid credentials";
+    this.success = errorData?.success || false;
+    this.name = errorData?.name || "AuthError";
+    this.code = errorData?.code || "ERROR_AUTH";
+    this.timestamp = errorData?.timestamp || new Date().toISOString();
+    if (errorData?.field) {
+      this.field = errorData.field;
+    }
+    if (errorData?.details) {
+      this.details = errorData.details;
+    }
+  }
+}
+//{"statusCode":401,
+// "error":"AuthError",
+// "message":"Invalid credentials",
+// "success":false,
+// "name":"AuthError",
+// "code":"ERROR_AUTH",
+// "timestamp":"2025-05-31T09:16:22.427Z"}
 /**
  *  *** not used yet ***
  * FormError class for handling form validation errors.

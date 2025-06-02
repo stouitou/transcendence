@@ -7,6 +7,7 @@ import AuthProviderRepository from "../repository/AuthProvider.repository";
 
 import { generateTOTPSecret, verifyTOTP } from "../utils/totp";
 import { AuthProvider } from "../models/AuthProvider.models";
+import { ValidationError } from "@src/Errors/errors";
 const defaultAvatar = "/uploads/defaultAvatar.jpg"; //@TODO : a changer
 /**
  * Service d'authentification
@@ -70,10 +71,8 @@ export class AuthService {
    * @param user
    * @returns
    */
-  generateToken(user: { id: number,name:string,avatar?:string,role:string }) { //@TODO : changer le type de user et retourner un objet User complet
+  generateToken(user: { id: number,name:string,avatar?:string,role:string }) {
     return this.app.jwt.sign(
-     // { id: user.id },
-    //  { ...user },//on envoie tout l'objet user
     {
       id: user.id,
       name: user.name,
@@ -82,8 +81,7 @@ export class AuthService {
       //email: user.email,
       //authProviders: user.authProviders
     },
-      { expiresIn: "10h" } //@DEBUG
-      //{ expiresIn: "1h" } 
+    { expiresIn: "1h" } 
       //{ expiresIn: "1m" } // 1 minute
     );
   }
@@ -148,7 +146,7 @@ export class AuthService {
       const decoded = this.app.jwt.verify(token, "REFRESH_TOKEN_PUBLIC_KEY") as any;
       return this.generateToken({ id: decoded.id,name:decoded.name, avatar:decoded.avatar, role:decoded.role });
     } catch (err) {
-      throw new Error("Invalid token");
+      throw err;
     }
   }
 
@@ -202,10 +200,10 @@ export class AuthService {
         //on retourne le jwt
         return this.buildOauthProviderResponse({ id: user.id ,role: user.role, name: user.name, avatar: user.avatar });
       }
-    throw new Error("User already exists");
+    throw new ValidationError("User already exists", "email");
   }
    
-/** //@TODO : devrait être dans le service
+/**
    * Créer ou mettre à jour un utilisateur avec un fournisseur d'authentification OAuth
    *
    * @param profile
@@ -301,7 +299,7 @@ async registerWithOauthProvider(profile:any, provider: string) {
     }
   }
 
-  //@TODO : in progress
+
    async updatePassword(providerId:number , password: string) :Promise<AuthProvider | null>{
     // 1 - vérifier si l'utilisateur existe déjà
 

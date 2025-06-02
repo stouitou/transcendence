@@ -106,6 +106,7 @@ export class ForgotPasswordTwoFactor extends BaseComponent<{}, { form2FA: TwoFac
          <div id="message-box" class="form-error">ici</div>
         <p class="text-center mb-4">Please enter the 2FA code sent to your email or App</p>
         <div id="code-error" class="form-error"></div>
+        <input type="hidden" id="hiddenCode" name="code" value="" />
         <div id="2faCodeContainer" class="code-input-container">
           <input name="code_1" type="text" maxlength="1" class="form-text-input code-input" />
           <input name="code_2" type="text" maxlength="1" class="form-text-input code-input" />

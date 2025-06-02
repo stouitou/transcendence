@@ -1,3 +1,4 @@
+import { generateErrorResponse } from "@src/Errors/handler";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 
 
@@ -25,6 +26,8 @@ export async function  isGuest(req: FastifyRequest, reply: FastifyReply) {
         console.log("🟡 Invalid or expired token, invalidating session");
         // Supprimer la session si le token est invalide ou expiré
         req.session.destroy();
+        return generateErrorResponse(reply,err)
+        //reply.status(401).send({ error: "Invalid or expired token" });
       }
     } else {
       console.log("🟡 No authToken found, invalidating session");

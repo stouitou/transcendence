@@ -47,7 +47,7 @@ export class DropdownProfile extends BaseComponent<{ isDrop: boolean, user:User|
       this.innerHTML = ``;
       return;
     }
-    console.log('user:', user);
+    // console.log('user:', user);
 
     this.innerHTML = `
     <div class="relative inline-block text-left">

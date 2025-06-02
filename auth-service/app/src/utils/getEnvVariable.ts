@@ -10,8 +10,3 @@ export const getEnvVariable = (key: string): string =>{
 	return value;
   }
 
-export const getServerAddress = ()=> {
-	const host = getEnvVariable('BACKEND_SERVER_NAME_API');
-	const port = getEnvVariable('BACKEND_SERVER_SSH_PORT');
-	return {host: host, port: port};
-}

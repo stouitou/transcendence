@@ -1,6 +1,5 @@
 import { FastifyInstance } from "fastify";
 
-// @TODO : Implementer les routes de l'Autorisation
 // exemple info ; ne sera pas forcement implementé
 export async function managerRoutes(app: FastifyInstance) {
 

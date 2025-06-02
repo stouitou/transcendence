@@ -2,6 +2,8 @@ import  UserRepository  from "../repository/User.repository";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { BaseController } from "./BaseController";
 import { generateCSRFToken } from "../utils/crypto";
+import { AuthError, NotFoundError, TwoFactorAuthError, ValidationError } from "@src/Errors/errors";
+import { generateErrorResponse } from "@src/Errors/handler";
 
 
 /**
@@ -219,37 +221,39 @@ export class TwoFactorController extends BaseController {
     try {
        const userId = (req.params as { id: number }).id;
       if (!userId) {
-        return reply.status(400).send({ error: "User ID is required" });
+        throw new ValidationError("User ID is required", "id");
       }
       console.log("[disable2FA] --start--")
       const authToken = req.cookies.authToken;
       //2- Vérifier si le token d'authentification est présent
       if (!authToken) {
-        console.log("[🔐enable2FA] 2FA QR code no authToken")
-        return reply.status(401).send({ error: "Unauthorized" });
+        throw new AuthError("Unauthorized");
       }
       // Vérifier le token pour l'authentification
       const decoded = this.app.jwt.verify(authToken, "ACCESS_TOKEN_PUBLIC_KEY") as {id: number,role: string};
             //verifier le role de l'utilisateur
       if (decoded.role !== "admin") {
-        return reply.status(401).send({ error: "Unauthorized" });
+        throw new AuthError("Unauthorized - you must be an admin to disable 2FA for a user");
+       // return reply.status(401).send({ error: "Unauthorized" });
       }
       const user = await this.UserRepository.getById(userId);
       if (!user) {
-        return reply.status(401).send({ error: "Unauthorized" });
+        throw new ValidationError("User not found", "id");
+       // return reply.status(401).send({ error: "Unauthorized" });
       }
       //3- Vérifier si l'utilisateur a déjà un secret pour l'authentification à deux facteurs
       const {authProviders} = user;
       if (!authProviders || authProviders.length === 0) {
-        return reply.status(400).send({ error: "User has no authProviders" });
+        throw new ValidationError("User has no authProviders", "authProviders");
       }
       const authProvider = authProviders[0];
       if (!authProvider) {
-        return reply.status(400).send({ error: "User has no authProviders" });
+        throw new ValidationError("User has no authProviders", "authProviders");
       }
       const { provider_id, two_factor_auth } = authProvider;
       if (!two_factor_auth) {
-        return reply.status(400).send({ error: "User already has 2FA disable" });
+        throw new ValidationError("User already has 2FA disable", "two_factor_auth");
+        //return reply.status(400).send({ error: "User already has 2FA disable" });
       }
       
       //4- Activer l'authentification à deux facteurs
@@ -258,7 +262,8 @@ export class TwoFactorController extends BaseController {
      return reply.status(200).send({ message: "2FA disable" });
     } catch (error) {
       console.error("🔴[enable2FA] error", error);
-      return reply.status(500).send({ error: "Internal server error" });
+      throw error;
+      // return reply.status(500).send({ error: "Internal server error" });
     }
     
   }
@@ -279,7 +284,8 @@ export class TwoFactorController extends BaseController {
          const authToken = req.cookies.authToken;
         if (!authToken) {
           console.log("[🔐generate2FAQRcode] 2FA QR code no authToken")
-          return reply.status(401).send({ error: "Unauthorized" });
+          throw new ValidationError("Unauthorized", "Cookies.authToken");
+         // return reply.status(401).send({ error: "Unauthorized" });
         }
       //2- Vérifier le token temporaire pour l'authentification à deux facteurs
       const decoded = this.app.jwt.verify(authToken, "ACCESS_TOKEN_PUBLIC_KEY") as {id: number};
@@ -292,8 +298,9 @@ export class TwoFactorController extends BaseController {
         .header("Surrogate-Control", "no-store")
         .send(qrBuffer);
     } catch (error) {
-      console.error("🔴[generate2FAQRcode] error", error);
-      return reply.status(500).send({ error: "Internal server error" });
+      console.error("🔴[generate2FAQRcode] error", error, error.message);
+      throw error;
+     // return reply.status(500).send({ error: "Internal server error" });
     }
   }
   
@@ -312,22 +319,26 @@ export class TwoFactorController extends BaseController {
       console.log("🔐[verify2FA] --start--")
       const { code, isforce = false } = req.body as { code: string; isforce?: boolean };
       if (!code || typeof code !== 'string' || code.length != 6) {
-        return reply.status(400).send({ error: "Invalid or missing code" });
+        //return reply.status(400).send({ error: "Invalid or missing code" });
+        throw new ValidationError("Invalid or missing code", "code");
       }
       if (typeof isforce !== 'boolean') {
-        return reply.status(400).send({ error: "Invalid isforce parameter" });
+        //return reply.status(400).send({ error: "Invalid isforce parameter" });
+        throw new ValidationError("Invalid isforce parameter", "isforce");
+
       }
       console.log("🔐[verify2FA] --req.session.csrfToken",req.session.csrfToken)
       console.log("🔐[verify2FA] --code : ",code,isforce)
-      //1- Vérifier si le code est présent
+/*       //1- Vérifier si le code est présent
       if (!code) {
         return reply.status(400).send({ error: "Code is required" });
-      }
+      } */
       const authToken2FA = req.cookies.authToken2FA;
       //2- Vérifier si le token d'authentification est présent
       if (!authToken2FA) {
         console.log("[🔐verify2FA] 2FA QR code no authToken")
-        return reply.status(401).send({ error: "[verify2FA] Unauthorized" });
+       // return reply.status(401).send({ error: "[verify2FA] Unauthorized" });
+        throw new ValidationError("Unauthorized", "Cookies.authToken2FA");
       }
       // Vérifier le token temporaire pour l'authentification à deux facteurs
       console.log("🔐[verify2FA] --authToken2FA : ",authToken2FA)
@@ -340,17 +351,17 @@ export class TwoFactorController extends BaseController {
         console.log("🔐[verify2FA] --isValid : ",isValid)
           // Vérifier si le code est valide
         if (!isValid) {
-            return reply.status(400).send({ error: "Invalid 2FA code" });
+           // return reply.status(400).send({ error: "Invalid 2FA code" });
+          throw new TwoFactorAuthError("Invalid 2FA code", "ERROR_TWO_FACTOR_AUTH_INVALID");
           }
 
-      //reset le cookie
-        // reply.clearCookie('authToken2FA');//@TODO
         // Authentifier l'utilisateur
         const params = {authProviders:{provider_id:decoded.email, provider:"local"}};
         const user = await this.UserRepository.getOneByParams(params);
         if (!user) {
           console.log("[verify2FA] user not found")
-          return reply.status(400).send({ error: "User not found" });
+         // return reply.status(400).send({ error: "User not found" });
+          throw new NotFoundError("User not found");
         }
         const token = this.app.authService.generateToken(user);
 
@@ -376,7 +387,7 @@ export class TwoFactorController extends BaseController {
 
           // Définir le cookie de reset de mot de passe
                   // 3- generer un token JWT forgot password
-              const token = this.app.authService.generateToken(user);//@TODO
+              const token = this.app.authService.generateToken(user);
                 //  console.log("🟢 token ",token)
                       // Définir le cookie avec le token
                     reply.setCookie('authForgetPasswordToken', token, {
@@ -390,8 +401,10 @@ export class TwoFactorController extends BaseController {
       return reply.status(201).send({ token: token });
     }
     catch (error) {
-      console.error("🔴[verify2FA] error", error);
-      return reply.status(500).send({ error: "Internal server error" });
+    //  console.error("🔴[verify2FA] error", error);
+     // return reply.status(500).send({ error: "Internal server error" });
+      console.error("🔴[verify2FA] error");
+     return generateErrorResponse(reply, error);
     }
   }
 

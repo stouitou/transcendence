@@ -31,7 +31,7 @@ export class Game {
   mode: string;
  */
   //chaque partie a plusieurs joueurs
-  @ManyToMany(() => User, (user) => user.games, { cascade: true , onUpdate: 'CASCADE'  })
+  @ManyToMany(() => User, (user) => user.games, { cascade: true , onDelete: 'CASCADE', onUpdate: 'CASCADE'  })
   @JoinColumn()
   players: User[];
 

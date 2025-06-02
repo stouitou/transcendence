@@ -254,14 +254,14 @@ export class AdminUsersComponent extends BaseComponent <{two_factor_auth:boolean
   //  this.render();
   }
 
-  fetchTwoFAStatus = async (userId: number) => {
+/*   fetchTwoFAStatus = async (userId: number) => {
 	const response = await fetch(`/api/users/${userId}/2fa/status`);
 	if (!response.ok) {
 	  throw new Error('Failed to fetch 2FA status');
 	}
 	const data = await response.json();
 	this.state.two_factor_auth = data.two_factor_auth;
-	}
+	} */
   
     connectedCallback() {
 		if (!this.user) {

@@ -74,13 +74,6 @@ export const disable2FA = async (id: number): Promise<User | void> => {
 }
 
 /**
- * Admin Users enable 2FA
- */
-/* export const enable2FA = async (id: number): Promise<User | void> => {
-  const url = `/api/users/admin/users/${id}/enable-2fa`;
-  return apiRequest<User | void>(url, 'PUT', {});
-} */
-/**
  * Admin Users status 2FA
  */
 export const get2FAStatus = async (id: number): Promise<{ provider: string, provider_id: string, two_factor_auth: boolean, two_factor_auth_method: "email"|"totp" } | void> => {

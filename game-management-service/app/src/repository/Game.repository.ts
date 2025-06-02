@@ -40,7 +40,7 @@ class GameRepository extends BaseRepository<Game,GameCreate> implements IReposit
   create = async (game: Partial<GameCreate>): Promise<Game> => { 
     const {/*  authProviders, */ id, ...gameExtracted } = game;
 
-    console.log("GameRepository create()  --gameExtracted--",gameExtracted);//gameExtracted.tournament: null
+//    console.log("GameRepository create()  --gameExtracted--",gameExtracted);//gameExtracted.tournament: null
     const response = await fetch(this.URL+this.getRelations(), {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -49,20 +49,20 @@ class GameRepository extends BaseRepository<Game,GameCreate> implements IReposit
       }),
     });
     const data = await response.json();
-    console.log("🔐Game.repository.ts GameRepository.create()  --data--",data)
+//    console.log("🔐Game.repository.ts GameRepository.create()  --data--",data)
     const gameCreated = data.data;
-    console.log("🔐Game.repository.ts GameRepository.create()  --gameCreated--",gameCreated)
+//    console.log("🔐Game.repository.ts GameRepository.create()  --gameCreated--",gameCreated)
    // const gameCreated = User.fromJSON(data.data);
     if (!gameCreated) {
       throw new Error("User creation failed");
     }
     //updtate the usersStats
-    console.log(" GameRepository.create()  --gameCreated-- OK")
-    console.log(" GameRepository.create()  --gameCreated-- gameCreated.players--",gameCreated.players)
+//    console.log(" GameRepository.create()  --gameCreated-- OK")
+//    console.log(" GameRepository.create()  --gameCreated-- gameCreated.players--",gameCreated.players)
     const {type,format,players} = gameCreated as {format:"classic"|"tournament",type:'local'|'remote',players:User[]};
        const games = await Promise.all(players.map(async (user: User) => {
 
-        console.log(" GameRepository.create()  --STATS-- user--",user)
+//        console.log(" GameRepository.create()  --STATS-- user--",user)
         const userStatsCreate = buildUserStatsCreate(user, format, type, game.tournament?true:false);
         const userUpdated = await (new UserRepository()).update(userStatsCreate/* {
           id: user.id,
@@ -76,12 +76,12 @@ class GameRepository extends BaseRepository<Game,GameCreate> implements IReposit
         } */);
         return userUpdated;
        }));
-       console.log(" GameRepository.create()  --gameCreated-STATS- UPDATED--",games)
+ //      console.log(" GameRepository.create()  --gameCreated-STATS- UPDATED--",games)
     return gameCreated;
   };
 
   private getRelations = (): string => {
-    console.log("🔐 GameRepository.getRelations()  --this.RELATIONS--",this.RELATIONS)
+  //  console.log("🔐 GameRepository.getRelations()  --this.RELATIONS--",this.RELATIONS)
     if (this.RELATIONS.length === 0) {
       return "";
     }
@@ -109,7 +109,7 @@ class GameRepository extends BaseRepository<Game,GameCreate> implements IReposit
   //  const url = `${this.URL}?${queryPagination}`;
     const url = `${this.URL}?${queryPagination}`;
     //const url = `${this.URL}${this.getRelations()}&${queryPagination}`;
-    console.log("🔐 GameRepository.getAll()  --start-- fetch from: ", this.URL)
+  //  console.log("🔐 GameRepository.getAll()  --start-- fetch from: ", this.URL)
     const response = await fetch(url);
   //  console.log("🔐 GameRepository.getAll()  --response--",response)
     const data = await response.json();
@@ -125,24 +125,24 @@ class GameRepository extends BaseRepository<Game,GameCreate> implements IReposit
    
     //return data.map(User.fromJSON);
     const url = `${this.URL}${this.getRelations()}`;
-    console.log("🔐 GameRepository.getAll()  --start-- fetch from: ", this.URL)
+  //  console.log("🔐 GameRepository.getAll()  --start-- fetch from: ", this.URL)
     const response = await fetch(url);
-    console.log("🔐 GameRepository.getAll()  --response--",response)
+  //  console.log("🔐 GameRepository.getAll()  --response--",response)
     const data = await response.json();
-    console.log("🔐 GameRepository.getAll()  --data--",data)
+  //  console.log("🔐 GameRepository.getAll()  --data--",data)
     const results = data.data//.map((user: User) => User.fromJSON(user));
     //const results = data.data.map(User.fromJSON);
-    console.log("🔐 GameRepository.getAll()  --results--",results)
+  //  console.log("🔐 GameRepository.getAll()  --results--",results)
     return {...results};
   }
 
  getById= async (id: number): Promise<Game | null> => {
       
     const url = `${this.URL}/id/${id}?relations=players`;//{this.getRelations()}
-    console.log("🔐 GameRepository.getById()  --url--",url)
+  //  console.log("🔐 GameRepository.getById()  --url--",url)
     const response = await fetch(url);
     const  result  = await response.json();
-    console.log("🔐Gane.repository.ts GameRepository.getById()  --data--",result)
+  //  console.log("🔐Gane.repository.ts GameRepository.getById()  --data--",result)
    const { data } = result
     return data?? null;
   }
@@ -160,24 +160,24 @@ class GameRepository extends BaseRepository<Game,GameCreate> implements IReposit
   
     //  const queryString = Helpers.buildQueryString(params);
       const queryString = this.newfilters(params);
-      console.log("🔐 GameRepository.getByParams()  --queryString--",queryString)
+  //    console.log("🔐 GameRepository.getByParams()  --queryString--",queryString)
       const url = `${this.URL}${queryString}`;
       const response = await fetch(url);
-      console.log("🔐 GameRepository.getByParams()  --response--",response)
+  //    console.log("🔐 GameRepository.getByParams()  --response--",response)
       const data = await response.json();
-      console.log("🔐 GameRepository.getByParams()  --data--",data)
+  //    console.log("🔐 GameRepository.getByParams()  --data--",data)
      // return data.map(User.fromJSON);
       return data.data?data.data[0]?data.data:null:null;
     }
     getOneByParams = async(params: any) : Promise<Game | null> => {  
       //  const queryString = Helpers.buildQueryString(params);
         const queryString = this.newfilters(params);
-        console.log("🔐 GameRepository.getByParams()  --queryString--",queryString)
+    //    console.log("🔐 GameRepository.getByParams()  --queryString--",queryString)
         const url = `${this.URL}${queryString}`;
         const response = await fetch(url);
-        console.log("🔐 GameRepository.getByParams()  --response--",response)
+    //    console.log("🔐 GameRepository.getByParams()  --response--",response)
         const data = await response.json();
-        console.log("🔐 GameRepository.getByParams()  --data--",data)
+    //    console.log("🔐 GameRepository.getByParams()  --data--",data)
        // return data.map(User.fromJSON);
         return data.data?data.data[0]?data.data[0]:null:null;
       }
@@ -186,9 +186,9 @@ class GameRepository extends BaseRepository<Game,GameCreate> implements IReposit
 
   //update
   update = async (user: Partial<Game>):Promise<Game>=>{
-    console.log("🔐 GameRepository.update()  --user--",user)
+  //  console.log("🔐 GameRepository.update()  --user--",user)
     const { id, ...userExtracted } = user;
-    console.log("🔐 GameRepository.update()  --userExtracted--",userExtracted)
+  //  console.log("🔐 GameRepository.update()  --userExtracted--",userExtracted)
     const response = await fetch(`${this.URL}/id/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -197,7 +197,7 @@ class GameRepository extends BaseRepository<Game,GameCreate> implements IReposit
       }),
     });
     const data = await response.json();
-    console.log("🔐 GameRepository.update()  --data--",data)
+  //  console.log("🔐 GameRepository.update()  --data--",data)
     //const userUpdated = User.fromJSON(data.data);
     const userUpdated =data.data;
     if (!userUpdated) {
@@ -220,7 +220,7 @@ class GameRepository extends BaseRepository<Game,GameCreate> implements IReposit
       if (!game) {
         return null;
       }
-      console.log("🔐 GameRepository.addPlayer()  --game--",game)
+    //  console.log("🔐 GameRepository.addPlayer()  --game--",game)
       //2- recuperer les joueurs et en faire un tableau d'int avec les id des joueurs
       const { players } = game;
       const playersIds = players?(players as User[]).map((player: User) => player.id):[];

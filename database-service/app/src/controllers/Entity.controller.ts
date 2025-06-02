@@ -91,7 +91,7 @@ export class EntityController {
     
     try{
       const { filters } = req.query as UrlSearchParams;
-      console.log("getEntitysAndCount",req.query);
+     // console.log("getEntitysAndCount",req.query);
       // const { filters, limit, offset, order } = req.query as UrlSearchParams;
       const { database, entity } = req.params as { database: string, entity: string };
       //0- Récupérer la base de données par son nom
@@ -298,7 +298,7 @@ deleteEntity = async (req: FastifyRequest, reply: FastifyReply) => {
     //5- Mettre à jour l'entité
     const entityId = Number(id);
     const result = await repository.delete(entityId);
-    console.log(result);
+ //  console.log(result);
     //5-a Vérifier si l'entité a été crée
     if (!result)  throw new CustomIdNotFoundError(`Entity '${entity}' with ID ${id} could not be deleted`) //return generateErrorResponse(reply, 404, `Entity '${entity}' could not be deleted`);
       //6- Retourner les données
@@ -338,7 +338,7 @@ deleteEntity = async (req: FastifyRequest, reply: FastifyReply) => {
 }
 
 
-//@TODO :
+
 // 📌 📢 Route : GET /table/:entity/:id/:entity2
 // 📌 📢 Route : POST /table/:entity/:id/:entity2 //voir pour jointure
 // 📌 📢 Route : PUT /table/:entity/:id/:entity2

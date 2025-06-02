@@ -23,7 +23,7 @@ export class TournamentsController {
 
   //generate next round
   async generateNextRound(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
-    console.log("[TournamentsController] generateNextRound()  --request--",request.params.id);
+  //  console.log("[TournamentsController] generateNextRound()  --request--",request.params.id);
      const tournamentId = Number(request.params.id);
   try {
     const result = await this.tournamentService.generateNextRound(tournamentId);
@@ -40,11 +40,11 @@ export class TournamentsController {
    * @returns 
    */
   async getTournaments(request: FastifyRequest, reply: FastifyReply) {   
-        console.log("--TournamentsController getTournaments ");
+      //  console.log("--TournamentsController getTournaments ");
         const query = request.query as IParams;
        // const options = new BuildOptions(query).getOptions();
         const tournaments = await  this.tournamentsRepository.getAllbyQuery(query);
-        console.log("TournamentsController getTournaments ",tournaments);
+      //  console.log("TournamentsController getTournaments ",tournaments);
           return reply.send(tournaments);
   }
 
@@ -80,7 +80,7 @@ export class TournamentsController {
     const { ...requestBody } = request.body;
     const { state } = requestBody;
     const updatedTournament = await this.tournamentsRepository.update({id:tournamentId, state});
-    console.log("TournamentsController updateTournament ",updatedTournament);
+  //  console.log("TournamentsController updateTournament ",updatedTournament);
 
     if (!updatedTournament) {
       return reply.status(404).send({ error: 'Tournament not found' });

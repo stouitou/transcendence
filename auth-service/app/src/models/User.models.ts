@@ -1,8 +1,3 @@
-//import "reflect-metadata";
-//import { Entity, PrimaryGeneratedColumn, Column, OneToMany } from "typeorm";
-//import { AuthProvider } from "./AuthProvider.entity";
-//@Entity()
-
 import { AuthProvider } from "./AuthProvider.models";
 
 export interface UserStats {
@@ -107,7 +102,7 @@ export class User/*  extends BaseModel<User>  */{
        created_at?:Date,
        updated_at?:Date,
        userStats?:UserStats}) {
-		//super(user);
+		
 		this.id = user.id ?? 0; // <=> user.id ? user.id : 0
 		this.name = user.name ?? "";
 		this.role = user.role ?? "user";
@@ -115,7 +110,7 @@ export class User/*  extends BaseModel<User>  */{
 		this.authProviders =user.authProviders ??[]// user.authProviders ?user.authProviders.map(AuthProvider.fromJSON):[];
 		this.created_at = user.created_at ?? new Date();
 		this.updated_at = user.updated_at ?? new Date();
-    //@TODO reset test value
+    // Initialisation des statistiques de l'utilisateur
     this.userStats = user.userStats ?? {
       classic_total_game_played: 0,
       classic_total_game_won: 0,

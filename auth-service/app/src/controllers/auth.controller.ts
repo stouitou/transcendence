@@ -4,6 +4,8 @@ import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { BaseController } from "./BaseController";
 import { send2FAEmail } from "../services/mail.service";
 import { generateCSRFToken } from "../utils/crypto";
+import { AuthError, NotFoundError, ValidationError } from "@src/Errors/errors";
+import { generateErrorResponse } from "@src/Errors/handler";
 
 
 /**
@@ -47,13 +49,15 @@ export class AuthController extends BaseController {
    * @returns 
    */ 
   async register(req: FastifyRequest, reply: FastifyReply) {
+    try {
 	  console.log("🔵 AuthController  start register")
     const { name, email, password } = req.body as { name : string, email: string; password: string };
     // Vérifier si l'utilisateur existe déjà dan AuthProvider
     const existingUser = await this.AuthProviderRepository.getByParams({provider_id:email,provider:"local"});
   //	console.log("❓ AuthController   existingUser: ", existingUser)
     if (existingUser) {
-      return reply.status(400).send({ error: "User already exists" });
+      throw new ValidationError("User already exists", "email");
+     // return reply.status(400).send({ error: "User already exists",message: "User already exists" });
     }
     console.log("🟠 AuthController  try create User")
 
@@ -61,11 +65,17 @@ export class AuthController extends BaseController {
     const newUser = await this.app.authService.createUser(name, email, password);
 	  console.log("🟡 newUser",newUser)
     if (!newUser) {
-      return reply.status(400).send({ error: "User already exists" });
+      //return reply.status(400).send({ error: "User already exists" });
+      throw new ValidationError("User already exists", "name");
     }
     const token = this.app.authService.generateToken(newUser!); // `!` pour forcer le non-null
   //  console.log("🔗🟢 token",{token})
     return reply.status(201).send({ token });
+  }
+    catch (error) {
+      console.error("🔴 AuthController register error", error);
+      return generateErrorResponse(reply, error);
+    }
   }
 
   /**
@@ -76,22 +86,24 @@ export class AuthController extends BaseController {
    * @returns 
    */
   async login(req: FastifyRequest, reply: FastifyReply) {
+    try {
     const { email, password } = req.body as { email: string; password: string };
     console.log("🔐[LOGIN] email",email)
     console.log("🔐[LOGIN] req.session.crsf",req.session.csrfToken)
     const user = await this.app.authService.validateUser(email, password);
     if (!user) {
-      return reply.status(401).send({ error: "Invalid credentials" });
+     // return reply.status(401).send({ error: "Invalid credentials" });
+      throw new AuthError("Invalid credentials");
     }
     //rapel une session est instancie des que des données sont stockées dans req.session
     // la session pour l'utilisateur actuelle a debuté par la creation du req.session.csrfToken
     //la cette session est a present atache a l'utilisateur
     req.session.userID = user.id
-      const csrfToken = req.cookies.csrf_token;
+    /*   const csrfToken = req.cookies.csrf_token;
       const csrfTokenHeader = req.headers['x-csrf-token'];
       console.log("🔐[LOGIN] req.headers['x-csrf-token']", csrfTokenHeader)
       console.log("🔐[LOGIN] req.cookies.csrf_token", csrfToken)
-    console.log("🔐[LOGIN] req.session.crsf",req.session.csrfToken)
+    console.log("🔐[LOGIN] req.session.crsf",req.session.csrfToken) */
 
     // Vérifier si l'utilisateur a activé l'authentification à deux facteurs
     // Si oui, générer un token temporaire pour l'authentification à deux facteurs
@@ -139,6 +151,11 @@ export class AuthController extends BaseController {
     req.session.crsfToken = generateCSRFToken();
     console.log("🟢 AuthController  login session",req.session.test)
     return reply.status(201).send({ token: token });
+  }
+    catch (error) {
+      console.error("🔴 AuthController login error", error);
+      return generateErrorResponse(reply, error);
+    }
   }
 
   /**
@@ -193,27 +210,30 @@ export class AuthController extends BaseController {
   }
   // 🟢 Vérification du token
   async me(req: FastifyRequest, reply: FastifyReply) {
-    console.log("🔓 [me]-----    req.session.userID> ", req.session.userID)
-    console.log("🔓 [me]----- req.session.crsfToken> ", req.session.crsfToken)
-
+  //  console.log("🔓 [me]-----    req.session.userID> ", req.session.userID)
+  //  console.log("🔓 [me]----- req.session.crsfToken> ", req.session.crsfToken)
+    try {
    // const startTime = Date.now(); // Démarrer le chronomètre
     const authHeader = req.headers.authorization;
-    if (!authHeader) return reply.status(401).send({ error: "No token provided" });
+   // if (!authHeader) return reply.status(401).send({ error: "No token provided" });
+    if (!authHeader) throw new AuthError("No token provided");
    // let endTime = Date.now(); // Arrêter le chronomètre
    // console.log(`⏱️ [AuthController]  [AuthController] Hook onRequest [check authToken] exécuté en ${endTime - startTime} ms`);
-    try {
+
      // console.log("🔓 me authHeader",authHeader)
 
       const token = authHeader.split(" ")[1];
       const decoded = this.app.jwt.verify(token,"ACCESS_TOKEN_PUBLIC_KEY") as any;
      if (!req.session.userID) {
         console.log("🔴 Session expired or not found");
-        return reply.status(401).send({ error: "Session expired or not found" });
+        throw new AuthError("Session expired or not found");
+        //return reply.status(401).send({ error: "Session expired or not found" });
       }
 
        if (decoded.id !== req.session.userID) {
         console.log("🔴 Token does not match session");
-        return reply.status(401).send({ error: "Invalid token or session" });
+        throw new AuthError("Token does not match session");
+        //return reply.status(401).send({ error: "Invalid token or session" });
       }
      // console.log("🟢 me decoded",decoded)
 
@@ -245,6 +265,7 @@ export class AuthController extends BaseController {
  
    return reply.status(200).send(decoded);
     } catch (err) {
+    return  generateErrorResponse(reply, err);
       console.error("🔴 me error",err)
       if (err.message === "jwt expired") {
         console.log("🔴 me jwt expired")
@@ -295,7 +316,6 @@ export class AuthController extends BaseController {
   }
 
 
-//@BUG : a revoir
    /**
    * Connexion (loginForgetPassword) by email
    * 
@@ -307,15 +327,10 @@ export class AuthController extends BaseController {
     const { email } = req.body as { email: string; password: string };
     const user = await this.app.authService.validateAuthProvider(email, "local");    
     if (!user) {
-      return reply.status(201).send({ twoFactorRequired: true, method: 'email' });
-   //   return reply.status(401).send({ error: "Invalid credentials" });//@TODO on devrait pas dire que les identifiants sont invalides
+      return reply.status(201).send({ twoFactorRequired: true, method: 'email' });//on doit pas dire que les identifiants sont invalides
     }
-    console.log("🔐[LOGIN] [loginForgetPassword]  user",user)
-   // return reply.status(200).send({ user });
-
     // Vérifier si l'utilisateur a activé l'authentification à deux facteurs
     // Si oui, générer un token temporaire pour l'authentification à deux facteurs
-  //  const is2FAEnabled = user.authProviders && user.authProviders[0].two_factor_auth;
     if (user.authProviders/*  && is2FAEnabled */ ) {
       //1- generer un token temporaire pour l'authentification à deux facteurs
       const {provider_id, two_factor_auth_method = "totp"} = user.authProviders[0];
@@ -330,23 +345,19 @@ export class AuthController extends BaseController {
       });
       //2- si la methode est email, envoyer un code de vérification par email
       if (two_factor_auth_method != "totp") {
-        console.log("🔐[LOGIN][loginForgetPassword] two_factor_auth_method",two_factor_auth_method)
         const { otp, otpExpiration } = await this.app.twoFactorAuthService.generate2FAEmailCode(user,true);
         console.log("🔐 otp",otp)
-        console.log("🔐 otpExpiration",otpExpiration)
         // Envoyer le code de vérification par email
          console.log("🔐[LOGIN] send2FAEmail to: ",email)
 
- //@TODO a decommenter pour un envoie de mail
+ //@TEST a decommenter pour un envoie de mail
         await send2FAEmail(email, otp);
       }
       return reply.status(201).send({ twoFactorRequired: true, method: two_factor_auth_method });
     }
       // Sinon, générer un token JWT forgot password
 
-    const token = this.app.authService.generateToken(user);//@TODO
-  //  console.log("🟢 token ",token)
-
+    const token = this.app.authService.generateToken(user);
         // Définir le cookie avec le token
       reply.setCookie('authForgetPasswordToken', token, {
           httpOnly: true,
@@ -359,7 +370,6 @@ export class AuthController extends BaseController {
     return reply.status(201).send({ twoFactorRequired: true, method: email });
   }
 
-//@BUG : a revoir
   /**
    * changer le mot de passe oublié
    * on utilise le token de reinitialisation du mot de passe: authForgetPasswordToken
@@ -435,20 +445,24 @@ export class AuthController extends BaseController {
 
 
   async updateMePassword(req: FastifyRequest, reply: FastifyReply) {
-    const { oldPassword, newPassword } = req.body as { oldPassword: string; newPassword: string };
-    if (!oldPassword || !newPassword) {
-      return reply.status(400).send({ error: "Old password and new password are required" });
-    }
-    if (oldPassword === newPassword) {
-      return reply.status(400).send({ error: "Old password and new password are the same" });
-    }
+ 
     try {
+      const { oldPassword, newPassword } = req.body as { oldPassword: string; newPassword: string };
+      if (!oldPassword || !newPassword) {
+        //return reply.status(400).send({ error: "Old password and new password are required" });
+        throw new ValidationError("Old password and new password are required", "oldPassword");
+      }
+      if (oldPassword === newPassword) {
+     //   return reply.status(400).send({ error: "Old password and new password are the same" });
+        throw new ValidationError("Old password and new password cannot be the same", "oldPassword");
+      }
       console.log("[updateMePassword] --start--")
       const authToken = req.cookies.authToken;
       //2- Vérifier si le token d'authentification est présent
       if (!authToken) {
         console.log("[updateMePassword] no authToken")
-        return reply.status(401).send({ error: "Unauthorized" });
+       // return reply.status(401).send({ error: "Unauthorized" });
+        throw new AuthError();
       }
       // Vérifier le token pour l'authentification
       const decoded = this.app.jwt.verify(authToken, "ACCESS_TOKEN_PUBLIC_KEY") as {id: number};
@@ -457,24 +471,28 @@ export class AuthController extends BaseController {
       const user = await this.UserRepository.getById(decoded.id);
       if (!user) {
        console.log("[updateMePassword] !user");
-        return reply.status(401).send({ error: "Unauthorized" });
+        //return reply.status(401).send({ error: "Unauthorized" });
+        throw new AuthError("User not found");
       }
       //3- Vérifier si l'utilisateur a déjà un secret pour l'authentification à deux facteurs
       const {authProviders} = user;
       if (!authProviders || authProviders.length === 0) {
 
        console.log("[updateMePassword] !authProviders || authProviders.length === 0");
-        return reply.status(400).send({ error: "User has no authProviders" });
+       // return reply.status(400).send({ error: "User has no authProviders" });
+        throw new ValidationError("User has no authProviders", "authProviders");
       }
       const authProvider = authProviders[0];
 
        console.log("[updateMePassword] authProvider",authProvider);
       if (!authProvider) {
-        return reply.status(400).send({ error: "User has no authProviders" });
+       // return reply.status(400).send({ error: "User has no authProviders" });
+        throw new ValidationError("User has no authProviders", "authProviders");
       }
       const {id, provider, provider_id, password } = authProvider;
-      if (!id ||provider !== "local") {//@TODO corriger le type
-        return reply.status(400).send({ error: "User has no authProviders" });
+      if (!id ||provider !== "local") {
+       // return reply.status(400).send({ error: "User has no authProviders" });
+       throw new ValidationError("User has no authProviders", "authProviders");
       }
       console.log("[updateMePassword] provider_id",provider_id);
       /* if (provider !== "local") {
@@ -485,20 +503,24 @@ export class AuthController extends BaseController {
       const isValid = await this.app.authService.isValidResetPassword(provider_id, oldPassword, password);
       console.log("[updateMePassword] isValidResetPassword",isValid)
       if (!isValid) {
-        return reply.status(400).send({ error: "Invalid credentials" });
+        //return reply.status(400).send({ error: "Invalid credentials" });
+        throw new ValidationError("Invalid credentials", "oldPassword");
       }
       //5- Changer le mot de passe
       const updatedUser = await this.app.authService.updatePassword(id, newPassword);
       console.log("[updateMePassword] updatedUser",updatedUser)
       if (!updatedUser) {
-        return reply.status(400).send({ error: "User not found" });
+        //return reply.status(400).send({ error: "User not found" });
+        throw new ValidationError("User not found", "user");
       }
       //return no content
       console.log("[updateMePassword] --end--")
       return reply.status(204).send();
     } catch (error) {
-      console.error("🔴[updateMePassword] error", error);
-      return reply.status(500).send({ error: "Internal server error" });
+/*       console.error("🔴[updateMePassword] error", error);
+      return reply.status(500).send({ error: "Internal server error" }); */
+      console.error("🔴[updateMePassword] error");
+      return generateErrorResponse(reply, error);
     }
     
   }

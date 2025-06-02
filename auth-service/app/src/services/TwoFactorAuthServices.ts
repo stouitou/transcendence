@@ -1,3 +1,4 @@
+import { NotFoundError, ValidationError } from "@src/Errors/errors";
 import { AuthProvider } from "../models/AuthProvider.models";
 import { User } from "../models/User.models";
 import AuthProviderRepository from "../repository/AuthProvider.repository";
@@ -18,7 +19,7 @@ export class TwoFactorAuthService {
   async generate2FASecret(userId: number) {
     const user = await this.userRepository.getById(userId);
     if (!user) {
-      throw new Error("User not found");
+      throw new NotFoundError("User not found");
     }
 
     const { otpauth } = await this.get2FASecret(user.authProviders[0].provider_id);
@@ -30,10 +31,10 @@ export class TwoFactorAuthService {
   }
     async get2FASecret(email: string): Promise< {secret:string,otpauth:string| null } > {
 	  //1- on verifie si l'utilisateur existe
-	  if (!email) throw new Error("email not found");
+	  if (!email) throw new ValidationError("Email is required", "email");
 	  //2- on verifie si l'utilisateur a deja un secret
 	  const user = await this.userRepository.getOneByParams({authProviders:{provider_id:email, provider:"local"}});
-	  if (!user) throw new Error("User not found");
+	  if (!user) throw new NotFoundError("User not found");
 	  //3- on verifie si l'utilisateur a deja activé l'authentification à deux facteurs
 	//  if (user.authProviders[0].two_factor_auth_secret) return {secret:user.authProviders[0].two_factor_auth_secret, otpauth:null};
 	  //3- on genere le secret de l'authentification à deux facteurs
@@ -48,7 +49,7 @@ export class TwoFactorAuthService {
 	}
 	 async generate2FAEmailCode(user: User,isForce:boolean=false): Promise<{ otp:string, otpExpiration:Date }> {
 		//1- on verifie si l'utilisateur existe
-		if (!user) throw new Error("User not found");
+		if (!user) throw new NotFoundError("User not found");
 		console.log("🔐AuthService:  generate2FAEmailCode()  user : ",user)
 		//2- on verifie si l'utilisateur a activé l'authentification à deux facteurs
 		if (!isForce && !user.authProviders[0].two_factor_auth) throw new Error("[generate2FAEmailCode] Two factor auth not enabled");
@@ -80,30 +81,30 @@ export class TwoFactorAuthService {
 
 	  async verify2FAEmailCode(authProviders: AuthProvider|null, code: string,isForce:boolean=false): Promise<boolean> {
 		//1- on verifie si l'utilisateur existe
-		if (!authProviders) throw new Error("User not found");
+		if (!authProviders) throw new NotFoundError("User not found");
 		//2- on verifie si l'utilisateur a activé l'authentification à deux facteurs
-		if (!isForce && !authProviders.two_factor_auth) throw new Error("[verify2FAEmailCode]Two factor auth not enabled");
+		if (!isForce && !authProviders.two_factor_auth) throw new ValidationError("[verify2FAEmailCode]Two factor auth not enabled", "two_factor_auth");
 		//3- on verifie si l'utilisateur a deja un code de verification
-		if (!authProviders.otp) throw new Error("No OTP code found");
+		if (!authProviders.otp) throw new NotFoundError("No OTP code found");
 		//4- on verifie si le code de verification est encore valide
 		const now = new Date();
 		const expiration = new Date(authProviders.otpExpiration?? 0);
-		if (now > expiration) throw new Error("OTP code expired");
+		if (now > expiration) throw new ValidationError("OTP code expired", "otp");
 		//5- on verifie le code de verification
 		const isValid = decrypt(authProviders.otp) === code;
 		//on reset le code de verification
-		await this.authProviderRepository.set2FAEmailCode(authProviders.id!, "", new Date());// on reset le code de verification //@TODO null
+		await this.authProviderRepository.set2FAEmailCode(authProviders.id!, "", new Date());// on reset le code de verification
 		return isValid;
 	  }
 
 	  async verify2FATOTPCode(authProviders: AuthProvider|null, code: string): Promise<boolean> {
 		//1- on verifie si l'utilisateur existe
-		if (!authProviders) throw new Error("User not found");
+		if (!authProviders) throw new NotFoundError("User not found");
 		//2- on verifie si l'utilisateur a activé l'authentification à deux facteurs
-		if (!authProviders.two_factor_auth) throw new Error("[verify2FATOTPCode] Two factor auth not enabled");
+		if (!authProviders.two_factor_auth) throw new ValidationError("[verify2FATOTPCode] Two factor auth not enabled", "two_factor_auth");
 		//3- on verifie si l'utilisateur a deja un code de verification
 		console.log("🔐AuthService:  verify2FATOTPCode()  authProviders.two_factor_auth_secret : ",authProviders.two_factor_auth_secret)
-		if (!authProviders.two_factor_auth_secret) throw new Error("No two_factor_auth_secret code found");
+		if (!authProviders.two_factor_auth_secret) throw new ValidationError("No two_factor_auth_secret code found", "two_factor_auth_secret");
 			//4- on verifie le code de verification
 		const isValid =verifyTOTP(code, authProviders.two_factor_auth_secret);
 		return isValid;
@@ -117,7 +118,7 @@ export class TwoFactorAuthService {
     });
     if (!authProvider) {
 		console.log("🔴 verify2FACode user not found", userEmail,method,isForce)
-      throw new Error("User not found");
+      throw new NotFoundError("User not found");
     }
 
     if (method === "totp") {     
@@ -135,8 +136,7 @@ export class TwoFactorAuthService {
     });
 
     if (!authProvider) {
-		console.log("🔴 enable2FA user not found")
-      throw new Error("User not found");
+      throw new NotFoundError("User not found");
     }
 
     // Activez le 2FA pour l'utilisateur
@@ -159,7 +159,7 @@ export class TwoFactorAuthService {
     });
 
     if (!authProvider) {
-      throw new Error("User not found");
+      throw new ValidationError("User not found", "email");
     }
 
     // Désactivez le 2FA pour l'utilisateur

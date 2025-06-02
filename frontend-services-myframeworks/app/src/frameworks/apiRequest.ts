@@ -1,4 +1,5 @@
-import { ApiError } from "./base-error";
+import { ApiError, ApiErrorBase } from "./base-error";
+import { t } from "./i18n/index";
 
 /**
  *  * Fonction générique pour effectuer des requêtes API
@@ -77,13 +78,15 @@ export const apiRequest = async <T, B = unknown>(
 
     if (!response.ok) {
       const errorData = await response.json();
-      throw new ApiError(response.status, errorData.error || "An error occurred");
+      console.log("API Request Error Data:", errorData);
+      throw new ApiErrorBase(errorData);
+     // throw new ApiError(response.status, errorData.error || "An error occurred");
     }
 
     return await response.json();
   } catch (error) {
     console.error("API Request Error:", error);
-    if (error instanceof ApiError) {
+    if (error instanceof ApiErrorBase) {
       throw error;
     }
     throw new ApiError(500, "Unexpected error occurred");
