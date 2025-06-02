@@ -31,7 +31,7 @@ export class User {
   authProviders: AuthProvider[];
 
   //chaque joueur a un ou plusieurs Tournois
-  @ManyToMany(() => Tournaments, (tournements) => tournements.players ,{ onUpdate: 'CASCADE', nullable: true })
+  @ManyToMany(() => Tournaments, (tournements) => tournements.players ,{ onDelete: 'CASCADE',onUpdate: 'CASCADE', nullable: true })
  @JoinTable()
  tournaments: Tournaments[];
   //chaque joueur a un ou plusieurs round /Tournois
@@ -40,12 +40,12 @@ export class User {
  rounds: Round[]; */
 
    //chaque joueur a plusieurs parties
-  @ManyToMany(() => Game, (game) => game.players ,{ /* cascade: true, */ onUpdate: 'CASCADE', nullable: true })
+  @ManyToMany(() => Game, (game) => game.players ,{ /* cascade: true, */onDelete: 'CASCADE', onUpdate: 'CASCADE', nullable: true })
   @JoinTable()
   games: Game[];
 
   //chaque joueur a plusieurs amis
-  @ManyToMany(() => User, (user) => user.friends ,{ /* cascade: true, */ onUpdate: 'CASCADE', nullable: true })
+  @ManyToMany(() => User, (user) => user.friends ,{ /* cascade: true, */onDelete: 'CASCADE', onUpdate: 'CASCADE', nullable: true })
   @JoinTable()
   friends: User[];
 

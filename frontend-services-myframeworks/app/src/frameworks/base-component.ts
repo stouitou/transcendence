@@ -294,12 +294,12 @@ export abstract class BaseComponent<TState = {}, TForms extends Record<string, a
   */
 
     protected _apiErrorHandlers: Map<number, ApiErrorHandler> = new Map();
-    setApiErrorHandler(status: number, handler: ApiErrorHandler) {
-      this._apiErrorHandlers.set(status, handler);
+    setApiErrorHandler(statusCode: number, handler: ApiErrorHandler) {
+      this._apiErrorHandlers.set(statusCode, handler);
     }
     apiErrorHandler = (error: unknown) => {
        if (error instanceof ApiError) {
-    const handler = this._apiErrorHandlers.get(error.status);
+    const handler = this._apiErrorHandlers.get(error.statusCode);
 
     if (handler) {
       // Afficher le message personnalisé ou standard

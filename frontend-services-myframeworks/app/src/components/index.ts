@@ -1,5 +1,4 @@
 
-import { PongComponent } from './game';
 import { NavBarComponent } from './navbar/NavBar';
 import { BackgroundCanvas } from './background/background';
 import { OnlineComponent } from './online-component';
@@ -11,10 +10,6 @@ if (!customElements.get('navbar-component')) {
 
 if (!customElements.get('background-canvas-component')) {
   customElements.define('background-canvas-component', BackgroundCanvas);
-}
-
-if (!customElements.get('pong-game')) {
-  customElements.define('pong-game', PongComponent);
 }
 
 if (!customElements.get('is-online-component')) {

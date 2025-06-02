@@ -87,3 +87,29 @@ export interface SettingsUpdateLangFormData  {
 export type SettingsFormData ={
   formUpdateLang: SettingsUpdateLangFormData,
 }
+
+/* GameSettings */
+export interface SettingsGameTypeFormData  {
+  type: "local" | "remote";
+};
+export interface SettingsGameFormatFormData  {
+  format: "classic" | "tournament";
+};
+export interface SettingsGamePlayerFormData  {
+  is_max_players: string;
+  is_format: string;
+  type: "local" | "remote";
+  avatar: string;
+  display_name: string;
+  is_IA: string;
+  user: number | null;
+};
+export interface SettingsGameMaxPlayerFormData  {
+  max_players: number;
+};
+export type SettingsGameFormData ={
+  formSetGameType: SettingsGameTypeFormData,
+  formSetGameFormat: SettingsGameFormatFormData,
+  addPlayerForm: SettingsGamePlayerFormData,
+  formSetGameMaxPlayer: SettingsGameMaxPlayerFormData,
+}

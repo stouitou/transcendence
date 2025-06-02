@@ -62,7 +62,7 @@ export function generateSucessResponse<T>( reply: FastifyReply, code:number, dat
    if (!options) {
 	 options = { limit: 0, offset: 0, order: "ASC" };
    }
-   console.log("🔗 responseHandler.ts generateSucessResponse()  --total:",options.total)
+//   console.log("🔗 responseHandler.ts generateSucessResponse()  --total:",options.total)
    options = {
 	  limit: options.limit ? options.limit : 0,
 	  offset: options.offset ? options.offset : 0,

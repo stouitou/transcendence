@@ -8,7 +8,6 @@ import { ChatComponent } from './chat-component';
 import { Dashboard } from "./dashboard-test-component";
 import { GameLobyComponent } from "./game-loby-componemt";
 import { Home } from "./home-component";
-import { GameMenu } from "../components/GameMenu";
 import { ResetPassword } from "./reset-password-component";
 import { ForgotPasswordRequest } from "./forgot-password-request-component";
 import { ForgotPasswordTwoFactor } from "./forgot-password-two-factor-component";
@@ -31,9 +30,6 @@ import { GameWrapper } from "./game-wrapper-component";
 	connectedCallback() {
 	  this.innerHTML = `<h1>About Us</h1>`;
 	}
-  }
-  if (!customElements.get('game-menu')) {
-	customElements.define('game-menu', GameMenu);
   }
   if (!customElements.get('home-component')) {
 	customElements.define('home-component', Home);

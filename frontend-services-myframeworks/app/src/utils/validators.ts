@@ -27,9 +27,23 @@ export const checkboxValidator = (value: string): string[] => {
 export const SettingLangValidator = (value: string): string[] => {
   const errors: string[] = [];
   if (!value) errors.push("FORM.SETTINGS.LANG.REQUIRED");
-  const allowedLangs = ['fr', 'en'];
+  const allowedLangs = ['fr', 'en', 'es'];
   // if (!allowedLangs.includes(value)) errors.push("La langue sélectionnée n'est pas valide.");
    if (!allowedLangs.includes(value)) errors.push("FORM.SETTINGS.LANG.INVALID");
   
   return errors;
-};
+}; 
+
+export const hiddenCheckboxValidator = (value: string): string[] => {
+  const errors: string[] = [];
+  if (!value) errors.push("FORM.GENERIC.REQUIRED");
+  if (value !== "false") errors.push("FORM.GENERIC.MAX.INVALID");
+  return errors;
+}
+
+export const hiddenisformatValidator = (value: string): string[] => {
+  const errors: string[] = [];
+  if (!value) errors.push("FORM.GENERIC.FORMAT.REQUIRED");
+  if (value !== "true") errors.push("FORM.GENERIC.FORMAT.INVALID");
+  return errors;
+}

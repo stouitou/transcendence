@@ -26,10 +26,10 @@ export class Admin extends BaseComponent<{user: User | null}> {
 	}
 	const disable = user === null || user === undefined;
 	this.innerHTML = `
-	  <section class=" px-4 py-8">
-		<div class="max-w-7xl mx-auto">
-		  <h1 class="text-4xl font-bold mb-8 text-center">Admin Dashboard</h1>
-		  <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+	  <section class="section-container">
+		<div class="section-content">
+		  <h1 class="title-main">Admin Dashboard</h1>
+		  <div class="dashboard-grid">
 			${this.card("manage Users", "Lancez une nouvelle partie", "/admin/users", "👤👤",disable)}
 			${this.card("Paramètres", "Réglez vos préférences", "/settings", "⚙️")}
 			${this.card("Support", "Besoin d’aide ?", "/support", "❓")}
@@ -46,14 +46,14 @@ export class Admin extends BaseComponent<{user: User | null}> {
 	const isDisabled = disabled;
 	const linkAttribute = isDisabled ? '' : `href="${link}"`;
 	const cardClasses = isDisabled
-	  ? 'cursor-not-allowed opacity-50 bg-gray-200 dark:bg-gray-700'
-	  : 'cursor-pointer bg-white dark:bg-gray-800 hover:shadow-lg transition-all hover:scale-[1.02] hover:bg-gray-50 dark:hover:bg-gray-700';
+	  ? 'dashboard-card-disabled'
+	  : 'dashboard-card-hover';
   
 	return `
-	  <a ${linkAttribute} data-link="${link}" class="p-6 rounded-2xl shadow ${cardClasses}">
-		<div class="text-4xl mb-3">${emoji}</div>
-		<h2 class="text-xl font-semibold mb-1">${title}</h2>
-		<p class="text-sm text-gray-600 dark:text-gray-300">${subtitle}</p>
+	  <a ${linkAttribute} data-link="${link}" class="dashboard-card ${cardClasses}">
+		<div class="dashboard-card-icon">${emoji}</div>
+        <h2 class="dashboard-card-title">${title}</h2>
+        <p class="dashboard-card-text-muted">${subtitle}</p>
 	  </a>
 	`;
   }

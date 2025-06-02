@@ -8,6 +8,7 @@ import { UserStats } from '../models/User';
 import Helpers, { IParams } from '../repository/helpers';
 import { AuthServiceController } from './authService.controller';
 import { chmod } from 'node:fs/promises';
+import { AuthError, NotFoundError, ValidationError } from '@src/Errors/errors';
 const pump = promisify(pipeline);
 
 export type User = {
@@ -88,6 +89,7 @@ export class UserController {
     this.updateUser = this.updateUser.bind(this);
     this.updateMe = this.updateMe.bind(this);
     this.deleteUser = this.deleteUser.bind(this);
+    this.deleteUserMe = this.deleteUserMe.bind(this);
     this.updateUserAvatar = this.updateUserAvatar.bind(this);
     this.updateUserAvatarById = this.updateUserAvatarById.bind(this);
     this.addFriend = this.addFriend.bind(this);
@@ -100,27 +102,15 @@ export class UserController {
 
     this.getUserTournamentsByUserId = this.getUserTournamentsByUserId.bind(this);
   }
-  //constructor(private userService: UserService) {}
-
- /*  async  registerUser( request: FastifyRequest<{ Body: CreateUserBody }>, reply: FastifyReply) {
-
-    const { ...requestBody } = request.body;
-    const { name, email } = requestBody;
-    console.log("UserController registerUser ", name, email);
-    try {
-      const user = await this.userService.registerUser(name, email);
-      return reply.status(201).send(user);
-    } catch (error) {
-      return reply.status(400).send({ error: error.message });
-    }
-  } */
 
     async createUser(request: FastifyRequest<{ Body: {name:string,avatar:string} }>, reply: FastifyReply) {  
       const { ...requestBody } = request.body;
       //const users = await UserRepository.create(requestBody);
       const users = await this.userRepository.create(requestBody);
       if (!users) {
-        return reply.status(404).send({ error: 'User not found' });
+      //  return reply.status(404).send({ error: 'User not found' });
+        throw new ValidationError("User not created", "request.body");
+
       }
       return reply.status(201).send(users);
     }
@@ -132,81 +122,85 @@ export class UserController {
         const query = request.query as IParams;
        // const options = new BuildOptions(query).getOptions();
         const users = await  this.userRepository.getAllbyQuery(query);
- //   const users = await  this.userRepository.getAll();
-        console.log("UserController getUsers ",users);
-    return reply.send(users);  } catch (error) {
+        if (!users) {
+          throw new ValidationError("Users not found", "request.query");
+        }
+      return reply.send(users);
+    } catch (error) {
       console.error("UserController getUsers error ",error);
-      return reply.status(407).send({ error: 'Internal server error' });
+      throw new ValidationError("Malformed response from user service", "request.query");
     }
   }
 
   async getUserMe(request:  FastifyRequest, reply: FastifyReply) {
     const authenticatedUser = request.authenticatedUser;
     if (!authenticatedUser) {
-      return reply.status(401).send({ error: 'User not authenticated' });
+    //  return reply.status(401).send({ error: 'User not authenticated' });
+       // Fastify catchera cette erreur
+       throw new AuthError("User not authenticated");
     }
     const user = await this.userRepository.getById(authenticatedUser.id!);
         if (!user) {
-      return reply.status(404).send({ error: 'User not found' });
+      //return reply.status(404).send({ error: 'User not found' });
+      throw new NotFoundError("User not found");
     }
     return reply.send(user);
   }
 
 
   async getUserById(request:  FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
-    const userId = Number(request.params.id);    
-  //  const user = await this.userService.getUser(userId);
-    //const user = await UserRepository.getById(userId);
+    const userId = Number(request.params.id);
     const user = await this.userRepository.getById(userId);
-        if (!user) {
-      return reply.status(404).send({ error: 'User not found' });
+      if (!user) {
+        throw new NotFoundError("User not found");
     }
     return reply.send(user);
   }
-    async getUserMeById(request:  FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
+
+  async getUserMeById(request:  FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     const userId = Number(request.params.id);
     const user = await this.userRepository.getById(userId);
-        if (!user) {
-      return reply.status(404).send({ error: 'User not found' });
+    if (!user) {
+        throw new NotFoundError("User not found");
     }
-    const {id,avatar,name,role,created_at} = user;
-    return reply.send({id,avatar,name,role,created_at});
+    const {id,avatar,name,role,created_at,level} = user;
+    return reply.send({id,avatar,name,role,created_at,level});
   }
 
   async getUserStatsById(request:  FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     const userId = Number(request.params.id);
     const user = await this.userRepository.getById(userId);
-        if (!user) {
-      return reply.status(404).send({ error: 'User not found' });
+     if (!user) {
+        throw new NotFoundError("User not found");
     }
     return reply.send(user.userStats);
   }
   async getUsersLeaderboard(request:  FastifyRequest, reply: FastifyReply) {
     const leaderboard = await this.userRepository.getUsersLeaderboard();
-        if (!leaderboard) {
-      return reply.status(404).send({ error: 'leaderboard not found' });
+    if (!leaderboard) {
+      throw new NotFoundError("leaderboard not found");
     }
     return reply.send(leaderboard);
   }
-  //@TODO updateStatsById est ce que c'est utile de le conserver ?
+
   async updateStatsById(request:  FastifyRequest<{ Params: { id: string },Body:Partial<UserStats> }>, reply: FastifyReply) {
     const userId = Number(request.params.id);
     if (!userId) {
-      return reply.status(400).send({ error: "Invalid user id" });
+      throw new ValidationError("Invalid user id", "request.params.id");
     }
     if (!request.body) {
-      return reply.status(400).send({ error: "Invalid request body" });
+      throw new ValidationError("Invalid request body", "request.body");
     }
   
     // Récupérer l'utilisateur et ses statistiques
     const user = await this.userRepository.getById(userId);
     if (!user) {
-      return reply.status(404).send({ error: "User not found" });
+      throw new NotFoundError("User not found");
     }
-  
+
     const userStats = user.userStats;
     if (!userStats) {
-      return reply.status(404).send({ error: "UserStats not found" });
+      throw new NotFoundError("UserStats not found");
     }
   
     const {id,...requestBody } = request.body;
@@ -219,7 +213,7 @@ export class UserController {
     });
   
     if (!userUpdated) {
-      return reply.status(500).send({ error: "Failed to update user stats" });
+      throw new ValidationError("Failed to update user stats", "request.body");
     }
   
     return reply.send(userUpdated);
@@ -228,15 +222,15 @@ export class UserController {
   async updateUser(request: FastifyRequest<{ Params: { id: string }, Body: UpdateUserBody&{role?:string} }>, reply: FastifyReply) {
     const admin = request.authenticatedUser?.role === 'admin';
     if (!admin) {
-      return reply.status(403).send({ error: 'Unauthorized'/* ,admin:request.authenticatedUser?.role */ });
+      throw new AuthError("Unauthorized");
     }
-    
+
     const userId = Number(request.params.id);
     if (!userId) {
-      return reply.status(400).send({ error: 'Invalid user id' });
+      throw new ValidationError("Invalid user id", "request.params.id");
     }
     if (!request.body) {
-      return reply.status(400).send({ error: 'Invalid request body' });
+      throw new ValidationError("Invalid request body", "request.body");
     }
     const { ...requestBody } = request.body;
     const { id,name,avatar,password,providers,role} = requestBody;
@@ -247,7 +241,7 @@ export class UserController {
     console.log("UserController updateUser ",user);
 
     if (!user) {
-      return reply.status(404).send({ error: 'User not found' });
+      throw new NotFoundError("User not found");
     }
     return reply.send(user);
   }
@@ -257,10 +251,10 @@ export class UserController {
     console.log("UserController body ",request.body);
     const userId = Number(request.authenticatedUser?.id);
     if (!userId) {
-      return reply.status(400).send({ error: 'Invalid user id' });
+      throw new ValidationError("Invalid user id", "request.authenticatedUser.id");
     }
     if (!request.body) {
-      return reply.status(400).send({ error: 'Invalid request body' });
+      throw new ValidationError("Invalid request body", "request.body");
     }
     const { ...requestBody } = request.body;
     const { id,name,avatar,password,providers} = requestBody;
@@ -276,7 +270,7 @@ export class UserController {
     console.log("UserController updateUser ",user);
 
     if (!user) {
-      return reply.status(404).send({ error: 'User not found' });
+      throw new NotFoundError("User not found");
     }
     return reply.send(user);
   }
@@ -286,10 +280,10 @@ export class UserController {
   async updateMePassword(request: FastifyRequest, reply: FastifyReply) {
      const userId = Number(request.authenticatedUser?.id);
     if (!userId) {
-      return reply.status(400).send({ error: 'Invalid user id' });
+      throw new ValidationError("Invalid user id", "request.authenticatedUser.id");
     }
     if (!request.body) {
-      return reply.status(400).send({ error: 'Invalid request body' });
+      throw new ValidationError("Invalid request body", "request.body");
     }
     const { ...requestBody } = request.body as { oldPassword: string, newPassword: string };
     const { oldPassword, newPassword} = requestBody;
@@ -299,7 +293,8 @@ export class UserController {
       return reply.code(204).send();
     } catch (error) {
       console.error('Error fetching 2FA status:', error);
-      return reply.status(500).send({ error: error.message });
+      throw new ValidationError("Failed to update password", "request.body");
+    //  return reply.status(500).send({ error: error.message });
     }
   }
 
@@ -308,20 +303,20 @@ export class UserController {
     try {
     const userId = request.authenticatedUser?.id;
     console.log("UserController updateUserAvatar ",userId);
-    if (!userId) {      
-      return reply.status(400).send({ error: 'Invalid user id' });
+    if (!userId) { 
+      throw new AuthError("Invalid user id user not authenticated");
     }
     const data = await request.file();
     console.log("UserController updateUserAvatar ",data);
     if (!data) {
       console.log("UserController updateUserAvatar  no file");
-      return reply.status(400).send({ error: 'Aucun fichier envoyégk' });
+      throw new ValidationError("No file uploaded", "request.file");
     }
     //get extension
     const fileExtension = data.filename.split('.').pop();
     if (!fileExtension) {
       console.log("UserController updateUserAvatar  no file extension");
-      return reply.status(400).send({ error: 'Aucun fichier envoyégk' });
+      throw new ValidationError("No file extension", "request.file");
     }
     //const uploadPath = `${process.cwd()}/uploads/${userId}-${data.filename}`;
     const uploadPath = `${process.cwd()}/uploads/${userId}-avatar.${fileExtension}`;
@@ -332,13 +327,13 @@ await chmod(uploadPath, 0o644);
    // const user = await this.userRepository.update({...request.authenticatedUser,avatar:`uploads/${userId}-${data.filename}`});
     const user = await this.userRepository.update({id:userId, avatar:`/uploads/${userId}-avatar.${fileExtension}`});
       if (!user) {
-        return reply.status(404).send({ error: 'User not found' });
+        throw new NotFoundError("User not found");
       }
       return reply.send(user);
     }
     catch (error) {
       console.error('Error uploading avatar:', error);
-      return reply.status(500).send({ error: 'Error uploading avatar' });
+      throw new ValidationError("Error uploading avatar", "request.file");
     }
   }
   /**
@@ -351,28 +346,38 @@ await chmod(uploadPath, 0o644);
   async updateUserAvatarById(request: FastifyRequest, reply: FastifyReply) {
     const admin = request.authenticatedUser?.role === 'admin';
     if (!admin) {
-      return reply.status(403).send({ error: 'Unauthorized'/* ,admin:request.authenticatedUser?.role */ });
+      throw new AuthError("Unauthorized");
     }
     
     const userId = (request.params as {id:number}).id;
     console.log("UserController updateUserAvatar ",userId);
-    if (!userId) {      
-      return reply.status(400).send({ error: 'Invalid user id' });
+    if (!userId) {
+      throw new ValidationError("Invalid user id", "request.params.id");
     }
     const data = await request.file();
     console.log("UserController updateUserAvatar ",data);
     if (!data) {
       console.log("UserController updateUserAvatar  no file");
-      return reply.status(400).send({ error: 'Aucun fichier envoyégk' });
+      throw new ValidationError("No file uploaded", "request.file");
     }
-    const uploadPath = `${process.cwd()}/uploads/${userId}-${data.filename}`;
+    //get extension
+    const fileExtension = data.filename.split('.').pop();
+    if (!fileExtension) {
+      console.log("UserController updateUserAvatar  no file extension");
+      throw new ValidationError("No file extension", "request.file");
+    }
+    //const uploadPath = `${process.cwd()}/uploads/${userId}-${data.filename}`;
+    const uploadPath = `${process.cwd()}/uploads/${userId}-avatar.${fileExtension}`;
     console.log("UserController updateUserAvatar ",uploadPath);
     await pump(data.file, createWriteStream(uploadPath));
+// Fix permissions (lecture-écriture pour le propriétaire, lecture pour les autres)
+await chmod(uploadPath, 0o644);
 
    // const user = await this.userRepository.update({...request.authenticatedUser,avatar:`uploads/${userId}-${data.filename}`});
-    const user = await this.userRepository.update({id:userId, avatar:`/uploads/${userId}-${data.filename}`});
+    const user = await this.userRepository.update({id:userId, avatar:`/uploads/${userId}-avatar.${fileExtension}`});
+   // const user = await this.userRepository.update({id:userId, avatar:`/uploads/${userId}-${data.filename}`});
       if (!user) {
-        return reply.status(404).send({ error: 'User not found' });
+        throw new NotFoundError("User not found");
       }
       return reply.send(user);
     }
@@ -382,21 +387,22 @@ await chmod(uploadPath, 0o644);
      try {
         const userId = Number(request.authenticatedUser?.id);
         if (!userId) {
-          return reply.status(400).send({ error: 'Invalid user id' });
+          throw new AuthError("Invalid user id user not authenticated");
         }
           const friendName = request.body.friendName;
 
           const friend = await this.userRepository.getOneByParams({ name: friendName })
           if (!friend) {
-            return reply.status(404).send({ error: 'Friend not found' });
+            throw new ValidationError("Friend not found", "friendName");
           }
           //const user = await this.userService.deleteUser(userId);
         // const user = await UserRepository.delete(userId);
           const user = await this.userRepository.addFriend(userId,friend.id);
+          //if success return user
           return reply.send(user);
       } catch (error) {
           console.error('Error adding friend by username:', error);
-          return reply.status(500).send({ error: 'Failed to add friend' });
+          throw new ValidationError("Failed to add friend", "friendName");
       }
     }
 
@@ -404,12 +410,15 @@ await chmod(uploadPath, 0o644);
      // const userId = parseInt(request.params.id);
      const userId = Number(request.authenticatedUser?.id);
      if (!userId) {
-       return reply.status(400).send({ error: 'Invalid user id' });
+       throw new AuthError("Invalid user id user not authenticated");
      }
       const friendId = parseInt(request.body.friendId);
       //const user = await this.userService.deleteUser(userId);
      // const user = await UserRepository.delete(userId);
       const user = await this.userRepository.addFriend(userId,friendId);
+      if (!user) {
+        throw new ValidationError("Friend not found", "request.body.friendId");
+      }
       return reply.send(user);
     }
     //remove Friend
@@ -417,7 +426,7 @@ await chmod(uploadPath, 0o644);
      try {
      const userId = Number(request.authenticatedUser?.id);
      if (!userId) {
-       return reply.status(400).send({ error: 'Invalid user id user not authenticated' });
+       throw new AuthError("Invalid user id user not authenticated");
      }
       const friendId = parseInt(request.body.friendId);
       console.log("UserController removeFriend ",userId,friendId);
@@ -425,11 +434,14 @@ await chmod(uploadPath, 0o644);
       //const user = await this.userService.deleteUser(userId);
      // const user = await UserRepository.delete(userId);
       const user = await this.userRepository.removeFriend(userId,friendId);
+      if (!user) {
+        throw new ValidationError("Friend not found", "request.body.friendId");
+      }
       return reply.send(user);
     }
     catch (error) {
       console.error('Error removing friend:', error);
-      return reply.status(500).send({ error: 'Failed to remove friend' });
+      throw new ValidationError("Failed to remove friend", "request.body");
     }
   }
 
@@ -438,8 +450,28 @@ await chmod(uploadPath, 0o644);
     const userId = parseInt(request.params.id);
     //const user = await this.userService.deleteUser(userId);
    // const user = await UserRepository.delete(userId);
-    const user = await this.userRepository.delete(userId);
+    const user = await this.userRepository.delete(userId); 
+    if (!user) {
+      throw new ValidationError("User not found", "request.params.id");
+    }
     return reply.send(user);
+  }
+    async deleteUserMe(request: FastifyRequest, reply: FastifyReply) {
+   try {
+     const userId = Number(request.authenticatedUser?.id);
+     if (!userId) {
+       throw new AuthError("Invalid user id user not authenticated");
+     }
+    const user = await this.userRepository.delete(userId);
+    if (!user) {
+      throw new ValidationError("User not found", "request.authenticatedUser.id");
+    }
+    console.log("UserController deleteUserMe ",user);
+    return reply.send(user);
+   } catch (error) {
+      console.error('Error deleting user:', error);
+      throw new ValidationError("Failed to delete user", "request.body");
+    }
   }
  /*  async requestQuery(request: FastifyRequest<{ Body: {name:string,avatar:string} }>, reply: FastifyReply) {
  const date = new Date().toISOString();
@@ -466,11 +498,11 @@ await chmod(uploadPath, 0o644);
   async getUserGames(request: FastifyRequest, reply: FastifyReply) {
     const authenticatedUser = request.authenticatedUser;
     if (!authenticatedUser) {
-      return reply.status(401).send({ error: 'User not authenticated' });
+      throw new AuthError("User not authenticated");
     }
     const userId = authenticatedUser.id;
     if (!userId) {
-      return reply.status(400).send({ error: 'Invalid user id' });
+      throw new AuthError("User not authenticated - Invalid user id");
     }
     //add userId to query filters {"id":userId}
         console.log("[UserController] getUserGames request.query ",request.query);
@@ -489,28 +521,27 @@ await chmod(uploadPath, 0o644);
 
     if (!response.ok) {
       console.error("Error fetching games:", response);
-      throw new Error(`[getUserGames] Failed to fetch games: ${response.statusText}`);
+      throw new NotFoundError(`[getUserGames] Failed to fetch games: ${response.statusText}`);
     }
-
     const games = await response.json();
     return reply.code(200).send(games);
   } catch (error) {
     console.error("Error fetching games:", error);
-    return reply.code(500).send({ error: "Failed to fetch games" });
+    throw error;
   }
 }
   async getUserGamesByPlayerId(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
     const authenticatedUser = request.authenticatedUser;
     if (!authenticatedUser) {
-      return reply.status(401).send({ error: 'User not authenticated' });
+      throw new AuthError("User not authenticated");
     }
     const userId = authenticatedUser.id;
     if (!userId) {
-      return reply.status(400).send({ error: 'Invalid user id' });
+      throw new AuthError("Invalid user id");
     }
     const playerId = parseInt(request.params.id);
     if (!playerId) {
-      return reply.status(400).send({ error: 'Invalid player id' });
+      throw new ValidationError("Invalid player id", "request.params.id");
     }
     //add userId to query filters {"id":userId}
         console.log("[UserController] getUserGames request.query ",request.query);
@@ -529,14 +560,15 @@ await chmod(uploadPath, 0o644);
 
     if (!response.ok) {
       console.error("Error fetching games:", response);
-      throw new Error(`[getUserGames] Failed to fetch games: ${response.statusText}`);
+      throw new NotFoundError(`[getUserGames] Failed to fetch games: ${response.statusText}`);
     }
 
     const games = await response.json();
     return reply.code(200).send(games);
   } catch (error) {
     console.error("Error fetching games:", error);
-    return reply.code(500).send({ error: "Failed to fetch games" });
+    throw error;
+  //  return reply.code(500).send({ error: "Failed to fetch games" });
   }
 }
 async getUserGameById(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
@@ -551,47 +583,25 @@ async getUserGameById(request: FastifyRequest<{ Params: { id: string } }>, reply
     });
 
     if (!response.ok) {
-      throw new Error(`Failed to fetch game: ${response.statusText}`);
+      throw new NotFoundError(`[getUserGameById] Failed to fetch game: ${response.statusText}`);
     }
 
     const game = await response.json();
     return reply.code(200).send(game);
   } catch (error) {
     console.error("Error fetching game:", error);
-    return reply.code(500).send({ error: "Failed to fetch game" });
+    throw error;
   }
 }
-
-async getUserFriends(request: FastifyRequest, reply: FastifyReply) {
-    try {
-      const authHeader = request.headers.authorization;
-      const response = await fetch('http://game-management-service:3000/api/tournaments', {
-        method: 'GET',
-        headers: {
-          'Authorization': authHeader?? '',
-        },
-      });
-  
-      if (!response.ok) {
-        throw new Error(`Failed to fetch tournaments: ${response.statusText}`);
-      }
-  
-      const tournaments = await response.json();
-      return reply.code(200).send(tournaments);
-    } catch (error) {
-      console.error("Error fetching tournaments:", error);
-      return reply.code(500).send({ error: "Failed to fetch tournaments" });
-    }
-  }
 
   async getUserTournaments(request: FastifyRequest, reply: FastifyReply) {
     const authenticatedUser = request.authenticatedUser;
     if (!authenticatedUser) {
-      return reply.status(401).send({ error: 'User not authenticated' });
+      throw new AuthError("User not authenticated");
     }
     const userId = authenticatedUser.id;
     if (!userId) {
-      return reply.status(400).send({ error: 'Invalid user id' });
+      throw new AuthError("Invalid user id");
     }
     //add userId to query filters {"id":userId}
         console.log("[UserController] getUserTournaments request.query ",request.query);
@@ -607,28 +617,28 @@ async getUserFriends(request: FastifyRequest, reply: FastifyReply) {
       });
   
       if (!response.ok) {
-        throw new Error(`Failed to fetch tournament: ${response.statusText}`);
+        throw new NotFoundError(`[getUserTournaments] Failed to fetch tournaments: ${response.statusText}`);
       }
   
       const tournament = await response.json();
       return reply.code(200).send(tournament);
     } catch (error) {
       console.error("Error fetching tournament:", error);
-      return reply.code(500).send({ error: "Failed to fetch tournament" });
+      throw error;
     }
   }
     async getUserTournamentsByUserId(request: FastifyRequest<{Params:{id:string}}>, reply: FastifyReply) {
     const authenticatedUser = request.authenticatedUser;
     if (!authenticatedUser) {
-      return reply.status(401).send({ error: 'User not authenticated' });
+      throw new AuthError("User not authenticated");
     }
     const userId = authenticatedUser.id;
     if (!userId) {
-      return reply.status(400).send({ error: 'Invalid user id' });
+      throw new AuthError("Invalid user id");
     }
      const playerId = parseInt(request.params.id);
     if (!playerId) {
-      return reply.status(400).send({ error: 'Invalid player id' });
+      throw new ValidationError("Invalid player id", "request.params.id");
     }
     //add userId to query filters {"id":userId}
         console.log("[UserController] getUserTournaments request.query ",request.query);
@@ -644,14 +654,14 @@ async getUserFriends(request: FastifyRequest, reply: FastifyReply) {
       });
   
       if (!response.ok) {
-        throw new Error(`Failed to fetch tournament: ${response.statusText}`);
+        throw new NotFoundError(`[getUserTournaments] Failed to fetch tournament: ${response.statusText}`);
       }
   
       const tournament = await response.json();
       return reply.code(200).send(tournament);
     } catch (error) {
       console.error("Error fetching tournament:", error);
-      return reply.code(500).send({ error: "Failed to fetch tournament" });
+      throw error;
     }
   }
   async getUserTournamentById(request: FastifyRequest<{ Params: { id: string } }>, reply: FastifyReply) {
@@ -666,14 +676,14 @@ async getUserFriends(request: FastifyRequest, reply: FastifyReply) {
       });
   
       if (!response.ok) {
-        throw new Error(`Failed to fetch tournament: ${response.statusText}`);
+        throw new NotFoundError(`[getUserTournamentById] Failed to fetch tournament: ${response.statusText}`);
       }
-  
+
       const tournament = await response.json();
       return reply.code(200).send(tournament);
     } catch (error) {
       console.error("Error fetching tournament:", error);
-      return reply.code(500).send({ error: "Failed to fetch tournament" });
+      throw error;
     }
   }
 

@@ -144,7 +144,7 @@ getDisplayName(player: Players) {
 
             <div class="game-card-container-row">
                 <div>
-                <p>difficulty: </p>
+                <p>${this.t("GAME.ACT_DIFF")}: </p>
                 </div>
                 <div class="flex items-center">
                   ${Array.from({ length: this.maxDifficulty }, (_, i) => {
@@ -169,7 +169,7 @@ getDisplayName(player: Players) {
                           <h2 class="text-2xl font-semibold">${this.getDisplayName(player)}</h2>
 
                           <br>
-                            <h3 class="text-lg font-semibold">Games Score</h3>
+                            <h3 class="text-lg font-semibold">${this.t("GENERIC.SCORE")}</h3>
                             <p class="text-green-600 text-9xl">${player.score}</p>
 
                 </div>`:``
@@ -193,7 +193,7 @@ getDisplayName(player: Players) {
                               <h2 class="text-2xl font-semibold">${this.getDisplayName(player)}</h2>
 
                               <br>
-                                <h3 class="text-lg font-semibold">Games Score</h3>
+                                <h3 class="text-lg font-semibold">${this.t("GENERIC.SCORE")}</h3>
                                 <p class="text-green-600 text-9xl">${player.score}</p>
 
                     </div>`:``

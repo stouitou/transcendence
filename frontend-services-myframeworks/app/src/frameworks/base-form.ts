@@ -48,7 +48,7 @@ export class FormHandler<TFormData extends Record<string,any>> {
   // Ajouter des validations pour les champs
   addValidation(validations: { [fieldName in keyof TFormData]: FieldValidation }) {
     this.validations = { ...this.validations, ...validations };
-	console.log('Validations added:', this.formElement);
+	//console.log('Validations added:', this.formElement);
 
     Object.keys(validations).forEach((fieldName) => {
       const field = this.formElement.querySelector<HTMLInputElement>(`[name="${fieldName}"]`);
@@ -105,7 +105,7 @@ export class FormHandler<TFormData extends Record<string,any>> {
   }
 
     const value = field.value.trim();
-    console.log('value:', value);
+   // console.log('value:', value);
 
     // Vérifier si le champ est requis
     if (validation.required && value === '') {
@@ -154,7 +154,7 @@ export class FormHandler<TFormData extends Record<string,any>> {
 
 	  if (validation.customValidator) {
 			const errors = validation.customValidator(value);
-			console.log('errors:', errors);
+		//	console.log('errors:', errors);
 			if (errors.length > 0) {
 				this.setError(fieldName, errors[0]); // tu peux en afficher plusieurs si tu veux
 				return false;

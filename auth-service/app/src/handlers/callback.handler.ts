@@ -77,7 +77,7 @@ export class AuthHandlerCallback {
 			const { token } = await this.app.fortyTwoOAuth2.getAccessTokenFromAuthorizationCodeFlow(request);
 			console.log("🔓 42 Callback Token:", token);
 			const {access_token} = token;
-			const user = await this.authController.oauthCallbackApi42(request, reply, access_token); // @TODO change to Promise<string>
+			const user = await this.authController.oauthCallbackApi42(request, reply, access_token);
 			// const user = req.user as User & { token: string };
 			const authToken = (user  as  {user:User} & { token: string }).token ?? "";
 				reply.setCookie('authToken', authToken , {

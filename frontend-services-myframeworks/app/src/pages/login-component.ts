@@ -39,10 +39,10 @@ export class Login extends BaseComponent<{}, { formLogin: LoginFormData }> {
       const formData = formHandler.getFormData();
 			const loginToken = await  loginUser(formData);
       const { twoFactorRequired} = loginToken;
-      console.log('Login 2FA token:', loginToken);
+      // console.log('Login 2FA token:', loginToken);
       // Check if two-factor authentication is required
       if (twoFactorRequired) {
-        console.log('Two-factor authentication required');
+        // console.log('Two-factor authentication required');
         this.router.navigate('/login-2fa');
         return;
       }
@@ -53,17 +53,22 @@ export class Login extends BaseComponent<{}, { formLogin: LoginFormData }> {
       this.router.navigate('/');
 		} catch (error) {
 			console.error('Login failed:', error);
-			alert('Login failed. Please try again.');
+			//alert('Login failed. Please try again.');
+      if (error instanceof Error) {
+        this.showMessage(error.message, 'error');
+      } else {
+        this.showMessage('An unexpected error occurred. Please try again.', 'error');
+      }
 		}
   }
 
   render() {    
       this.innerHTML = `
       <form id=formLogin class="form-container">
-            <h2 class="text-3xl font-bold text-center mb-6">${this.t('AUTH.LOGIN')}</h2>
-         <div id="message-box" class="font-bold text-center mb-4"></div>
-            <label for="email" class="block  mb-2">Email:</label>
-        <div id="email-error" class="font-bold text-center mb-4"></div>
+        <h2 class="form-title">${this.t('AUTH.LOGIN')}</h2>
+        <div id="message-box" class="form-error"></div>
+        <label for="email" class="form-label">Email:</label>
+        <div id="email-error" class="form-error"></div>
             <input
                 id="email"
                 type="email"
@@ -73,8 +78,8 @@ export class Login extends BaseComponent<{}, { formLogin: LoginFormData }> {
                 autocomplete="email"
                 required
             />
-            <label for="password" class="block  mb-2">Password:</label>
-        <div id="password-error" class="font-bold text-center mb-4"></div>
+         <label for="password" class="form-label">Password:</label>
+        <div id="password-error" class="form-error"></div>
             <input
                 id="password"
                 type="password"
@@ -91,11 +96,11 @@ export class Login extends BaseComponent<{}, { formLogin: LoginFormData }> {
                 >
                 Login
             </button>
-            <span class="text-sm text-center block mt-4">
-                Don't have an account? <a href="/register" class="text-blue-500 hover:underline">Register</a>
+            <span class="form-footer">
+                Don't have an account? <a href="/register" class="form-footer-link">Register</a>
             </span>
-            <span class="text-sm text-center block mt-4">
-                Forgot your password? <a href="/forgot-password" class="text-blue-500 hover:underline">Reset Password</a>
+            <span class="form-footer">
+                Forgot your password? <a href="/forgot-password" class="form-footer-link">Reset Password</a>
             </span>
         </form>
         <login-provider-component />

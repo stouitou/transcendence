@@ -41,6 +41,7 @@ export class User{
   role: string;
   friends?: User[];
   userStats: UserStats;
+  level?: number;
   
 	constructor(data: Partial<User>) {
     this.id = 0;

@@ -33,10 +33,10 @@ export class Leaderboard extends BaseComponent<{leaderboard: LeaderBoardUser[]}>
 
   render() {
     const user = UserContext().user();
-    if (!user) {
-      this.innerHTML = `<p class="text-center text-lg text-gray-700 dark:text-gray-300 mt-10">Veuillez vous connecter pour voir le classement.</p>`;
-      return;
-    }
+    // if (!user) {
+    //   this.innerHTML = `<p class="text-center text-lg text-gray-700 dark:text-gray-300 mt-10">Veuillez vous connecter pour voir le classement.</p>`;
+    //   return;
+    // }
 const {leaderboard} = this.state ;
     // Classement fictif
 /*     const leaderboard: Player[] = [

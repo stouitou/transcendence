@@ -10,14 +10,13 @@ export class	WebSocketManager {
 
 	private	eventListeners: Map< string, WebSocketEventCallback[] > = new Map();
 	private	wsMe: { userId: number; name: string; index: number } | null = null;
-	private	dataConfig: { id: string; config: { type: string; players: any[] } } | null = null;
+	private	_dataConfig: { id: string; config: { type: string; players: any[] } } | null = null;
 
 	constructor () { }
 
-	set lobyId (lobyId: string | undefined) {
-		this._lobyId = lobyId || this._lobyId;
-		console.log('Loby ID:', this._lobyId);
-	}
+	get dataConfig ()	{ return this._dataConfig ; }
+
+	set lobyId (lobyId: string | undefined)	{ this._lobyId = lobyId || this._lobyId; console.log('Loby ID:', this._lobyId); }
 
 	handleMessage (message: any) {
 		console.log('WebSocket message received:', message);
@@ -29,9 +28,9 @@ export class	WebSocketManager {
 				this.wsMe = data;
 				break ;
 			case 'SETUPNEWGAME':
-				this.dataConfig = message.data;
-				if (!this.dataConfig) { console.error('No dataConfig found'); return; }
-				this.wsMe!.index = this.dataConfig.config.players.findIndex((player) => player.userId === Number(this.wsMe?.userId));
+				this._dataConfig = message.data;
+				if (!this._dataConfig) { console.error('No dataConfig found'); return; }
+				this.wsMe!.index = this._dataConfig.config.players.findIndex((player) => player.userId === Number(this.wsMe?.userId));
 				break ;
 		}
 	}
@@ -87,7 +86,7 @@ export class	WebSocketManager {
 		const message = { 
 			type: 'move',
 			lobyId: `${this._lobyId}`,
-			pongId: `${this.dataConfig?.id}`,	
+			pongId: `${this._dataConfig?.id}`,	
 			index: this.wsMe!.index,
 			direction
 		};

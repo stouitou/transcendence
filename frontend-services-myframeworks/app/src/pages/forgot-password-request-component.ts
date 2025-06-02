@@ -43,13 +43,13 @@ export class ForgotPasswordRequest extends BaseComponent<{}, { formLogin: Forgot
   render() {
     this.innerHTML = `
       <form id="formLogin" class="form-container">
-        <h2 class="text-3xl font-bold text-center mb-6">Forgot Password</h2>
+        <h2 class="form-title">Forgot Password</h2>
 
-        <div id="message-box" class="font-bold text-center mb-4"></div>
+        <div id="message-box" class="form-error"></div>
 
         <p class="text-center mb-4">Please enter your email address to reset your password.</p>
-        <div id="email-error" class="font-bold text-center mb-4"></div>
-        <label for="email" class="block mb-2">Email:</label>
+        <div id="email-error" class="form-error"></div>
+        <label for="email" class="form-label">Email:</label>
         <input id="email" name="email" type="email" class="form-text-input" placeholder="name@student.42.fr" required />
         <button id="loginBtn" type="submit" class="btn">Reset Password</button>
       </form>

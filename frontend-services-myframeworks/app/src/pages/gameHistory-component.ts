@@ -1,60 +1,62 @@
 import { BaseComponent } from "../frameworks/base-component";
 import { UserContext } from "../globalstate/GlobalState";
-import { User, Game} from "../types/types";
-import { getGames , MetaPagination } from "../services/api.users.game";
+import { User, Game } from "../types/types";
+import { getGames, MetaPagination } from "../services/api.users.game";
 
 
-export class GameHistory extends BaseComponent<{ user: User | null,
+export class GameHistory extends BaseComponent<{
+	user: User | null,
 	localGame: Game[] | null,
 	remoteGame: Game[] | null,
-	metaPagination:{localGame: MetaPagination| null, remoteGame: MetaPagination| null} }> {
-  constructor() {
-	super({ user: null,localGame: null, remoteGame: null,metaPagination:{localGame: null, remoteGame: null} });
-  }
+	metaPagination: { localGame: MetaPagination | null, remoteGame: MetaPagination | null }
+}> {
+	constructor() {
+		super({ user: null, localGame: null, remoteGame: null, metaPagination: { localGame: null, remoteGame: null } });
+	}
 
-  connectedCallback() {
-	this.state.user = UserContext().user();
-	getGames({limit:10},{type:"remote"}).then((result) => { 
-		if (!result || !result.success) return;
-		const {data:games,meta} = result;
-		console.log('getGames(remote).then((data) games', games);
-	  if (games) {
-		this.state.metaPagination.remoteGame= meta;
-		this.state.remoteGame = games
+	connectedCallback() {
+		this.state.user = UserContext().user();
+		getGames({ limit: 10 }, { type: "remote" }).then((result) => {
+			if (!result || !result.success) return;
+			const { data: games, meta } = result;
+			console.log('getGames(remote).then((data) games', games);
+			if (games) {
+				this.state.metaPagination.remoteGame = meta;
+				this.state.remoteGame = games
+				this.render();
+			}
+		}).catch((e) => console.error(e));
+		getGames({ limit: 10 }, { type: "local" }).then((result) => {
+			if (!result || !result.success) return;
+			const { data: games, meta } = result;
+			console.log('getGames(local).then((data) games', games);
+			if (games) {
+				this.state.metaPagination.localGame = meta;
+				this.state.localGame = games
+				this.render();
+			}
+		}).catch((e) => console.error(e));
 		this.render();
-		}
-	}).catch((e) =>console.error(e));
-	getGames({limit:10},{type:"local"}).then((result) => {
-		if (!result || !result.success) return;
-		const {data:games,meta} = result;
-		console.log('getGames(local).then((data) games', games);
-	  if (games) {
-		this.state.metaPagination.localGame = meta;
-		this.state.localGame = games
-		this.render();
-		}
-	}).catch((e) =>console.error(e));
-	this.render();
-  }
+	}
 
 
 
-  setUser(user: User) {
-	this.setState({ ...this.state, user });
-  }
+	setUser(user: User) {
+		this.setState({ ...this.state, user });
+	}
 
-  determinePageCount(offset:number,pagination: MetaPagination):{ currentPage: number, pageCount: number } {
-	const { limit, total } = pagination;
-	const pageCount = Math.ceil(total / limit);
-	const currentPage = Math.floor(offset / limit) + 1;
-	return { currentPage, pageCount };
-	
-  }
-  generatePagination(currentPage: number, pageCount: number,type:string): string {
-	let paginationHTML = '';
-  
-	// Bouton "Précédent"
-	paginationHTML += `
+	determinePageCount(offset: number, pagination: MetaPagination): { currentPage: number, pageCount: number } {
+		const { limit, total } = pagination;
+		const pageCount = Math.ceil(total / limit);
+		const currentPage = Math.floor(offset / limit) + 1;
+		return { currentPage, pageCount };
+
+	}
+	generatePagination(currentPage: number, pageCount: number, type: string): string {
+		let paginationHTML = '';
+
+		// Bouton "Précédent"
+		paginationHTML += `
 	  <li  data-page="${currentPage - 1}" data-type="${type}" class="paginator">
 		<div class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 		   data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>
@@ -65,24 +67,23 @@ export class GameHistory extends BaseComponent<{ user: User | null,
 		</div>
 	  </li>
 	`;
-  
-	// Boutons pour chaque page
-	for (let i = 1; i <= pageCount; i++) {
-	  paginationHTML += `
+
+		// Boutons pour chaque page
+		for (let i = 1; i <= pageCount; i++) {
+			paginationHTML += `
 		<li  data-page="${i}"  data-type="${type}" class="paginator">
-		  <div class="flex items-center justify-center px-4 h-10 leading-tight ${
-			i === currentPage
-			  ? 'text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white'
-			  : 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white'
-		  }" data-page="${i}">
+		  <div class="flex items-center justify-center px-4 h-10 leading-tight ${i === currentPage
+					? 'text-blue-600 border border-blue-300 bg-blue-50 hover:bg-blue-100 hover:text-blue-700 dark:border-gray-700 dark:bg-gray-700 dark:text-white'
+					: 'text-gray-500 bg-white border border-gray-300 hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white'
+				}" data-page="${i}">
 			${i}
 		  </div>
 		</li>
 	  `;
-	}
-  
-	// Bouton "Suivant"
-	paginationHTML += `
+		}
+
+		// Bouton "Suivant"
+		paginationHTML += `
 	  <li  data-page="${currentPage + 1}"  data-type="${type}" class="paginator">
 		<div class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 		   data-page="${currentPage + 1}" ${currentPage === pageCount ? 'disabled' : ''}>
@@ -93,36 +94,36 @@ export class GameHistory extends BaseComponent<{ user: User | null,
 		</div>
 	  </li>
 	`;
-  
-	return paginationHTML;
-  }
-  render() {
-	const { user , localGame, remoteGame,metaPagination} = this.state;
 
-	if (user) {
-		//console.log('game', user.games);
-		const localPagination = metaPagination.localGame
-		? this.generatePagination(
-			this.determinePageCount(metaPagination.localGame.offset, metaPagination.localGame).currentPage,
-			this.determinePageCount(0, metaPagination.localGame).pageCount,
-			"local"
-		  )
-		: '';
-  
-	  const remotePagination = metaPagination.remoteGame
-		? this.generatePagination(
-			this.determinePageCount(metaPagination.remoteGame.offset, metaPagination.remoteGame).currentPage,
-			this.determinePageCount(0, metaPagination.remoteGame).pageCount,
-			"remote"
-		  )
-		: '';
-	  this.innerHTML = `
+		return paginationHTML;
+	}
+	render() {
+		const { user, localGame, remoteGame, metaPagination } = this.state;
+
+		if (user) {
+			//console.log('game', user.games);
+			const localPagination = metaPagination.localGame
+				? this.generatePagination(
+					this.determinePageCount(metaPagination.localGame.offset, metaPagination.localGame).currentPage,
+					this.determinePageCount(0, metaPagination.localGame).pageCount,
+					"local"
+				)
+				: '';
+
+			const remotePagination = metaPagination.remoteGame
+				? this.generatePagination(
+					this.determinePageCount(metaPagination.remoteGame.offset, metaPagination.remoteGame).currentPage,
+					this.determinePageCount(0, metaPagination.remoteGame).pageCount,
+					"remote"
+				)
+				: '';
+			this.innerHTML = `
 		
         <div class="mx-auto p-6 text-center">
-              <h2 class="text-3xl font-bold text-center mb-6 ">Game History Local ${this.state.metaPagination.localGame?.total||0}</h2>
+              <h2 class="text-3xl font-bold text-center mb-6 ">Game History Local ${this.state.metaPagination.localGame?.total || 0}</h2>
 				<nav aria-label="Page navigation ">
 					<ul class="flex items-center -space-x-px h-10 text-base">
-						${ localPagination}
+						${localPagination}
 					</ul>
 				</nav>
 			
@@ -136,19 +137,19 @@ export class GameHistory extends BaseComponent<{ user: User | null,
                     </div>
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Id
+				${this.t("TOURNAMENT.ID")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Difficulty
+				${this.t("TOURNAMENT.DIFFICULTY")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    state
+                	${this.t("TOURNAMENT.STATE")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Date
+                	${this.t("TOURNAMENT.DATE")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Victory
+                    ${this.t("TOURNAMENT.VICTORY")}
                 </th>
             </tr>
         </thead>
@@ -158,10 +159,10 @@ export class GameHistory extends BaseComponent<{ user: User | null,
 
 
 		        <div class="mx-auto p-6 text-center">
-              <h2 class="text-3xl font-bold text-center mb-6 ">Game History Remote ${this.state.metaPagination.remoteGame?.total||0}</h2>
+              <h2 class="text-3xl font-bold text-center mb-6 ">Game History Remote ${this.state.metaPagination.remoteGame?.total || 0}</h2>
 			  				<nav aria-label="Page navigation ">
 					<ul class="flex items-center -space-x-px h-10 text-base">
-						${ remotePagination}
+						${remotePagination}
 					</ul>
 				</nav>
             <table class="w-full text-sm text-left rtl:text-right text-gray-500 dark:text-gray-400">
@@ -194,89 +195,90 @@ export class GameHistory extends BaseComponent<{ user: User | null,
     </table>
         </div>
 		`;
-		const tbodyLocal = document.querySelector('#table-game-history-local')
-		if (tbodyLocal) {
-		  localGame?.forEach((game) =>
-			tbodyLocal.innerHTML +=this.gameDetailsView(game)
-		  
-		  );
-		}
-		
-		const tbodyRemote = document.querySelector('#table-game-history-remote')
-		if (tbodyRemote) {
-		  remoteGame?.forEach((game) =>
-			tbodyRemote.innerHTML +=this.gameDetailsView(game)
-		  
-		  );
-		}
+			const tbodyLocal = document.querySelector('#table-game-history-local')
+			if (tbodyLocal) {
+				localGame?.forEach((game) =>
+					tbodyLocal.innerHTML += this.gameDetailsView(game)
 
-		  // Ajouter l'événement de click pour rediriger vers le détail du tournoi
-		  this.querySelectorAll('.gameRow').forEach(card => {
-			//this.shadowRoot.querySelectorAll('.tournamentRow').forEach(card => {
-			card.addEventListener('click', (e: Event) => {
-			  const target = e.currentTarget as HTMLElement;
-			   const id = target.getAttribute('data-id');
-			  if (!id) return;		 
-			 const game = this.state.localGame?.find(t => t.id === Number(id))|| this.state.remoteGame?.find(t => t.id === Number(id));
-			 if (!game) return;
-			 // Créer un nouvel élément <tr>
-			 const newRow = document.createElement('tr');
-			 const newRowTd = document.createElement('td');
-			 newRowTd.setAttribute('data-type', 'detail');
-			 newRowTd.setAttribute('colspan', '5');
+				);
+			}
 
-			 const newRowTdContent = document.createElement('game-card-component') as any;;
-			 newRowTdContent.data = game
-			 newRowTd.appendChild(newRowTdContent);
-			 newRow.appendChild(newRowTd);
-			 
-			 if (target.parentNode) {
-			 // Vérifier si le nouvel élément existe déjà
-			const existingRow = target.nextSibling;
-			if (existingRow && (existingRow.nodeType === Node.ELEMENT_NODE)) {
-			   // Si oui, le supprimer
-			   target.parentNode.removeChild(existingRow);
-			 }else {
-			   // Sinon, ajouter le nouvel élément
-			   target.parentNode.insertBefore(newRow, target.nextSibling);
-			 }	 
-			}});
-		  });
+			const tbodyRemote = document.querySelector('#table-game-history-remote')
+			if (tbodyRemote) {
+				remoteGame?.forEach((game) =>
+					tbodyRemote.innerHTML += this.gameDetailsView(game)
 
-		  this.querySelectorAll('.paginator').forEach((button) => {
-			button.addEventListener('click', (e: Event) => {
-			  e.preventDefault();
-			  console.log('paginator click');
-			  const target = e.currentTarget as HTMLElement;
-			  const page = Number(target.getAttribute('data-page'));
-			  const type = target.getAttribute('data-type');
-			  console.log('page', page);
-			  if (!page || page < 1) return;
-			  if (!type) return;		  
-			  // Charger les données pour la page sélectionnée
-			  getGames({ limit: 10, offset: (page - 1) * 10 }, { type: type }).then((result) => {
-				if (!result) return;
-				const { data:games, meta } = result;
-				if (type === 'remote') {
-				  this.state.metaPagination.remoteGame = meta;
-				  this.state.remoteGame = games;
-				}
-				if (type === 'local') {
-				  this.state.metaPagination.localGame = meta;
-				  this.state.localGame = games;
-				}
-				this.render();
-			  });
+				);
+			}
+
+			// Ajouter l'événement de click pour rediriger vers le détail du tournoi
+			this.querySelectorAll('.gameRow').forEach(card => {
+				//this.shadowRoot.querySelectorAll('.tournamentRow').forEach(card => {
+				card.addEventListener('click', (e: Event) => {
+					const target = e.currentTarget as HTMLElement;
+					const id = target.getAttribute('data-id');
+					if (!id) return;
+					const game = this.state.localGame?.find(t => t.id === Number(id)) || this.state.remoteGame?.find(t => t.id === Number(id));
+					if (!game) return;
+					// Créer un nouvel élément <tr>
+					const newRow = document.createElement('tr');
+					const newRowTd = document.createElement('td');
+					newRowTd.setAttribute('data-type', 'detail');
+					newRowTd.setAttribute('colspan', '5');
+
+					const newRowTdContent = document.createElement('game-card-component') as any;;
+					newRowTdContent.data = game
+					newRowTd.appendChild(newRowTdContent);
+					newRow.appendChild(newRowTd);
+
+					if (target.parentNode) {
+						// Vérifier si le nouvel élément existe déjà
+						const existingRow = target.nextSibling;
+						if (existingRow && (existingRow.nodeType === Node.ELEMENT_NODE)) {
+							// Si oui, le supprimer
+							target.parentNode.removeChild(existingRow);
+						} else {
+							// Sinon, ajouter le nouvel élément
+							target.parentNode.insertBefore(newRow, target.nextSibling);
+						}
+					}
+				});
 			});
-		  });
-	  return;
-	}
-	this.innerHTML = `not user //@TODO: add loading spinner or redirect`;
-  }
 
-  gameDetailsView = (game:Game) => {
-	console.log('gameDetailsView', game);
-	return (`
+			this.querySelectorAll('.paginator').forEach((button) => {
+				button.addEventListener('click', (e: Event) => {
+					e.preventDefault();
+					console.log('paginator click');
+					const target = e.currentTarget as HTMLElement;
+					const page = Number(target.getAttribute('data-page'));
+					const type = target.getAttribute('data-type');
+					console.log('page', page);
+					if (!page || page < 1) return;
+					if (!type) return;
+					// Charger les données pour la page sélectionnée
+					getGames({ limit: 10, offset: (page - 1) * 10 }, { type: type }).then((result) => {
+						if (!result) return;
+						const { data: games, meta } = result;
+						if (type === 'remote') {
+							this.state.metaPagination.remoteGame = meta;
+							this.state.remoteGame = games;
+						}
+						if (type === 'local') {
+							this.state.metaPagination.localGame = meta;
+							this.state.localGame = games;
+						}
+						this.render();
+					});
+				});
+			});
+			return;
+		}
+		this.innerHTML = `not user //@TODO: add loading spinner or redirect`;
+	}
+
+	gameDetailsView = (game: Game) => {
+		console.log('gameDetailsView', game);
+		return (`
 	<tr data-id="${game.id}" class="gameRow border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
 	
 		<td class="w-4 p-4">
@@ -305,12 +307,12 @@ export class GameHistory extends BaseComponent<{ user: User | null,
 		<td class="px-6 py-4">
 			<div class="flex items-center">
 					<div class="h-2.5 w-2.5 rounded-full  bg-green-500"></div>
-					<span>${game.gameHistory?.winner??""}</span>
+					<span>${game.gameHistory?.winner ?? ""}</span>
 				
 			</div>
 		</td>
 	</tr>
 	`);
-  }
+	}
 }
 

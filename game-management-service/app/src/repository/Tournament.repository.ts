@@ -41,6 +41,7 @@ class TournamentsRepository extends BaseRepository<Tournaments,TournamentsCreate
       throw new Error("Players are required to create a tournament");
     }
     const {/*  authProviders, */ id, ...gameExtracted } = game;
+    console.log("🔐Gane.repository.ts TournamentsRepository.create()  --gameExtracted--",gameExtracted)
     const response = await fetch(this.URL, {
       method: "POST",
       headers: { "Content-Type": "application/json" },
@@ -49,19 +50,19 @@ class TournamentsRepository extends BaseRepository<Tournaments,TournamentsCreate
       }),
     });
     const data = await response.json();
-    console.log("🔐Gane.repository.ts TournamentsRepository.create()  --data--",data)
+  //  console.log("🔐Gane.repository.ts TournamentsRepository.create()  --data--",data)
     const gameCreated = data.data;
     console.log("🔐Gane.repository.ts TournamentsRepository.create()  --gameCreated--",gameCreated)
    // const gameCreated = User.fromJSON(data.data);
     if (!gameCreated) {
       throw new Error("User creation failed");
     }
-    console.log(" TournamentsRepository.create()  --gameCreated-- OK")
+  //  console.log(" TournamentsRepository.create()  --gameCreated-- OK")
     return gameCreated;
   };
 
   private getRelations = (): string => {
-    console.log("🔐 TournamentsRepository.getRelations()  --this.RELATIONS--",this.RELATIONS)
+  //  console.log("🔐 TournamentsRepository.getRelations()  --this.RELATIONS--",this.RELATIONS)
     if (this.RELATIONS.length === 0) {
       return "";
     }
@@ -73,14 +74,14 @@ class TournamentsRepository extends BaseRepository<Tournaments,TournamentsCreate
    
     //return data.map(User.fromJSON);
     const url = `${this.URL}${this.getRelations()}`;
-    console.log("🔐 TournamentsRepository.getAll()  --start-- fetch from: ", this.URL)
+  //  console.log("🔐 TournamentsRepository.getAll()  --start-- fetch from: ", this.URL)
     const response = await fetch(url);
-    console.log("🔐 TournamentsRepository.getAll()  --response--",response)
+  //  console.log("🔐 TournamentsRepository.getAll()  --response--",response)
     const data = await response.json();
-    console.log("🔐 TournamentsRepository.getAll()  --data--",data)
+  //  console.log("🔐 TournamentsRepository.getAll()  --data--",data)
     const results = data.data//.map((user: User) => User.fromJSON(user));
     //const results = data.data.map(User.fromJSON);
-    console.log("🔐 TournamentsRepository.getAll()  --results--",results)
+  //  console.log("🔐 TournamentsRepository.getAll()  --results--",results)
     return {...results};
   }
   getAllbyQuery = async (query:IParams): Promise<Tournaments[]> =>{
@@ -90,25 +91,25 @@ class TournamentsRepository extends BaseRepository<Tournaments,TournamentsCreate
   //  const url = `${this.URL}?limit=10`;
    
     //const url = `${this.URL}${this.getRelations()}&${queryPagination}`;
-    console.log("🔐 TournamentsRepository.getAllbyQuery()  --start-- fetch from: ", url)
+  //  console.log("🔐 TournamentsRepository.getAllbyQuery()  --start-- fetch from: ", url)
     const response = await fetch(url);
-    console.log("🔐 TournamentsRepository.getAllbyQuery()  --response--",response)
+  //  console.log("🔐 TournamentsRepository.getAllbyQuery()  --response--",response)
     const data = await response.json();
-    console.log("🔐 TournamentsRepository.getAllbyQuery()  --data--",data)
+  //  console.log("🔐 TournamentsRepository.getAllbyQuery()  --data--",data)
    // const results = data.data//.map((user: User) => User.fromJSON(user));
     const results = data//.map((user: User) => User.fromJSON(user));
     //const results = data.data.map(User.fromJSON);
-    console.log("🔐 TournamentsRepository.getAllbyQuery()  --results--",results)
+  //  console.log("🔐 TournamentsRepository.getAllbyQuery()  --results--",results)
     return {...results};
   }
  getById= async (id: number): Promise<Tournaments | null> => {
       
     //const url = `${this.URL}/id/${id}?relations=players&relations=rounds&relations=rounds.games&relations=rounds.games.players`;//{this.getRelations()}
     const url = `${this.URL}/id/${id}?relations=players&relations=games&relations=games.players&relations=winner`;//{this.getRelations()}
-    console.log("🔐 TournamentsRepository.getById()  --url--",url)
+  //  console.log("🔐 TournamentsRepository.getById()  --url--",url)
     const response = await fetch(url);
     const  result  = await response.json();
-    console.log("🔐Gane.repository.ts TournamentsRepository.getById()  --data--",result)
+  //  console.log("🔐Gane.repository.ts TournamentsRepository.getById()  --data--",result)
    const { data } = result
     return data?? null;
   }
@@ -126,24 +127,24 @@ class TournamentsRepository extends BaseRepository<Tournaments,TournamentsCreate
   
     //  const queryString = Helpers.buildQueryString(params);
       const queryString = this.newfilters(params);
-      console.log("🔐 TournamentsRepository.getByParams()  --queryString--",queryString)
+    //  console.log("🔐 TournamentsRepository.getByParams()  --queryString--",queryString)
       const url = `${this.URL}${queryString}`;
       const response = await fetch(url);
-      console.log("🔐 TournamentsRepository.getByParams()  --response--",response)
+    //  console.log("🔐 TournamentsRepository.getByParams()  --response--",response)
       const data = await response.json();
-      console.log("🔐 TournamentsRepository.getByParams()  --data--",data)
+    //  console.log("🔐 TournamentsRepository.getByParams()  --data--",data)
      // return data.map(User.fromJSON);
       return data.data?data.data[0]?data.data:null:null;
     }
     getOneByParams = async(params: any) : Promise<Tournaments | null> => {  
       //  const queryString = Helpers.buildQueryString(params);
         const queryString = this.newfilters(params);
-        console.log("🔐 TournamentsRepository.getByParams()  --queryString--",queryString)
+    //    console.log("🔐 TournamentsRepository.getByParams()  --queryString--",queryString)
         const url = `${this.URL}${queryString}`;
         const response = await fetch(url);
-        console.log("🔐 TournamentsRepository.getByParams()  --response--",response)
+    //    console.log("🔐 TournamentsRepository.getByParams()  --response--",response)
         const data = await response.json();
-        console.log("🔐 TournamentsRepository.getByParams()  --data--",data)
+    //    console.log("🔐 TournamentsRepository.getByParams()  --data--",data)
        // return data.map(User.fromJSON);
         return data.data?data.data[0]?data.data[0]:null:null;
       }
@@ -152,9 +153,9 @@ class TournamentsRepository extends BaseRepository<Tournaments,TournamentsCreate
 
   //update
   update = async (user: Partial<Tournaments>):Promise<Tournaments>=>{
-    console.log("🔐 TournamentsRepository.update()  --user--",user)
+  //  console.log("🔐 TournamentsRepository.update()  --user--",user)
     const { id, ...userExtracted } = user;
-    console.log("🔐 TournamentsRepository.update()  --userExtracted--",userExtracted)
+  //  console.log("🔐 TournamentsRepository.update()  --userExtracted--",userExtracted)
     const response = await fetch(`${this.URL}/id/${id}`, {
       method: "PUT",
       headers: { "Content-Type": "application/json" },
@@ -163,7 +164,7 @@ class TournamentsRepository extends BaseRepository<Tournaments,TournamentsCreate
       }),
     });
     const data = await response.json();
-    console.log("🔐 TournamentsRepository.update()  --data--",data)
+  //  console.log("🔐 TournamentsRepository.update()  --data--",data)
     //const userUpdated = User.fromJSON(data.data);
     const userUpdated =data.data;
     if (!userUpdated) {
@@ -186,7 +187,7 @@ class TournamentsRepository extends BaseRepository<Tournaments,TournamentsCreate
     if (!tournament) {
       return null;
     }
-    console.log("🔐 TournamentsRepository.addPlayer()  --tournament--",tournament)
+  //  console.log("🔐 TournamentsRepository.addPlayer()  --tournament--",tournament)
     //2- recuperer les joueurs et en faire un tableau d'int avec les id des joueurs
     const { players } = tournament;
     const playersIds = players?players.map((player: User) => player.id):[];

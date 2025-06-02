@@ -1,3 +1,27 @@
+
+### get csrf token 
+GET https://localhost:4433/api/auth/csrf HTTP/1.1
+Content-Type: application/json
+
+### create a new User
+POST https://localhost:4433/api/auth/register HTTP/1.1
+Content-Type: application/json
+x-csrf-token: a604acdd3a47992dfcfec994626b7c7e770f15a7e87ac8c3eb5ef60f3c4402a6
+
+{"name":"moi","email":"brigui.nizar@gmail.com","password":"xxxxxxx@","confirmPassword":"xxxxxxx@"}
+
+### create a new User
+POST https://localhost:4433/api/auth/logout HTTP/1.1
+Content-Type: application/json
+
+{}
+### create a new User
+POST https://localhost:4433/api/auth/login HTTP/1.1
+Content-Type: application/json
+authorization: Bearer eyJhbGciOiJSUzI1NiIsInR5cCI6IkpXVCJ9.eyJpZCI6NSwibmFtZSI6Im1vaV8zIiwiYXZhdGFyIjoiL3VwbG9hZHMvZGVmYXVsdEF2YXRhci5qcGciLCJyb2xlIjoidXNlciIsImlhdCI6MTc0ODU5MzE4NCwiZXhwIjoxNzQ4NjI5MTg0fQ.Jo6nS6Md-phLrSuYgDpaS-mEx9CcSYzLpYTYIDOvxVQMAGQA2RxM5lPjAP4P6788YpcrFh23gOADR1nltwbq3QFVDUBR-C2iip5gK912wXGSZCDoo40gKm2f2d68aAtyVu8tekxquf_9iuU5mS6KFArGcDsNVhVBTKgSYl4EESHDAWd_TX8yCZyAfeHdFWC5Hb6Rlgc-dCtTL63XyEasTnShCgC2t4AJHnidZIiBfhTQxyLoRkIsKzNrbXNMXpfDmi34r5W2j5mRTZofcKtsCOvUuFzUb1MBKC3REjTCN-bSSj89BQP8t-MNqnEdXAE-Fh5k-kAnSWfrg9jqb1uMulZo7e2WDtZCbUyB9VSLgxIIayQJNKbCBXi-NlCLKZZcRsjRb-OX44f-uJCaZhaCPKiuQAG1992fYmuza1GqEkC76hH66qOj8higyJsT4r4YeYDWmXoXwzXfY7gkseu41PE41Lqt0YRZrH85ffp5-vBJjjVoxTvskV78NHNBP07euswftBFClNzM8Vj_KygEfk9BQs6rAACPJkSgYriecLhlzPjiAQYTMgIVGODLProrNUsYq0gjGO3dV9RKpDlFss2CT8nMQoeycStAqDfTN4LPvzbgecjcanpO0YyCuU6DOAOCsAwDMaFRkiv8IWonPy3YDmMKIqISADVuOEJjbpA
+x-csrf-token: 5aa7f6605cf29e99c0f08d882cb8963bf2f9f68a77547bee123df50b563da7fb
+
+{"email":"brigui.nizar@gmail1.com","password":"xxxxx@"}
 ### create a new User
 POST https://localhost:4433/api/v2/database/myDb/table/user HTTP/1.1
 Content-Type: application/json

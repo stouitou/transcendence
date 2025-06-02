@@ -51,8 +51,8 @@ export class	Match {
 	setGameHero (div: HTMLElement)			{ this._renderer.gameHero = div; }
 	setGameHeroTree (div: HTMLElement)		{ this._renderer.gameHeroTree = div; }
 
-	renderGameHeroDiv(data:any)		{ this._renderer.renderGameHeroDiv(data); }
-	renderGameHeroTreeDiv(data:any)	{ this._renderer.renderGameHeroTreeDiv(data); }
+	private renderGameHeroDiv (data: any)		{ this._renderer.renderGameHeroDiv(data); }
+	private renderGameHeroTreeDiv (data: any)	{ this._renderer.renderGameHeroTreeDiv(data); }
 
 	// Handler used by the Web Socket for initial countdown	@param data
 	renderCountdownHandler (data: { matchId: string, value: number }) {
@@ -73,7 +73,6 @@ export class	Match {
 		this._gameManager?.setDataconfig(datas);			// set game with received datas
 		this._gameManager?.setupGame();						// setup game
 		this._renderer.setupDisplay();						// initialise graphics
-		this._renderer.render(this._gameManager!.players);	// display initial user interface: players, score, ground
 		if (this._gameManager?.dataConfig?.config.type === 'remote') {
 			this.attachRemoteMovementListener();			// attach event listeners for moves
 			this.start();									// remote
@@ -149,7 +148,8 @@ export class	Match {
 
 	startLocal () {
 		if (!this._gameManager)	{ throw new Error('GameManager not initialized') ; }
-		if (this._isRunning) { return; }	// already running
+		if (this._isRunning)	{ return ; }	// already running
+
 		this._isRunning = true;
 		this.gameLoopLocal();
 	}

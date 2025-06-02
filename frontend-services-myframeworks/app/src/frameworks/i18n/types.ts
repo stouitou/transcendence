@@ -1,2 +1,2 @@
-export const languages = ['fr', 'en'] as const;
+export const languages = ['fr', 'en', 'es'] as const;
 export type Language = typeof languages[number];

@@ -47,6 +47,7 @@ export class DropdownProfile extends BaseComponent<{ isDrop: boolean, user:User|
       this.innerHTML = ``;
       return;
     }
+    // console.log('user:', user);
 
     this.innerHTML = `
     <div class="relative inline-block text-left">
@@ -59,8 +60,7 @@ export class DropdownProfile extends BaseComponent<{ isDrop: boolean, user:User|
           <div class="flex items-center p-4">
             <img referrerPolicy="no-referrer" src="${user.avatar}" alt="User avatar" class="w-10 h-10 rounded-full mr-3">
             <div>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">Bonnie Green</p>
-              <p class="text-sm text-gray-500 dark:text-gray-300">name@flowbite.com</p>
+              <p class="text-sm font-medium text-gray-900 dark:text-white">${user.name}</p>
             </div>
           </div>
           <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">

@@ -140,7 +140,6 @@ export class NavBarComponent extends BaseComponent<{ theme: string,user: User | 
  <dropdown-porfile-component></dropdown-porfile-component>
 
                 </nav>
-
             </div>
           </div>
           <!-- End Theme Toggle -->
