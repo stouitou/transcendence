@@ -115,7 +115,7 @@ export const DESIGN = {
 
 /* ---------- structure helpers ---------- */
 export function createAppendix(): HTMLDivElement {
-    const   bar = document.createElement("div");
+    const bar = document.createElement("div");
 
     Object.assign(bar.style, {
         width               : `${CANVAS_WIDTH}px`,
@@ -306,7 +306,7 @@ export function drawPaddle(
     ctx.restore();
 }
 
-// /* ---------- scoreboard cell helper ---------- */
+/* ---------- scoreboard cell helper ---------- */
 const style = document.createElement("style");
 style.textContent = `
   .score-cell{

@@ -127,14 +127,14 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
       </h2>
 
       <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-lg">
-        <div class="font-semibold">Lobby&nbsp;ID:</div>                 <div>${game?.lobyId}</div>
-        <!--<div class="font-semibold">Game&nbsp;ID:</div>                  <div>${game?.config.gameId}</div>-->
-        <div class="font-semibold">Game&nbsp;State:</div>               <div>${game?.config.state}</div>
+        <div class="font-semibold">LobbyID:</div>                 <div>${game?.lobyId}</div>
+        <!--<div class="font-semibold">GameID:</div>                  <div>${game?.config.gameId}</div>-->
+        <div class="font-semibold">Game State:</div>               <div>${game?.config.state}</div>
         <div class="font-semibold">Type:</div>                          <div>${game?.config.type}</div>
         <div class="font-semibold">Format:</div>                        <div>${game?.config.format}</div>
-        <div class="font-semibold">Max&nbsp;players:</div>              <div>${game?.config.maxPlayers}</div>
-      <!--  <div class="font-semibold">Tournament&nbsp;ID:</div>            <div>${game?.config.tournamentId}</div>-->
-        <div class="font-semibold">Allow&nbsp;registration:</div>       <div>${game?.config.isallowedRegistration}</div>
+        <div class="font-semibold">Max players:</div>              <div>${game?.config.maxPlayers}</div>
+      <!--  <div class="font-semibold">Tournament ID:</div>            <div>${game?.config.tournamentId}</div>-->
+        <div class="font-semibold">Allow registration:</div>       <div>${game?.config.isallowedRegistration}</div>
       </div>
         
       <div class="text-center">
