@@ -65,6 +65,9 @@ export class SettingsLanguage extends BaseComponent<{}, SettingsFormData> {
               <option value="en" ${this.currentLang === 'en' ? 'selected' : ''}>
                 ${this.t("LANGUAGE.EN")}
               </option>
+              <option value="es" ${this.currentLang === 'es' ? 'selected' : ''}>
+                ${this.t("LANGUAGE.ES")}
+              </option>
             </select>
             <!-- Down arrow icon -->
             <span class="pointer-events-none absolute inset-y-0 right-4 flex items-center">

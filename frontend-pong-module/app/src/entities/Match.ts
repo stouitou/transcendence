@@ -141,7 +141,8 @@ export class	Match {
 
 	start () {
 		if (!this._gameManager)	{ throw new Error('GameManager not initialized') ; }
-		if (this._isRunning) { return; }	// already running
+		if (this._isRunning)	{ return ; }	// already running
+
 		this._isRunning = true;
 		this.gameLoop();
 	}
@@ -154,9 +155,10 @@ export class	Match {
 		this.gameLoopLocal();
 	}
 
+	private	_rafId: number | null = null;
+
 	// Boucle de jeu principale. Remote une simple boucle de jeu qui rend à chaque frame
 	private gameLoop () {
-		//return;
 		if (!this._isRunning)	{ return ; }
 	
 		// Mettre à jour la logique du jeu // en remote gerer par le serveur
@@ -169,7 +171,6 @@ export class	Match {
 		 this._rafId = requestAnimationFrame(() => this.gameLoop());
 	}
 
-    private _rafId: number | null = null;
 	private gameLoopLocal () {
 		if (!this._isRunning) { return ; }
 

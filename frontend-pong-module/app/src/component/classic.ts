@@ -306,16 +306,16 @@ export class classic extends LitElement {
 		}
 	`;
 
-	constructor() {
+	constructor () {
 		super();
 		console.log('game component constructor');
 	}
 
-	set params(params: { id: string }) {
+	set params (params: { id: string }) {
 		this.data = params;
 	}
 
-	connectedCallback(): void {
+	connectedCallback (): void {
 		super.connectedCallback();
 		console.log('ConnectedCallback: Component added to the DOM');
 
@@ -327,7 +327,7 @@ export class classic extends LitElement {
 		this._game.webSocketManager.lobyId = this.data?.id;
 	}
 
-	firstUpdated() {
+	firstUpdated () {
 		console.log('firstUpdated: DOM is ready');
 
 		const gameCanvas      = this.shadowRoot?.querySelector('#gameCanvas')  as HTMLCanvasElement;
@@ -349,7 +349,7 @@ export class classic extends LitElement {
 		this._game.webSocketManager.connect();
 	}
 
-	render() {
+	render () {
 		console.log('render: Rendering the component');
 		return html`
 			<!-- Single‐match hero card (hidden when empty) -->
@@ -373,7 +373,7 @@ export class classic extends LitElement {
 		`;
 	}
 
-	disconnectedCallback() {
+	disconnectedCallback () {
 		console.log('disconnectedCallback: Component removed from the DOM');
 		window.removeEventListener('keydown', this._onKeyDown);
 		this._game?.stop();
@@ -382,11 +382,10 @@ export class classic extends LitElement {
 		super.disconnectedCallback();
 	}
 
-	private hideBackground(): void {
-		const bg = document.querySelector('background-canvas-component');
-		if (bg) {
-			(bg as HTMLElement).style.display = 'none';
-		}
+	private hideBackground (): void {
+		const	bg = document.querySelector('background-canvas-component');
+		if (bg) { (bg as HTMLElement).style.display = 'none'; }
+
 		document.documentElement.style.backgroundColor = 'black';
 		document.documentElement.style.backgroundImage = 'url("/uploads/bg10.png")';
 		document.documentElement.style.backgroundRepeat = 'no-repeat';
@@ -394,41 +393,40 @@ export class classic extends LitElement {
 		document.documentElement.style.backgroundPosition = 'center';
 		document.body.style.backgroundColor = '';
 		document.body.style.backgroundImage = `
-      linear-gradient(
-        rgba(255,255,255,0.8),
-        rgba(255,255,255,0.8)
-      ), 
-      url("/uploads/bg10.png")
-    `;
+			linear-gradient(
+				rgba(255,255,255,0.8),
+				rgba(255,255,255,0.8)
+			), 
+			url("/uploads/bg10.png")
+		`;
 		document.body.style.backgroundRepeat = 'no-repeat';
 		document.body.style.backgroundSize = 'cover';
 		document.body.style.backgroundPosition = 'center';
 	}
 
-	private showBackground(): void {
-		const bg = document.querySelector('background-canvas-component');
-		if (bg) {
-			(bg as HTMLElement).style.display = '';
-		}
+	private showBackground (): void {
+		const	bg = document.querySelector('background-canvas-component');
+		if (bg) { (bg as HTMLElement).style.display = ''; }
+
 		document.documentElement.style.backgroundColor = 'black';
 		document.body.style.backgroundImage = `
-      linear-gradient(
-        rgba(255,255,255,0.8),
-        rgba(255,255,255,0.8)
-      ), 
-      url("/uploads/bg10.png")
-    `;
+			linear-gradient(
+				rgba(255,255,255,0.8),
+				rgba(255,255,255,0.8)
+			), 
+			url("/uploads/bg10.png")
+		`;
 		document.documentElement.style.backgroundRepeat = 'no-repeat';
 		document.documentElement.style.backgroundSize = 'cover';
 		document.documentElement.style.backgroundPosition = 'center';
 		document.body.style.backgroundColor = '';
 		document.body.style.backgroundImage = `
-      linear-gradient(
-        rgba(255,255,255,0.8),
-        rgba(255,255,255,0.8)
-      ), 
-      url("/uploads/bg10.png")
-    `;
+			linear-gradient(
+				rgba(255,255,255,0.8),
+				rgba(255,255,255,0.8)
+			), 
+			url("/uploads/bg10.png")
+		`;
 		document.body.style.backgroundRepeat = 'no-repeat';
 		document.body.style.backgroundSize = 'cover';
 		document.body.style.backgroundPosition = 'center';

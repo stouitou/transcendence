@@ -124,7 +124,7 @@ export class Renderer {
 	 *   4) Draw each paddle
 	 *   5) Update the scoreboard bubbles
 	 */
-	draw(ball: Ball, players: Player[]) {
+	draw (ball: Ball, players: Player[]) {
 		this.clear();
 		Design.drawBackground(this._ctx);
 
@@ -145,16 +145,17 @@ export class Renderer {
 	/**
 	 * Clears the entire HTML canvas area.
 	 */
-	private clear() {
-		if (!this._ctx || !this._canvas) { console.error('Game context is not set.'); return; }
+	private clear () {
+		if (!this._ctx || !this._canvas)	{ console.error('Game context is not set.'); return ; }
+
 		this._ctx.clearRect(0, 0, this._canvas.width, this._canvas.height);
 	}
 
 	/**
 	 * Draws a glossy ball with radial gradient, shadow, blur, highlight, and edge stroke.
 	 */
-	private drawBall(ball: Ball) {
-		if (!this._ctx) { return; }
+	private drawBall (ball: Ball) {
+		if (!this._ctx) { return ; }
 
 		const ctx = this._ctx;
 		const r = ball.size.width;    // radius
