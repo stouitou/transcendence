@@ -2,7 +2,14 @@ import { BaseComponent } from "../frameworks/base-component";
 import { UserContext } from '../globalstate/GlobalState';
 import { User } from '../types/types';
 import { disable2FA, enable2FA, get2FADetail, TwoFA } from "../services/api.2fa";
-import { addfriendByUserName, removeFriendById, updatePassword, updateProfileDeleteMe, updateProfileName, uploadProfileAvatar } from "../services/api.profile";
+import {
+  addfriendByUserName,
+  removeFriendById,
+  updatePassword,
+  updateProfileDeleteMe,
+  updateProfileName,
+  uploadProfileAvatar
+} from "../services/api.profile";
 import { ProfileUpdateFormData } from "../types/forms.type";
 import {
   profileUpdateAddFriendByNameconstraint,

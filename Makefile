@@ -37,8 +37,8 @@ clean-docker:
 	@docker volume rm $$(docker volume ls -q) 2>/dev/null || true
 	@docker network rm $$(docker network ls -q | grep -v bridge | grep -v host | grep -v none) 2>/dev/null || true
 clean-node:
-	@rm -rf ./auth-service/app/node_modules ./database-service/app/node_modules ./frontend-pong-module/app/node_modules ./frontend-services/app/node_modules ./game-management-service/app/node_modules ./user-management-service/app/node_modules ./ws-service/app/node_modules
-	@mkdir -p ./auth-service/app/node_modules ./database-service/app/node_modules ./frontend-pong-module/app/node_modules ./frontend-services/app/node_modules ./game-management-service/app/node_modules ./user-management-service/app/node_modules ./ws-service/app/node_modules
+	@rm -rf ./auth-service/app/node_modules ./database-service/app/node_modules ./frontend-pong-module/app/node_modules ./frontend-services-myframeworks/app/node_modules ./game-management-service/app/node_modules ./user-management-service/app/node_modules ./ws-service/app/node_modules
+	@mkdir -p ./auth-service/app/node_modules ./database-service/app/node_modules ./frontend-pong-module/app/node_modules ./frontend-services-myframeworks/app/node_modules ./game-management-service/app/node_modules ./user-management-service/app/node_modules ./ws-service/app/node_modules
 # Docker compose commands
 start:
 	docker-compose -f $(FILE) up -d
