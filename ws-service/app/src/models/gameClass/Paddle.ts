@@ -1,37 +1,41 @@
 import { Position, Size } from "../../types/gameUtils.type";
 
-export class Paddle {
-	position: Position;
-	size: Size;
+export class	Paddle {
 
-	constructor(initialPosition: Position, size: Size) {
-		this.position = { ...initialPosition };
-		this.size = { ...size };
+	private	_position: Position;
+	private	_size: Size;
+
+	constructor (initialPosition: Position, size: Size) {
+		this._position = { ...initialPosition };
+		this._size = { ...size };
 	}
 
-	clamp(canvas:{ width: number, height: number }) {
-		if (this.position.x < 0) this.position.x = 0;
-		if (this.position.y < 0) this.position.y = 0;
-		if (this.position.x + this.size.width > canvas.width)
-			this.position.x = canvas.width - this.size.width;
-		if (this.position.y + this.size.height > canvas.height)
-			this.position.y = canvas.height - this.size.height;
+	get position ()	{ return this._position ; }
+	get size ()	{ return this._size ; }
+
+	clamp (canvas:{ width: number, height: number }) {
+		if (this._position.x < 0) this._position.x = 0;
+		if (this._position.y < 0) this._position.y = 0;
+		if (this._position.x + this._size.width > canvas.width)
+			this._position.x = canvas.width - this._size.width;
+		if (this._position.y + this._size.height > canvas.height)
+			this._position.y = canvas.height - this._size.height;
 	}
-	move(dx: number, dy: number) {
-		this.position.x += dx;
-		this.position.y += dy;
+	move (dx: number, dy: number) {
+		this._position.x += dx;
+		this._position.y += dy;
 		this.clamp({ width: 800, height: 600 });
 	}
-	setPosition(position: Position) {
+	setPosition (position: Position) {
 		const canvas = { width: 800, height: 600 };
-		this.position = { ...position };
+		this._position = { ...position };
 		this.clamp(canvas);
 	}
 
-	toJSON() {
+	toJSON () {
 		return {
-			position: this.position,
-			size: this.size,
+			position: this._position,
+			size: this._size,
 		};
 	}
 }

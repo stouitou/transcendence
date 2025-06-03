@@ -7,7 +7,6 @@ export class	Bot {
 
 	private readonly	_player: Player;
 	private readonly	_level: number;
-	//private				_targetSide: string | null = null;
 	private readonly	_tolerance: number = 20;	// tolerance to avoid vibrations
 
 	constructor (level: number, player: Player) {

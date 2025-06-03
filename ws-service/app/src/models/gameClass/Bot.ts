@@ -6,10 +6,9 @@ export class	Bot {
 
 	private readonly	_player: Player;
 	private readonly	_level: number;
-	//private				_targetSide: string | null = null;
 	private readonly	_tolerance: number = 20;	// tolerance to avoid vibrations
-	CANVAS_HEIGHT = 600;
 	CANVAS_WIDTH = 800;
+	CANVAS_HEIGHT = 600;
 
 	constructor (level: number, player: Player) {
 		this._player = player;
@@ -39,9 +38,10 @@ export class	Bot {
 	
 		const	{ paddle } = this._player;
 		const	target = paddle.position.x + paddle.size.width / 2;			// middle of the paddle
-		const	noise = (Math.random() - 0.5) * Math.pow(this._level, 4);	// noise depending on the bot level
+		const	noise = (Math.random() - 0.5) * Math.pow(1 / this._level, 3);	// noise depending on the bot level
 		const	ballPosition: Position = { x: ball.position.x + noise, y: ball.position.y + noise };
-			// Go back to the center of the canvas if ball go away
+
+		// Go back to the center of the canvas if ball go away
 		if (
 			ball.velocity.y < 0 && this._player.index === 2 ||
 			ball.velocity.y > 0 && this._player.index === 3
@@ -49,25 +49,25 @@ export class	Bot {
 			this.repositionToCenterHorizontal();
 			return ;
 		}
-	
 
-			// Détermine le seuil de déclenchement selon le niveau
-			const minTrigger = 0.2 + 0.15 * (this._level - 1); // lvl 1: 0.2, lvl 5: 0.8
-			let triggerZone = 0;
-			if (this._player.index === 2) { // Défend le bas
-				triggerZone = this.CANVAS_HEIGHT * minTrigger;
-				if (ball.position.y < this.CANVAS_HEIGHT - triggerZone) {
-					this._player.directionReceived = null;
-					return;
-				}
+		// Détermine le seuil de déclenchement selon le niveau
+		const minTrigger = 0.5 + 0.15 * (this._level - 1); // lvl 1: 0.2, lvl 5: 0.8
+		let triggerZone = 0;
+
+		if (this._player.index === 2) { // Défend le bas
+			triggerZone = this.CANVAS_HEIGHT * minTrigger;
+			if (ball.position.y < this.CANVAS_HEIGHT - triggerZone) {
+				this._player.directionReceived = null;
+				return;
 			}
-			if (this._player.index === 3) { // Défend le haut
-				triggerZone = this.CANVAS_HEIGHT * minTrigger;
-				if (ball.position.y > triggerZone) {
-					this._player.directionReceived = null;
-					return;
-				}
+		}
+		if (this._player.index === 3) { // Défend le haut
+			triggerZone = this.CANVAS_HEIGHT * minTrigger;
+			if (ball.position.y > triggerZone) {
+				this._player.directionReceived = null;
+				return;
 			}
+		}
 		// Check if the bot needs to move
 		if (Math.abs(target - ballPosition.x) > this._tolerance) {
 			if (target > ballPosition.x) {
@@ -86,7 +86,7 @@ export class	Bot {
 	
 		const	{ paddle } = this._player;
 		const	target = paddle.position.y + paddle.size.height / 2;		// middle of the paddle
-		const	noise = (Math.random() - 0.5) * Math.pow(this._level, 4);	// noise depending on the bot level
+		const	noise = (Math.random() - 0.5) * Math.pow(1 / this._level, 3);	// noise depending on the bot level
 		const	ballPosition: Position = { x: ball.position.x + noise, y: ball.position.y + noise };
 	
 		// Go back to the center of the canvas if ball go away
@@ -99,7 +99,7 @@ export class	Bot {
 		}
 
 	 // Détermine le seuil de déclenchement selon le niveau
-    const minTrigger = 0.2 + 0.15 * (this._level - 1); // lvl 1: 0.2, lvl 5: 0.8
+    const minTrigger = 0.5 + 0.15 * (this._level - 1); // lvl 1: 0.2, lvl 5: 0.8
     let triggerZone = 0;
 
     if (this._player.index === 0) { // Défend le bas

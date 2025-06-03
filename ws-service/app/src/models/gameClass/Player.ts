@@ -4,7 +4,8 @@ import { WaitingPlayers } from "../../services/ws.service";
 import { Bot } from "./Bot";
 
 const directions:Direction[] = ['left', 'right', 'top', 'bottom'];
-export class Player {
+export class	Player {
+
 	id: number; // peut être "local", "remote-1", etc.
 	userId: number = -1;
 	name: string = 'host';
@@ -25,7 +26,7 @@ export class Player {
 	bot:Bot|null = null; // Bot instance if the player is a bot
 	directionReceived: 'up'|'down'|'left'|'right'|null = null;
 
-	constructor(jsonData: WaitingPlayers, index: number = 0,difficulty: number = 1) {
+	constructor (jsonData: WaitingPlayers, index: number = 0,difficulty: number = 1) {
 		/**
 		 * 
 				userId: 'User-3',

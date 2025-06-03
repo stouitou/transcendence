@@ -27,130 +27,130 @@ export class Match extends EventEmitter {
 	private intervalId: NodeJS.Timeout | null = null;
 	private isGameFinished: boolean = false;
 	_gameHistoryId: number = -1;
-  
+	
 	constructor(
-	  private lobyId: string,
-	  private _id: string,
-	  private _config: WebSocketGameConfig,
+		private lobyId: string,
+		private _id: string,
+		private _config: WebSocketGameConfig,
 
 	) {
 		super();
 		const canvas = { //@TODO canvas size a definir dans config
-		  width: 800,
-		  height: 600,
+			width: 800,
+			height: 600,
 		};
-	  this._playerManager = new GamePlayerManager(_config.players,_config.difficulty = 1);
-	  this._socketManager = new GameSocketManager();
-	  this.ballManager = new GameBallManager(canvas,{width:10,height:10},{x:1,y:1});
-	  this.collisionManager = new GameCollisionManager(canvas,this.ballManager);
-	  this._movementManager = new GameMovementManager(canvas);
+		this._playerManager = new GamePlayerManager(_config.players,_config.difficulty = 1);
+		this._socketManager = new GameSocketManager();
+		this.ballManager = new GameBallManager(canvas,{width:10,height:10},{x:1,y:1});
+		this.collisionManager = new GameCollisionManager(canvas,this.ballManager);
+		this._movementManager = new GameMovementManager(canvas);
 	 // this.databaseManager = new DatabaseManager();
 	}
 	get gameHistoryId(): number {
-	  return this._gameHistoryId;
+		return this._gameHistoryId;
 	}
 	setgameHistoryId(value: number) {
-	  this._gameHistoryId = value;
-	  console.log("GameHistoryId set to", value);
+		this._gameHistoryId = value;
+		console.log("GameHistoryId set to", value);
 	}
 	get movementManager(): GameMovementManager {
-	  return this._movementManager;
+		return this._movementManager;
 	}
 	get playerManager(): GamePlayerManager {
-	  return this._playerManager;
+		return this._playerManager;
 	}
 	get socketManager(): GameSocketManager {
-	  return this._socketManager;
+		return this._socketManager;
 	}
 
 	get id(): string {
-	  return this._id;
+		return this._id;
 	}
 	set id(value: string) {
-	  this._id = value;
+		this._id = value;
 	}
 	get config(): WebSocketGameConfig {
-	  return this._config;
+		return this._config;
 	}
 	set config(value: WebSocketGameConfig) {
-	  this._config = value;
+		this._config = value;
 	}
 	start() {
 		//if (this.isStarted) {
 		console.log("Match started [SETUPNEWGAME]",this.toJSON(),'SETUPNEWGAME');
 		if (this.observer.isStarted) {
-		  console.log("Match already started");
-		  return;
+			console.log("Match already started");
+			return;
 		}
 		this.socketManager.broadcastMessage(this.toJSON(),'SETUPNEWGAME');
 	//	this.emit("start"); // Émettre l'événement `start`
 
-	//  this.setPlayers();
+	//	this.setPlayers();
 	this.observer.isStarted = true;
-	  if (this.config.type === "remote") {
-	  this.intervalId = setInterval(() => this.update(), 1000 / 60);
-	  }
-	  else if (this.config.type === "local") {
-	  this.intervalId = setInterval(() => null, 1000 / 60); // = 1000/60 = 16.67ms
-	  }
+		if (this.config.type === "remote") {
+		this.intervalId = setInterval(() => this.update(), 1000 / 60);
+		}
+		else if (this.config.type === "local") {
+		this.intervalId = setInterval(() => null, 1000 / 60); // = 1000/60 = 16.67ms
+		}
 	}
 
 	stop(): void {
 		console.log("[Match].stopp() is called stopped");
-	  this.observer.isFinished = true;
+		this.observer.isFinished = true;
 		this.emit("end"); // Émettre l'événement `end`
-	  if (this.intervalId) {
+		if (this.intervalId) {
 		clearInterval(this.intervalId);
 		this.intervalId = null;
-	  }
-	  this.observer.isStarted = true;
-	  this.isGameFinished = true;
-	  console.log("[Match].stopp() Match stopped");
-	  console.log("[Match].stopp() is called stopped",this.observer);
-	  this.socketManager.broadcastMessage( this.observer,'STOP');
+		}
+		this.observer.isStarted = true;
+		this.isGameFinished = true;
+		console.log("[Match].stopp() Match stopped");
+		console.log("[Match].stopp() is called stopped",this.observer);
+		this.socketManager.broadcastMessage( this.observer,'STOP');
 	}
-  
-	update(): void {
-	  if (this.playerManager.areAllPlayersInGame()) {
+	
+	update (): void {
+		if (this.playerManager.areAllPlayersInGame()) {
 		this.movementManager.updatePlayerMovements( // @TODO passer le player manager au mouvement manager?
-		  this.playerManager.getPlayers(),
-		  this.playerManager.getPlayerActions(this.ballManager.getBall())
+			this.playerManager.getPlayers(),
+			this.playerManager.getPlayerActions(this.ballManager.getBall())
 		);
 	//	this.collisionManager.getBall().update();
 		this.ballManager.getBall().update();
-		this.collisionManager.checkCollisions(
-		  this.playerManager.getPlayers(),
+		this.collisionManager.handleCollisions(
+			this.playerManager.getPlayers()
 		 // this.collisionManager.getBall()
 		);
 		this.socketManager.broadcastState(this.toJSON());
-	  }
-	  else {
+		}
+		else {
 		this.socketManager.broadcastMessage(
-		  { type: "waiting", message: "Waiting for players to join" });
-	  }
-  
-	  if (this.playerManager.areAllPlayersFinished()) {
+			{ type: "waiting", message: "Waiting for players to join" });
+		}
+	
+		if (this.playerManager.areAllPlayersFinished()) {
 		this.stop();
 		this.isOver();
-	  }
+		}
 	}
-  
+	
 	isOver(): void {
-	  this.isGameFinished = true;
-	//  this.databaseManager.saveMatchResults(this);
-	  console.log("Match finished");
+		this.isGameFinished = true;
+	//	this.databaseManager.saveMatchResults(this);
+		console.log("Match finished");
 	}
 
 
 	toJSON(): any {
-	  return {
+		return {
 		id: this.id,
 		lobyId: this.lobyId,
 		players: this.playerManager.toJSON(),
 		ball: this.ballManager.getBall(),
 		config: this.config,
 		canvas: this.collisionManager.canvas,//@TODO non use
-	  };	  
+		};		
 	}
 
 	viewDetails() {
@@ -172,4 +172,4 @@ export class Match extends EventEmitter {
 			isFinished: this.observer.isFinished
 		}
 	}
-  }
+	}

@@ -1,40 +1,69 @@
 import { Position, Size } from "../../types/gameUtils.type";
+import { Player } from "./Player";
 
-export class Ball {
-	position: Position;
-	size: Size;
-	velocity: Position; // dx, dy  
+export class	Ball {
+
+	private				_position: Position;
+	private readonly	_size: Size;
+	private				_velocity: Position; // dx, dy  
 	private				_speed: number;
-	
-	constructor(initialPosition: Position, size: Size, initialVelocity: Position,private canvas: { width: number; height: number }) {
-	  this.position = { ...initialPosition };
-	  this.size = { ...size };
-	  this.velocity = { ...initialVelocity };
+	private				_lastHit: Player | null = null;
+	private				_lastWallBounce: number | null = null;
+	private				_maxBounceCountRound: number = 0;
+
+	constructor (position: Position, size: Size, velocity: Position, private canvas: { width: number; height: number }) {
+		this._position = { ...position };
+		this._size = { ...size };
+		this._velocity = { ...velocity };
 		this.normalize();
-		this._speed = 5;
+		this._speed = 8;
 	}
   
-  	update () {
-		this.position.x += this.velocity.x * this._speed;
-		this.position.y += this.velocity.y * this._speed;
-	}
-	reset(/* position: Position, velocity: Position = this.velocity */) {
-		this.spawn();
+	get position ()							{ return this._position ; }
+	get size ()								{ return this._size ; }
+	get speed ()							{ return this._speed ; }
+	get velocity ()							{ return this._velocity ; }
+	get lastHit () : Player | null			{ return this._lastHit ; }
+	get lastWallBounce () : number | null	{ return this._lastWallBounce ; }
+	get maxBounceCountRound ()				{ return this._maxBounceCountRound ; }
 
-	 /*  this.position = { ...position };
-	  this.velocity = { ...velocity }; */
+	set position (position: Position)			{ this._position = position; }
+	set speed (speed: number)					{ this._speed = speed; }
+	set lastHit (player: Player)				{ this._lastHit = player; }
+	set lastWallBounce (wall: number | null)	{ this._lastWallBounce = wall; }
+	set maxBounceCountRound (count: number)		{ this._maxBounceCountRound = count; }
+
+  	update () {
+		this._position.x += this._velocity.x * this._speed;
+		this._position.y += this._velocity.y * this._speed;
 	}
-	toJSON() {
+
+	reset () {
+		this.spawn();
+		this._lastHit = null;
+		this._lastWallBounce = null;
+		this._maxBounceCountRound = 0;
+	}
+
+	normalize () {
+		const	magnitude = this.magnitude();
+
+		if (magnitude === 0)	{ this._velocity = { x: 0, y: 0 }; return ; }
+		this._velocity.x = this._velocity.x / magnitude;
+		this._velocity.y = this._velocity.y / magnitude;
+	}
+
+	toJSON () {
 		return {
-			position: this.position,
-			size: this.size,
-		};
-	}
+			position: this._position,
+			size: this._size,
+		} ;	
+	}	
 
 	private spawn () {
 		const	x = this.canvas.width / 2;
 		const	y = (33 + (Math.random() * 100) / 3) / 100 * this.canvas.height;
-		this.position = { x: x, y: y };
+		this._position = { x: x, y: y };
 
 		const	add = Math.random() * 30;
 		let		vx = Math.sin((45 + add) * Math.PI / 180);
@@ -43,19 +72,11 @@ export class Ball {
 		if (base < 2)				vx *= -1;
 		if (base >= 1 && base < 3)	vy *= -1;
 
-		this.velocity = { x: vx, y: vy };
+		this._velocity = { x: vx, y: vy };
 		this.normalize();
-	}
+	}	
 	
-	normalize () {
-		const	magnitude = this.magnitude();
-
-		if (magnitude === 0) { this.velocity = { x: 0, y: 0 }; return ; }
-		this.velocity.x = this.velocity.x / magnitude;
-		this.velocity.y = this.velocity.y / magnitude;
-	}
-
 	private magnitude () {
-		return Math.sqrt(Math.pow(this.velocity.x, 2) + Math.pow(this.velocity.y, 2)) ;
+		return Math.sqrt(Math.pow(this._velocity.x, 2) + Math.pow(this._velocity.y, 2)) ;
 	}
   }

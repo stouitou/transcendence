@@ -369,13 +369,13 @@ export class ProfileEdit extends BaseComponent<{ user: User | null }, ProfileUpd
       this.showMessage('Please fix the errors in the form.', 'error');
       return;
     }
-    try {
-      await updateProfileDeleteMe();
-      this.router.navigate('/logout');
-//    try {         
-//     await  updateProfileDeleteMe();
-//      UserContext().setUserLogout();  
-//      this.router.navigate('/');
+    // try {
+      // await updateProfileDeleteMe();
+      // this.router.navigate('/logout');
+   try {         
+    await  updateProfileDeleteMe();
+     UserContext().setUserLogout();  
+     this.router.navigate('/');
     } catch (error) {
       this.apiErrorHandler(error);
     }

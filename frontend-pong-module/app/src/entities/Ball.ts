@@ -46,6 +46,14 @@ export class	Ball {
 		this._lastWallBounce = null;
 		this._maxBounceCountRound = 0;
 	}
+	
+	normalize () {
+		const	magnitude = this.magnitude();
+
+		if (magnitude === 0)	{ this._velocity = { x: 0, y: 0 }; return ; }
+		this._velocity.x = this._velocity.x / magnitude;
+		this._velocity.y = this._velocity.y / magnitude;
+	}
 
 	private spawn () {
 		const	x = CANVAS_WIDTH / 2;
@@ -61,16 +69,8 @@ export class	Ball {
 
 		this._velocity = { x: vx, y: vy };
 		this.normalize();
-	}
+	}	
 	
-	normalize () {
-		const	magnitude = this.magnitude();
-
-		if (magnitude === 0) { this._velocity = { x: 0, y: 0 }; return ; }
-		this._velocity.x = this._velocity.x / magnitude;
-		this._velocity.y = this._velocity.y / magnitude;
-	}
-
 	private magnitude () {
 		return Math.sqrt(Math.pow(this._velocity.x, 2) + Math.pow(this._velocity.y, 2)) ;
 	}

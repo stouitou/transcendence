@@ -31,7 +31,7 @@ export class Tournaments {
   max_players: number;
 
   //chaque Tournoi a plusieurs joueurs
-  @ManyToMany(() => User, (user) => user.tournaments, { cascade: true , onUpdate: 'CASCADE' , nullable: true  })
+  @ManyToMany(() => User, (user) => user.tournaments, { cascade: true , onDelete: 'CASCADE' , onUpdate: 'CASCADE' , nullable: true  })
   @JoinColumn()
   players: User[];
   
