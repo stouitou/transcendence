@@ -10,8 +10,8 @@ customElements.define('logout-btn', Logout);
 
 if (!customElements.get('msg-btn'))
 customElements.define('msg-btn', MessageBtn);
-if (!customElements.get('dropdown-porfile-component')) {
-  customElements.define('dropdown-porfile-component', DropdownProfile);
+if (!customElements.get('dropdown-profile-component')) {
+  customElements.define('dropdown-profile-component', DropdownProfile);
 }
 
 /**
@@ -94,10 +94,10 @@ export class NavBarComponent extends BaseComponent<{ theme: string,user: User | 
 
           ${!user ? `
           <a href="/login" class="nav-link">Log-In</a>
-          <a href="/register" class="nav-link">Register</a>
+          <!--<a href="/register" class="nav-link">Register</a>-->
           ` : ``}
 
-          <dropdown-porfile-component></dropdown-porfile-component>
+          <dropdown-profile-component></dropdown-profile-component>
         </nav>
       </div>
     </header>

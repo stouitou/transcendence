@@ -10,33 +10,34 @@ customElements.define('logout-btn', Logout);
  */
 export class OnlineComponent extends BaseComponent<{ ws: IWebSocketsService | null ,isOnline: string[] | null}> {
     
-  constructor() { super({ ws:null,isOnline:null}); }
+  constructor() { super({ ws: null, isOnline: null}); }
  /*  toggleTheme() {
     const newTheme = this.state.theme === 'light' ? 'dark' : 'light';
     this.setState({ theme: newTheme });
   } */
-    connectedCallback() {
-      super.connectedCallback();
-      this.state.ws = UserContext().ws();
-      this.render();
-      document.addEventListener('ws-isOnline', (e: Event) => {
-        const customEvent = e as CustomEvent;
-        console.log('profile-data-updated event received');
-        this.state.isOnline = customEvent.detail.users;
-        this.render();
-      });
-/*       document.addEventListener('login-success', (e: Event) => {
-        const customEvent = e as CustomEvent;
-        this.state.islogged = customEvent.detail.islogged;
-        this.render();
-      });
 
-      document.addEventListener('logout-success', (e: Event) => {
-        const customEvent = e as CustomEvent;
-        this.state.islogged = customEvent.detail.islogged;
-        this.render();
-      }); */
-    }
+  connectedCallback() {
+    super.connectedCallback();
+    this.state.ws = UserContext().ws();
+    this.render();
+    document.addEventListener('ws-isOnline', (e: Event) => {
+      const customEvent = e as CustomEvent;
+      console.log('profile-data-updated event received');
+      this.state.isOnline = customEvent.detail.users;
+      this.render();
+    });
+/*       document.addEventListener('login-success', (e: Event) => {
+      const customEvent = e as CustomEvent;
+      this.state.islogged = customEvent.detail.islogged;
+      this.render();
+    });
+
+    document.addEventListener('logout-success', (e: Event) => {
+      const customEvent = e as CustomEvent;
+      this.state.islogged = customEvent.detail.islogged;
+      this.render();
+    }); */
+  }
 
   render() {
     const { isOnline } = this.state;

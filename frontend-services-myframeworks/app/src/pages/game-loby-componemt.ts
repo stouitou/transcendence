@@ -144,7 +144,7 @@ export class GameLobyComponent extends BaseComponent<{
 
         /*  ↓↓↓ FULL, ORIGINAL MARKUP (unchanged) ↓↓↓  */
         this.innerHTML = /*html*/`
- <section class="min-h-screen flex items-center justify-center p-4">
+ <section class="flex items-center justify-center p-4">
     <div class="w-full max-w-6xl space-y-12">
 
       <!-- header -->

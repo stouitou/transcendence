@@ -44,15 +44,15 @@
   <div id="app">
     <div class="relative w-full h-screen ">
     <background-canvas-component></background-canvas-component>
-      <div class="relative z-10 w-full h-full">
+      <div class="relative z-10 w-full h-full px-10">
         <navbar-component></navbar-component>
-          <app-router>
-            
-            <!-- page courante injectée dans le router View -->
-            <router-view></router-view>
-            <popup-cookies></popup-cookies>
-          </app-router>
-          <is-online-component></is-online-component>
+        <app-router>
+          
+          <!-- page courante injectée dans le router View -->
+          <router-view></router-view>
+          <popup-cookies></popup-cookies>
+        </app-router>
+        <is-online-component></is-online-component>
       </div>
     </div>
   </div>

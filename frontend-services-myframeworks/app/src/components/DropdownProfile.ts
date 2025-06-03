@@ -3,7 +3,7 @@ import { UserContext } from "../globalstate/GlobalState";
 import { User } from "../types/types";
 import { logoutUser } from "../services/api.auth";
 
-export class DropdownProfile extends BaseComponent<{ isDrop: boolean, user:User|null }> {
+export class  DropdownProfile extends BaseComponent<{ isDrop: boolean, user:User | null }> {
   constructor() {
     super({
       isDrop: false,
@@ -16,6 +16,7 @@ export class DropdownProfile extends BaseComponent<{ isDrop: boolean, user:User|
     this.state.user = customEvent.detail.profileData;
     this.render();
   };
+
   connectedCallback() {
     this.state.user = UserContext().user();
     this.render();
@@ -60,7 +61,8 @@ export class DropdownProfile extends BaseComponent<{ isDrop: boolean, user:User|
           <div class="flex items-center p-4">
             <img referrerPolicy="no-referrer" src="${user.avatar}" alt="User avatar" class="w-10 h-10 rounded-full mr-3">
             <div>
-              <p class="text-sm font-medium text-gray-900 dark:text-white">${user.name}</p>
+              <a href="/profile" class="text-sm font-medium text-gray-900 dark:text-white">${user.name}</a>
+              <!--<p class="text-sm font-medium text-gray-900 dark:text-white">${user.name}</p>-->
             </div>
           </div>
           <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">

@@ -11,7 +11,7 @@ export class Support extends BaseComponent<{}> {
 
   render() {
     this.innerHTML = `
-      <section class="px-4 py-10 text-gray-900 dark:text-white min-h-screen">
+      <section class="px-4 py-10 text-gray-900 dark:text-white">
         <div class="max-w-4xl mx-auto">
           <h1 class="text-3xl font-bold mb-6 text-center">${this.t("SUPPORT.TITLE")}</h1>
 
