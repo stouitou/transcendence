@@ -1,6 +1,5 @@
-
 import { BaseComponent } from "../frameworks/base-component";
-import {  UserContext } from '../globalstate/GlobalState';
+import { UserContext } from '../globalstate/GlobalState';
 import { User } from '../types/types';
 import { disable2FA, enable2FA, get2FADetail, TwoFA } from "../services/api.2fa";
 import { addfriendByUserName, removeFriendById, updatePassword , updateProfileDeleteMe, updateProfileName, uploadProfileAvatar } from "../services/api.profile";
@@ -11,6 +10,7 @@ export class ProfileEdit extends BaseComponent<{user: User | null},ProfileUpdate
   constructor() {
     super({ user: null});
   }
+
   handleListenerProfileUpdate = (e: Event) => {
     const customEvent = e as CustomEvent;
     this.state.user = customEvent.detail.profileData;
@@ -51,145 +51,96 @@ export class ProfileEdit extends BaseComponent<{user: User | null},ProfileUpdate
   renderProfileEdit(div: Element) {
     const { user } = this.state;
     if (!user) {
-      this.innerHTML = ` 
-        <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-6">
-          <div class="flex items-center space-x-4">
-              <div role="status">
-                  <svg aria-hidden="true" class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
-                      <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
-                      <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
-                  </svg>
-                  <span class="sr-only">Loading... waiting ProfileData</span>
-              </div>
+      this.innerHTML = `
+        <div class="flex justify-center items-center h-40 bg-white dark:bg-gray-800 rounded-xl shadow-md">
+          <div role="status">
+              <svg aria-hidden="true" class="w-8 h-8 text-gray-200 animate-spin dark:text-gray-600 fill-blue-600" viewBox="0 0 100 101" fill="none" xmlns="http://www.w3.org/2000/svg">
+                  <path d="M100 50.5908C100 78.2051 77.6142 100.591 50 100.591C22.3858 100.591 0 78.2051 0 50.5908C0 22.9766 22.3858 0.59082 50 0.59082C77.6142 0.59082 100 22.9766 100 50.5908ZM9.08144 50.5908C9.08144 73.1895 27.4013 91.5094 50 91.5094C72.5987 91.5094 90.9186 73.1895 90.9186 50.5908C90.9186 27.9921 72.5987 9.67226 50 9.67226C27.4013 9.67226 9.08144 27.9921 9.08144 50.5908Z" fill="currentColor"/>
+                  <path d="M93.9676 39.0409C96.393 38.4038 97.8624 35.9116 97.0079 33.5539C95.2932 28.8227 92.871 24.3692 89.8167 20.348C85.8452 15.1192 80.8826 10.7238 75.2124 7.41289C69.5422 4.10194 63.2754 1.94025 56.7698 1.05124C51.7666 0.367541 46.6976 0.446843 41.7345 1.27873C39.2613 1.69328 37.813 4.19778 38.4501 6.62326C39.0873 9.04874 41.5694 10.4717 44.0505 10.1071C47.8511 9.54855 51.7191 9.52689 55.5402 10.0491C60.8642 10.7766 65.9928 12.5457 70.6331 15.2552C75.2735 17.9648 79.3347 21.5619 82.5849 25.841C84.9175 28.9121 86.7997 32.2913 88.1811 35.8758C89.083 38.2158 91.5421 39.6781 93.9676 39.0409Z" fill="currentFill"/>
+              </svg>
+              <span class="sr-only">Loading... waiting ProfileData</span>
           </div>
         </div>
-        `;
+      `;
       return;
     }
-    const avatar = user?.avatar??'';
+
+    const avatar = user?.avatar ?? '';
     div.innerHTML = `
-    <two-factor-setup-component></two-factor-setup-component>
-    <div class="bg-white dark:bg-gray-800 rounded-2xl shadow p-6 space-y-6">
-    <div class="flex  space-x-4">
-      <div>
-        <h2 class="text-3xl font-bold mb-6">Edit Profile</h2>
-        <div id="message-box" class="font-bold text-center mb-4"></div>
-        <p class="text-gray-500 dark:text-gray-400">Edit your profile information below.</p>
-        <p class="text-gray-500 dark:text-gray-400">You can update your name, avatar, and password.</p>
-        <img referrerPolicy="no-referrer" src=${avatar?.startsWith('http')?avatar:avatar?`${avatar}`:undefined} alt="avatar" width="100" height="100"/>
-        <p class="text-gray-500 dark:text-gray-400">Name: ${user.name}</p>
-        <p class="text-gray-500 dark:text-gray-400">Role: ${user.role}</p>            
+      <two-factor-setup-component></two-factor-setup-component>
+      <div class="max-w-4xl mx-auto p-6 space-y-8 bg-white dark:bg-gray-800 rounded-xl shadow-lg">
+        <div class="flex flex-col md:flex-row items-center gap-6">
+          <img referrerPolicy="no-referrer" src="${avatar?.startsWith('http') ? avatar : avatar ? `${avatar}` : ''}" alt="avatar" class="w-24 h-24 rounded-full border-4 border-blue-500 object-cover"/>
+          <div>
+            <h2 class="text-3xl font-bold text-gray-900 dark:text-white">${user.name}</h2>
+            <p class="text-gray-600 dark:text-gray-300">Role: ${user.role}</p>
+          </div>
+        </div>
+
+        <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
+          <!-- Forms Section -->
+
+          <form id="formAddfriend" class="space-y-4">
+            <label for="friendName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Add friend:</label>
+            <input id="friendName" type="text" name="friendName" class="form-text-input" required />
+            <div id="friendName-error" class="text-red-500 text-sm"></div>
+            <button type="submit" class="btn w-full">Add Friend</button>
+          </form>
+
+          <form id="formRemoveFriend" class="space-y-4">
+            <label for="inputSelectRmfriend" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Remove Friend by ID:</label>
+            <select name="friendId" id="inputSelectRmfriend" class="form-select">
+              <option value="">Select a user</option>
+              ${user.friends?.map(friend => `<option value='${friend.id}'>${friend.name} (${friend.id})</option>`).join('')}
+            </select>
+            <div id="id-error" class="text-red-500 text-sm"></div>
+            <button type="submit" class="btn w-full">Remove Friend</button>
+          </form>
+
+          <form id="formUpdateName" class="space-y-4">
+            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Name:</label>
+            <input id="name" type="text" name="name" value="${user.name}" class="form-text-input" required />
+            <div id="name-error" class="text-red-500 text-sm"></div>
+            <button type="submit" class="btn w-full">Update Name</button>
+          </form>
+
+          <form id="formUpdateAvatar" class="space-y-4">
+            <img id="avatar-preview" src="" alt="Avatar Preview" class="w-24 h-24 rounded-full object-cover border" />
+            <label for="avatar" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Avatar:</label>
+            <input id="avatar" name="avatar" type="file" accept="image/png, image/jpeg" class="form-file-input" />
+            <div id="avatar-error" class="text-red-500 text-sm"></div>
+            <button type="submit" class="btn w-full">Update Avatar</button>
+          </form>
+
+          <form id="formUpdatePassword" class="space-y-4 col-span-full">
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Update Password</h3>
+            <input type="password" id="oldPassword" name="oldPassword" placeholder="Old Password" class="form-text-input" />
+            <div id="oldPassword-error" class="text-red-500 text-sm"></div>
+            <input type="password" id="newPassword" name="newPassword" placeholder="New Password" class="form-text-input" />
+            <div id="newPassword-error" class="text-red-500 text-sm"></div>
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm New Password" class="form-text-input" />
+            <div id="confirmPassword-error" class="text-red-500 text-sm"></div>
+            <button type="submit" class="btn w-full">Update Password</button>
+          </form>
+
+          <form id="formDeleteUser" class="space-y-4 col-span-full">
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Are you sure you want to delete this user?</label>
+            <label class="switch">
+              <input type="checkbox" name="confirm" required />
+              <span class="slider round"></span>
+            </label>
+            <button type="submit" class="btn w-full bg-red-600 hover:bg-red-700 text-white">Delete User</button>
+          </form>
+        </div>
       </div>
-      	<form id="formAddfriend">
-        <label for="friendName" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Add friend:</label>
-        <input 
-          id="friendName"
-          type="text"
-          name="friendName" 
-          class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <div id="friendName-error" class="font-bold text-center mb-4"></div>
-        <button type="submit" class="btn">ADD Friend</button>
-			</form>
-
-      <form id="formRemoveFriend">
-        <label for="friendId" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">Remove Friend by ID:</label>
-         <select friendId="inputSelectRmfriend" name='friendId'  class="select-form-message">
-                        <option value="">Select a user</option>
-                        ${user.friends?.map((friend) => (
-                            `<option value='${friend.id}'>
-                                ${friend.name} (${friend.id})
-                            </option>`
-                        ))}
-                    </select>
-        <div id="id-error" class="font-bold text-center mb-4"></div>
-        <button type="submit" class="btn">Remove Friend</button>
-      </form>
-			<form id="formUpdateName">
-        <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New Name:</label>
-        <input 
-          id="name"
-          type="text"
-          name="name" value="${user.name}" 
-          class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-          required
-        />
-        <div id="name-error" class="font-bold text-center mb-4"></div>
-        <button type="submit" class="btn">Update Name</button>
-			</form>
-			<form id="formUpdateAvatar">
-      <img id="avatar-preview"
-        src=''
-        alt="Avatar Preview, select a file to see the preview"
-        style="max-width: 120px;"
-        referrerPolicy="no-referrer"
-      />
-				<label for="avatar" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">New avatar:</label>
-				<input					
-					id="avatar"
-					name="avatar"
-					type="file"
-					accept="image/png, image/jpeg"
-					class="block w-full px-4 py-2 border border-gray-300 dark:border-gray-600 rounded-lg bg-gray-50 dark:bg-gray-700 text-gray-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-500"
-					placeholder="Avatar"
-				 />
-				<div id="avatar-error" class="font-bold text-center mb-4"></div>
-				<button type="submit" class="btn">Update Avatar</button>
-			</form>
-        <form class="mt-4" id="formUpdatePassword">
-            <h2 class="text-3xl font-bold mb-6">Update Password</h2>
-            <label for="oldPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">oldPassword:</label>
-            <div id="oldPassword-error" class="font-bold text-center mb-4"></div>
-            <input
-                type="password"
-                id="oldPassword"
-                name="oldPassword"
-                placeholder="Old Password"
-                class="form-text-input"
-            />
-           <label for="newPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">newPassword:</label>
-             <div id="newPassword-error" class="font-bold text-center mb-4"></div>
-            <input
-                type="password"
-                id="newPassword"
-                name="newPassword"
-                placeholder="New Password"
-                class="form-text-input"
-            />
-           <label for="confirmPassword" class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">confirmPassword:</label>
-            <div id="confirmPassword-error" class="font-bold text-center mb-4"></div>
-            <input
-                type="password"
-                id="confirmPassword"
-                name="confirmPassword"
-                placeholder="Confirm New Password"
-                class="form-text-input"
-            />
-            <button
-                type="submit"
-                class="btn py-3"
-            >
-                Update Password
-            </button>
-        </form>
-
-       <form id="formDeleteUser">
-				<label class="block text-sm font-medium text-gray-700 dark:text-gray-300 mb-1">
-					Are you sure you want to delete this user?
-				</label>
-				<label class="switch"> 
-					<input type="checkbox"  name="confirm" required/>
-					<span class="slider round"></span>
-				</label>
-				<button type="submit" class="btn">Delete User</button>
-			</form>
-    </div>
-    </div>
     `;
-	  this.attachAllForm();
+    this.attachAllForm();
     this.previewImage();
   }
+
+  // ... previewImage, handleSubmit functions, attachAllForm remain unchanged
+
+
 
   previewImage = () => {
     const input = this.querySelector('#formUpdateAvatar input[type="file"]') as HTMLInputElement;

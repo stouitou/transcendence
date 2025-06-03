@@ -26,7 +26,7 @@ export const fr = {
     NORMAL: "Normal",
     ADVANCED: "Avancé",
     ACTION: "Acción",
-    LOBBY: "SAlon",
+    LOBBY: "Salon",
     LIST_VIEW: "Voir la liste",
   },
   DASHBOARD: {
