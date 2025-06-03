@@ -2,8 +2,8 @@ import  UserRepository  from "../repository/User.repository";
 import { FastifyInstance, FastifyReply, FastifyRequest } from "fastify";
 import { BaseController } from "./BaseController";
 import { generateCSRFToken } from "../utils/crypto";
-import { AuthError, NotFoundError, TwoFactorAuthError, ValidationError } from "@src/Errors/errors";
-import { generateErrorResponse } from "@src/Errors/handler";
+import { AuthError, NotFoundError, TwoFactorAuthError, ValidationError } from "../Errors/errors";
+import { generateErrorResponse } from "../Errors/handler";
 
 
 /**

@@ -1,6 +1,6 @@
 
-import { ErrorFactory } from '@src/Errors/ErrorFactory';
-import { ValidationError } from '@src/Errors/errors';
+import { ErrorFactory } from '../Errors/ErrorFactory';
+import { ValidationError } from '../Errors/errors';
 import { FastifyRequest } from 'fastify';
 
 export class AuthServiceController {

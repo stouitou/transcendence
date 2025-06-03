@@ -1,4 +1,4 @@
-import { AuthError } from "@src/Errors/errors";
+import { AuthError } from "../Errors/errors";
 import { errorDebugLog } from "./logger.middleware";
 import { FastifyReply, FastifyRequest } from "fastify";
 

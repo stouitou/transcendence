@@ -1,5 +1,5 @@
 
-import { ServiceUnavailableError } from "@src/Errors/errors";
+import { ServiceUnavailableError } from "../Errors/errors";
 import nodemailer from "nodemailer";
 const USER_FROM = process.env.MAIL_USER || "noreply@invalidMailNoSet.fr";
 

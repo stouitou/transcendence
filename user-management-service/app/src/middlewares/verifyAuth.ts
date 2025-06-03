@@ -1,5 +1,5 @@
-import { ErrorFactory } from "@src/Errors/ErrorFactory";
-import { AppError, AuthError } from "@src/Errors/errors";
+import { ErrorFactory } from "../Errors/ErrorFactory";
+import { AppError, AuthError } from "../Errors/errors";
 import { FastifyReply, FastifyRequest } from "fastify";
 import { errorDebugLog } from "./logger.middleware";
 

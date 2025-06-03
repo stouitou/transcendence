@@ -1,6 +1,6 @@
 import { FastifyReply } from "fastify";
 import { AppError } from "./errors";
-import { errorsLog } from "@src/middlewares/logger.middleware";
+import { errorsLog } from "../middlewares/logger.middleware";
 
 export interface ErrorResponse {
 	status: number;

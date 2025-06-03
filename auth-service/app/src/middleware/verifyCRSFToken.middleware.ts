@@ -1,5 +1,5 @@
-import { CustomCSRFError } from "@src/Errors/errors";
-import { generateErrorResponse } from "@src/Errors/handler";
+import { CustomCSRFError } from "../Errors/errors";
+import { generateErrorResponse } from "../Errors/handler";
 import { FastifyRequest, FastifyReply } from "fastify";
 
 export async function verifyCSRFToken(req: FastifyRequest, reply: FastifyReply) {

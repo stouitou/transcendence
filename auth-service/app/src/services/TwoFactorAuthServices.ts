@@ -1,4 +1,4 @@
-import { NotFoundError, ValidationError } from "@src/Errors/errors";
+import { NotFoundError, ValidationError } from "../Errors/errors";
 import { AuthProvider } from "../models/AuthProvider.models";
 import { User } from "../models/User.models";
 import AuthProviderRepository from "../repository/AuthProvider.repository";

@@ -8,7 +8,7 @@ import { UserStats } from '../models/User';
 import Helpers, { IParams } from '../repository/helpers';
 import { AuthServiceController } from './authService.controller';
 import { chmod } from 'node:fs/promises';
-import { AuthError, NotFoundError, ValidationError } from '@src/Errors/errors';
+import { AuthError, NotFoundError, ValidationError } from '../Errors/errors';
 const pump = promisify(pipeline);
 
 export type User = {

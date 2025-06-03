@@ -8,9 +8,9 @@ import {
   get2FAStatusById,
   disable2FAById,
 } from '../handlers/twoFA.handler';
-import { loggerMiddleware } from "@src/middlewares/logger.middleware";
-import { AdminSchema } from "@src/schemas/admin.schema";
-import { verifyIsAdmin } from "@src/middlewares/verifyIsAdmin";
+import { loggerMiddleware } from "../middlewares/logger.middleware";
+import { AdminSchema } from "../schemas/admin.schema";
+import { verifyIsAdmin } from "../middlewares/verifyIsAdmin";
 /**
  * Ensemble des routes de l'API utilisateur actuellement connecté
  * @param app 

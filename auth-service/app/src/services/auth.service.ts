@@ -7,7 +7,7 @@ import AuthProviderRepository from "../repository/AuthProvider.repository";
 
 import { generateTOTPSecret, verifyTOTP } from "../utils/totp";
 import { AuthProvider } from "../models/AuthProvider.models";
-import { ValidationError } from "@src/Errors/errors";
+import { ValidationError } from "../Errors/errors";
 const defaultAvatar = "/uploads/defaultAvatar.jpg"; //@TODO : a changer
 /**
  * Service d'authentification

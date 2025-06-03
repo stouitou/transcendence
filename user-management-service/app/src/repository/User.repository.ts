@@ -9,7 +9,7 @@ import Helpers, { IParams } from "../repository/helpers";
 import { User } from "../models/User";
 import { IRepository } from "./Base/IRepository";
 import { BaseRepository } from "./Base/BaseRepository";
-import { errorDebugLog } from "@src/middlewares/logger.middleware";
+import { errorDebugLog } from "../middlewares/logger.middleware";
 
 /**
  * UserRepository - Gestion des appels HTTP à la DB

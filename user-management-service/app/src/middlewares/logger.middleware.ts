@@ -1,4 +1,4 @@
-import { ErrorResponse } from '@src/Errors/handler';
+import { ErrorResponse } from '../Errors/handler';
 import { FastifyRequest, FastifyReply } from 'fastify';
 
 

@@ -10,9 +10,9 @@ import {
   disable2FA,
   generate2FAQrCode,
 } from '../handlers/twoFA.handler';
-import { loggerMiddleware } from "@src/middlewares/logger.middleware";
-import { UserMeSchema } from "@src/schemas/userMe.schema";
-import { GamesSchema } from "@src/schemas/games.schema";
+import { loggerMiddleware } from "../middlewares/logger.middleware";
+import { UserMeSchema } from "../schemas/userMe.schema";
+import { GamesSchema } from "../schemas/games.schema";
 /**
  * Ensemble des routes de l'API utilisateur actuellement connecté
  * @param app 
