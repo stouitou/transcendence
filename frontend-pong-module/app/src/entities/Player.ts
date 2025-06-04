@@ -19,12 +19,12 @@ export class	Player {
 	private				_score: number = 0;
 
 	private				_paddle: Paddle | null = null;
-	private				_location: number = 0;
+	private				_location: number;
 	private				_direction: Direction;
 
 	private				_lastWin: boolean = false;
 
-	private readonly	_history = {bounceCount: 0, goalsConceded: 0, distance: 0};
+	private readonly	_history = { bounceCount: 0, goalsConceded: 0, distance: 0 };
 	public				bot: Bot | null = null;
 
 	constructor (json: any, index: number, inputManager: InputManager) {

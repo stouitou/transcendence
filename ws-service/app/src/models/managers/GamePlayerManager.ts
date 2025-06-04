@@ -153,7 +153,7 @@ export class GamePlayerManager {
 		position: player.position,
 		size: player.size,
 		score: player.score,
-		paddle: player.paddle.toJSON(),
+		paddle: player.paddle?.toJSON(),
 		userId: player.userId,
 	 }));
 	}

@@ -2,8 +2,8 @@ import { Position, Size } from "../../types/gameUtils.type";
 
 export class	Paddle {
 
-	private	_position: Position;
-	private	_size: Size;
+	private				_position: Position;
+	private	readonly	_size: Size;
 
 	constructor (initialPosition: Position, size: Size) {
 		this._position = { ...initialPosition };

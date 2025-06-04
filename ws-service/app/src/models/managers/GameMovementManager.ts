@@ -11,7 +11,7 @@ export class	GameMovementManager {
 			const action = actions[index];
 			if (action) {
 				const	movement = this.getMovement(action);
-				player.paddle.move(movement.dx, movement.dy);
+				player.paddle?.move(movement.dx, movement.dy);
 			}
 		});
 	}

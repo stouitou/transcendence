@@ -31,25 +31,3 @@ export class	Paddle {
 		this.clamp({ width: 800, height: 600 });
 	}
 }
-	// type localMapping = Record<string, { dx: number;dy: number;direction: string }>;
-	// const localMappings: localMapping[] =
-	// 	 [
-	// 		{
-	// 		ArrowUp: { dx: 0, dy: -5, direction:"up"},// up
-	// 		ArrowDown: { dx: 0, dy: 5, direction:"down" },// down
-	// 		},
-	// 		{
-	// 		z: { dx: 0, dy: -5, direction:"up"},// up
-	// 		s: { dx: 0, dy: 5, direction:"down" },// down
-	// 		},
-	// 		{
-	// 		ArrowLeft: { dx: -5, dy: 0 , direction:"left" },// left
-	// 		ArrowRight: { dx: 5, dy: 0 , direction:"right" },// right
-	// 		},
-	// ]
-	// const localBindMappings	=	{
-	// up: { dx: 0, dy: -5},// up
-	// down: { dx: 0, dy: 5},// down
-	// left: { dx: -5, dy: 0 },// left
-	// right: { dx: 5, dy: 0 },// right
-	// }
