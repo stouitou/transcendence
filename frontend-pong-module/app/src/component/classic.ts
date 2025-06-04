@@ -306,16 +306,16 @@ export class classic extends LitElement {
 		}
 	`;
 
-	constructor () {
+	constructor() {
 		super();
 		console.log('game component constructor');
 	}
 
-	set params (params: { id: string }) {
+	set params(params: { id: string }) {
 		this.data = params;
 	}
 
-	connectedCallback (): void {
+	connectedCallback(): void {
 		super.connectedCallback();
 		console.log('ConnectedCallback: Component added to the DOM');
 
@@ -327,19 +327,18 @@ export class classic extends LitElement {
 		this._game.webSocketManager.lobyId = this.data?.id;
 	}
 
-	firstUpdated () {
+	firstUpdated() {
 		console.log('firstUpdated: DOM is ready');
 
-		const gameCanvas      = this.shadowRoot?.querySelector('#gameCanvas')  as HTMLCanvasElement;
-		const gameDivUi       = this.shadowRoot?.querySelector('#game-ui')     as HTMLElement;
-		const gameDivAlert    = this.shadowRoot?.querySelector('#alertBox')    as HTMLElement;
-		const gameDivHero     = this.shadowRoot?.querySelector('#gameHero')    as HTMLElement;
+		const gameCanvas = this.shadowRoot?.querySelector('#gameCanvas') as HTMLCanvasElement;
+		const gameDivUi = this.shadowRoot?.querySelector('#game-ui') as HTMLElement;
+		const gameDivAlert = this.shadowRoot?.querySelector('#alertBox') as HTMLElement;
+		const gameDivHero = this.shadowRoot?.querySelector('#gameHero') as HTMLElement;
 		const gameDivHeroTree = this.shadowRoot?.querySelector('#gameHeroTree') as HTMLElement;
 
 		if (!gameCanvas || !gameDivUi || !gameDivAlert || !gameDivHero || !gameDivHeroTree) {
 			throw new Error('One or more game DOM nodes not found');
 		}
-
 		this._game.setCanvas(gameCanvas);
 		this._game.setGameUI(gameDivUi);
 		this._game.setGameAlert(gameDivAlert);
@@ -349,7 +348,7 @@ export class classic extends LitElement {
 		this._game.webSocketManager.connect();
 	}
 
-	render () {
+	render() {
 		console.log('render: Rendering the component');
 		return html`
 			<!-- Single‐match hero card (hidden when empty) -->
@@ -373,7 +372,7 @@ export class classic extends LitElement {
 		`;
 	}
 
-	disconnectedCallback () {
+	disconnectedCallback() {
 		console.log('disconnectedCallback: Component removed from the DOM');
 		window.removeEventListener('keydown', this._onKeyDown);
 		this._game?.stop();
@@ -382,8 +381,8 @@ export class classic extends LitElement {
 		super.disconnectedCallback();
 	}
 
-	private hideBackground (): void {
-		const	bg = document.querySelector('background-canvas-component');
+	private hideBackground(): void {
+		const bg = document.querySelector('background-canvas-component');
 		if (bg) { (bg as HTMLElement).style.display = 'none'; }
 
 		document.documentElement.style.backgroundColor = 'black';
@@ -404,8 +403,8 @@ export class classic extends LitElement {
 		document.body.style.backgroundPosition = 'center';
 	}
 
-	private showBackground (): void {
-		const	bg = document.querySelector('background-canvas-component');
+	private showBackground(): void {
+		const bg = document.querySelector('background-canvas-component');
 		if (bg) { (bg as HTMLElement).style.display = ''; }
 
 		document.documentElement.style.backgroundColor = 'black';
