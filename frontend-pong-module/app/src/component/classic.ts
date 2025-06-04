@@ -440,6 +440,6 @@ declare global {
 }
 
 export function setCanvasSize(width: number, height: number) {
-	CANVAS_WIDTH = 1200;
-	CANVAS_HEIGHT = 1000;
+	CANVAS_WIDTH = width;
+	CANVAS_HEIGHT = height;
 }

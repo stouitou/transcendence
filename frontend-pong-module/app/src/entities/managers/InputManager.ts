@@ -26,7 +26,6 @@ const	localBindMappings = {
 
 export class	InputManager {
 
-	private readonly	_playerIndex: number;
 	private readonly	_isActive: boolean;
 	private				_directionReceived:  string | null = null;
 	private				_keysPressed: Set< string > = new Set< string >();
@@ -42,7 +41,6 @@ export class	InputManager {
 	]
 
 	constructor (playerIndex: number = 0, isActive: boolean) {
-		this._playerIndex = playerIndex;
 		this._isActive = isActive;
 		this._controlMapping = localMappings[playerIndex];
 		this._controlBindMapping = localBindMappings;
