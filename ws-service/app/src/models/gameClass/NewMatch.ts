@@ -110,25 +110,24 @@ export class Match extends EventEmitter {
 		this.socketManager.broadcastMessage( this.observer,'STOP');
 	}
 	
-	update (): void {
+	update () : void {
 		if (this.playerManager.areAllPlayersInGame()) {
-		this.movementManager.updatePlayerMovements( // @TODO passer le player manager au mouvement manager?
-			this.playerManager.getPlayers(),
-			this.playerManager.getPlayerActions(this.ballManager.getBall())
-		);
-	//	this.collisionManager.getBall().update();
-		this.ballManager.getBall().update();
-		this.collisionManager.handleCollisions(
-			this.playerManager.getPlayers()
-		 // this.collisionManager.getBall()
-		);
-		this.socketManager.broadcastState(this.toJSON());
-		}
-		else {
-		this.socketManager.broadcastMessage(
-			{ type: "waiting", message: "Waiting for players to join" });
-		}
-	
+			this.movementManager.updatePlayerMovements( // @TODO passer le player manager au mouvement manager?
+				this.playerManager.getPlayers(),
+				this.playerManager.getPlayerActions(this.ballManager.getBall())
+			);
+			//	this.collisionManager.getBall().update();
+			this.ballManager.getBall().update();
+			this.collisionManager.handleCollisions(
+				this.playerManager.getPlayers()
+				// this.collisionManager.getBall()
+			);
+			this.socketManager.broadcastState(this.toJSON());
+		} else {
+			this.socketManager.broadcastMessage(
+				{ type: "waiting", message: "Waiting for players to join" });
+			}
+
 		if (this.playerManager.areAllPlayersFinished()) {
 		this.stop();
 		this.isOver();

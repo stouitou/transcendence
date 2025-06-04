@@ -78,7 +78,7 @@ export class GamePlayerManager {
 	}
   
 	areAllPlayersInGame(): boolean {
-	  return this._players.every((player) => player.isInGame);
+	  return this._players.every((player) => { player.isInGame });
 	}
   
 	areAllPlayersFinished(): boolean {

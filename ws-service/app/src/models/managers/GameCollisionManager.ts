@@ -173,72 +173,71 @@ export class	GameCollisionManager {
 	updateScore = (wallIndex: number, players: Player[]) => {
 		const	maxScore = 5; // Score maximum pour gagner //@TODO
 		// Vérifier si la collision est valide
-		if (this._ballManager.ball.lastHit && this._ballManager.ball.lastWallBounce != null && this._ballManager.ball.lastWallBounce < players.length &&
-			(this._ballManager.ball.position.x + this._ballManager.ball.size.width < 0 ||
-			this._ballManager.ball.position.x > this._canvas.width ||
-			this._ballManager.ball.position.y + this._ballManager.ball.size.height < 0 ||
-			this._ballManager.ball.position.y > this._canvas.height)
-		) {
-			let	score = 0;
-			if (players.length === 2) {
-				const	winnerIndex = this._ballManager.ball.lastWallBounce === 0 ? 1 : 0;
-				players[winnerIndex].score++;
-				score = players[winnerIndex].score;
-			} else {
-				if (this._ballManager.ball.lastHit.location === this._ballManager.ball.lastWallBounce && this._ballManager.ball.lastHit.score > 0)
-					this._ballManager.ball.lastHit.score--;
-				else if (this._ballManager.ball.lastHit.location != this._ballManager.ball.lastWallBounce) {
-					this._ballManager.ball.lastHit.score++;
-					score = this._ballManager.ball.lastHit.score;
-				}
-			}
-			players[this._ballManager.ball.lastWallBounce].history.goalsConceded++;
-			this._ballManager.ball.reset();
-
-			if (score >= maxScore) {
-				this.setPlayersFinished(players);
-			}
-
-		}
-
-		// if (wallIndex === -1)	{ return ; } // Pas de collision avec un mur
-		// if (players.length <= wallIndex)	{ return ; } // Pas de joueur pour ce mur
-	
-		// let resetBall = false;
-	
-		// // Parcourir les joueurs pour mettre à jour le score
-		// let score = 0;
-		// for (const [index, player] of players.entries()) { 
-		// 	if (index !== wallIndex) {
-		// 		if (player.score === undefined) {
-		// 			player.score = 0; // Initialiser le score à 0 si non défini
+		// if (this._ballManager.ball.lastHit && this._ballManager.ball.lastWallBounce != null && this._ballManager.ball.lastWallBounce < players.length &&
+		// 	(this._ballManager.ball.position.x + this._ballManager.ball.size.width < 0 ||
+		// 	this._ballManager.ball.position.x > this._canvas.width ||
+		// 	this._ballManager.ball.position.y + this._ballManager.ball.size.height < 0 ||
+		// 	this._ballManager.ball.position.y > this._canvas.height)
+		// ) {
+		// 	let	score = 0;
+		// 	if (players.length === 2) {
+		// 		const	winnerIndex = this._ballManager.ball.lastWallBounce === 0 ? 1 : 0;
+		// 		players[winnerIndex].score++;
+		// 		score = players[winnerIndex].score;
+		// 	} else {
+		// 		if (this._ballManager.ball.lastHit.location === this._ballManager.ball.lastWallBounce && this._ballManager.ball.lastHit.score > 0)
+		// 			this._ballManager.ball.lastHit.score--;
+		// 		else if (this._ballManager.ball.lastHit.location != this._ballManager.ball.lastWallBounce) {
+		// 			this._ballManager.ball.lastHit.score++;
+		// 			score = this._ballManager.ball.lastHit.score;
 		// 		}
-		// 		// Si ce n'est pas le joueur défendant le mur, incrémenter son score
-		// 		player.score++;
-		// 		if (score <= player.score) {
-		// 			score = player.score;
-		// 		}
-		// 		resetBall = true;
-		// 	 //   console.log(`id:${player.id} name:${player.name} score: ${player.score}`);
 		// 	}
-		// }
-	
-		// // Réinitialiser la balle si un point a été marqué
-		// if (resetBall) {
-		// 	// Vérifier si le score maximum est atteint
+		// 	players[this._ballManager.ball.lastWallBounce].history.goalsConceded++;
+		// 	this._ballManager.ball.reset();
+
 		// 	if (score >= maxScore) {
 		// 		this.setPlayersFinished(players);
-		// 		/* // les player passe en finished //@TODO a voir si neccessaire
-		// 		players.forEach((player) => {
-		// 				player.state = "finished";
-		// 				//player.isInGame = false;
-		// 		} 
-		// 		);*/
-				
 		// 	}
-		// //	this.ball.reset({ x: this.canvas.width / 2, y: this.canvas.height / 2 },{ x: -this.ball.velocity.x, y: -this.ball.velocity.y });
-		// 	this._ballManager.resetBallPosition();
 		// }
+
+		if (wallIndex === -1)	{ return ; } // Pas de collision avec un mur
+		if (players.length <= wallIndex)	{ return ; } // Pas de joueur pour ce mur
+	
+		let resetBall = false;
+	
+		// Parcourir les joueurs pour mettre à jour le score
+		let score = 0;
+		for (const [index, player] of players.entries()) { 
+			if (index !== wallIndex) {
+				if (player.score === undefined) {
+					player.score = 0; // Initialiser le score à 0 si non défini
+				}
+				// Si ce n'est pas le joueur défendant le mur, incrémenter son score
+				player.score++;
+				if (score <= player.score) {
+					score = player.score;
+				}
+				resetBall = true;
+			 //   console.log(`id:${player.id} name:${player.name} score: ${player.score}`);
+			}
+		}
+	
+		// Réinitialiser la balle si un point a été marqué
+		if (resetBall) {
+			// Vérifier si le score maximum est atteint
+			if (score >= maxScore) {
+				this.setPlayersFinished(players);
+				/* // les player passe en finished //@TODO a voir si neccessaire
+				players.forEach((player) => {
+						player.state = "finished";
+						//player.isInGame = false;
+				} 
+				);*/
+				
+			}
+		//	this.ball.reset({ x: this.canvas.width / 2, y: this.canvas.height / 2 },{ x: -this.ball.velocity.x, y: -this.ball.velocity.y });
+			this._ballManager.resetBallPosition();
+		}
 	}
 
 	private setPlayersFinished (players: Player[]) : void {

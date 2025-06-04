@@ -14,7 +14,7 @@ export class	Player {
 	private				_state: string = 'waiting'; // "waiting" | "playing" | "finished" | "joined" | "left" | "cancelled"
 
 	private readonly	_isIA: boolean = false;
-	private				_isInGame: boolean = false;
+	public				isInGame: boolean = false;
 
 	private				_score: number = 0;
 
@@ -49,7 +49,7 @@ export class	Player {
 		this._index = index;
 		this._size =this._sizes[index];
 		this._position = this._initialPosition[index];//@TODO doublon
-		this.paddle = new Paddle(this._position, this._size);
+		this._paddle = new Paddle(this._position, this._size);
 		this._location = index;
 		this._direction = directions[index];
 
@@ -59,8 +59,8 @@ export class	Player {
 		//this.isRemote = jsonData.isRemote;
 		this._avatar = jsonData.avatar?? '/uploads/1-avatartest.jpg';
 		this._isIA = jsonData.isIA;
-		this.isInGame = this._isIA?true:jsonData.isInGame;
-		this.score = jsonData.score?? 0;
+		this.isInGame = this._isIA ? true : jsonData.isInGame;
+		this._score = jsonData.score ?? 0;
 		//add bot if isIA
 		if (this._isIA) {
 			this.bot = new Bot(difficulty, this);
@@ -73,10 +73,12 @@ export class	Player {
 	get name ()						{ return this._name ; }
 	get userId ()					{ return this._userId ; }
 	get avatar ()					{ return this._avatar ; }
+	get state ()					{ return this._state ; }
 	get isIA ()						{ return this._isIA ; }
+	// get isInGame ()					{ return this._isInGame ; }
+	get score ()					{ return this._score ; }
 	get paddle () : Paddle | null	{ return this._paddle ; }
 	get location ()					{ return this._location ; }
-	get score ()					{ return this._score ; }
 	get direction (): string | null	{ return this._direction ; }
 	get position ()					{ return this._position ; }
 	get size ()						{ return this._size ; }
@@ -86,7 +88,7 @@ export class	Player {
 	/* ---------- setters ---------- */
 	set id (id: number)							{ this._id = id; }
 	set state (state: string)					{ this._state = state; }
-	set isInGame (isInGame: boolean)			{ this._isInGame = isInGame; }
+	// set isInGame (isInGame: boolean)			{ this._isInGame = isInGame; }
 	set paddle (paddle: Paddle)					{ this._paddle = paddle; }
 	set lastWin (lastWin: boolean)				{ this._lastWin = lastWin; }
 	set score (score: number)					{ this._score = score; }
@@ -98,12 +100,12 @@ export class	Player {
 			userId: this._userId,
 			name: this._name,
 			avatar: this._avatar,
-			state: this.state,
+			state: this._state,
 			isInGame: this.isInGame,
 			isIA: this._isIA,
 			position: this._position,
 			size: this._size,
-			score: this.score
+			score: this._score
 		};
 	}
 }
