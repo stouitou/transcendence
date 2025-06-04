@@ -74,7 +74,7 @@ class AuthProviderRepository extends BaseRepository<AuthProvider> implements IRe
     const results = data.data//.map((user: User) => User.fromJSON(user));
     //const results = data.data.map(User.fromJSON);
 //    console.log("🔐 AuthProviderRepository.getAll()  --results--",results)
-    return {...results};
+    return results ;
   }
 
  getById= async (id: number): Promise<AuthProvider | null> => {

@@ -39,6 +39,9 @@ export class AuthController extends BaseController {
       this.decodeToken = this.decodeToken.bind(this);
 
       this.updateMePassword = this.updateMePassword.bind(this);
+
+      //for Test
+      this.deleteUserByEmail = this.deleteUserByEmail.bind(this);
 	  }
 
   /**
@@ -107,7 +110,7 @@ export class AuthController extends BaseController {
 
     // Vérifier si l'utilisateur a activé l'authentification à deux facteurs
     // Si oui, générer un token temporaire pour l'authentification à deux facteurs
-    const is2FAEnabled = user.authProviders && user.authProviders[0].two_factor_auth;
+    const is2FAEnabled = user.authProviders && user.authProviders[0] && user.authProviders[0].two_factor_auth;
     if (user.authProviders && is2FAEnabled ) {
       //1- generer un token temporaire pour l'authentification à deux facteurs
       const {provider_id, two_factor_auth_method = "totp"} = user.authProviders[0];
@@ -523,5 +526,27 @@ export class AuthController extends BaseController {
       return generateErrorResponse(reply, error);
     }
     
+  }
+
+  // delete user by email
+  // for testing purpose only
+  async deleteUserByEmail(req: FastifyRequest, reply: FastifyReply) {
+   try {
+      const { email } = req.params as { email: string };
+    if (!email) {
+      throw new ValidationError("Email is required", "email");
+    }
+
+    const params = {authProviders:{provider_id:email, provider:"local"}};
+    const user = await this.UserRepository.getOneByParams(params);
+    
+    if (!user) {
+        throw new ValidationError("User not found", "email");
+      }
+      await this.UserRepository.delete(user.id);
+      return reply.status(204).send();
+    } catch (error) {
+      return generateErrorResponse(reply, error);
+    }
   }
 }

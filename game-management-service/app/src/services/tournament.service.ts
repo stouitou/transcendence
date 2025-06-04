@@ -38,9 +38,9 @@ export class TournamentService {
 		}
     let currentMaxPlayers = max_players || 16; // Default to 4 if not specified
     //adpater le max_players au nombre de players
-    if (players.length <= 4 ) currentMaxPlayers = 4;
-    else if (players.length <= 8) currentMaxPlayers = 8;
-    else if (players.length <= 16) currentMaxPlayers = 16;
+    if (configPlayers.players.length <= 4 ) currentMaxPlayers = 4;
+    else if (configPlayers.players.length <= 8) currentMaxPlayers = 8;
+    else if (configPlayers.players.length <= 16) currentMaxPlayers = 16;
     else throw { status: 400, message: 'Too many players for a tournament' }; // Limit to powers of two
     // 4, 8, 16
 

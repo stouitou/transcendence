@@ -11,8 +11,10 @@
 		"paths": {
 			"@src/*": ["./src/*"]
 			},
-    "useUnknownInCatchVariables": false
+    "useUnknownInCatchVariables": false,
+	"isolatedModules": true
   },
   "include": ["src/**/*.ts"],
-  "exclude": ["node_modules", "build", "src/**/*.spec.ts","src/public/"]
+  "exclude": ["node_modules", "build", "src/**/*.spec.ts","src/public/",
+  "src/**/*.test.ts", "src/__test__"]
 }

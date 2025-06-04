@@ -21,7 +21,11 @@ export async function registerAuthPlugin(app: FastifyInstance) {
 	app.register(fastifySession ,{
 		secret: safeSecret,
 		saveUninitialized: false,//  true, //-> false = ne pas créer de session pour les utilisateurs non authentifiés
-		cookie: {secure:true, httpOnly: true, sameSite: 'strict', maxAge: 60 *60 *1000 }, // 1 heure
+		cookie: {secure: process.env.NODE_ENV === 'production' ? true : false,
+			 httpOnly: true,
+			 sameSite: 'strict',
+			 maxAge: 60 *60 *1000
+			}, // 1 heure
 		rolling: true, // Renouvelle la durée de vie du cookie à chaque requête
 	})
 	app.register(fastifyPassport.initialize())

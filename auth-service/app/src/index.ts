@@ -17,7 +17,8 @@ server.setNotFoundHandler((request, reply) => {
     error: "NotFound",
     type: "NotFoundError",
     name: "NotFoundError",
-    message: "Route not found",
+	  code: "ERROR_NOT_FOUND",
+    message: "Not found",
     timestamp: new Date().toISOString(),
     details: {
       method: request.raw.method,

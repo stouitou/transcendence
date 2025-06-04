@@ -3,19 +3,16 @@ import { ServiceUnavailableError } from "../Errors/errors";
 import nodemailer from "nodemailer";
 const USER_FROM = process.env.MAIL_USER || "noreply@invalidMailNoSet.fr";
 
-const transporter = nodemailer.createTransport({
-  host: process.env.MAIL_HOST,
-  secure: true, //false, // true for 465, false for other ports
-  auth: {
-    user: process.env.MAIL_USER,
-    pass: process.env.MAIL_PASS,
- },
-});
-
-
-
 export const send2FAEmail = async (to:string,code:string) => {
 	try {
+		const transporter = nodemailer.createTransport({
+			host: process.env.MAIL_HOST,
+			secure: true, //false, // true for 465, false for other ports
+			auth: {
+				user: process.env.MAIL_USER,
+				pass: process.env.MAIL_PASS,
+			},
+		});
 		const mailOptions = {
 		  from: `Transcendence<${USER_FROM}>`,
 			to: to,

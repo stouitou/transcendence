@@ -28,6 +28,8 @@ async function internalRoutes(app: FastifyInstance) {
   app.put('/2fa/disable/:id',{schema:{description:'disable 2FA for user by ID',tags:['Internal']}}, twoFactorController.disable2FAById);
   app.get('/2fa/status/me',{schema:{description:'get 2FA status for current user',tags:['Internal']}}, twoFactorController.getStatus2FA);
   app.get('/2fa/status/:id',{schema:{description:'get 2FA status for user by ID',tags:['Internal']}}, twoFactorController.getStatus2FAById);
+ //test delete by email
+ // app.delete('/delete/:email',{schema:{description:'delete user by email',tags:['Internal']}}, authController.deleteUserByEmail);
 }
 
 export default internalRoutes;

@@ -11,7 +11,10 @@ import { generateCSRFToken } from "../utils/crypto";
  * -- Il est utilisé pour gérer les requêtes HTTP et les réponses.
  */
 export class CrsfController extends BaseController {
-
+  // Map pour stocker les tokens CSRF pour les WebSockets
+ static getWsCSRFTokenMap() {
+    return wsCSRFTokenMap;
+  }
   /**
    * Crée une instance de AuthController.
    * 

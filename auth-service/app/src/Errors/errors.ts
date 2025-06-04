@@ -58,7 +58,7 @@ export class CustomCSRFError extends AppError {
 // Auth error
 // 401 Unauthorized
 export class AuthError extends AppError {
-	constructor(message = "Authentification requise") {
+	constructor(message = "Authentication required") {
 		super(message, 401, "ERROR_AUTH", "AuthError");
 		this.name = "AuthError";
 	}
@@ -67,7 +67,7 @@ export class AuthError extends AppError {
 // Not found error
 // 404 Not Found
 export class NotFoundError extends AppError {
-	constructor(message = "Ressource non trouvée") {
+	constructor(message = "Not found") {
 		super(message, 404, "ERROR_NOT_FOUND", "NotFoundError");
 		this.name = "NotFoundError";
 	}
@@ -76,7 +76,7 @@ export class NotFoundError extends AppError {
 // two-factor authentication error
 // 401 Unauthorized
 export class TwoFactorAuthError extends AppError {
-	constructor(message = "Authentification à deux facteurs requise",
+	constructor(message = "Two-factor authentication is required",
 		code: "ERROR_TWO_FACTOR_AUTH" | "ERROR_TWO_FACTOR_AUTH_REQUIRED"| "ERROR_TWO_FACTOR_AUTH_INVALID" = "ERROR_TWO_FACTOR_AUTH") {
 		super(message, 401, code, "TwoFactorAuthError");
 		this.name = "TwoFactorAuthError";

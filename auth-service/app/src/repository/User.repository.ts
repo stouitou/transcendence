@@ -100,7 +100,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
     const results = data.data//.map((user: User) => User.fromJSON(user));
     //const results = data.data.map(User.fromJSON);
  //   console.log("🔐 UserRepository.getAll()  --results--",results)
-    return {...results};
+    return results;
   }
 
  getById= async (id: number): Promise<User | null> => {
@@ -174,7 +174,7 @@ class UserRepository extends BaseRepository<User> implements IRepository<User>  
   delete = async (id: number) :Promise<boolean>=>{
     const response = await fetch(`${this.URL}/id/${id}`, {
       method: "DELETE",
-      headers: { "Content-Type": "application/json" },     
+    //  headers: { "Content-Type": "application/json" },     
     });
     const data = await response.json();
     return data;
