@@ -373,9 +373,9 @@ export class ProfileEdit extends BaseComponent<{ user: User | null }, ProfileUpd
       // await updateProfileDeleteMe();
       // this.router.navigate('/logout');
    try {         
-    await  updateProfileDeleteMe();
-     UserContext().setUserLogout();  
-     this.router.navigate('/');
+      await  updateProfileDeleteMe();
+      UserContext().setUserLogout();  
+      this.router.navigate('/');
     } catch (error) {
       this.apiErrorHandler(error);
     }
