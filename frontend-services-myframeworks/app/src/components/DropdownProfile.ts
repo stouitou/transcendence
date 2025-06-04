@@ -58,13 +58,14 @@ export class DropdownProfile extends BaseComponent<{ isDrop: boolean, user: User
 
       ${isDrop ? `
         <div id="dropdown" class="dropdown-menu transition ease-out duration-200 transform opacity-0 scale-95 absolute right-0 mt-2 w-64 bg-white dark:bg-gray-700 rounded-lg shadow-lg divide-y divide-gray-100 dark:divide-gray-600 z-50">
-<div class="flex items-center p-4">
-  <img referrerPolicy="no-referrer" src="${user.avatar}" alt="User avatar" class="w-10 h-10 rounded-full mr-3">
-  <div>
-    <p class="text-sm font-medium text-gray-900 dark:text-white">${user.name}</p>
-    <p class="text-sm text-gray-500 dark:text-gray-300">${user.email ? `${user.email}` : ''}</p>
-  </div>
-</div>
+          <div class="flex items-center p-4">
+            <img referrerPolicy="no-referrer" src="${user.avatar}" alt="User avatar" class="w-10 h-10 rounded-full mr-3">
+            <div>
+              <a href="/profile/edit" class="text-sm font-medium text-gray-900 dark:text-white">${user.name}</p>
+              <!--<p class="text-sm font-medium text-gray-900 dark:text-white">${user.name}</p>-->
+              <p class="text-sm text-gray-500 dark:text-gray-300">${user.email ? `${user.email}` : ''}</p>
+            </div>
+          </div>
 
           <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
             <li><a href="/settings" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a></li>
