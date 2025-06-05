@@ -14,7 +14,7 @@ export class	Tournament extends BaseComponent<{ user: User | null; tournaments: 
 		this.render();
 		document.addEventListener('profile-data-updated', (e: Event) => {
 			const	customEvent = e as CustomEvent;
-			console.log('profile-data-updated event received');
+			// console.log('profile-data-updated event received');
 			this.state.user = customEvent.detail.profileData;
 			this.render();
 		});
@@ -28,7 +28,7 @@ export class	Tournament extends BaseComponent<{ user: User | null; tournaments: 
 		const	{ user } = this.state;
 
 		if (user) {
-			console.log('game', user.games);
+			// console.log('game', user.games);
 			this.innerHTML = `
 				<div class="mx-auto p-6 text-center">
 					<h2 class="text-3xl font-bold text-center mb-6 text-gray-800">Game History</h2>
@@ -82,7 +82,7 @@ export class	Tournament extends BaseComponent<{ user: User | null; tournaments: 
 				if ( game?.gameHistory.score2 > game?.gameHistory.score1 ) victory = game?.gameHistory.player2;
 				if ( game?.gameHistory.score1 ===	game?.gameHistory.score2 ) victory = null;
 			} */
-		console.log('game', game);
+		// console.log('game', game);
 		return (`
 			<tr class=" border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
 				<td class="w-4 p-4">

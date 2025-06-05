@@ -21,7 +21,7 @@ export class GameLobyComponent extends BaseComponent<{
 
     handleListenerSuccessCreateGame(e: Event) {
         const { lobyId } = (e as CustomEvent).detail;
-        console.log('redirectToLobby', lobyId);
+        // console.log('redirectToLobby', lobyId);
 
         if (!lobyId) return;                 // safety guard
 
@@ -47,14 +47,14 @@ export class GameLobyComponent extends BaseComponent<{
 
 
     handleListenerProfileUpdate = (e: Event) => {
-        console.log("profile-data-updated event received");
+        // console.log("profile-data-updated event received");
         const customEvent = e as CustomEvent;
         this.state.user = customEvent.detail.profileData;
         this.updateList();
     };
 
     handleListenerWsGameUpdate = (e: Event) => {
-        console.log("ws-games event", (e as CustomEvent).detail);
+        // console.log("ws-games event", (e as CustomEvent).detail);
         const wsGames = (e as CustomEvent).detail.wsGame;
         this.state.games = wsGames;
         this.updateList();

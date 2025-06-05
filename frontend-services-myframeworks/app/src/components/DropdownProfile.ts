@@ -103,7 +103,7 @@ export class DropdownProfile extends BaseComponent<{ isDrop: boolean, user: User
    */
   handleSubmitLogout = async (e: Event) => {
     e.preventDefault();
-    console.log('handleSubmitLogout');
+    // console.log('handleSubmitLogout');
     try {
       await logoutUser();
       UserContext().setUserLogout();

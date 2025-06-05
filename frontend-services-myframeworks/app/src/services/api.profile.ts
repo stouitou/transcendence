@@ -14,7 +14,7 @@ export const updateProfileName = async (user: Partial<User>): Promise<User | voi
  */
 export const uploadProfileAvatar = async (formData: FormData): Promise<User | void> => {
 	  const url = `/api/users/me/upload-avatar`;
-	  console.log("uploadProfileAvatar",formData)
+	  // console.log("uploadProfileAvatar",formData)
 	  return apiRequest<User | void>(url, 'POST', formData,{},true,false);
 }
 
@@ -53,7 +53,7 @@ export const updatePassword = async (data: Partial<UpdatePassword>): Promise<{me
 				return { message: 'Password updated successfully' };
 			}
             const profileData = await response.json();
-            console.log('[updateProfile]Profile updated:', profileData);
+            // console.log('[updateProfile]Profile updated:', profileData);
             return profileData;
         } else {
             console.error('[updateProfile]Failed to update profile');
@@ -98,6 +98,7 @@ export const getLeaderboard = async (): Promise<LeaderBoardUser[] | void> => {
  * Profile Users addfriendByUserName
  */
 export const addfriendByUserName = async (friend:{friendName: string}): Promise<User | void> => {
+  // console.log('friend name:', friend.friendName);
   const url = `/api/users/me/addFriendByUserName`;
   return apiRequest<User | void>(url, 'PUT', friend);
 }

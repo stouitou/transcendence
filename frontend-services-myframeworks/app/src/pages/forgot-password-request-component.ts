@@ -26,10 +26,10 @@ export class ForgotPasswordRequest extends BaseComponent<{}, { formLogin: Forgot
     try {
       const formData = formHandler.getFormData();
       const loginToken = await forgotPassword(formData.email);
-      console.log('Login successful:', loginToken);
+      // console.log('Login successful:', loginToken);
 
       if (loginToken.twoFactorRequired) {
-        console.log('Two-factor authentication required');
+        // console.log('Two-factor authentication required');
         //const router = RouterConfig.getInstance();
         this.router.navigate('/forgot-password-2fa'); // Naviguer vers le composant 2FA
       }

@@ -24,7 +24,7 @@ class LanguageContext {
   getLang() { return this.lang; }
   setLang(newLang: Language) {
     if (this.lang !== newLang) {
-		console.log("setLang", newLang);
+		// console.log("setLang", newLang);
       this.lang = newLang;
 	  // Met à jour la langue dans le stockage local
       localStorage.setItem('lang', newLang);

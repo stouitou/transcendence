@@ -75,7 +75,7 @@ export class GameCardTest extends BaseComponent<{ user: User | null; isEditing: 
     super({ user: null, isEditing: false });
   }
   set data(game: Game) {
-    console.log('game is set', game);
+    // console.log('game is set', game);
       this.game = game;
       this.render();
     }

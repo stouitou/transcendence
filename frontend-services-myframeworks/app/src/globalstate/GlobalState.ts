@@ -34,7 +34,7 @@ class GlobalState {
     }
 
     private _firstLoadProfileData = async () => {
-      console.log('Fetching profile data on first load...');
+      // console.log('Fetching profile data on first load...');
         try {
           const profileData = await fetchProfileData();
           this.setuser(profileData);

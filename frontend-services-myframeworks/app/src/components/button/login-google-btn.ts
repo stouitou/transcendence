@@ -8,7 +8,7 @@ export class LoginGoogle extends BaseComponent {
 
  handleSubmitGoogle = async (e: Event) => {
     e.preventDefault();
-    console.log('handleSubmitGoogle');
+    // console.log('handleSubmitGoogle');
 try {
   await  loginWithProvider('google');
 } catch (error) {

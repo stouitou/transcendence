@@ -8,7 +8,7 @@ export class LoginGithub extends BaseComponent {
 
  handleSubmit = async (e: Event) => {
     e.preventDefault();
-    console.log('handleSubmitGoogle');
+    // console.log('handleSubmitGoogle');
 try {
   await  loginWithProvider('github');
 } catch (error) {

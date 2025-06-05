@@ -29,12 +29,12 @@ export class Dashboard extends BaseComponent<{ user: User | null,tournamentsData
 		if (this.state.user) {
 			this.state.tournamentsData = this.state.user.tournaments || [];
 		} else {
-		console.log('No user connected');
+		// console.log('No user connected');
 		}
 		this.render();
 		document.addEventListener('profile-data-updated', (e: Event) => {
 		const customEvent = e as CustomEvent;
-		console.log('profile-data-updated event received');
+		// console.log('profile-data-updated event received');
 		this.state.user = customEvent.detail.profileData;
 		/*  if (this.state.user) {
 			this.state.tournamentsData = this.state.user.tournaments || [];

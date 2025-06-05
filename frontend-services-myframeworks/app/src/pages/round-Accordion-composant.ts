@@ -13,7 +13,7 @@ import { Game } from '../types/types';
 	// Attente d'une propriété « data » 
 	set data(data: string) {
 		console.warn('data', data);
-		console.log('data', this.round);
+		// console.log('data', this.round);
 	  try {
 		this.round = JSON.parse(data);
 	  } catch (error) {
@@ -48,7 +48,7 @@ import { Game } from '../types/types';
 		if (!this.shadowRoot) return;
 		if (!this.round) {
 			this.shadowRoot.innerHTML = '<p>Aucun round disponible.</p>';
-			console.log('data', this.getAttribute('data'));
+			// console.log('data', this.getAttribute('data'));
 			return;
 		}
 

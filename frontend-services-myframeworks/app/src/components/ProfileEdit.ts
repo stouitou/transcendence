@@ -90,7 +90,7 @@ export class ProfileEdit extends BaseComponent<{ user: User | null }, ProfileUpd
             <p class="text-gray-600 dark:text-gray-300">Role: ${user.role}</p>
           </div>
         </div>
-
+  <div id="message-box" class="form-error"></div>
         <div class="grid grid-cols-1 md:grid-cols-2 gap-8">
           <!-- Forms Section -->
 
@@ -103,7 +103,7 @@ export class ProfileEdit extends BaseComponent<{ user: User | null }, ProfileUpd
 
           <form id="formRemoveFriend" class="space-y-4">
             <label for="inputSelectRmfriend" class="block text-sm font-medium text-gray-700 dark:text-gray-300">${this.t('PROFILE.RMVFRIEND')}:</label>
-            <select name="friendId" id="inputSelectRmfriend" class="form-select">
+            <select name="friendId" id="inputSelectRmfriend" class="form-select bg-gray-200 text-gray-800 border border-gray-400 rounded-md">
               <option value="">${this.t('PROFILE.ADDFRIEND')}</option>
               ${user.friends?.map(friend => `<option value='${friend.id}'>${friend.name} (${friend.id})</option>`).join('')}
             </select>
@@ -119,7 +119,7 @@ export class ProfileEdit extends BaseComponent<{ user: User | null }, ProfileUpd
           </form>
 
           <form id="formUpdateAvatar" class="space-y-4">
-            <img id="avatar-preview" src="" alt="Avatar Preview" class="w-24 h-24 rounded-full object-cover border" />
+            <img id="avatar-preview" src="" alt="Avatar Preview" class=" block mx-auto w-24 h-24 rounded-full object-cover border" />
             <label for="avatar" class="block text-sm font-medium text-gray-700 dark:text-gray-300">${this.t('PROFILE.UPDATEAVT')}:</label>
             <input id="avatar" name="avatar" type="file" accept="image/png, image/jpeg" class="form-file-input" />
             <div id="avatar-error" class="text-red-500 text-sm"></div>
@@ -328,7 +328,7 @@ export class TwoFactorSetup extends BaseComponent<{ user: User | null; twoFa: Tw
   connectedCallback() {
     this.state.user = UserContext().user();
     this.fetch2FADetails().then(() => {
-      console.log("TwoFactorSetup connectedCallback fetch2FADetails");
+      // console.log("TwoFactorSetup connectedCallback fetch2FADetails");
     });
   }
 
@@ -337,10 +337,10 @@ export class TwoFactorSetup extends BaseComponent<{ user: User | null; twoFa: Tw
     if (!user) return;
 
     try {
-      console.log("Fetching 2FA details for user:", user.id);
+      // console.log("Fetching 2FA details for user:", user.id);
       const data = await get2FADetail();
       this.setState({ ...this.state, twoFa: data ?? null });
-      console.log("2FA data:", data);
+      // console.log("2FA data:", data);
       this.render();
     } catch (error) {
       console.error("Error fetching 2FA details:", error);
@@ -384,7 +384,7 @@ export class TwoFactorSetup extends BaseComponent<{ user: User | null; twoFa: Tw
     if (!twoFa) return;
     const method = twoFa.two_factor_auth_method === "email" ? "totp" : "email";
     this.setState({ ...this.state, twoFa: { ...twoFa, two_factor_auth_method: method } });
-    console.log("this.state.twofa", this.state.twoFa);
+    // console.log("this.state.twofa", this.state.twoFa);
     this.HandleEnable2FA();
   }
 
@@ -462,7 +462,7 @@ export class TwoFactorSetup extends BaseComponent<{ user: User | null; twoFa: Tw
 
     try {
       const timestamp = new Date().getTime(); // avoid caching
-      console.log("2FA QR code generated successfully");
+      // console.log("2FA QR code generated successfully");
       const div = this.querySelector(".qrcode");
       if (div) {
         div.innerHTML = `
@@ -472,7 +472,7 @@ export class TwoFactorSetup extends BaseComponent<{ user: User | null; twoFa: Tw
         `;
       }
     } catch (error) {
-      console.error("Error generating 2FA QR code:", error);
+        console.error("Error generating 2FA QR code:", error);
     }
   }
 }
