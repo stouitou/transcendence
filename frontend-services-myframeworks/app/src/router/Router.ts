@@ -66,7 +66,7 @@ export class RouterConfig {
 
   // Charger un composant
   private loadComponent(path: string,searchParams: URLSearchParams | null = null) {
-    console.log('Loading component for path:', path);
+    // console.log('Loading component for path:', path);
    // console.log('searchParams:', searchParams);
     const app = document.querySelector('router-view');
     if (!app) {
@@ -155,7 +155,7 @@ export class Router extends HTMLElement {
 
   constructor() {
     super();
-    console.log('Router constructor');
+    // console.log('Router constructor');
     this.routerConfig = RouterConfig.getInstance(); // Obtenir l'instance unique de RouterConfig
     window.addEventListener('popstate', this.handlePopState.bind(this));
     document.addEventListener('click', this.handleLinkClick.bind(this));

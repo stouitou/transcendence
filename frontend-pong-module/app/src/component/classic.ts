@@ -56,6 +56,7 @@ export class classic extends LitElement {
 			width: 100%;
 			height: 100%;
 			display: block;
+			background-color: black;
 		}
 
 		/* ────────────────────────────────────────────────────────────────────────── */
@@ -322,7 +323,7 @@ export class classic extends LitElement {
 		// ─── Attach the arrow‐key listener here ─────────────────────────────────
 		window.addEventListener('keydown', this._onKeyDown);
 
-		this.hideBackground();
+		//this.hideBackground();
 		this._game = new Match();
 		this._game.webSocketManager.lobyId = this.data?.id;
 	}

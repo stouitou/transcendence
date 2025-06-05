@@ -40,7 +40,7 @@ import {User} from '../types/types';
 	this.render();
 	document.addEventListener('profile-data-updated', (e: Event) => {
 	  const customEvent = e as CustomEvent;
-	  console.log('profile-data-updated event received');
+	//   console.log('profile-data-updated event received');
 	  this.state.user = customEvent.detail.profileData;
 	  this.render();
 	});

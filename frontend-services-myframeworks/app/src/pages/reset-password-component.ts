@@ -34,7 +34,7 @@ export class ResetPassword extends BaseComponent<{},{formResetPassword:ResetPass
     try {
        const formData = formHandler.getFormData();
 			const loginToken = await  resetPassword(formData.password);
-      console.log('Login resetPassword:', loginToken);
+      // console.log('Login resetPassword:', loginToken);
 			const data = await fetchProfileData();
       if (!data) {
         return;
@@ -42,7 +42,7 @@ export class ResetPassword extends BaseComponent<{},{formResetPassword:ResetPass
       UserContext().setUser(data);
       UserContext().setLoginSuccess(loginToken.token);
 
-      console.log('Reset password successful');
+      // console.log('Reset password successful');
       this.router.navigate('/');
 		} catch (error) {
 			console.error('Login failed:', error);

@@ -32,7 +32,7 @@ export class ChatComponent extends BaseComponent<{ ws: IWebSocketsService | null
       this.render();
       document.addEventListener('ws-isOnline', (e: Event) => {
         const customEvent = e as CustomEvent;
-        console.log('profile-data-updated event received');
+        // console.log('profile-data-updated event received');
         this.state.isOnline = customEvent.detail.users;
        //update only the inputSelectUser element
         const inputSelectUser = this.querySelector('#inputSelectUser') as HTMLSelectElement;
@@ -174,7 +174,7 @@ export class ChatComponent extends BaseComponent<{ ws: IWebSocketsService | null
       );
 
       this.attachEvent(this, '#send-button', 'click', (event: Event) => {
-        console.log('send-button clicked');
+        // console.log('send-button clicked');
         event.preventDefault();
         this.handleSendMessage();
       }

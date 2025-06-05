@@ -26,7 +26,7 @@ export class MessageBtn extends BaseComponent<{nbMsg:number}> {
 	this.render();
 	document.addEventListener('nb-messages-updated', (e: Event) => {
 	  const customEvent = e as CustomEvent;
-	  console.log('message-data-updated event received',customEvent.detail.nbMsg);
+	//   console.log('message-data-updated event received',customEvent.detail.nbMsg);
 	  this.setNbMessages(customEvent.detail.nbMessages);
 	});
   }

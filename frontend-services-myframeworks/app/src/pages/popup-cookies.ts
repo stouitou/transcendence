@@ -53,7 +53,7 @@ export class PopupCookies extends BaseComponent<{}> {
   }
 
   render() {
-    console.log("PopupCookies render");
+    // console.log("PopupCookies render");
     this.innerHTML = `
       ${this.renderCookiePopup()}
     `;

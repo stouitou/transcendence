@@ -18,9 +18,9 @@ export class	ScoreManager {
 	updateScore (ball: Ball) {
 		if (ball.lastHit && ball.lastWallBounce != null && ball.lastWallBounce < this._players.length &&
 			(ball.position.x + ball.size.width < 0 ||
-			ball.position.x > this._canvas.width ||
+			ball.position.x - ball.size.width > this._canvas.width ||
 			ball.position.y + ball.size.height < 0 ||
-			ball.position.y > this._canvas.height)
+			ball.position.y - ball.size.width > this._canvas.height)
 		) {
 			if (this._players.length === 2) {
 				const	winnerIndex = ball.lastWallBounce === 0 ? 1 : 0;

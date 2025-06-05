@@ -1,4 +1,5 @@
 import { BaseComponent } from "../frameworks/base-component";
+import { UserContext } from "../globalstate/GlobalState";
 
 export class GameWrapper extends BaseComponent {
   static get observedAttributes() { return ['id']; }

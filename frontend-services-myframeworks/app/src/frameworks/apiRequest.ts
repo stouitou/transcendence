@@ -78,7 +78,7 @@ export const apiRequest = async <T, B = unknown>(
 
     if (!response.ok) {
       const errorData = await response.json();
-      console.log("API Request Error Data:", errorData);
+      // console.log("API Request Error Data:", errorData);
       throw new ApiErrorBase(errorData);
      // throw new ApiError(response.status, errorData.error || "An error occurred");
     }

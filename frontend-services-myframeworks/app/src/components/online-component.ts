@@ -22,7 +22,7 @@ export class OnlineComponent extends BaseComponent<{ ws: IWebSocketsService | nu
     this.render();
     document.addEventListener('ws-isOnline', (e: Event) => {
       const customEvent = e as CustomEvent;
-      console.log('profile-data-updated event received');
+      // console.log('profile-data-updated event received');
       this.state.isOnline = customEvent.detail.users;
       this.render();
     });
@@ -48,7 +48,7 @@ export class OnlineComponent extends BaseComponent<{ ws: IWebSocketsService | nu
 					<ul class="flex flex-wrap">
 					${isOnline?.map((user) => (
             !user?
-						`<li class="bg-red-300'> ${user}</li>`:`<li class="mx-1 px-2 bg-green-800">${user}</li>`
+						`<li class="bg-red-300'> ${user}</li>`:`<li class="mx-1 px-2 bg-green-800 text-white">${user}</li>`
 					))}
 					</ul>
 				</div>
@@ -72,7 +72,7 @@ export class OnlineComponent extends BaseComponent<{ ws: IWebSocketsService | nu
     const div = document.createElement('ul');
     user.friends?.forEach(friend => {
         if (isOnline?.includes(`User-${String(friend.id).trim()}`)) {
-          div.innerHTML += `<li class="bg-yellow-800"> ${friend.name}</li>`;
+          div.innerHTML += `<li class="bg-yellow-800 text-white"> ${friend.name}</li>`;
         }      
       });
     return div.innerHTML; 

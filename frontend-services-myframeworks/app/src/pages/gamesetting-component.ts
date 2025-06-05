@@ -40,7 +40,7 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
       // attach the event handler to the form
       this.attachEvent(this, '#addPlayerForm', 'submit', this.handleSubmitAddPlayerForm.bind(this));
     } catch (error) {
-        console.log('Error attaching form handler:', error);
+        // console.log('Error attaching form handler:', error);
     }
 
     this.attachEvent(this, '#addIA', 'click', (e: Event) => {
@@ -111,7 +111,7 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
 
     document.addEventListener('profile-data-updated', (e: Event) => {
       const customEvent = e as CustomEvent;
-      console.log('profile-data-updated event received');
+      // console.log('profile-data-updated event received');
       this.state.user = customEvent.detail.profileData;
       this.state.players![0].avatar = this.state.user?.avatar;
       this.state.players![0].display_name = this.state.user?.name;
@@ -169,11 +169,11 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
 
   handleDifficultyChange(event: Event) {
     event.preventDefault();
-    console.log('handleDifficultyChange');
+    // console.log('handleDifficultyChange');
     const input = event.target as HTMLInputElement;
     const value = parseInt(input.value, 10);
     this.setDifficulty(value);
-    console.log('Difficulty changed:', value);
+    // console.log('Difficulty changed:', value);
     const progress = this.querySelector('#progress') as HTMLElement;
     if (progress) {
      const percentage = (value ) / (5 ) * 100;
@@ -207,7 +207,7 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
     <!-- decorative pastel blob behind the card -->
 
     <!-- ── 1. difficulty slider ───────────────────────────────────────── -->
-    <div class="block text-center">
+  <!--  <div class="block text-center">
       <h3 class="text-lg font-semibold">${this.t("GAME.GAME_DIFF")}</h3>
 
       <div class="relative w-full h-3 mt-4 rounded-full bg-white/40 overflow-hidden">
@@ -220,15 +220,15 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
       </div>
 
       <p class="mt-2 text-sm">${this.t("GAME.ACT_DIFF")}: <b>${difficulty}</b></p>
-    </div>
+    </div> -->
 
     <!-- ── 2. toggles (IDs unchanged so old listeners keep working) ────── -->
     <div class="block flex flex-col items-center gap-4">
 
-      <div id="setType" class="toggle-row">
+    <!--    <div id="setType" class="toggle-row">
         <button class="btn toggle-btn ${type==='local' ? 'on':'off'}"  data-type="local">${this.t("GAME.LOCAL")}</button>
         <button class="btn toggle-btn ${type!=='local'? 'on':'off'}"    data-type="remote">${this.t("GAME.REMOTE")}</button>
-      </div>
+      </div>  -->
 
       <div id="setFormat" class="toggle-row">
         <button class="btn toggle-btn ${format==='classic' ? 'on':'off'}" data-type="classic">${this.t("GAME.CLASSIC")}</button>
@@ -243,7 +243,7 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
 
     <!-- ── 3. summary chips ───────────────────────────────────────────── -->
     <div class="block flex flex-wrap gap-3 justify-center">
-      <span class="summary-chip">Type: <b>${type}</b></span>
+    <!--  <span class="summary-chip">Type: <b>${type}</b></span> -->
       <span class="summary-chip">Format : <b>${format}</b></span>
      <!-- <span class="summary-chip">Mode : <b>{mode}</b></span> -->
     </div>
@@ -359,7 +359,7 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
 
 
     this.attachEvent(this, '#playerAvatar', 'change', () => {
-    console.log('changed');
+    // console.log('changed');
     const select = this.querySelector('#playerAvatar') as HTMLSelectElement;
     const backgroundImage = select.options[select.selectedIndex].getAttribute('data-image');
     const avatarPreview = this.querySelector('#avatarPreviewSelected') as HTMLElement;
@@ -398,7 +398,7 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
     if (!target.classList.contains('rem-chip'))  { return ; }
 
     const playerName = target.dataset.name;
-    console.log('You clicked on', playerName);
+    // console.log('You clicked on', playerName);
     const players = [...(this.state.players ?? [])];
     const indexToRemove = players.findIndex(p => p.display_name === playerName);
 
@@ -422,7 +422,7 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
         //check player unique name
         const playerName = formData.display_name;
         const existingPlayer = this.state.players?.find(p => p.display_name === playerName);
-        console.log('existingPlayer', existingPlayer);
+        // console.log('existingPlayer', existingPlayer);
         if (existingPlayer) {
           this.showMessage(`Player with name ${playerName} already exists.`, 'error');
           return;
@@ -445,5 +445,4 @@ export class GameSetting extends BaseComponent<IGameSettingState, SettingsGameFo
         this.apiErrorHandler(error);
       }
     }
-
 }

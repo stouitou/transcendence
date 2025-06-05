@@ -19,7 +19,7 @@ export class GameHistory extends BaseComponent<{
 		getGames({ limit: 10 }, { type: "remote" }).then((result) => {
 			if (!result || !result.success) return;
 			const { data: games, meta } = result;
-			console.log('getGames(remote).then((data) games', games);
+			// console.log('getGames(remote).then((data) games', games);
 			if (games) {
 				this.state.metaPagination.remoteGame = meta;
 				this.state.remoteGame = games
@@ -29,7 +29,7 @@ export class GameHistory extends BaseComponent<{
 		getGames({ limit: 10 }, { type: "local" }).then((result) => {
 			if (!result || !result.success) return;
 			const { data: games, meta } = result;
-			console.log('getGames(local).then((data) games', games);
+			// console.log('getGames(local).then((data) games', games);
 			if (games) {
 				this.state.metaPagination.localGame = meta;
 				this.state.localGame = games
@@ -248,11 +248,11 @@ export class GameHistory extends BaseComponent<{
 			this.querySelectorAll('.paginator').forEach((button) => {
 				button.addEventListener('click', (e: Event) => {
 					e.preventDefault();
-					console.log('paginator click');
+					// console.log('paginator click');
 					const target = e.currentTarget as HTMLElement;
 					const page = Number(target.getAttribute('data-page'));
 					const type = target.getAttribute('data-type');
-					console.log('page', page);
+					// console.log('page', page);
 					if (!page || page < 1) return;
 					if (!type) return;
 					// Charger les données pour la page sélectionnée
@@ -277,7 +277,7 @@ export class GameHistory extends BaseComponent<{
 	}
 
 	gameDetailsView = (game: Game) => {
-		console.log('gameDetailsView', game);
+		// console.log('gameDetailsView', game);
 		return (`
 	<tr data-id="${game.id}" class="gameRow border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
 	

@@ -13,7 +13,7 @@ export class ForgotPasswordTwoFactor extends BaseComponent<{}, { form2FA: TwoFac
      action: (error) => {
         //console.error('Unauthorized error:', error);
         // Rediriger vers la page de connexion
-        console.log('redirecting to /forgot-password page');
+        // console.log('redirecting to /forgot-password page');
        this.router.navigate('/forgot-password');
        }
     });
@@ -22,7 +22,7 @@ export class ForgotPasswordTwoFactor extends BaseComponent<{}, { form2FA: TwoFac
      action: (error) => {
         //console.error('Unauthorized error:', error);
         // Rediriger vers la page de connexion
-        console.log('redirecting to /forgot-password page');
+        // console.log('redirecting to /forgot-password page');
        this.router.navigate('/forgot-password');
        }
     });
@@ -31,7 +31,7 @@ export class ForgotPasswordTwoFactor extends BaseComponent<{}, { form2FA: TwoFac
      action: (error) => {
         //console.error('Unauthorized error:', error);
         // Rediriger vers la page de connexion
-        console.log('redirecting to /forgot-password page');
+        // console.log('redirecting to /forgot-password page');
        this.router.navigate('/forgot-password');
        }
     });
@@ -52,7 +52,7 @@ export class ForgotPasswordTwoFactor extends BaseComponent<{}, { form2FA: TwoFac
 
     const formHandler = this.getFormHandler('form2FA');
     if (!formHandler?.validateForm()) {
-      console.log('Form validation failed', formHandler?.getFormData().code);
+      // console.log('Form validation failed', formHandler?.getFormData().code);
       this.showMessage('Please fix the errors in the form.', 'error');
       return;
     }
@@ -60,7 +60,7 @@ export class ForgotPasswordTwoFactor extends BaseComponent<{}, { form2FA: TwoFac
     const formData = formHandler.getFormData();
     try {
       const result = await verify2FA(formData.code, true);
-      console.log('2FA verification successful:', result);
+      // console.log('2FA verification successful:', result);
       const router = RouterConfig.getInstance();
       router.navigate('/reset-password');
     } catch (error) {

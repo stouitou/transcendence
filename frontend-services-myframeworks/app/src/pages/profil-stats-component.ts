@@ -30,11 +30,11 @@ import { UserStats } from "../types/types";
 
 		getProfileStat(this.state.id).then((data) => {
 			if (data) {
-				console.log('Profile stats:', data);
+				// console.log('Profile stats:', data);
 				this.state.userStats = data;
 				this.render();
 			} else {
-				console.log('No user connected');
+				// console.log('No user connected');
 			}
 		}).catch((error) => {
 			console.error('Error fetching profile stats:', error);

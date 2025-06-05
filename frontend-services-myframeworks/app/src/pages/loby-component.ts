@@ -49,11 +49,11 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
     this.wsGamesListener = this.handleWsGames.bind(this);
    }
    private handleWsGames(e: Event) {
-    console.log('ws-games event', (e as CustomEvent).detail);
+    // console.log('ws-games event', (e as CustomEvent).detail);
     const wsGamesDetail = (e as CustomEvent).detail;
     const wsGames = wsGamesDetail.wsGame;
-    console.log('ws-games event is: ', wsGames);
-    console.log('ws-games event this.gameID: ', this.gameID);
+    // console.log('ws-games event is: ', wsGames);
+    // console.log('ws-games event this.gameID: ', this.gameID);
 
     if (this.gameID !== null) {
       this.state.game = wsGames.filter((game: Match) => Number(game.config.gameId) === this.gameID)[0];
@@ -61,7 +61,7 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
     if (this.lobyID !== null) {
       this.state.game = wsGames.filter((game: Match) => game.lobyId === this.lobyID)[0];
     }
-    console.log('ws-games event', this.state.game);
+    // console.log('ws-games event', this.state.game);
     this.render();
   }
   // Suppression de l'écouteur d'événements
@@ -88,12 +88,12 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
       this.state.subscribe = !this.state.subscribe;
     }
       set data(gameID: number) {
-        console.log('game is set', gameID);
+        // console.log('game is set', gameID);
           this.gameID = gameID;
         }
       
       set LobyId(lobyID: string) {
-        console.log('game is set lobyID', lobyID);
+        // console.log('game is set lobyID', lobyID);
         this.lobyID = lobyID;
       }
 

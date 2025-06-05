@@ -35,7 +35,7 @@ export const logoutUser = async (): Promise<void> => {
 
 export type LoginProvider = 'google' | 'github' | '42api';
 export const loginWithProvider = async (provider: LoginProvider): Promise<void> => {
-    console.log(`Logging in with ${provider}`);
+    // console.log(`Logging in with ${provider}`);
     window.location.href = `/api/auth/${provider}`;
 };
 

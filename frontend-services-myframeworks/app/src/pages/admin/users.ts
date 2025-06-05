@@ -18,7 +18,7 @@ export class AdminUsers extends BaseComponent<{ user: User | null,
 	getUsers({limit:10},{type:"remote"}).then((result) => { 
 		if (!result || !result.success) return;
 		const {data:users,meta} = result;
-		console.log('getusers(remote).then((data) users', users);
+		// console.log('getusers(remote).then((data) users', users);
 	  if (users) {
 		this.state.metaPagination.users= meta;
 		this.state.users = users
@@ -184,11 +184,11 @@ export class AdminUsers extends BaseComponent<{ user: User | null,
 		  this.querySelectorAll('.paginator').forEach((button) => {
 			button.addEventListener('click', (e: Event) => {
 			  e.preventDefault();
-			  console.log('paginator click');
+			//   console.log('paginator click');
 			  const target = e.currentTarget as HTMLElement;
 			  const page = Number(target.getAttribute('data-page'));
 			  const type = target.getAttribute('data-type');
-			  console.log('page', page);
+			//   console.log('page', page);
 			  if (!page || page < 1) return;
 			  if (!type) return;		  
 			  // Charger les données pour la page sélectionnée
@@ -207,7 +207,7 @@ export class AdminUsers extends BaseComponent<{ user: User | null,
   }
 
   usersDetailsView = (user:User) => {
-	console.log('userDetailsView', user);
+	// console.log('userDetailsView', user);
 	return (`
 	<tr data-id="${user.id}" class="userRow border-b dark:bg-gray-800 dark:border-gray-700 border-gray-200 hover:bg-gray-50 dark:hover:bg-gray-600">
 	
@@ -270,7 +270,7 @@ export class AdminUsersComponent extends BaseComponent <{two_factor_auth:boolean
 		}
 		get2FAStatus(this.user?.id).then((result) => {
 			if (!result) return;
-			console.log('get2FAStatus', result);
+			// console.log('get2FAStatus', result);
 			this.state.two_factor_auth = result.two_factor_auth;
 	  		this.render();
 		}).catch((e) =>console.error(e));
@@ -482,12 +482,12 @@ export class AdminUsersComponent extends BaseComponent <{two_factor_auth:boolean
 		const formHandler = this.getFormHandler('formEditAvatar');
 		if (!formHandler?.validateForm()) {
 			this.showMessage('Please fix the errors in the form.', 'error');
-			console.log('formHandler.getFormData()', formHandler?.getFormData());
+			// console.log('formHandler.getFormData()', formHandler?.getFormData());
 			return;
 		}
 		try {
 			const formData = formHandler.getFormData();
-			console.log('formHandler.getFormData()', formData);
+			// console.log('formHandler.getFormData()', formData);
 			 const newformData = new FormData();
    			 newformData.append('file', formData.avatar); 
 			await  uploadAvatar(this.user.id, newformData);
@@ -504,7 +504,7 @@ export class AdminUsersComponent extends BaseComponent <{two_factor_auth:boolean
 		const formHandler = this.getFormHandler('formDeleteUser');
 		if (!formHandler?.validateForm()) {
 			this.showMessage('Please fix the errors in the form.', 'error');
-			console.log('formHandler.getFormData()', formHandler?.getFormData());
+			// console.log('formHandler.getFormData()', formHandler?.getFormData());
 			return;
 		}
 		alert('delete user');

@@ -317,9 +317,7 @@ export const UserMeSchema = {
 		summary: 'Update user avatar',
 		consumes: ['multipart/form-data'],
 		Headers: HeadersSchema,
-		params: Type.Object({
-			id: Type.String({ description: "ID de l'utilisateur pour lequel mettre à jour l'avatar", examples: ["1"] }),
-		}),
+
 		response: {
 			200: UsersSchema,
 			...AppErrorSchema

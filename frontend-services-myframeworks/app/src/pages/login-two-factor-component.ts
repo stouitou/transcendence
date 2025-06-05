@@ -48,7 +48,7 @@ export class LoginTwoFactor extends BaseComponent<{}, { form2FA: TwoFactorAuthFo
 
     const formHandler = this.getFormHandler('form2FA');
     if (!formHandler?.validateForm()) {
-      console.log('Form validation failed', formHandler?.getFormData().code);
+      // console.log('Form validation failed', formHandler?.getFormData().code);
       this.showMessage('Please fix the errors in the form.', 'error');
       return;
     }
@@ -56,7 +56,7 @@ export class LoginTwoFactor extends BaseComponent<{}, { form2FA: TwoFactorAuthFo
     const formData = formHandler.getFormData();
     try {
       const data2FA = await verify2FA(formData.code);
-      console.log('2FA verification successful:', data2FA);
+      // console.log('2FA verification successful:', data2FA);
       const data = await fetchProfileData();
       if (!data) {
         return;

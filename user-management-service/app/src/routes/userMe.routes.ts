@@ -46,7 +46,7 @@ async function userMeRoutes(app: FastifyInstance) {
 
   /* metre a jour l'avatar de l'utilisateur connecté*/
    app.post('/upload-avatar', {schema: UserMeSchema.updateUserAvatar,preHandler: [verifyAuth,verifyCSRF] }, userController.updateUserAvatar);
-  /* 
+  /*  
    recuperer les amis de l'utilisateur connecté
   */
 //  app.get("/friends",/*  {schema: UserSchema.getUserById} ,*/ userController.getUserFriendsById);
