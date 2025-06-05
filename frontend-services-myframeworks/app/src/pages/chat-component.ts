@@ -121,18 +121,18 @@ export class ChatComponent extends BaseComponent<{ ws: IWebSocketsService | null
                 </div>
 
                 <div class="input-container">
-                 <label for="inputMessage" class="block  mb-2">Type a message</label>
+                 <label for="inputMessage" class="block  mb-2">${this.t("CHAT.TYPE")}</label>
            
                     <input
                         id="inputMessage"
                         type="text"
                         value="${privateMessage.inputMessage}"
-                        placeholder="Type a message..."
+                        placeholder="${this.t("CHAT.TYPE")}..."
                         class="form-text-input"
                     />
                     <br />
                     <select id="inputSelectUser" value="${privateMessage.to}" class="select-form-message">
-                        <option value="">Select a user</option>
+                        <option value="">${this.t("PROFILE.SELECTUSER")}</option>
                         ${isOnline?.map((user) => (
                             `<option value=${user}>
                                 ${user}
@@ -140,7 +140,7 @@ export class ChatComponent extends BaseComponent<{ ws: IWebSocketsService | null
                         ))}
                     </select>
                     <button id="send-button" class="btn">
-                        Send
+                        ${this.t("CHAT.SEND")}
                     </button>
                 </div>
         </div>

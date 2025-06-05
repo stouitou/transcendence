@@ -53,13 +53,13 @@ import { UserStats } from "../types/types";
 		 ${!toggle ? `
 			<divclass=" w-full px-6 py-10 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
 				<section   id="toggle-profile-charts"  >
-					<h2  class="text-2xl font-bold mb-4 text-center">View Profile Stats</h2>
+					<h2  class="text-2xl font-bold mb-4 text-center">${this.t("PROFILE.STATS")}</h2>
 				</section>
 			</div>` : `
 		  <div class="min-h-screen w-full px-6 py-10 bg-gray-100 dark:bg-gray-900 text-gray-900 dark:text-white">
 		  	<div class="max-w-7xl mx-auto space-y-10">
 				<section  id="toggle-profile-charts"  >
-					<h2  class="text-2xl font-bold mb-4 text-center">Mask Profile Stats</h2>
+					<h2  class="text-2xl font-bold mb-4 text-center">${this.t("PROFILE.MASK_PROFILE_STAT")}</h2>
 				</section>
 			  <!-- Game Stats Section -->
 			  <section>
@@ -81,7 +81,7 @@ import { UserStats } from "../types/types";
 	  
 			  <!-- Tournament Stats Section -->
 			  <section>
-				<h2 class="text-2xl font-bold mb-4 text-center">Tournament Stats</h2>
+				<h2 class="text-2xl font-bold mb-4 text-center">${this.t("TOURNAMENT.STATS")}</h2>
 				<div class="grid grid-cols-1 md:grid-cols-3 gap-4 bg-white dark:bg-gray-800 rounded-2xl p-6 shadow-md">
 				  <donuts-chart id="tournamentChart"></donuts-chart>
 				  <donuts-chart id="tournamentChartLocal"></donuts-chart>

@@ -3,6 +3,7 @@ export const en = {
 		ERROR: "An error occurred, please try again.",
 		SUCCESS: "Success",
 		LOADING: "Loading...",
+		NAME: "Name",
 		NOT_FOUND: "Not found",
 		BACK: "Back",
 		PLAYERS: "Players",
@@ -36,6 +37,23 @@ export const en = {
 		TITLE: "My Profile",
 		PHRASE: "Consult or modify your profile",
 		MODIFY: "Modify",
+		UPDATE: "Update",
+		OLDPWD: "Old password",
+		NEWPWD: "New password",
+		NEWNAME: "New name",
+		ADDFRIEND: "Add a friend",
+		RMVFRIEND: "Remove a friend",
+		NEWAVATAR: "Modify avatar",
+		UPDATEPWD: "Update password",
+		UPDATEAVT: "Update avatar",
+		UPDATENAME: "Update name",
+		DELETE: "Delete",
+		SELECTUSER: "Select a user",
+		AREU: "Definitely delete user",
+		STATS: "Profile Stats",
+		LEVEL: "Level",
+		MASK_PROFILE_STAT: "Hide profile stats",
+
 	},
 	GAME: {
 		TITLE: "Play",
@@ -48,14 +66,15 @@ export const en = {
 		TYPE: "Type",
 		CREATE: "Create a new game",
 		PLAYER_NAME: "Player name",
-        JOIN: "Join a game",
+		JOIN: "Join a game",
 		PLAYER_ADD: "Add a player",
-		CLASSIC: "Classic", 
-		NORMAL: "Normal", 
-		ADVANCED: "Advanced", 
-        ACTION: "Action",
+		CLASSIC: "Classic",
+		NORMAL: "Normal",
+		ADVANCED: "Advanced",
+		ACTION: "Action",
 		LOBBY: "Lobby",
-        LIST_VIEW: "View list",
+		LIST_VIEW: "View list",
+		WINNER: "Winner",
 	},
 	DASHBOARD: {
 		TITLE: "Dashboard",
@@ -70,6 +89,17 @@ export const en = {
 		LOGIN: "Log in",
 		LOGOUT: "Log out",
 		REGISTER: "Register",
+		EMAIL: "Email",
+		PWD: "Password",
+		NOACC: "No account yet?",
+		NOPWD: "Forgot your password?",
+		COND1: "COND1",
+		COND2: "COND2",
+		ERR: "Please correct the error in the form",
+		ACC: "Already have an account ?",
+		RESET: "Reset password",
+		RESETPWD: "Please enter your email address to reset your password.",
+
 	},
 	SETTINGS: {
 		TITLE: "Settings",
@@ -87,6 +117,7 @@ export const en = {
 		WRITE_MSG: "Write a message",
 		SEND: "Send",
 		CHANGE_AVATAR: "Change the avatar",
+		TYPE: "Type a message",
 	},
 	RANKING: {
 		TITLE: "Leaderboard",
@@ -99,8 +130,12 @@ export const en = {
 		DATE: "Date",
 		DIFFICULTY: "Difficulty",
 		ID: "Id",
+		GAME_HT_LOC: "Remote History",
+		GAME_HT_REM: "Local History",
 		STATE: "State",
 		FORMAT: "Format",
+		STATS: "Stats",
+
 	},
 	SUPPORT: {
 		TITLE: "Support & Legal Notice",
@@ -164,5 +199,19 @@ export const en = {
 			INVALID: "Please enter a valid email address.",
 			REQUIRED: "Email is required.",
 		}
-	}
+	},
+	MISS: {
+		UNAUTH: "Sorry, you are not authorized to access this page.",
+		EXIST: "Sorry, the page you are looking for does not exist.",
+	},
+
+	FRIENDS: {
+		TITLE: "FRIENDS",
+	},
+	AF: {
+		DISABLECAN: "You can disable A2F in your profile settings",
+		AF: "A2F",
+		CODEPLS: "Please enter the 2FA code sent to your email or App",
+
+	},
 } as const;

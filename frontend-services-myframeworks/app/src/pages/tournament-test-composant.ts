@@ -153,7 +153,7 @@ export class DashboardTournois extends BaseComponent<{ user: User | null,
 	  this.innerHTML = `
 		
         <div class="mx-auto p-6 text-center">
-              <h2 class="text-3xl font-bold text-center mb-6">Tournament History Local ${this.state.metaPagination.localGame?.total||0}</h2>
+              <h2 class="text-3xl font-bold text-center mb-6">${this.t("TOURNAMENT.TITLE")} ${this.t("TOURNAMENT.GAME_HT_LOC")} ${this.state.metaPagination.localGame?.total||0}</h2>
 			  	<nav aria-label="Page navigation ">
 					<ul class="flex items-center -space-x-px h-10 text-base">
 						${ localPagination}
@@ -172,13 +172,13 @@ export class DashboardTournois extends BaseComponent<{ user: User | null,
                     Id
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    state
+                    ${this.t("TOURNAMENT.STATE")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Date
+                    ${this.t("TOURNAMENT.DATE")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Victory
+                    ${this.t("TOURNAMENT.VICTORY")}
                 </th>
             </tr>
         </thead>
@@ -209,7 +209,7 @@ export class DashboardTournois extends BaseComponent<{ user: User | null,
 		</td>
 		<td class="px-6 py-4">
 			<div class="flex items-center">
-			${tournament.winner ? `<span>Gagnant : ${(typeof tournament.winner === 'number') ? 'ID ' + tournament.winner : tournament.winner.display_name }</span>` : ''}
+			${tournament.winner ? `<span>${this.t("GAME.WINNER")} : ${(typeof tournament.winner === 'number') ? 'ID ' + tournament.winner : tournament.winner.display_name }</span>` : ''}
 				
 			</div>
 		</td>
@@ -223,7 +223,7 @@ export class DashboardTournois extends BaseComponent<{ user: User | null,
 
 				
         <div class="mx-auto p-6 text-center">
-              <h2 class="text-3xl font-bold text-center mb-6">Tournament History Remote ${this.state.metaPagination.remoteGame?.total||0}</h2>
+              <h2 class="text-3xl font-bold text-center mb-6">${this.t("TOURNAMENT.TITLE")} ${this.t("TOURNAMENT.GAME_HT_REM")} ${this.state.metaPagination.remoteGame?.total||0}</h2>
 			  	<nav aria-label="Page navigation ">
 					<ul class="flex items-center -space-x-px h-10 text-base">
 						${ remotePagination}
@@ -242,13 +242,13 @@ export class DashboardTournois extends BaseComponent<{ user: User | null,
                     Id
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    state
+                    ${this.t("TOURNAMENT.STATE")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Date
+                    ${this.t("TOURNAMENT.DATE")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Victory
+                    ${this.t("TOURNAMENT.VICTORY")}
                 </th>
             </tr>
         </thead>
@@ -279,7 +279,7 @@ export class DashboardTournois extends BaseComponent<{ user: User | null,
 		</td>
 		<td class="px-6 py-4">
 			<div class="flex items-center">
-			${tournament.winner ? `<span>Gagnant : ${(typeof tournament.winner === 'number') ? 'ID ' + tournament.winner : tournament.winner.display_name }</span>` : ''}
+			${tournament.winner ? `<span>${this.t("GAME.WINNER")} : ${(typeof tournament.winner === 'number') ? 'ID ' + tournament.winner : tournament.winner.display_name }</span>` : ''}
 				
 			</div>
 		</td>

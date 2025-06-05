@@ -8,6 +8,7 @@ export const es = {
         SUCCESS: "Éxito",
         LOADING: "Cargando...",
         NOT_FOUND: "No encontrado",
+        NAME: "Nombre",
         BACK: "Volver",
         PLAYERS: "Jugadores",
         PLAYER: "Jugador",
@@ -36,7 +37,22 @@ export const es = {
         TITLE: "Mi Perfil",
         PHRASE: "Consulta o modifica tu perfil",
         MODIFY: "Modificar",
-
+        UPDATE: "Actualización",
+        OLDPWD: "Contraseña antigua",
+        NEWPWD: "Nueva contraseña",
+        NEWNAME: "Nuevo nombre",
+        ADDFRIEND: "Añadir un amigo",
+        RMVFRIEND: "Eliminar un amigo",
+        NEWAVATAR: "Modificar avatar",
+        UPDATEPWD: "Actualizar contraseña",
+        UPDATEAVT: "Actualizar avatar",
+        UPDATENAME: "Actualizar nombre",
+        DELETE: "Eliminar",
+        SELECTUSER: "Seleccionar un usuario",
+        AREU: "Borrar usuario definitivamente",
+        STATS: "Estadísticas del perfil",
+        LEVEL: "Nivel",
+        MASK_PROFILE_STAT: "Ocultar las estadísticas del perfil",
     },
     GAME: {
         TITLE: "Jugar",
@@ -57,6 +73,8 @@ export const es = {
         ACTION: "Acción",
         LOBBY: "Vestíbulo",
         LIST_VIEW: "Ver lista",
+        WINNER: "Ganador",
+
     },
     DASHBOARD: {
         TITLE: "Panel",
@@ -71,6 +89,15 @@ export const es = {
         LOGIN: "Iniciar sesión",
         LOGOUT: "Cerrar sesión",
         REGISTER: "Registrarse",
+        EMAIL: "Correo electrónico",
+        PWD: "Contraseña",
+        NOACC: "¿Aún no hay cuenta?",
+        NOPWD: "¿Olvidó su contraseña?",
+        COND1: "COND1",
+        COND2: "COND2",
+        ERR: "Por favor, corrija el error en el formulario",
+        RESET: "Restablecer contraseña",
+        ACC: "¿Ya tiene una cuenta?",
     },
     SETTINGS: {
         TITLE: "Configuración",
@@ -87,6 +114,7 @@ export const es = {
         TITLE: "Chat",
         WRITE_MSG: "Escribe un mensaje",
         SEND: "Enviar",
+        TYPE: "Tipo un mensaje",
         CHANGE_AVATAR: "Cambiar avatar",
     },
     RANKING: {
@@ -100,8 +128,13 @@ export const es = {
         DATE: "Fecha",
         DIFFICULTY: "Dificultad",
         ID: "Id",
+        GAME_HT_REM: "Historia a distancia",
+        GAME_HT_LOC: "Historia local",
         STATE: "Estado",
-		FORMAT: "Formato",
+        FORMAT: "Formato",
+        NEXT: "Siguiente",
+        PREV: "Precedente",
+        STATS: "Estadísticas",
 
     },
     SUPPORT: {
@@ -166,5 +199,18 @@ export const es = {
             INVALID: "Por favor, introduce una dirección de correo válida.",
             REQUIRED: "El correo es obligatorio.",
         }
-    }
+    },
+
+    MISS: {
+        UNAUTH: "Lo sentimos, no está autorizado a acceder a esta página.",
+        EXIST: "Lo sentimos, la página que busca no existe.",
+    },
+    FRIENDS: {
+        TITLE: "Amigos",
+    },
+    AF: {
+        DISABLECAN: "Puede desactivar la configuración del perfil A2F",
+        AF: "A2F",
+        CODEPLS: "Introduzca el código enviado por correo electrónico.",
+    },
 } as const;

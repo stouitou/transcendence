@@ -52,10 +52,10 @@ export class Register extends BaseComponent<{},{formRegister:RegisterFormData}> 
   render() {
     this.innerHTML = `
           <form id="formRegister" class="form-container">
-            <h2 class="form-title">Register</h2>
+            <h2 class="form-title">${this.t("AUTH.REGISTER")}</h2>
              <div id="message-box" class="form-error"></div>
             
-              <label for="name" class="form-label">Name:</label>
+              <label for="name" class="form-label">${this.t("GENERIC.NAME")}</label>
                <div id="name-error" class="form-error"></div>
               <input
                 id="name"             
@@ -67,7 +67,7 @@ export class Register extends BaseComponent<{},{formRegister:RegisterFormData}> 
                 required
               />
   
-              <label for="email" class="form-label">Email:</label>
+              <label for="email" class="form-label">${this.t("AUTH.EMAIL")}:</label>
               <div id="email-error" class="form-error"></div>
               <input
                 id="email"
@@ -79,7 +79,7 @@ export class Register extends BaseComponent<{},{formRegister:RegisterFormData}> 
                 required
               />
   
-              <label for="password" class="form-label">Password:</label>
+              <label for="password" class="form-label">${this.t("AUTH.PWD")}:</label>
               <div id="password-error" class="form-error"></div>
               <input
                 id="password"
@@ -91,7 +91,7 @@ export class Register extends BaseComponent<{},{formRegister:RegisterFormData}> 
                 required
               />
   
-              <label for="confirmPassword" class="form-label">Confirm Password:</label>
+              <label for="confirmPassword" class="form-label">${this.t("AUTH.PWD")}:</label>
               <div id="confirmPassword-error" class="form-error"></div>
               <input
                 id="confirmPassword"
@@ -108,11 +108,11 @@ export class Register extends BaseComponent<{},{formRegister:RegisterFormData}> 
               type="submit"
               class="btn"
             >
-              Register
+              ${this.t("AUTH.REGISTER")}
             </button>
   
             <p class="form-footer">
-              Already have an account? <a href="/login" class="form-footer-link">Login</a>
+              ${this.t("AUTH.ACC")} <a href="/login" class="form-footer-link">${this.t("AUTH.LOGIN")}</a>
             </p>
           </form>
     `;

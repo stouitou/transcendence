@@ -47,11 +47,11 @@ export class ForgotPasswordRequest extends BaseComponent<{}, { formLogin: Forgot
 
         <div id="message-box" class="form-error"></div>
 
-        <p class="text-center mb-4">Please enter your email address to reset your password.</p>
+        <p class="text-center mb-4">${this.t("AUTH.RESETPWD")}</p>
         <div id="email-error" class="form-error"></div>
         <label for="email" class="form-label">Email:</label>
         <input id="email" name="email" type="email" class="form-text-input" placeholder="name@student.42.fr" required />
-        <button id="loginBtn" type="submit" class="btn">Reset Password</button>
+        <button id="loginBtn" type="submit" class="btn">${this.t("AUTH.RESET")}</button>
       </form>
     `;
   }

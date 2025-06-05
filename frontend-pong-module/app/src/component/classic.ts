@@ -1,4 +1,5 @@
 import { LitElement, css, html } from 'lit';
+import { UserContext } from '../../../../frontend-services-myframeworks/app/src/globalstate/GlobalState';
 import { customElement, property } from 'lit/decorators.js';
 import { Match } from '../entities/Match';
 
@@ -304,6 +305,7 @@ export class classic extends LitElement {
 			align-items: center;
 			justify-content: center;
 		}
+
 	`;
 
 	constructor() {
@@ -328,6 +330,7 @@ export class classic extends LitElement {
 	}
 
 	firstUpdated() {
+
 		console.log('firstUpdated: DOM is ready');
 
 		const gameCanvas = this.shadowRoot?.querySelector('#gameCanvas') as HTMLCanvasElement;
@@ -351,6 +354,7 @@ export class classic extends LitElement {
 	render() {
 		console.log('render: Rendering the component');
 		return html`
+			<div class="game-wrapper">
 			<!-- Single‐match hero card (hidden when empty) -->
 			<div id="gameHero"></div>
 
@@ -369,6 +373,7 @@ export class classic extends LitElement {
 				<!-- Alert box -->
 				<div class="alert" id="alertBox"></div>
 			</div>
+			<div>
 		`;
 	}
 
@@ -382,6 +387,12 @@ export class classic extends LitElement {
 	}
 
 	private hideBackground(): void {
+		const isDark = document.documentElement.classList.contains('dark');
+		if (isDark) {
+			document.documentElement.style.backgroundImage = 'url("/uploads/bg-dark.png")';
+			document.body.style.backgroundImage = 'linear-gradient(rgba(18,18,18,0.8), rgba(18,18,18,0.8)), url("/uploads/bg-dark.png")';
+		}
+
 		const bg = document.querySelector('background-canvas-component');
 		if (bg) { (bg as HTMLElement).style.display = 'none'; }
 

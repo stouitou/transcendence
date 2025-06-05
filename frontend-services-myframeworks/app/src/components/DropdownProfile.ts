@@ -67,9 +67,9 @@ export class DropdownProfile extends BaseComponent<{ isDrop: boolean, user: User
 </div>
 
           <ul class="py-2 text-sm text-gray-700 dark:text-gray-200">
-            <li><a href="/settings" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Settings</a></li>
-            <li><a href="/dashboard" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Dashboard</a></li>
-            <li id="logoutBtn"><a href="/" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">Sign out</a></li>
+            <li><a href="/settings" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">${this.t('SETTINGS.TITLE')}</a></li>
+            <li><a href="/dashboard" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">${this.t('DASHBOARD.TITLE')}</a></li>
+            <li id="logoutBtn"><a href="/" class="block px-4 py-2 hover:bg-gray-100 dark:hover:bg-gray-600 dark:hover:text-white">${this.t('AUTH.LOGOUT')}</a></li>
           </ul>
         </div>
       ` : ''}

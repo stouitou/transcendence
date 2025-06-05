@@ -32,7 +32,7 @@ export class Login extends BaseComponent<{}, { formLogin: LoginFormData }> {
     e.preventDefault()
     const formHandler = this.getFormHandler('formLogin');
     if (!formHandler?.validateForm()) {
-      this.showMessage('Please fix the errors in the form.', 'error');
+      this.showMessage(`${this.t('AUTH.ERR')}`, 'error');
       return;
     }
     try {
@@ -67,7 +67,7 @@ export class Login extends BaseComponent<{}, { formLogin: LoginFormData }> {
       <form id=formLogin class="form-container">
         <h2 class="form-title">${this.t('AUTH.LOGIN')}</h2>
         <div id="message-box" class="form-error"></div>
-        <label for="email" class="form-label">Email:</label>
+        <label for="email" class="form-label">${this.t('AUTH.EMAIL')}</label>
         <div id="email-error" class="form-error"></div>
             <input
                 id="email"
@@ -78,7 +78,7 @@ export class Login extends BaseComponent<{}, { formLogin: LoginFormData }> {
                 autocomplete="email"
                 required
             />
-         <label for="password" class="form-label">Password:</label>
+         <label for="password" class="form-label">${this.t('AUTH.PWD')}</label>
         <div id="password-error" class="form-error"></div>
             <input
                 id="password"
@@ -94,13 +94,13 @@ export class Login extends BaseComponent<{}, { formLogin: LoginFormData }> {
                 type="submit"
                 class="btn"
                 >
-                Login
+                 ${this.t('AUTH.LOGIN')} 
             </button>
             <span class="form-footer">
-                Don't have an account? <a href="/register" class="form-footer-link">Register</a>
+                ${this.t('AUTH.NOACC')}  <a href="/register" class="form-footer-link"> ${this.t('AUTH.REGISTER')} </a>
             </span>
             <span class="form-footer">
-                Forgot your password? <a href="/forgot-password" class="form-footer-link">Reset Password</a>
+                ${this.t('AUTH.NOPWD')} <a href="/forgot-password" class="form-footer-link"> ${this.t('AUTH.RESET')} </a>
             </span>
         </form>
         <login-provider-component />

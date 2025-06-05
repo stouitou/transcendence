@@ -12,7 +12,7 @@ export class ProfilePage extends BaseComponent<{ user: User | null, userProfile:
     super({ user: null, userProfile: null, twoFa: null });
   }
   set params(params: { id: string }) {
-   // console.error("params", params);
+    // console.error("params", params);
     this.data = params;
   }
   handleListenerProfileUpdate = (e: Event) => {
@@ -97,7 +97,7 @@ export class ProfilePage extends BaseComponent<{ user: User | null, userProfile:
                     class="w-16 h-16 rounded-full object-cover">
               <div>
                 <h2 class="text-lg font-semibold">${user.name}</h2>
-                <p class="text-lg font-semibold">level : ${user.level}</p>
+                <p class="text-lg font-semibold">${this.t("PROFILE.LEVEL")} : ${user.level}</p>
                 <br>
                 <div id="twofa-display-status"></div>
               </div>
@@ -109,6 +109,8 @@ export class ProfilePage extends BaseComponent<{ user: User | null, userProfile:
             </a>
           </div>
         </div>
+          ${user?.friends?.length ? this.renderFriendsList(user.friends) : ''}
+
       </section>
 			  <profil-stats-component id=${user.id}></profil-stats-component>
     `;
@@ -133,7 +135,7 @@ export class ProfilePage extends BaseComponent<{ user: User | null, userProfile:
                     class="w-16 h-16 rounded-full object-cover">
               <div>
                 <h2 class="text-lg font-semibold">${user.name}</h2>
-                <p class="text-lg font-semibold">level : ${user.level}</p>
+                <p class="text-lg font-semibold">${this.t("PROFILE.LEVEL")} : ${user.level}</p>
                 <br>
               </div>
             </div>
@@ -146,6 +148,21 @@ export class ProfilePage extends BaseComponent<{ user: User | null, userProfile:
     `;
   }
 
+  renderFriendsList(friends: { id: string; name: string }[]): string {
+    return `
+      <div class="friends-list-container mt-8">
+        <h2 class="friends-list-title">${this.t("FRIENDS.TITLE") || "Liste d'amis"}</h2>
+        <ul class="friends-list">
+          ${friends.map(friend => `
+            <li class="friend-item">
+              <span class="friend-avatar">👤</span>
+              <span class="friend-name">${friend.name}</span>
+            </li>
+          `).join('')}
+        </ul>
+      </div>
+    `;
+  }
 
   update2FaRender() {
     if (this.data.id) return;
@@ -159,7 +176,7 @@ export class ProfilePage extends BaseComponent<{ user: User | null, userProfile:
         <p class="text-lg font-bold">Two-Factor Authentication 
           ${twoFa?.two_factor_auth ? `<span class="text-green-500">enable</span>` : `<span class="text-red-500">disable</span>`}
           </p>
-          <span class="text-sm text-gray-500">(${twoFa?.two_factor_auth ? "You can disable it in your profile settings." : "You can enable it in your profile settings."})</span>
+          <span class="text-sm text-gray-500">(${twoFa?.two_factor_auth ? `${this.t("AF.DISABLECAN")}`  : "You can enable it in your profile settings."})</span>
          `;
       }
     }
@@ -233,7 +250,7 @@ export class ProfileGameHistory extends BaseComponent<{
     <li  data-page="${currentPage - 1}" data-type="${type}" class="paginator">
     <div class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
        data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>
-      <span class="sr-only">Previous</span>
+      <span class="sr-only">${this.t("TOURNAMENT.PREV")}</span>
       <svg class="w-3 h-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4"/>
       </svg>
@@ -260,7 +277,7 @@ export class ProfileGameHistory extends BaseComponent<{
     <li  data-page="${currentPage + 1}"  data-type="${type}" class="paginator">
     <div class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
        data-page="${currentPage + 1}" ${currentPage === pageCount ? 'disabled' : ''}>
-      <span class="sr-only">Next</span>
+      <span class="sr-only">${this.t("TOURNAMENT.NEXT")}</span>
       <svg class="w-3 h-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
       </svg>
@@ -293,7 +310,7 @@ export class ProfileGameHistory extends BaseComponent<{
       this.innerHTML = `
     
         <div class="mx-auto p-6 text-center">
-              <h2 class="text-3xl font-bold text-center mb-6 ">Game History Local ${this.state.metaPagination.localGame?.total || 0}</h2>
+              <h2 class="text-3xl font-bold text-center mb-6 ">${this.t("TOURNAMENT.GAME_HT_LOC")} ${this.state.metaPagination.localGame?.total || 0}</h2>
         <nav aria-label="Page navigation ">
           <ul class="flex items-center -space-x-px h-10 text-base">
             ${localPagination}
@@ -333,7 +350,7 @@ export class ProfileGameHistory extends BaseComponent<{
 
 
             <div class="mx-auto p-6 text-center">
-              <h2 class="text-3xl font-bold text-center mb-6 ">Game History Remote ${this.state.metaPagination.remoteGame?.total || 0}</h2>
+              <h2 class="text-3xl font-bold text-center mb-6 ">${this.t("TOURNAMENT.GAME_HT_REM")} ${this.state.metaPagination.remoteGame?.total || 0}</h2>
                 <nav aria-label="Page navigation ">
           <ul class="flex items-center -space-x-px h-10 text-base">
             ${remotePagination}
@@ -513,7 +530,7 @@ function generatePagination(currentPage: number, pageCount: number, type: string
     <li  data-page="${currentPage - 1}" data-type="${type}" class="paginator">
     <div class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
        data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>
-      <span class="sr-only">Previous</span>
+      <span class="sr-only">${this.t("TOURNAMENT.PREV")}</span>
       <svg class="w-3 h-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4"/>
       </svg>
@@ -540,7 +557,7 @@ function generatePagination(currentPage: number, pageCount: number, type: string
     <li  data-page="${currentPage + 1}"  data-type="${type}" class="paginator">
     <div class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
        data-page="${currentPage + 1}" ${currentPage === pageCount ? 'disabled' : ''}>
-      <span class="sr-only">Next</span>
+      <span class="sr-only">${this.t("TOURNAMENT.NEXT")}</span>
       <svg class="w-3 h-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
       <path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
       </svg>
@@ -657,13 +674,13 @@ export class ProfileTournamentHistory extends BaseComponent<{
                     Id
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    state
+                    ${this.t("TOURNAMENT.STATE")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Date
+                    ${this.t("TOURNAMENT.DATE")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Victory
+                    ${this.t("TOURNAMENT.VICTORY")}
                 </th>
             </tr>
         </thead>
@@ -708,7 +725,7 @@ export class ProfileTournamentHistory extends BaseComponent<{
 
         
         <div class="mx-auto p-6 text-center">
-              <h2 class="text-3xl font-bold text-center mb-6">Tournament History Remote ${this.state.metaPagination.remoteGame?.total || 0}</h2>
+              <h2 class="text-3xl font-bold text-center mb-6"> ${this.t("TOURNAMENT.GAME_HT_REM")} ${this.state.metaPagination.remoteGame?.total || 0}</h2>
           <nav aria-label="Page navigation ">
           <ul class="flex items-center -space-x-px h-10 text-base">
             ${remotePagination}
@@ -727,13 +744,13 @@ export class ProfileTournamentHistory extends BaseComponent<{
                     Id
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    state
+                    ${this.t("TOURNAMENT.STATE")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Date
+                    ${this.t("TOURNAMENT.DATE")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Victory
+                    ${this.t("TOURNAMENT.VICTORY")}
                 </th>
             </tr>
         </thead>

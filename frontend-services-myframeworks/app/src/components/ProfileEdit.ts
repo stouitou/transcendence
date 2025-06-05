@@ -95,55 +95,55 @@ export class ProfileEdit extends BaseComponent<{ user: User | null }, ProfileUpd
           <!-- Forms Section -->
 
           <form id="formAddfriend" class="space-y-4">
-            <label for="friendName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Add friend:</label>
+            <label for="friendName" class="block text-sm font-medium text-gray-700 dark:text-gray-300">${this.t('PROFILE.ADDFRIEND')}:</label>
             <input id="friendName" type="text" name="friendName" class="form-text-input" required />
             <div id="friendName-error" class="text-red-500 text-sm"></div>
-            <button type="submit" class="btn w-full">Add Friend</button>
+            <button type="submit" class="btn w-full">${this.t('PROFILE.ADDFRIEND')}</button>
           </form>
 
           <form id="formRemoveFriend" class="space-y-4">
-            <label for="inputSelectRmfriend" class="block text-sm font-medium text-gray-700 dark:text-gray-300">Remove Friend by ID:</label>
+            <label for="inputSelectRmfriend" class="block text-sm font-medium text-gray-700 dark:text-gray-300">${this.t('PROFILE.RMVFRIEND')}:</label>
             <select name="friendId" id="inputSelectRmfriend" class="form-select">
-              <option value="">Select a user</option>
+              <option value="">${this.t('PROFILE.ADDFRIEND')}</option>
               ${user.friends?.map(friend => `<option value='${friend.id}'>${friend.name} (${friend.id})</option>`).join('')}
             </select>
             <div id="id-error" class="text-red-500 text-sm"></div>
-            <button type="submit" class="btn w-full">Remove Friend</button>
+            <button type="submit" class="btn w-full">${this.t('PROFILE.RMVFRIEND')}</button>
           </form>
 
           <form id="formUpdateName" class="space-y-4">
-            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Name:</label>
+            <label for="name" class="block text-sm font-medium text-gray-700 dark:text-gray-300">${this.t('PROFILE.NEWNAME')}:</label>
             <input id="name" type="text" name="name" value="${user.name}" class="form-text-input" required />
             <div id="name-error" class="text-red-500 text-sm"></div>
-            <button type="submit" class="btn w-full">Update Name</button>
+            <button type="submit" class="btn w-full">${this.t('PROFILE.UPDATENAME')}</button>
           </form>
 
           <form id="formUpdateAvatar" class="space-y-4">
             <img id="avatar-preview" src="" alt="Avatar Preview" class="w-24 h-24 rounded-full object-cover border" />
-            <label for="avatar" class="block text-sm font-medium text-gray-700 dark:text-gray-300">New Avatar:</label>
+            <label for="avatar" class="block text-sm font-medium text-gray-700 dark:text-gray-300">${this.t('PROFILE.UPDATEAVT')}:</label>
             <input id="avatar" name="avatar" type="file" accept="image/png, image/jpeg" class="form-file-input" />
             <div id="avatar-error" class="text-red-500 text-sm"></div>
-            <button type="submit" class="btn w-full">Update Avatar</button>
+            <button type="submit" class="btn w-full">${this.t('PROFILE.UPDATEAVT')}</button>
           </form>
 
           <form id="formUpdatePassword" class="space-y-4 col-span-full">
-            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">Update Password</h3>
-            <input type="password" id="oldPassword" name="oldPassword" placeholder="Old Password" class="form-text-input" />
+            <h3 class="text-xl font-semibold text-gray-900 dark:text-white">${this.t('PROFILE.UPDATEPWD')}</h3>
+            <input type="password" id="oldPassword" name="oldPassword" placeholder="${this.t('PROFILE.OLDPWD')}" class="form-text-input" />
             <div id="oldPassword-error" class="text-red-500 text-sm"></div>
-            <input type="password" id="newPassword" name="newPassword" placeholder="New Password" class="form-text-input" />
+            <input type="password" id="newPassword" name="newPassword" placeholder="${this.t('PROFILE.NEWPWD')}" class="form-text-input" />
             <div id="newPassword-error" class="text-red-500 text-sm"></div>
-            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="Confirm New Password" class="form-text-input" />
+            <input type="password" id="confirmPassword" name="confirmPassword" placeholder="${this.t('PROFILE.NEWPWD')}" class="form-text-input" />
             <div id="confirmPassword-error" class="text-red-500 text-sm"></div>
-            <button type="submit" class="btn w-full">Update Password</button>
+            <button type="submit" class="btn w-full">${this.t('PROFILE.UPDATEPWD')}</button>
           </form>
 
           <form id="formDeleteUser" class="space-y-4 col-span-full">
-            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Are you sure you want to delete this user?</label>
+            <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">${this.t('PROFILE.AREU')}</label>
             <label class="switch">
               <input type="checkbox" name="confirm" required />
               <span class="slider round"></span>
             </label>
-            <button type="submit" class="btn w-full bg-red-600 hover:bg-red-700 text-white">Delete User</button>
+            <button type="submit" class="btn w-full bg-red-600 hover:bg-red-700 text-white">${this.t('PROFILE.DELETE')}</button>
           </form>
         </div>
       </div>

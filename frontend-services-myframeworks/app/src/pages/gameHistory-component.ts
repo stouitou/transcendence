@@ -60,7 +60,7 @@ export class GameHistory extends BaseComponent<{
 	  <li  data-page="${currentPage - 1}" data-type="${type}" class="paginator">
 		<div class="flex items-center justify-center px-4 h-10 ms-0 leading-tight text-gray-500 bg-white border border-e-0 border-gray-300 rounded-s-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 		   data-page="${currentPage - 1}" ${currentPage === 1 ? 'disabled' : ''}>
-		  <span class="sr-only">Previous</span>
+		  <span class="sr-only">${this.t("TOURNAMENT.PREV")}</span>
 		  <svg class="w-3 h-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
 			<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 1 1 5l4 4"/>
 		  </svg>
@@ -87,7 +87,7 @@ export class GameHistory extends BaseComponent<{
 	  <li  data-page="${currentPage + 1}"  data-type="${type}" class="paginator">
 		<div class="flex items-center justify-center px-4 h-10 leading-tight text-gray-500 bg-white border border-gray-300 rounded-e-lg hover:bg-gray-100 hover:text-gray-700 dark:bg-gray-800 dark:border-gray-700 dark:text-gray-400 dark:hover:bg-gray-700 dark:hover:text-white"
 		   data-page="${currentPage + 1}" ${currentPage === pageCount ? 'disabled' : ''}>
-		  <span class="sr-only">Next</span>
+		  <span class="sr-only">${this.t("TOURNAMENT.NEXT")}</span>
 		  <svg class="w-3 h-3 rtl:rotate-180" aria-hidden="true" xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 6 10">
 			<path stroke="currentColor" stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="m1 9 4-4-4-4"/>
 		  </svg>
@@ -120,7 +120,7 @@ export class GameHistory extends BaseComponent<{
 			this.innerHTML = `
 		
         <div class="mx-auto p-6 text-center">
-              <h2 class="text-3xl font-bold text-center mb-6 ">Game History Local ${this.state.metaPagination.localGame?.total || 0}</h2>
+              <h2 class="text-3xl font-bold text-center mb-6 ">${this.t("TOURNAMENT.GAME_HT_LOC")} ${this.state.metaPagination.localGame?.total || 0}</h2>
 				<nav aria-label="Page navigation ">
 					<ul class="flex items-center -space-x-px h-10 text-base">
 						${localPagination}
@@ -159,7 +159,7 @@ export class GameHistory extends BaseComponent<{
 
 
 		        <div class="mx-auto p-6 text-center">
-              <h2 class="text-3xl font-bold text-center mb-6 ">Game History Remote ${this.state.metaPagination.remoteGame?.total || 0}</h2>
+              <h2 class="text-3xl font-bold text-center mb-6 ">${this.t("TOURNAMENT.GAME_HT_REM")} ${this.state.metaPagination.remoteGame?.total || 0}</h2>
 			  				<nav aria-label="Page navigation ">
 					<ul class="flex items-center -space-x-px h-10 text-base">
 						${remotePagination}
@@ -178,16 +178,16 @@ export class GameHistory extends BaseComponent<{
                     Id
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Difficulty
+                    ${this.t("TOURNAMENT.DIFFICULTY")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    state
+                    ${this.t("TOURNAMENT.STATE")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Date
+                    ${this.t("TOURNAMENT.DATE")}
                 </th>
                 <th scope="col" class="px-6 py-3">
-                    Victory
+                    ${this.t("TOURNAMENT.VICTORY")}
                 </th>
             </tr>
         </thead>

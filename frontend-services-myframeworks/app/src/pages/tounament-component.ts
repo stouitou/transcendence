@@ -45,16 +45,16 @@ export class	Tournament extends BaseComponent<{ user: User | null; tournaments: 
 									Id
 								</th>
 								<th scope="col" class="px-6 py-3">
-									Difficulty
+									${this.t("TOURNAMENT.VICTORY")}
 								</th>
 								<th scope="col" class="px-6 py-3">
-									State
+									${this.t("TOURNAMENT.STATE")}
 								</th>
 								<th scope="col" class="px-6 py-3">
-									Date
+									${this.t("TOURNAMENT.DATE")}
 								</th>
 								<th scope="col" class="px-6 py-3">
-									Victory
+									${this.t("TOURNAMENT.VICTORY")}
 								</th>
 							</tr>
 						</thead>

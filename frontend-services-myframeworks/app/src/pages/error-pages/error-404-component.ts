@@ -11,7 +11,7 @@ export class Error404 extends BaseComponent {
 			<div class="max-w-7xl mx-auto space-y-10">
 			  
 			  <h1 class="text-4xl font-bold text-center">404 - Page Not Found</h1>
-			  <p class="text-lg text-center">Sorry, the page you are looking for does not exist.</p>
+			  <p class="text-lg text-center">${this.t("MISS.EXIST")}</p>
 			  <div class="flex justify-center">
 				<a href="/" class="btn">Go to Home</a>
 			</div>

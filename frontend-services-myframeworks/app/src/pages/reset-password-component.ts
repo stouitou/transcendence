@@ -58,7 +58,7 @@ export class ResetPassword extends BaseComponent<{},{formResetPassword:ResetPass
             <div id="message-box" class="form-error"></div>
             <p class="text-center mb-4">Please enter your email address to reset your password.</p>
             <div>
-              <label for="password" class="form-label">Password:</label>
+              <label for="password" class="form-label">${this.t("AUTH.PWD")}:</label>
               <div id="password-error" class="form-error"></div>
               <input
                 id="password"
@@ -72,7 +72,7 @@ export class ResetPassword extends BaseComponent<{},{formResetPassword:ResetPass
             </div>
   
             <div>
-              <label for="confirmPassword" class="form-label">Confirm Password:</label>
+              <label for="confirmPassword" class="form-label">${this.t("AUTH.PWD")}:</label>
               <div id="confirmPassword-error" class="form-error"></div>
               <input
                 id="confirmPassword"
@@ -90,7 +90,7 @@ export class ResetPassword extends BaseComponent<{},{formResetPassword:ResetPass
                 type="submit"
                 class="btn"
                 >
-                Reset Password
+                ${this.t("AUTH.RESET")}
             </button>
         </form>
     `;    

@@ -93,7 +93,7 @@ export class NavBarComponent extends BaseComponent<{ theme: string,user: User | 
           <!-- End Theme Toggle -->
 
           ${!user ? `
-          <a href="/login" class="nav-link">Log-In</a>
+          <a href="/login" class="nav-link">${this.t("AUTH.LOGIN")}</a>
           <!--<a href="/register" class="nav-link">Register</a>-->
           ` : ``}
 

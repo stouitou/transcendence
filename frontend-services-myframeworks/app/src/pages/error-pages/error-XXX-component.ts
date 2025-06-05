@@ -56,7 +56,7 @@ export class ErrorXXX extends BaseComponent {
 					<h1 class="text-4xl font-bold text-center">${this.errorMessage}</h1>
 					<p class="text-lg text-center">${this.errorDescription}</p>
 					<div class="flex justify-center">
-						<a href="/" class="btn">Go to Home</a>
+						<a href="/" class="btn">${this.t("MENU.TITLE")}</a>
 					</div>
 				</div>
 			</div>

@@ -1,5 +1,35 @@
 
 export const fr = {
+  GENERIC: {
+    ERROR: " Une erreur s'est produite, veuillez réessayer ",
+    SUCCESS: " Succès ",
+    LOADING: " Chargement... ",
+    NOT_FOUND: " Non trouvé ",
+    NAME: "Nom",
+    BACK: " Retour ",
+    PLAYER: " Joueurs ",
+    PLAYERS: " Joueur ",
+    PLAY: " Jouer ",
+    PLAYING: " Jouer ",
+    PAUSED: " En pause ",
+    STOPPED: " Stoppé ",
+    START: " Démarrer ",
+    STOP: " Arrêt ",
+    RESUME: " Reprendre ",
+    QUIT: " Quitter ",
+    CONTINUE: " Continuer ",
+    NEW: " Nouveau ",
+    NEW_GAME: " Nouveau jeu ",
+    NEW_MATCH: " Nouveau match ",
+    NEW_PLAYER: " Nouveau joueur ",
+    NEW_TOURNAMENT: " Nouveau tournoi ",
+    NEW_CONVERSATION: " Nouvelle conversation ",
+    NEW_MESSAGE: " Nouveau message ",
+    NEW_PROFILE: " Nouveau profil ",
+    NEW_SETTINGS: " Nouveaux paramètres ",
+    NEW_CHAT: " Nouvelle discussion ",
+    SCORE: " Score ",
+  },
   MENU: {
     TITLE: "Menu",
     PHRASE: "Consulter ou modifier votre profil",
@@ -8,6 +38,24 @@ export const fr = {
     TITLE: "Mon Profil",
     PHRASE: "Consulter ou modifier votre profil",
     MODIFY: "Modifier",
+    UPDATE: "Mettre a jour",
+    OLDPWD: "Ancien mot de passe",
+    NEWPWD: "Nouveau mot de passe",
+    NEWNAME: "Nouveau nom",
+    ADDFRIEND: "Ajouter un ami",
+    RMVFRIEND: "Supprimer un ami",
+    NEWAVATAR: "Modifier l'avatar",
+    UPDATEPWD: "Mettre a jour le MDP",
+    UPDATEAVT: "Mettre a jour l'avatar",
+    UPDATENAME: "Mettre a jour le nom",
+    DELETE: "Supprimer",
+    SELECTUSER: "Selectionner un utilisateur",
+    AREU: "Supprimer definitevement l'utilisateur",
+    STATS: "Afficher les stats du profil",
+    LEVEL: "Niveau",
+    MASK_PROFILE_STAT: "Masquer les stats",
+
+
   },
   GAME: {
     TITLE: "Jouer",
@@ -28,6 +76,7 @@ export const fr = {
     ACTION: "Action",
     LOBBY: "Salon",
     LIST_VIEW: "Voir la liste",
+    WINNER: "Gagnant",
   },
   DASHBOARD: {
     TITLE: "Tableau de bord",
@@ -37,6 +86,13 @@ export const fr = {
     LOGIN: "Connexion",
     LOGOUT: "Déconnexion",
     REGISTER: "Inscription",
+    EMAIL: "Email",
+    PWD: "Mot de passe",
+    NOACC: "Pas encore inscrit ?",
+    NOPWD: "Vous avez oublie votre MDP ?",
+    COND1: "Au moins une minuscule et une majuscule",
+    ACC: "Deja inscrit ?",
+    COND2: "Un caractere special [@, -, _, ]",
   },
   SETTINGS: {
     TITLE: "Paramètres",
@@ -53,6 +109,7 @@ export const fr = {
     TITLE: "Chat",
     WRITE_MSG: "Ecrire un message",
     SEND: "Envoyer",
+    TYPE: "Ecriver un message",
     CHANGE_AVATAR: "Changer un avatar",
   },
   RANKING: {
@@ -67,7 +124,12 @@ export const fr = {
     DIFFICULTY: "Difficulté",
     ID: "Id",
     STATE: "Etat",
+    GAME_HT_REM: "Historique a distance",
+    GAME_HT_LOC: "Historique local",
     FORMAT: "Format",
+    NEXT: "Suivant",
+    PREV: "Precedent",
+    STATS: "Stats",
 
   },
   SUPPORT: {
@@ -131,6 +193,19 @@ export const fr = {
     EMAIL: {
       INVALID: "Merci d'entrer une adresse e-mail valide.",
       REQUIRED: "L'adresse e-mail est requise.",
-    }
+    },
+    MISS: {
+      UNAUTH: "Desole, vous n'etes pas autoriser a acceder a cette page.",
+      EXIST: "Desole, la page que vous demandez n'existe pas.",
+
+    },
+    FRIENDS: {
+      TITLE: "Amis",
+    },
+    AF: {
+      DISABLECAN: "Vous pouvez desactiver l'A2F les parametres de profil",
+      AF: "A2F",
+      CODEPLS: "Entrer le code envoye par email.",
+    },
   }
 } as const;

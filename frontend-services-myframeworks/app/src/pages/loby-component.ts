@@ -104,7 +104,7 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
 
       if (/* game.config.type === 'local'  && */ game.config.players.length >= minPlayers) {
         return `<a class="btn px-8 py-3"
-           href="/game?id=${game?.lobyId}">Join game</a>`;
+           href="/game?id=${game?.lobyId}">${this.t("GAME.JOIN")}</a>`;
       }
       return `<div class="btn px-8 py-3"> waiting for players</div>`;
     }
@@ -129,12 +129,12 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
       <div class="grid grid-cols-2 gap-x-6 gap-y-2 text-lg">
         <div class="font-semibold">LobbyID:</div>                 <div>${game?.lobyId}</div>
         <!--<div class="font-semibold">GameID:</div>                  <div>${game?.config.gameId}</div>-->
-        <div class="font-semibold">Game State:</div>               <div>${game?.config.state}</div>
-        <div class="font-semibold">Type:</div>                          <div>${game?.config.type}</div>
+        <div class="font-semibold">${this.t("TOURNAMENT.STATE")}:</div>               <div>${game?.config.state}</div>
+        <div class="font-semibold">${this.t("GAME.TYPE")}</div>                          <div>${game?.config.type}</div>
         <div class="font-semibold">Format:</div>                        <div>${game?.config.format}</div>
-        <div class="font-semibold">Max players:</div>              <div>${game?.config.maxPlayers}</div>
-      <!--  <div class="font-semibold">Tournament ID:</div>            <div>${game?.config.tournamentId}</div>-->
-        <div class="font-semibold">Allow registration:</div>       <div>${game?.config.isallowedRegistration}</div>
+        <div class="font-semibold">Max ${this.t("GENERIC.PLAYER")}:</div>              <div>${game?.config.maxPlayers}</div>
+      <!--  <div class="font-semibold">${this.t("TOURNAMENT.TITLE")} ID:</div>            <div>${game?.config.tournamentId}</div>-->
+        <div class="font-semibold">${this.t("AUTH.REGISTER")}</div>       <div>${game?.config.isallowedRegistration}</div>
       </div>
         
       <div class="text-center">
@@ -183,7 +183,7 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
           <div class="overflow-x-auto">
             <table class="player-table w-full">
               <thead>
-                <tr><th>#</th><th>Name</th><th>Avatar</th><th>State</th><th></th></tr>
+                <tr><th>#</th><th>${this.t("GENERIC.NAME")}</th><th>Avatar</th><th>State</th><th></th></tr>
               </thead>
               <tbody id="join-game">
                 ${
@@ -204,7 +204,7 @@ export class LobyComponentClient extends BaseComponent<{ ws: IWebSocketsService 
                     !this.state.subscribe && p.userId===this.state.user?.id
                         ? `<button data-loby-id="${game?.lobyId}"
                                        class="action-btn">
-                                 Join game
+                                 ${this.t("GAME.JOIN")}
                                </button>`
                         : ''
                 }
