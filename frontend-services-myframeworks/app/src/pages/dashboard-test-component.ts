@@ -57,7 +57,6 @@ export class Dashboard extends BaseComponent<{ user: User | null,tournamentsData
 			  <!-- Profile & Chat Row -->
 			  <div class="flex flex-col md:flex-row gap-6">
 				<profile-component class="flex-1"></profile-component>
-				<chat-component class="flex-1"></chat-component>
 			  </div>
 
 			  <profil-stats-component id=${this.state.user?.id}></profil-stats-component>
