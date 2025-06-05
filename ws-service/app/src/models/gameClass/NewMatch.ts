@@ -83,15 +83,15 @@ export class Match extends EventEmitter {
 			return;
 		}
 		this.socketManager.broadcastMessage(this.toJSON(),'SETUPNEWGAME');
-	//	this.emit("start"); // Émettre l'événement `start`
+		// this.emit("start"); // Émettre l'événement `start`
 
-	//	this.setPlayers();
-	this.observer.isStarted = true;
+		// this.setPlayers();
+		this.observer.isStarted = true;
 		if (this.config.type === "remote") {
-		this.intervalId = setInterval(() => this.update(), 1000 / 60);
+			this.intervalId = setInterval(() => this.update(), 1000 / 60);
 		}
 		else if (this.config.type === "local") {
-		this.intervalId = setInterval(() => null, 1000 / 60); // = 1000/60 = 16.67ms
+			this.intervalId = setInterval(() => null, 1000 / 60); // = 1000/60 = 16.67ms
 		}
 	}
 
